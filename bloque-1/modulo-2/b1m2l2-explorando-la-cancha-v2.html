@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B1M2L2 - Explorando la cancha</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Segoe UI", Tahoma, sans-serif; min-height: 100vh; background: radial-gradient(circle at top, #155e4d, #0d2f27 72%); color: #f4fbf7; }
+        .layout { display: grid; grid-template-columns: 280px minmax(320px, 1fr) 300px; gap: 18px; min-height: 100vh; padding: 18px; }
+        .panel { background: rgba(8, 20, 17, 0.5); border: 1px solid rgba(255,255,255,.12); border-radius: 22px; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,.18); }
+        h1, h2 { color: #ffffff; margin-bottom: 10px; }
+        p { line-height: 1.6; color: #d8efe5; }
+        .actions { display: grid; gap: 10px; margin-top: 18px; }
+        .btn { border: none; border-radius: 14px; padding: 12px 14px; font-weight: 700; cursor: pointer; color: #fff; background: linear-gradient(135deg, #0ea5a4, #0f766e); transition: transform .18s ease, filter .18s ease; }
+        .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+        .btn.secondary { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+        .btn.ghost { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); }
+        .labels { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+        .label { display: inline-flex; align-items: center; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.1); font-size: .82rem; font-weight: 600; color: #eefcf7; }
+        .court-wrap { display: flex; align-items: center; justify-content: center; min-height: 76vh; }
+        .court { position: relative; width: min(900px, 100%); aspect-ratio: 23.77 / 10.97; background: linear-gradient(180deg, #27a94f, #1b843c); border: 8px solid #ffffff; border-radius: 24px; box-shadow: 0 28px 56px rgba(0,0,0,.22); transform-style: preserve-3d; transition: transform .35s ease; overflow: hidden; }
+        .zone { position: absolute; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease, filter .2s ease; }
+        .zone:hover { transform: scale(1.01); filter: brightness(1.08); }
+        .zone.found { box-shadow: inset 0 0 0 4px rgba(250,204,21,.9), 0 0 24px rgba(250,204,21,.55); }
+        .baseline { left: 8%; width: 84%; height: 18%; border: 3px solid rgba(255,255,255,.55); border-radius: 14px; background: rgba(16,185,129,.22); }
+        .baseline.top { top: 6%; }
+        .baseline.bottom { bottom: 6%; }
+        .service-box { width: 22%; height: 28%; border: 3px solid rgba(255,255,255,.75); background: rgba(59,130,246,.26); }
+        .service-a { top: 24%; left: 27%; }
+        .service-b { top: 24%; right: 27%; }
+        .service-c { bottom: 24%; left: 27%; }
+        .service-d { bottom: 24%; right: 27%; }
+        .alley { top: 0; width: 8%; height: 100%; background: rgba(249,115,22,.25); border-inline: 3px solid rgba(255,255,255,.58); }
+        .alley.left { left: 0; }
+        .alley.right { right: 0; }
+        .net { position: absolute; left: 50%; top: 0; width: 10px; height: 100%; transform: translateX(-50%); background: repeating-linear-gradient(to bottom, rgba(255,255,255,.95) 0 8px, transparent 8px 16px); box-shadow: 0 0 20px rgba(255,255,255,.5); }
+        .line { position: absolute; background: #ffffff; }
+        .center-line { left: 50%; top: 24%; width: 4px; height: 52%; transform: translateX(-50%); }
+        .status { margin-top: 16px; display: grid; gap: 10px; }
+        .task { display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); }
+        .task.done { background: rgba(34,197,94,.16); border-color: rgba(74,222,128,.45); }
+        .dot { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,.16); display: inline-flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 700; }
+        .task.done .dot { background: #22c55e; color: #0a2018; }
+        .progress { margin-top: 16px; padding: 14px; border-radius: 16px; background: rgba(255,255,255,.07); }
+        .progress strong { color: #ffffff; }
+        .info { margin-top: 14px; padding: 16px; border-radius: 18px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); line-height: 1.6; display: none; }
+        .info.show { display: block; }
+        .hint { margin-top: 12px; font-size: .94rem; color: #c9e6db; }
+        @media (max-width: 1120px) {
+            .layout { grid-template-columns: 1fr; }
+            .court-wrap { min-height: auto; }
+        }
+    </style>
+</head>
+<body>
+    <main class="layout">
+        <section class="panel">
+            <h1>Explorando la cancha</h1>
+            <p>Descubre las partes principales de una cancha de tenis. Haz clic sobre cada zona para conocer su funci&oacute;n y luego completa el mini reto.</p>
+            <div class="actions">
+                <button class="btn" type="button" data-view="top">Vista cenital</button>
+                <button class="btn secondary" type="button" data-view="perspective">Vista en perspectiva</button>
+                <button class="btn ghost" type="button" data-view="side">Vista lateral</button>
+                <button class="btn" type="button" id="startChallenge">Iniciar reto</button>
+                <button class="btn ghost" type="button" id="resetChallenge">Reiniciar</button>
+            </div>
+            <div class="labels">
+                <span class="label">Zona de fondo</span>
+                <span class="label">Cuadro de servicio</span>
+                <span class="label">Pasillo de dobles</span>
+                <span class="label">Red</span>
+            </div>
+            <p class="hint">Consejo: primero explora la cancha libremente y luego activa el reto para comprobar lo aprendido.</p>
+        </section>
+
+        <section class="court-wrap">
+            <div class="court" id="court">
+                <div class="zone baseline top" data-zone="fondo" aria-label="Zona de fondo superior"></div>
+                <div class="zone baseline bottom" data-zone="fondo" aria-label="Zona de fondo inferior"></div>
+                <div class="zone service-box service-a" data-zone="servicio" aria-label="Cuadro de servicio superior izquierdo"></div>
+                <div class="zone service-box service-b" data-zone="servicio" aria-label="Cuadro de servicio superior derecho"></div>
+                <div class="zone service-box service-c" data-zone="servicio" aria-label="Cuadro de servicio inferior izquierdo"></div>
+                <div class="zone service-box service-d" data-zone="servicio" aria-label="Cuadro de servicio inferior derecho"></div>
+                <div class="zone alley left" data-zone="dobles" aria-label="Pasillo de dobles izquierdo"></div>
+                <div class="zone alley right" data-zone="dobles" aria-label="Pasillo de dobles derecho"></div>
+                <div class="zone net" data-zone="red" aria-label="Red"></div>
+                <div class="line center-line"></div>
+            </div>
+        </section>
+
+        <aside class="panel">
+            <h2>Mini reto</h2>
+            <div class="status">
+                <div class="task" id="task-fondo"><span class="dot">1</span><span>Encuentra la zona de fondo</span></div>
+                <div class="task" id="task-servicio"><span class="dot">2</span><span>Encuentra el cuadro de servicio</span></div>
+                <div class="task" id="task-dobles"><span class="dot">3</span><span>Encuentra el pasillo de dobles</span></div>
+                <div class="task" id="task-red"><span class="dot">4</span><span>Encuentra la red</span></div>
+            </div>
+            <div class="progress">
+                Progreso: <strong id="progress">0/4</strong>
+            </div>
+            <div class="info" id="infoBox"></div>
+        </aside>
+    </main>
+
+    <script>
+        const court = document.getElementById("court");
+        const infoBox = document.getElementById("infoBox");
+        const progress = document.getElementById("progress");
+        const foundZones = new Set();
+        let challengeMode = false;
+
+        const zoneInfo = {
+            fondo: {
+                title: "Zona de fondo",
+                text: "Es la franja cercana a la l&iacute;nea de fondo. Desde aqu&iacute; nacen muchos intercambios y tambi&eacute;n se realiza el saque.",
+                tip: "Dominar esta zona ayuda a sostener peloteos con m&aacute;s control y profundidad."
+            },
+            servicio: {
+                title: "Cuadro de servicio",
+                text: "Es el espacio donde debe botar un saque v&aacute;lido. El saque siempre cruza en diagonal al cuadro opuesto.",
+                tip: "Si la pelota no cae en este cuadro, se marca falta de servicio."
+            },
+            dobles: {
+                title: "Pasillo de dobles",
+                text: "Es la franja lateral adicional que se usa en partidos de dobles. En individuales, esa parte queda fuera del campo v&aacute;lido.",
+                tip: "Su presencia hace la cancha m&aacute;s ancha y cambia la estrategia en dobles."
+            },
+            red: {
+                title: "Red",
+                text: "Divide la cancha en dos mitades. Para que la pelota siga en juego, debe pasar por encima de la red.",
+                tip: "La parte central de la red es m&aacute;s baja que los extremos junto a los postes."
+            }
+        };
+
+        function renderInfo(zone) {
+            const item = zoneInfo[zone];
+            infoBox.innerHTML = "<strong>" + item.title + "</strong><br><br>" + item.text + "<br><br><em>" + item.tip + "</em>";
+            infoBox.classList.add("show");
+        }
+
+        function updateProgress() {
+            progress.textContent = foundZones.size + "/4";
+            if (challengeMode && foundZones.size === 4) {
+                infoBox.innerHTML = "<strong>&iexcl;Reto completado!</strong><br><br>Ya identificaste las cuatro partes principales de esta cancha de tenis.";
+                infoBox.classList.add("show");
+                challengeMode = false;
+            }
+        }
+
+        function markZone(zone) {
+            renderInfo(zone);
+            if (!challengeMode || foundZones.has(zone)) {
+                return;
+            }
+            foundZones.add(zone);
+            document.querySelectorAll('[data-zone="' + zone + '"]').forEach(function(element) {
+                element.classList.add("found");
+            });
+            const task = document.getElementById("task-" + zone);
+            if (task) {
+                task.classList.add("done");
+            }
+            updateProgress();
+        }
+
+        document.querySelectorAll(".zone").forEach(function(zone) {
+            zone.addEventListener("click", function() {
+                markZone(zone.dataset.zone);
+            });
+        });
+
+        document.querySelectorAll("[data-view]").forEach(function(button) {
+            button.addEventListener("click", function() {
+                const view = button.dataset.view;
+                if (view === "top") {
+                    court.style.transform = "rotateX(0deg) rotateZ(0deg)";
+                }
+                if (view === "perspective") {
+                    court.style.transform = "rotateX(20deg) rotateZ(0deg)";
+                }
+                if (view === "side") {
+                    court.style.transform = "rotateX(12deg) rotateZ(90deg)";
+                }
+            });
+        });
+
+        document.getElementById("startChallenge").addEventListener("click", function() {
+            challengeMode = true;
+            foundZones.clear();
+            document.querySelectorAll(".zone").forEach(function(element) {
+                element.classList.remove("found");
+            });
+            document.querySelectorAll(".task").forEach(function(element) {
+                element.classList.remove("done");
+            });
+            infoBox.innerHTML = "<strong>Reto iniciado.</strong><br><br>Encuentra las cuatro zonas principales indicadas en el panel derecho.";
+            infoBox.classList.add("show");
+            updateProgress();
+        });
+
+        document.getElementById("resetChallenge").addEventListener("click", function() {
+            challengeMode = false;
+            foundZones.clear();
+            document.querySelectorAll(".zone").forEach(function(element) {
+                element.classList.remove("found");
+            });
+            document.querySelectorAll(".task").forEach(function(element) {
+                element.classList.remove("done");
+            });
+            infoBox.classList.remove("show");
+            infoBox.innerHTML = "";
+            updateProgress();
+        });
+
+        updateProgress();
+    </script>
+</body>
+</html>

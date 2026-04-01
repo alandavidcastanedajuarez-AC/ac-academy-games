@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B1M2L3 - Etiquetas en el tenis</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Segoe UI", Tahoma, sans-serif; min-height: 100vh; background: linear-gradient(135deg, #111827, #2f1d5a 52%, #551a64); color: #ffffff; }
+        .screen { min-height: 100vh; display: none; align-items: center; justify-content: center; padding: 24px; }
+        .screen.active { display: flex; }
+        .shell { width: min(980px, 100%); border-radius: 28px; padding: 28px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(10px); box-shadow: 0 24px 48px rgba(0,0,0,.22); }
+        .hero { text-align: center; }
+        .hero h1 { font-size: clamp(2rem, 4vw, 3.4rem); margin-bottom: 12px; }
+        .hero p { max-width: 680px; margin: 0 auto 22px; color: #ddd9f5; line-height: 1.65; }
+        .btn { border: none; border-radius: 999px; padding: 14px 24px; font-weight: 700; cursor: pointer; color: #ffffff; background: linear-gradient(135deg, #f97316, #ec4899); }
+        .topbar { text-align: center; margin-bottom: 24px; }
+        .progress-wrap { max-width: 560px; margin: 16px auto 0; }
+        .progress-head { display: flex; justify-content: space-between; margin-bottom: 8px; color: #ddd9f5; font-size: .95rem; }
+        .progress-track { height: 14px; border-radius: 999px; background: rgba(255,255,255,.14); overflow: hidden; }
+        .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #22c55e, #38bdf8); transition: width .25s ease; }
+        .score { margin-top: 14px; font-weight: 700; color: #fde047; }
+        .action-card { max-width: 700px; margin: 0 auto 26px; padding: 26px; border-radius: 22px; background: linear-gradient(135deg, rgba(147,51,234,.56), rgba(37,99,235,.58)); border: 1px solid rgba(255,255,255,.14); text-align: center; cursor: grab; box-shadow: 0 16px 32px rgba(0,0,0,.14); }
+        .action-card:active { cursor: grabbing; }
+        .action-card h3 { margin-bottom: 10px; font-size: 1.1rem; color: #fef3c7; }
+        .action-card p { font-size: 1.2rem; line-height: 1.6; }
+        .drop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; max-width: 760px; margin: 0 auto; }
+        .drop-zone { min-height: 180px; border-radius: 22px; padding: 24px; text-align: center; border: 2px dashed rgba(255,255,255,.34); transition: transform .18s ease, border-color .18s ease, background .18s ease; }
+        .drop-zone.good { background: rgba(34,197,94,.14); }
+        .drop-zone.bad { background: rgba(239,68,68,.14); }
+        .drop-zone.drag-over { transform: scale(1.02); border-color: #fde047; background: rgba(255,255,255,.12); }
+        .drop-zone h3 { margin-bottom: 10px; }
+        .drop-zone p { color: #e7e2ff; line-height: 1.55; }
+        .feedback { display: none; max-width: 740px; margin: 24px auto 0; padding: 18px; border-radius: 18px; text-align: center; line-height: 1.6; }
+        .feedback.show { display: block; }
+        .feedback.success { background: rgba(22,163,74,.18); border: 1px solid rgba(74,222,128,.44); }
+        .feedback.error { background: rgba(220,38,38,.18); border: 1px solid rgba(248,113,113,.44); }
+        .end-score { font-size: 3rem; font-weight: 800; color: #fde047; margin: 18px 0 10px; }
+    </style>
+</head>
+<body>
+    <section class="screen active" id="startScreen">
+        <div class="shell hero">
+            <h1>Etiquetas en el tenis</h1>
+            <p>Arrastra cada situaci&oacute;n al lado correcto y reconoce qu&eacute; conductas reflejan respeto, honestidad y juego limpio dentro de la cancha.</p>
+            <button class="btn" id="startBtn" type="button">Comenzar</button>
+        </div>
+    </section>
+
+    <section class="screen" id="gameScreen">
+        <div class="shell">
+            <div class="topbar">
+                <h2>Clasifica cada acci&oacute;n</h2>
+                <div class="progress-wrap">
+                    <div class="progress-head"><span>Progreso</span><span id="progressText">0/20</span></div>
+                    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+                </div>
+                <div class="score">Puntuaci&oacute;n: <span id="score">0</span></div>
+            </div>
+
+            <div class="action-card" id="actionCard" draggable="true">
+                <h3>Acci&oacute;n actual</h3>
+                <p id="actionText">Llegar puntual al partido o entrenamiento</p>
+            </div>
+
+            <div class="drop-grid">
+                <div class="drop-zone good" data-category="correct">
+                    <h3>Correcto</h3>
+                    <p>Comportamiento apropiado en la cancha.</p>
+                </div>
+                <div class="drop-zone bad" data-category="incorrect">
+                    <h3>Incorrecto</h3>
+                    <p>Comportamiento que rompe el respeto o el juego limpio.</p>
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+    </section>
+
+    <section class="screen" id="endScreen">
+        <div class="shell hero">
+            <h1>&iexcl;Juego terminado!</h1>
+            <p>Ya tienes una base m&aacute;s clara sobre las conductas que ayudan a construir respeto y buena convivencia en el tenis.</p>
+            <div class="end-score" id="finalScore">0/20</div>
+            <p id="finalMessage">Buen trabajo.</p>
+            <button class="btn" id="restartBtn" type="button">Volver a jugar</button>
+        </div>
+    </section>
+
+    <script>
+        const actions = [
+            { text: "Llegar puntual al partido o entrenamiento", correct: true, feedback: "Correcto. La puntualidad demuestra respeto y compromiso." },
+            { text: "Anunciar el marcador en voz alta antes de sacar", correct: true, feedback: "Correcto. Ayuda a que todos jueguen con claridad." },
+            { text: "Cantar bolas con honestidad, incluso en tu contra", correct: true, feedback: "Correcto. La honestidad es una base del tenis." },
+            { text: "Respetar al rival, al juez y al p&uacute;blico", correct: true, feedback: "Correcto. El respeto sostiene una competencia sana." },
+            { text: "Saludar al final del partido", correct: true, feedback: "Correcto. Cerrar bien tambi&eacute;n habla de tu deportividad." },
+            { text: "Guardar silencio cuando el rival saca", correct: true, feedback: "Correcto. El saque requiere concentraci&oacute;n." },
+            { text: "Esperar a que termine el punto antes de cruzar otra cancha", correct: true, feedback: "Correcto. Evitas distracciones y posibles accidentes." },
+            { text: "Recoger pelotas y devolverlas con calma al rival", correct: true, feedback: "Correcto. Los buenos gestos tambi&eacute;n forman parte del juego." },
+            { text: "Usar ropa y calzado adecuados para jugar", correct: true, feedback: "Correcto. La seguridad y la presentaci&oacute;n tambi&eacute;n cuentan." },
+            { text: "Reconocer un buen punto del rival", correct: true, feedback: "Correcto. Valorar al otro mejora el ambiente competitivo." },
+            { text: "Llegar tarde sin avisar", correct: false, feedback: "Incorrecto. Rompe la organizaci&oacute;n y muestra poco respeto." },
+            { text: "Quedarte callado cuando ganas un punto dudoso", correct: false, feedback: "Incorrecto. Las jugadas dudosas deben resolverse con honestidad." },
+            { text: "Insultar al rival o al juez", correct: false, feedback: "Incorrecto. Reclamar no significa faltar al respeto." },
+            { text: "Romper la raqueta por enojo", correct: false, feedback: "Incorrecto. El autocontrol tambi&eacute;n forma parte del deporte." },
+            { text: "Burlarte del rival al ganar un punto", correct: false, feedback: "Incorrecto. La celebraci&oacute;n no debe humillar a nadie." },
+            { text: "Caminar por otra cancha durante un punto", correct: false, feedback: "Incorrecto. Interrumpes el juego y generas riesgo." },
+            { text: "Patear pelotas por frustraci&oacute;n", correct: false, feedback: "Incorrecto. Debes gestionar la frustraci&oacute;n sin perder el control." },
+            { text: "Ignorar al rival cuando quiere revisar una marca", correct: false, feedback: "Incorrecto. Revisar juntos es parte del juego limpio." },
+            { text: "Hacer ruido para distraer al rival", correct: false, feedback: "Incorrecto. Ganar distrayendo no es competir con limpieza." },
+            { text: "No devolver las pelotas cuando el rival va a sacar", correct: false, feedback: "Incorrecto. El respeto tambi&eacute;n vive en los detalles." }
+        ];
+
+        const screens = {
+            start: document.getElementById("startScreen"),
+            game: document.getElementById("gameScreen"),
+            end: document.getElementById("endScreen")
+        };
+        const actionCard = document.getElementById("actionCard");
+        const actionText = document.getElementById("actionText");
+        const progressBar = document.getElementById("progressBar");
+        const progressText = document.getElementById("progressText");
+        const scoreEl = document.getElementById("score");
+        const feedbackEl = document.getElementById("feedback");
+        const finalScoreEl = document.getElementById("finalScore");
+        const finalMessageEl = document.getElementById("finalMessage");
+
+        let deck = [];
+        let index = 0;
+        let score = 0;
+        let correctAnswers = 0;
+
+        function showScreen(name) {
+            Object.keys(screens).forEach(function(key) {
+                screens[key].classList.remove("active");
+            });
+            screens[name].classList.add("active");
+        }
+
+        function shuffle(list) {
+            const copy = list.slice();
+            for (let i = copy.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const temp = copy[i];
+                copy[i] = copy[j];
+                copy[j] = temp;
+            }
+            return copy;
+        }
+
+        function updateUI() {
+            progressText.textContent = index + "/20";
+            progressBar.style.width = ((index / 20) * 100) + "%";
+            scoreEl.textContent = String(score);
+        }
+
+        function loadAction() {
+            actionText.textContent = deck[index].text;
+        }
+
+        function showFeedback(ok, message) {
+            feedbackEl.className = "feedback show " + (ok ? "success" : "error");
+            feedbackEl.innerHTML = message;
+            window.setTimeout(nextAction, ok ? 1700 : 2100);
+        }
+
+        function endGame() {
+            finalScoreEl.textContent = correctAnswers + "/20";
+            const ratio = correctAnswers / 20;
+            if (ratio === 1) {
+                finalMessageEl.textContent = "Perfecto. Dominas muy bien la etiqueta b&aacute;sica del tenis.";
+            } else if (ratio >= 0.8) {
+                finalMessageEl.textContent = "Muy buen resultado. Tienes una base s&oacute;lida de comportamiento en cancha.";
+            } else if (ratio >= 0.6) {
+                finalMessageEl.textContent = "Buen avance. Una segunda pasada te ayudar&aacute; a fijar mejor estas normas.";
+            } else {
+                finalMessageEl.textContent = "Conviene una segunda pasada para reforzar estas situaciones.";
+            }
+            showScreen("end");
+        }
+
+        function nextAction() {
+            feedbackEl.className = "feedback";
+            feedbackEl.innerHTML = "";
+            index += 1;
+            updateUI();
+            if (index >= deck.length) {
+                endGame();
+                return;
+            }
+            loadAction();
+        }
+
+        function startGame() {
+            deck = shuffle(actions);
+            index = 0;
+            score = 0;
+            correctAnswers = 0;
+            updateUI();
+            loadAction();
+            showScreen("game");
+        }
+
+        actionCard.addEventListener("dragstart", function(event) {
+            event.dataTransfer.setData("text/plain", "dragging");
+        });
+
+        document.querySelectorAll(".drop-zone").forEach(function(zone) {
+            zone.addEventListener("dragover", function(event) {
+                event.preventDefault();
+                zone.classList.add("drag-over");
+            });
+            zone.addEventListener("dragleave", function() {
+                zone.classList.remove("drag-over");
+            });
+            zone.addEventListener("drop", function(event) {
+                event.preventDefault();
+                zone.classList.remove("drag-over");
+                const current = deck[index];
+                const isCorrectDrop = (zone.dataset.category === "correct" && current.correct) || (zone.dataset.category === "incorrect" && !current.correct);
+                if (isCorrectDrop) {
+                    score += 10;
+                    correctAnswers += 1;
+                }
+                showFeedback(isCorrectDrop, current.feedback);
+            });
+        });
+
+        document.getElementById("startBtn").addEventListener("click", startGame);
+        document.getElementById("restartBtn").addEventListener("click", function() {
+            showScreen("start");
+        });
+    </script>
+</body>
+</html>
