@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B1M2L1 - Entendiendo el marcador</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Segoe UI", Tahoma, sans-serif; min-height: 100vh; padding: 20px; background: linear-gradient(135deg, #0b3b2e, #14634b 45%, #2a7f5a); color: #17382b; }
+        .app { max-width: 1080px; margin: 0 auto; background: rgba(255,255,255,.97); border-radius: 24px; padding: 28px; box-shadow: 0 20px 48px rgba(0,0,0,.16); }
+        .hero { text-align: center; margin-bottom: 28px; }
+        .hero h1 { font-size: clamp(2rem, 4vw, 3rem); color: #12382b; margin-bottom: 10px; }
+        .hero p { max-width: 720px; margin: 0 auto; color: #547164; line-height: 1.6; }
+        .progress { max-width: 520px; margin: 22px auto 0; }
+        .progress-head { display: flex; justify-content: space-between; font-size: .92rem; color: #38584a; margin-bottom: 8px; }
+        .progress-track { height: 12px; border-radius: 999px; background: #e7efe9; overflow: hidden; }
+        .progress-bar { height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, #16a34a, #0ea5e9, #f59e0b); transition: width .25s ease; }
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 26px; }
+        .step { border: 1px solid #dce7df; border-radius: 18px; background: #fff; padding: 18px; box-shadow: 0 8px 20px rgba(0,0,0,.05); }
+        .badge { display: inline-block; padding: 6px 10px; border-radius: 999px; color: #fff; font-size: .82rem; font-weight: 700; margin-bottom: 12px; }
+        .step h2 { font-size: 1.2rem; margin-bottom: 10px; color: #17382b; }
+        .step p { color: #456156; line-height: 1.55; }
+        .step button { margin-top: 14px; border: none; background: none; color: #166534; font-weight: 700; cursor: pointer; }
+        .details { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid #e6eee8; color: #314a40; line-height: 1.55; }
+        .details.open { display: block; }
+        .summary { margin-top: 24px; padding: 18px; border-radius: 18px; background: #f5faf7; border: 1px solid #dce8df; }
+        .summary h3 { margin-bottom: 12px; color: #17382b; }
+        .summary ul { padding-left: 20px; color: #456156; line-height: 1.7; }
+    </style>
+</head>
+<body>
+    <main class="app">
+        <header class="hero">
+            <h1>Entendiendo el marcador</h1>
+            <p>Recorre c&oacute;mo se construye un partido de tenis: del punto al game, del game al set y del set al partido completo.</p>
+            <div class="progress">
+                <div class="progress-head"><span>Recorrido</span><span id="progressLabel">0/5</span></div>
+                <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+            </div>
+        </header>
+
+        <section class="steps">
+            <article class="step" data-step><span class="badge" style="background:#16a34a;">Nivel 1</span><h2>El punto</h2><p>Es la unidad b&aacute;sica del tenis. Cada peloteo ganado suma un punto dentro del game.</p><button type="button">Ver m&aacute;s</button><div class="details">Ganas un punto cuando tu rival no devuelve la pelota, la manda fuera o la deja en la red.<br><br>En tenis los puntos no se cuentan 1, 2, 3... sino 15, 30 y 40.</div></article>
+            <article class="step" data-step><span class="badge" style="background:#0ea5e9;">15 - 30 - 40</span><h2>El game</h2><p>Para ganar un game normalmente necesitas cuatro puntos, pero si ambos llegan a 40 aparece el deuce.</p><button type="button">Ver m&aacute;s</button><div class="details">Secuencia habitual: 0 - 15 - 30 - 40 - game.<br><br>Si empatan 40-40, necesitas ventaja y luego un punto m&aacute;s para cerrar el game.</div></article>
+            <article class="step" data-step><span class="badge" style="background:#f59e0b;">6 games</span><h2>El set</h2><p>Un set se gana con 6 games y al menos 2 de diferencia.</p><button type="button">Ver m&aacute;s</button><div class="details">Ejemplos de sets ganados: 6-2, 6-3, 6-4.<br><br>Si el marcador llega a 6-5, debes seguir hasta 7-5 o llegar al 6-6.</div></article>
+            <article class="step" data-step><span class="badge" style="background:#ef4444;">Desempate</span><h2>El tiebreak</h2><p>Si el set llega a 6-6, se juega un desempate a 7 puntos con diferencia de 2.</p><button type="button">Ver m&aacute;s</button><div class="details">En el tiebreak los puntos s&iacute; se cuentan 1, 2, 3, 4...<br><br>Si ambos llegan a 6-6, el desempate sigue hasta que alguien saque ventaja de 2.</div></article>
+            <article class="step" data-step><span class="badge" style="background:#9333ea;">Cierre</span><h2>El partido</h2><p>El partido se gana al conquistar la mayor&iacute;a de sets: normalmente 2 de 3, o 3 de 5 en algunos torneos.</p><button type="button">Ver m&aacute;s</button><div class="details">En la mayor&iacute;a de partidos juveniles y amateur se juega al mejor de 3 sets.<br><br>En algunos eventos profesionales masculinos, se disputa al mejor de 5.</div></article>
+        </section>
+
+        <section class="summary">
+            <h3>Resumen r&aacute;pido</h3>
+            <ul>
+                <li>Punto: unidad b&aacute;sica del marcador.</li>
+                <li>Game: se construye con puntos.</li>
+                <li>Set: se gana con games.</li>
+                <li>Partido: se gana con sets.</li>
+            </ul>
+        </section>
+    </main>
+
+    <script>
+        const steps = Array.from(document.querySelectorAll("[data-step]"));
+        const progressBar = document.getElementById("progressBar");
+        const progressLabel = document.getElementById("progressLabel");
+        const seen = new Set();
+        function renderProgress() {
+            progressLabel.textContent = seen.size + "/5";
+            progressBar.style.width = (seen.size / steps.length * 100) + "%";
+        }
+        steps.forEach(function(step, index) {
+            const button = step.querySelector("button");
+            const details = step.querySelector(".details");
+            button.addEventListener("click", function() {
+                const open = details.classList.toggle("open");
+                button.textContent = open ? "Ver menos" : "Ver m\u00e1s";
+                if (open) {
+                    seen.add(index);
+                    renderProgress();
+                }
+            });
+        });
+        renderProgress();
+    </script>
+</body>
+</html>
