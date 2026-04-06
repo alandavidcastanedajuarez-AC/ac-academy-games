@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B1M2L4 - Posiciones del saque</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Segoe UI", Tahoma, sans-serif; min-height: 100vh; padding: 24px; background: linear-gradient(135deg, #17335d, #34145c 58%, #5e1a70); color: #ffffff; }
+        .shell { max-width: 1080px; margin: 0 auto; border-radius: 28px; padding: 28px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); box-shadow: 0 24px 48px rgba(0,0,0,.2); }
+        .hero { text-align: center; margin-bottom: 28px; }
+        .hero h1 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 10px; }
+        .hero p { max-width: 760px; margin: 0 auto; line-height: 1.65; color: #dde3ff; }
+        .note { margin-top: 14px; display: inline-block; padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,.1); font-size: .9rem; color: #fef3c7; }
+        .cards, .slots { display: grid; gap: 16px; }
+        .cards { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin: 26px 0 30px; }
+        .drag-card { border-radius: 20px; padding: 18px; cursor: grab; border: 1px solid rgba(255,255,255,.16); box-shadow: 0 12px 24px rgba(0,0,0,.16); user-select: none; }
+        .drag-card h2 { font-size: 1.15rem; margin-bottom: 8px; }
+        .drag-card p { line-height: 1.55; color: rgba(255,255,255,.92); }
+        .drag-card:nth-child(1) { background: linear-gradient(135deg, #ef4444, #f97316); }
+        .drag-card:nth-child(2) { background: linear-gradient(135deg, #0ea5e9, #2563eb); }
+        .drag-card:nth-child(3) { background: linear-gradient(135deg, #22c55e, #15803d); }
+        .drag-card:nth-child(4) { background: linear-gradient(135deg, #a855f7, #7e22ce); }
+        .slots { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+        .slot { min-height: 190px; border-radius: 20px; border: 2px dashed rgba(255,255,255,.34); background: rgba(255,255,255,.06); padding: 18px; text-align: center; transition: transform .18s ease, border-color .18s ease, background .18s ease; }
+        .slot.drag-over { transform: scale(1.02); border-color: #fde047; background: rgba(255,255,255,.12); }
+        .slot.filled { border-style: solid; }
+        .slot-tag { font-size: 2rem; font-weight: 800; color: #fde047; margin-bottom: 10px; }
+        .slot-label { color: #d7dcff; }
+        .actions { text-align: center; margin-top: 28px; }
+        .btn { border: none; border-radius: 999px; padding: 14px 22px; font-weight: 700; cursor: pointer; color: #ffffff; background: linear-gradient(135deg, #14b8a6, #2563eb); margin: 0 6px; }
+        .btn[disabled] { opacity: .45; cursor: not-allowed; }
+        .btn.secondary { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); }
+        .feedback { display: none; margin-top: 22px; padding: 18px; border-radius: 18px; text-align: center; line-height: 1.6; }
+        .feedback.show { display: block; }
+        .feedback.good { background: rgba(22,163,74,.18); border: 1px solid rgba(74,222,128,.45); }
+        .feedback.bad { background: rgba(220,38,38,.18); border: 1px solid rgba(248,113,113,.45); }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <header class="hero">
+            <h1>Posiciones del saque</h1>
+            <p>Ordena la secuencia b&aacute;sica que acompa&ntilde;a el inicio de un saque. La idea es reconocer qu&eacute; sucede primero y c&oacute;mo se ubican quienes participan en el punto.</p>
+            <span class="note">Objetivo: comprender el orden inicial del saque y la respuesta</span>
+        </header>
+
+        <section class="cards" id="cards">
+            <article class="drag-card" draggable="true" data-step="1">
+                <h2>Posici&oacute;n del sacador</h2>
+                <p>El jugador que sirve se coloca detr&aacute;s de la l&iacute;nea de fondo para iniciar el punto.</p>
+            </article>
+            <article class="drag-card" draggable="true" data-step="3">
+                <h2>Lanzamiento de la pelota</h2>
+                <p>La pelota sube para preparar el golpe de saque con mejor coordinaci&oacute;n.</p>
+            </article>
+            <article class="drag-card" draggable="true" data-step="4">
+                <h2>Direcci&oacute;n del saque</h2>
+                <p>La pelota debe viajar al cuadro de servicio opuesto para que el saque sea v&aacute;lido.</p>
+            </article>
+            <article class="drag-card" draggable="true" data-step="2">
+                <h2>Posici&oacute;n del receptor</h2>
+                <p>La persona que recibe se prepara para responder cuando el saque entre en juego.</p>
+            </article>
+        </section>
+
+        <section class="slots">
+            <div class="slot" data-position="1"><div class="slot-tag">1</div><p class="slot-label">Inicio del punto</p></div>
+            <div class="slot" data-position="2"><div class="slot-tag">2</div><p class="slot-label">Preparaci&oacute;n de la respuesta</p></div>
+            <div class="slot" data-position="3"><div class="slot-tag">3</div><p class="slot-label">Acci&oacute;n del saque</p></div>
+            <div class="slot" data-position="4"><div class="slot-tag">4</div><p class="slot-label">Destino correcto</p></div>
+        </section>
+
+        <div class="actions">
+            <button class="btn" type="button" id="checkButton" disabled>Verificar secuencia</button>
+            <button class="btn secondary" type="button" id="resetButton">Reiniciar</button>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+    </main>
+
+    <script>
+        const slots = Array.from(document.querySelectorAll(".slot"));
+        const sourceCards = Array.from(document.querySelectorAll(".drag-card"));
+        const checkButton = document.getElementById("checkButton");
+        const resetButton = document.getElementById("resetButton");
+        const feedback = document.getElementById("feedback");
+        let draggedCard = null;
+        let sequence = [null, null, null, null];
+
+        sourceCards.forEach(function(card) {
+            card.addEventListener("dragstart", function() {
+                draggedCard = card;
+            });
+            card.addEventListener("dragend", function() {
+                draggedCard = null;
+            });
+        });
+
+        slots.forEach(function(slot) {
+            slot.addEventListener("dragover", function(event) {
+                event.preventDefault();
+                slot.classList.add("drag-over");
+            });
+            slot.addEventListener("dragleave", function() {
+                slot.classList.remove("drag-over");
+            });
+            slot.addEventListener("drop", function(event) {
+                event.preventDefault();
+                slot.classList.remove("drag-over");
+                if (!draggedCard || slot.querySelector(".drag-card")) {
+                    return;
+                }
+                const position = Number(slot.dataset.position) - 1;
+                sequence[position] = Number(draggedCard.dataset.step);
+                slot.appendChild(draggedCard);
+                slot.classList.add("filled");
+                checkButton.disabled = !sequence.every(Boolean);
+            });
+        });
+
+        checkButton.addEventListener("click", function() {
+            const isCorrect = JSON.stringify(sequence) === JSON.stringify([1, 2, 3, 4]);
+            feedback.className = "feedback show " + (isCorrect ? "good" : "bad");
+            if (isCorrect) {
+                feedback.innerHTML = "<strong>&iexcl;Muy bien!</strong><br><br>Ordenaste correctamente la secuencia base del saque: primero se ubica el sacador, luego se prepara el receptor, despu&eacute;s se lanza la pelota y finalmente el saque debe caer en el cuadro opuesto.";
+            } else {
+                feedback.innerHTML = "<strong>Revisa el orden.</strong><br><br>Primero va la posici&oacute;n del sacador, luego la preparaci&oacute;n del receptor, despu&eacute;s el lanzamiento de la pelota y al final la direcci&oacute;n correcta del saque.";
+            }
+        });
+
+        resetButton.addEventListener("click", function() {
+            sequence = [null, null, null, null];
+            feedback.className = "feedback";
+            feedback.innerHTML = "";
+            checkButton.disabled = true;
+            const cardsContainer = document.getElementById("cards");
+            sourceCards.forEach(function(card) {
+                cardsContainer.appendChild(card);
+            });
+            slots.forEach(function(slot, index) {
+                slot.classList.remove("filled", "drag-over");
+                const labels = [
+                    "Inicio del punto",
+                    "Preparaci&oacute;n de la respuesta",
+                    "Acci&oacute;n del saque",
+                    "Destino correcto"
+                ];
+                slot.innerHTML = '<div class="slot-tag">' + (index + 1) + "</div><p class=\"slot-label\">" + labels[index] + "</p>";
+            });
+        });
+    </script>
+</body>
+</html>

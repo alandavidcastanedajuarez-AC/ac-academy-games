@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B1M2L5 - Curiosidades del tenis</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Segoe UI", Tahoma, sans-serif; min-height: 100vh; padding: 22px; background: linear-gradient(135deg, #12563a, #1f7a49 58%, #10492e); color: #163827; }
+        .shell { max-width: 980px; margin: 0 auto; background: #ffffff; border-radius: 28px; overflow: hidden; box-shadow: 0 24px 48px rgba(0,0,0,.22); }
+        .hero { background: linear-gradient(135deg, #f97316, #f59e0b); color: #ffffff; padding: 30px; text-align: center; }
+        .hero h1 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 10px; }
+        .hero p { max-width: 700px; margin: 0 auto; line-height: 1.6; opacity: .95; }
+        .content { padding: 28px; }
+        .stats { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 24px; }
+        .stat { padding: 12px 18px; border-radius: 16px; color: #ffffff; font-weight: 700; background: linear-gradient(135deg, #1f7a49, #2d9158); }
+        .board { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .card { aspect-ratio: 3 / 4; perspective: 1000px; cursor: pointer; border: none; background: transparent; }
+        .inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .45s ease; }
+        .card.flipped .inner, .card.matched .inner { transform: rotateY(180deg); }
+        .face { position: absolute; inset: 0; border-radius: 18px; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; text-align: center; padding: 16px; box-shadow: 0 12px 24px rgba(0,0,0,.12); }
+        .front { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 1.05rem; font-weight: 800; }
+        .back { background: linear-gradient(135deg, #f97316, #fb923c); color: #ffffff; transform: rotateY(180deg); line-height: 1.5; font-size: .95rem; }
+        .card.matched .back { background: linear-gradient(135deg, #16a34a, #22c55e); }
+        .actions { text-align: center; }
+        .btn { border: none; border-radius: 999px; padding: 14px 20px; font-weight: 700; cursor: pointer; color: #ffffff; background: linear-gradient(135deg, #f97316, #f59e0b); }
+        .done { display: none; margin-top: 22px; padding: 18px; border-radius: 18px; text-align: center; line-height: 1.6; background: #edf9f0; border: 1px solid #b7e4c7; color: #1f5134; }
+        .done.show { display: block; }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <header class="hero">
+            <h1>Curiosidades del tenis</h1>
+            <p>Empareja cada dato con su explicaci&oacute;n y descubre peque&ntilde;as historias que ayudan a recordar mejor la cultura del tenis.</p>
+        </header>
+
+        <section class="content">
+            <div class="stats">
+                <div class="stat">Tiempo: <span id="timer">00:00</span></div>
+                <div class="stat">Intentos: <span id="attempts">0</span></div>
+                <div class="stat">Pares: <span id="pairs">0/6</span></div>
+            </div>
+
+            <div class="board" id="board"></div>
+            <div class="actions"><button class="btn" type="button" id="restartBtn">Nuevo juego</button></div>
+            <div class="done" id="doneBox"></div>
+        </section>
+    </main>
+
+    <script>
+        const pairs = [
+            { front: "Love = 0", back: "La palabra se relaciona con el franc&eacute;s l'oeuf, porque un huevo recuerda la forma del cero." },
+            { front: "Saque toca la red", back: "Si la pelota cae en el cuadro correcto, el servicio se repite y se llama let." },
+            { front: "Wimbledon 2010", back: "El partido entre Isner y Mahut dur&oacute; 11 horas y 5 minutos, uno de los m&aacute;s largos de la historia." },
+            { front: "Pelotas amarillas", back: "Se hicieron comunes para mejorar la visibilidad en televisi&oacute;n y para el p&uacute;blico." },
+            { front: "Grand Slam", back: "El t&eacute;rmino viene del bridge y se usa para hablar de ganar los cuatro torneos grandes." },
+            { front: "Roland Garros", back: "El torneo franc&eacute;s lleva el nombre de un aviador llamado Roland Garros." }
+        ];
+
+        const board = document.getElementById("board");
+        const timerEl = document.getElementById("timer");
+        const attemptsEl = document.getElementById("attempts");
+        const pairsEl = document.getElementById("pairs");
+        const doneBox = document.getElementById("doneBox");
+        let deck = [];
+        let flipped = [];
+        let matched = 0;
+        let attempts = 0;
+        let seconds = 0;
+        let timer = null;
+        let started = false;
+        let locked = false;
+
+        function shuffle(list) {
+            const copy = list.slice();
+            for (let i = copy.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const temp = copy[i];
+                copy[i] = copy[j];
+                copy[j] = temp;
+            }
+            return copy;
+        }
+
+        function renderStats() {
+            const mins = String(Math.floor(seconds / 60)).padStart(2, "0");
+            const secs = String(seconds % 60).padStart(2, "0");
+            timerEl.textContent = mins + ":" + secs;
+            attemptsEl.textContent = String(attempts);
+            pairsEl.textContent = matched + "/6";
+        }
+
+        function startTimer() {
+            if (timer) {
+                clearInterval(timer);
+            }
+            timer = window.setInterval(function() {
+                seconds += 1;
+                renderStats();
+            }, 1000);
+        }
+
+        function buildDeck() {
+            deck = [];
+            pairs.forEach(function(pair, index) {
+                deck.push({ id: index, text: pair.front, kind: "front" });
+                deck.push({ id: index, text: pair.back, kind: "back" });
+            });
+            deck = shuffle(deck);
+        }
+
+        function renderBoard() {
+            board.innerHTML = "";
+            deck.forEach(function(card, index) {
+                const node = document.createElement("button");
+                node.type = "button";
+                node.className = "card";
+                node.dataset.index = index;
+                node.innerHTML = '<div class="inner"><div class="face front">?</div><div class="face back">' + card.text + "</div></div>";
+                node.addEventListener("click", onFlip);
+                board.appendChild(node);
+            });
+        }
+
+        function onFlip(event) {
+            const node = event.currentTarget;
+            const index = Number(node.dataset.index);
+            if (locked || node.classList.contains("flipped") || node.classList.contains("matched")) {
+                return;
+            }
+            if (!started) {
+                started = true;
+                startTimer();
+            }
+            node.classList.add("flipped");
+            flipped.push({ node: node, data: deck[index] });
+            if (flipped.length === 2) {
+                locked = true;
+                attempts += 1;
+                renderStats();
+                window.setTimeout(checkPair, 700);
+            }
+        }
+
+        function checkPair() {
+            const first = flipped[0];
+            const second = flipped[1];
+            const match = first.data.id === second.data.id && first.data.kind !== second.data.kind;
+            if (match) {
+                first.node.classList.add("matched");
+                second.node.classList.add("matched");
+                matched += 1;
+                if (matched === 6) {
+                    clearInterval(timer);
+                    doneBox.classList.add("show");
+                    doneBox.innerHTML = "<strong>&iexcl;Bien hecho!</strong><br><br>Completaste las seis curiosidades del tenis en " + timerEl.textContent + " y necesitaste " + attempts + " intentos.";
+                }
+            } else {
+                first.node.classList.remove("flipped");
+                second.node.classList.remove("flipped");
+            }
+            flipped = [];
+            locked = false;
+            renderStats();
+        }
+
+        function init() {
+            clearInterval(timer);
+            flipped = [];
+            matched = 0;
+            attempts = 0;
+            seconds = 0;
+            started = false;
+            locked = false;
+            doneBox.classList.remove("show");
+            doneBox.innerHTML = "";
+            buildDeck();
+            renderBoard();
+            renderStats();
+        }
+
+        document.getElementById("restartBtn").addEventListener("click", init);
+        init();
+    </script>
+</body>
+</html>
