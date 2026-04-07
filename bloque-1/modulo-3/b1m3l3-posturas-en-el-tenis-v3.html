@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B1M3L3 - Posturas en el tenis</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Segoe UI", Tahoma, sans-serif; min-height: 100vh; padding: 24px; background: linear-gradient(135deg, #fff7ed, #eff6ff 55%, #f0fdf4); color: #1f2937; }
+        .shell { max-width: 1100px; margin: 0 auto; background: rgba(255,255,255,.97); border-radius: 28px; padding: 28px; box-shadow: 0 24px 48px rgba(0,0,0,.12); }
+        .hero { text-align: center; margin-bottom: 28px; }
+        .hero h1 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 12px; }
+        .hero p { max-width: 760px; margin: 0 auto; line-height: 1.65; color: #5b677a; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+        .card { border-radius: 22px; padding: 20px; color: #fff; cursor: pointer; box-shadow: 0 14px 28px rgba(0,0,0,.12); }
+        .card p { line-height: 1.6; opacity: .95; }
+        .detail { margin-top: 24px; padding: 20px; border-radius: 22px; background: #0f172a; color: #fff; }
+        .detail p { color: #dbe4f0; line-height: 1.65; }
+        .quiz { margin-top: 24px; padding: 20px; border-radius: 22px; background: #fff; border: 1px solid #e5e7eb; }
+        .scenario { padding: 16px; border-radius: 16px; background: #eff6ff; color: #1d4ed8; font-weight: 600; line-height: 1.6; }
+        .answers { display: grid; gap: 10px; margin-top: 16px; }
+        .answer { border: 1px solid #d1d5db; background: #fff; border-radius: 14px; padding: 12px 14px; cursor: pointer; text-align: left; }
+        .feedback { margin-top: 14px; padding: 12px 14px; border-radius: 14px; display: none; }
+        .feedback.show { display: block; }
+        .feedback.good { background: #ecfdf5; color: #166534; border: 1px solid #86efac; }
+        .feedback.bad { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
+        .quiz-footer { margin-top: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .btn { border: none; border-radius: 999px; padding: 12px 18px; font-weight: 700; cursor: pointer; color: #fff; background: linear-gradient(135deg, #2563eb, #f97316); }
+        .btn[disabled] { opacity: .45; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <header class="hero">
+            <h1>Posturas en el tenis</h1>
+            <p>Compara tres posturas frecuentes para entender c&oacute;mo cambian la estabilidad, la movilidad y la potencia. Luego resuelve varias situaciones para elegir la respuesta m&aacute;s razonable.</p>
+        </header>
+        <section class="cards" id="cards"></section>
+        <section class="detail">
+            <h2 id="detailTitle">Selecciona una postura</h2>
+            <p id="detailText">Haz clic en una tarjeta para revisar cu&aacute;ndo puede ser &uacute;til y cu&aacute;l es su principal limitaci&oacute;n.</p>
+        </section>
+        <section class="quiz">
+            <div class="scenario" id="scenarioText">Explora primero las tres posturas para activar el quiz.</div>
+            <div class="answers" id="answers"></div>
+            <div class="feedback" id="feedback"></div>
+            <div class="quiz-footer">
+                <strong id="status">Resultado: 0/3</strong>
+                <button class="btn" type="button" id="nextButton" disabled>Siguiente</button>
+            </div>
+        </section>
+    </main>
+    <script>
+        const postures = [
+            { name: "Postura abierta", color: "linear-gradient(135deg,#16a34a,#15803d)", text: "Favorece la movilidad y la recuperaci&oacute;n cuando el punto exige reacci&oacute;n r&aacute;pida.", note: "Suele verse mucho en defensa y en intercambios veloces." },
+            { name: "Postura semiabierta", color: "linear-gradient(135deg,#2563eb,#1d4ed8)", text: "Busca equilibrio entre rotaci&oacute;n del cuerpo, control del golpe y capacidad de adaptaci&oacute;n.", note: "Es una soluci&oacute;n muy usada para derechas modernas." },
+            { name: "Postura cerrada", color: "linear-gradient(135deg,#ea580c,#c2410c)", text: "Aporta estabilidad y una sensaci&oacute;n m&aacute;s clara de direcci&oacute;n cuando el jugador tiene tiempo para acomodarse.", note: "Puede ser &uacute;til en golpes m&aacute;s preparados o direccionales." }
+        ];
+        const quiz = [
+            { q: "Te llega una pelota profunda y r&aacute;pida; necesitas defenderte y recuperarte con velocidad lateral.", options: ["Postura abierta", "Postura semiabierta", "Postura cerrada"], answer: 0, note: "La abierta suele ayudar m&aacute;s cuando lo urgente es reaccionar y recuperar terreno." },
+            { q: "Tienes tiempo razonable para una derecha moderna desde media pista, buscando equilibrio entre control y rotaci&oacute;n.", options: ["Postura abierta", "Postura semiabierta", "Postura cerrada"], answer: 1, note: "La semiabierta aparece mucho en ese tipo de golpe." },
+            { q: "Quieres un golpe m&aacute;s preparado, con mayor sensaci&oacute;n de estabilidad y direcci&oacute;n.", options: ["Postura abierta", "Postura semiabierta", "Postura cerrada"], answer: 2, note: "La cerrada suele asociarse con ese contexto m&aacute;s estable y direccional." }
+        ];
+        const seen = new Set();
+        let quizIndex = 0;
+        let quizScore = 0;
+        let answered = false;
+        postures.forEach(function(posture, index) {
+            const article = document.createElement("article");
+            article.className = "card";
+            article.style.background = posture.color;
+            article.innerHTML = "<h2>" + posture.name + "</h2><p>" + posture.text + "</p>";
+            article.addEventListener("click", function() {
+                seen.add(index);
+                document.getElementById("detailTitle").textContent = posture.name;
+                document.getElementById("detailText").innerHTML = posture.text + " " + posture.note;
+                if (seen.size === postures.length && document.getElementById("answers").children.length === 0) renderQuiz();
+            });
+            document.getElementById("cards").appendChild(article);
+        });
+        function renderQuiz() {
+            answered = false;
+            const item = quiz[quizIndex];
+            document.getElementById("scenarioText").innerHTML = item.q;
+            document.getElementById("status").textContent = "Resultado: " + quizScore + "/" + quiz.length;
+            document.getElementById("nextButton").disabled = true;
+            const feedback = document.getElementById("feedback");
+            feedback.className = "feedback";
+            feedback.innerHTML = "";
+            const answers = document.getElementById("answers");
+            answers.innerHTML = "";
+            item.options.forEach(function(option, optionIndex) {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "answer";
+                button.textContent = String.fromCharCode(65 + optionIndex) + ") " + option;
+                button.addEventListener("click", function() { answerQuiz(optionIndex); });
+                answers.appendChild(button);
+            });
+        }
+        function answerQuiz(optionIndex) {
+            if (answered) return;
+            answered = true;
+            const item = quiz[quizIndex];
+            const ok = optionIndex === item.answer;
+            if (ok) quizScore += 1;
+            const feedback = document.getElementById("feedback");
+            feedback.className = "feedback show " + (ok ? "good" : "bad");
+            feedback.innerHTML = (ok ? "<strong>&iexcl;Correcto!</strong> " : "<strong>No era esa.</strong> ") + item.note;
+            document.getElementById("status").textContent = "Resultado: " + quizScore + "/" + quiz.length;
+            document.getElementById("nextButton").disabled = false;
+        }
+        document.getElementById("nextButton").addEventListener("click", function() {
+            quizIndex += 1;
+            if (quizIndex >= quiz.length) {
+                document.getElementById("answers").innerHTML = "";
+                const feedback = document.getElementById("feedback");
+                feedback.className = "feedback show good";
+                feedback.innerHTML = "<strong>Quiz completado.</strong> Terminaste con " + quizScore + "/" + quiz.length + ".";
+                document.getElementById("nextButton").disabled = true;
+                return;
+            }
+            renderQuiz();
+        });
+    </script>
+</body>
+</html>

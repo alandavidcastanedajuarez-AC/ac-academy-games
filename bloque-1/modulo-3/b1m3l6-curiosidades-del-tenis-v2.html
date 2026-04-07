@@ -34,7 +34,7 @@
     <main class="shell">
         <header class="hero">
             <h1>Curiosidades del tenis</h1>
-            <p>Responde una trivia breve con datos hist&oacute;ricos, t&eacute;cnicos y culturales. El objetivo es repasar ideas generales del tenis con un tono ligero y recordable.</p>
+            <p>Responde una trivia breve con datos hist&oacute;ricos, t&eacute;cnicos y culturales. El objetivo es repasar ideas generales del tenis con un tono ligero y claro.</p>
         </header>
         <div class="score" id="scoreText">Puntos: 0/10</div>
         <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
@@ -52,16 +52,16 @@
     </main>
     <script>
         const questions = [
-            { q: "Qu&eacute; superficie suele considerarse la m&aacute;s r&aacute;pida en el tenis tradicional?", options: ["Arcilla", "Cesped", "Dura"], answer: 1, note: "El c&eacute;sped suele favorecer botes bajos y puntos m&aacute;s cortos." },
-            { q: "Para qu&eacute; sirve el split step?", options: ["Preparar la reacci&oacute;n", "Cambiar de empunadura", "Pedir la pelota"], answer: 0, note: "El split step activa piernas y equilibrio antes del golpe rival." },
-            { q: "Qu&eacute; color se populariz&oacute; para las pelotas por visibilidad televisiva?", options: ["Azul", "Amarillo", "Rojo"], answer: 1, note: "La pelota amarilla se volvi&oacute; una referencia visual del tenis moderno." },
-            { q: "Qu&eacute; torneo se asocia con una fuerte tradici&oacute;n de vestimenta blanca?", options: ["Wimbledon", "US Open", "Roland Garros"], answer: 0, note: "Wimbledon conserva esa identidad como parte de su tradici&oacute;n." },
-            { q: "Qu&eacute; golpe se relaciona m&aacute;s con el cierre en la red?", options: ["Volea", "Globo", "Slice defensivo"], answer: 0, note: "La volea permite atacar antes de que la pelota bote." },
-            { q: "Qu&eacute; palabra del marcador representa cero?", options: ["Let", "Love", "Break"], answer: 1, note: "Love se usa para indicar cero en el puntaje." },
-            { q: "Qu&eacute; tipo de empunadura se vincula mucho con una derecha moderna de topspin?", options: ["Continental", "Semi-western", "Eastern"], answer: 1, note: "La semi-western se asocia mucho con la derecha actual." },
-            { q: "Qu&eacute; zona de la cancha suele usarse para construir el punto con paciencia?", options: ["Fondo", "Red", "Pasillo de dobles"], answer: 0, note: "Desde el fondo se organiza gran parte del intercambio." },
-            { q: "Qu&eacute; parte del juego exige mucha lectura emocional y concentraci&oacute;n?", options: ["Solo el saque", "Solo el rev&eacute;s", "Todo el partido"], answer: 2, note: "La mente acompa&ntilde;a cada fase del juego, no solo un golpe." },
-            { q: "Qu&eacute; idea resume mejor el tenis competitivo?", options: ["Solo potencia", "Tecnica, decision y control", "Suerte y velocidad"], answer: 1, note: "El tenis combina t&eacute;cnica, lectura t&aacute;ctica y manejo emocional." }
+            { q: "&iquest;Qu&eacute; superficie suele considerarse la m&aacute;s r&aacute;pida en el tenis tradicional?", options: ["Arcilla", "C&eacute;sped", "Dura"], answer: 1, note: "El c&eacute;sped suele favorecer botes bajos y puntos m&aacute;s cortos." },
+            { q: "&iquest;Para qu&eacute; sirve el split step?", options: ["Preparar la reacci&oacute;n", "Cambiar de empu&ntilde;adura", "Pedir la pelota"], answer: 0, note: "El split step activa piernas y equilibrio antes del golpe rival." },
+            { q: "&iquest;Qu&eacute; color se populariz&oacute; para las pelotas por visibilidad televisiva?", options: ["Azul", "Amarillo", "Rojo"], answer: 1, note: "La pelota amarilla se volvi&oacute; una referencia visual del tenis moderno." },
+            { q: "&iquest;Qu&eacute; torneo se asocia con una fuerte tradici&oacute;n de vestimenta blanca?", options: ["Wimbledon", "US Open", "Roland Garros"], answer: 0, note: "Wimbledon conserva esa identidad como parte de su tradici&oacute;n." },
+            { q: "&iquest;Qu&eacute; golpe se relaciona m&aacute;s con el cierre en la red?", options: ["Volea", "Globo", "Slice defensivo"], answer: 0, note: "La volea permite atacar antes de que la pelota bote." },
+            { q: "&iquest;Qu&eacute; palabra del marcador representa cero?", options: ["Let", "Love", "Break"], answer: 1, note: "Love se usa para indicar cero en el puntaje." },
+            { q: "&iquest;Qu&eacute; tipo de empu&ntilde;adura se vincula mucho con una derecha moderna de topspin?", options: ["Continental", "Semi-western", "Eastern"], answer: 1, note: "La semi-western se asocia mucho con la derecha actual." },
+            { q: "&iquest;Qu&eacute; zona de la cancha suele usarse para construir el punto con paciencia?", options: ["Fondo", "Red", "Pasillo de dobles"], answer: 0, note: "Desde el fondo se organiza gran parte del intercambio." },
+            { q: "&iquest;Qu&eacute; parte del juego exige mucha lectura emocional y concentraci&oacute;n?", options: ["Solo el saque", "Solo el rev&eacute;s", "Todo el partido"], answer: 2, note: "La mente acompa&ntilde;a cada fase del juego, no solo un golpe." },
+            { q: "&iquest;Qu&eacute; idea resume mejor el tenis competitivo?", options: ["Solo potencia", "T&eacute;cnica, decisi&oacute;n y control", "Suerte y velocidad"], answer: 1, note: "El tenis combina t&eacute;cnica, lectura t&aacute;ctica y manejo emocional." }
         ];
         let index = 0;
         let score = 0;

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B1M3L4 - Desplazamientos basicos</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Segoe UI", Tahoma, sans-serif; min-height: 100vh; padding: 24px; background: linear-gradient(135deg, #dbeafe, #eff6ff 45%, #ecfeff); color: #1f2937; }
+        .shell { max-width: 1120px; margin: 0 auto; background: rgba(255,255,255,.97); border-radius: 28px; padding: 28px; box-shadow: 0 24px 48px rgba(0,0,0,.12); }
+        .hero { text-align: center; margin-bottom: 28px; }
+        .hero h1 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 12px; }
+        .hero p { max-width: 760px; margin: 0 auto; line-height: 1.65; color: #5b677a; }
+        .tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .tab { border: none; border-radius: 999px; padding: 12px 16px; font-weight: 700; cursor: pointer; color: #fff; background: #2563eb; }
+        .panel { border: 1px solid #e5e7eb; border-radius: 24px; padding: 20px; background: #fff; }
+        .court { margin-top: 18px; height: 260px; border-radius: 22px; background: linear-gradient(180deg, #2d8a47, #236c38); border: 6px solid #fff; position: relative; overflow: hidden; }
+        .court::before { content: ""; position: absolute; inset: 50% 0 auto 0; height: 2px; background: rgba(255,255,255,.9); }
+        .court::after { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: rgba(255,255,255,.9); }
+        .player { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; border-radius: 50%; background: #ef4444; transition: left .25s ease, bottom .25s ease, transform .25s ease; }
+        .detail p { line-height: 1.65; color: #5b677a; }
+        .quiz { margin-top: 24px; padding: 20px; border-radius: 22px; background: #0f172a; color: #fff; }
+        .scenario { padding: 14px; border-radius: 16px; background: rgba(255,255,255,.06); line-height: 1.6; }
+        .answers { display: grid; gap: 10px; margin-top: 14px; }
+        .answer { border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.06); color: #fff; border-radius: 14px; padding: 12px 14px; cursor: pointer; text-align: left; }
+        .feedback { margin-top: 14px; padding: 12px 14px; border-radius: 14px; display: none; }
+        .feedback.show { display: block; }
+        .feedback.good { background: rgba(22,163,74,.18); border: 1px solid rgba(74,222,128,.4); }
+        .feedback.bad { background: rgba(220,38,38,.18); border: 1px solid rgba(248,113,113,.4); }
+        .quiz-footer { margin-top: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .btn { border: none; border-radius: 999px; padding: 12px 18px; font-weight: 700; cursor: pointer; color: #fff; background: linear-gradient(135deg, #2563eb, #16a34a); }
+        .btn[disabled] { opacity: .45; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <header class="hero">
+            <h1>Desplazamientos basicos</h1>
+            <p>Reconoce cuatro movimientos esenciales del tenis y pract&iacute;calos con varios escenarios. La meta no es memorizar nombres, sino entender cu&aacute;ndo conviene cada respuesta corporal.</p>
+        </header>
+        <div class="tabs" id="tabs"></div>
+        <section class="panel">
+            <div class="detail">
+                <h2 id="detailTitle">Selecciona un desplazamiento</h2>
+                <p id="detailText">Haz clic en una opci&oacute;n para ver cu&aacute;ndo se usa y qu&eacute; error suele cometerse.</p>
+            </div>
+            <div class="court"><div class="player" id="player"></div></div>
+            <div class="quiz">
+                <div class="scenario" id="scenarioText">Explora primero los cuatro desplazamientos para activar el quiz.</div>
+                <div class="answers" id="answers"></div>
+                <div class="feedback" id="feedback"></div>
+                <div class="quiz-footer">
+                    <strong id="status">Resultado: 0/4</strong>
+                    <button class="btn" type="button" id="nextButton" disabled>Siguiente</button>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script>
+        const moves = [
+            { key: "split", name: "Split step", color: "#eab308", text: "Peque&ntilde;o salto de preparaci&oacute;n para activar piernas y equilibrio antes de reaccionar.", note: "Error com&uacute;n: caer pesado y perder velocidad.", pos: { left: "50%", bottom: "28px", transform: "translateX(-50%) scale(1.1)" } },
+            { key: "laterales", name: "Pasos laterales", color: "#2563eb", text: "Sirven para ajustar una pelota cercana sin cruzar las piernas y manteniendo estabilidad.", note: "Error com&uacute;n: abrir demasiado el cuerpo.", pos: { left: "34%", bottom: "44px", transform: "translateX(-50%)" } },
+            { key: "cruzados", name: "Pasos cruzados", color: "#dc2626", text: "Cubren m&aacute;s distancia cuando la pelota sale muy lejos y necesitas acelerar el desplazamiento.", note: "Error com&uacute;n: cruzar sin controlar el equilibrio.", pos: { left: "76%", bottom: "78px", transform: "translateX(-50%)" } },
+            { key: "ajuste", name: "Pasos de ajuste", color: "#16a34a", text: "Son pasitos cortos para afinar la distancia al impacto y golpear con mejor colocaci&oacute;n.", note: "Error com&uacute;n: llegar tarde y pegar forzado.", pos: { left: "56%", bottom: "52px", transform: "translateX(-50%) scale(.95)" } }
+        ];
+        const quiz = [
+            { q: "Tu rival est&aacute; a punto de golpear y quieres quedar listo para reaccionar hacia cualquier lado.", answer: "split", note: "El split step prepara la respuesta antes del golpe rival." },
+            { q: "La pelota viene cerca de tu lado, sin exigir mucha distancia, y quieres mantener equilibrio.", answer: "laterales", note: "Los pasos laterales suelen ayudar en ajustes cercanos y estables." },
+            { q: "La pelota sale muy abierta y debes cubrir mucho terreno con rapidez.", answer: "cruzados", note: "Los pasos cruzados cubren m&aacute;s distancia en menos tiempo." },
+            { q: "Ya llegaste a la pelota, pero necesitas acomodarte fino antes del impacto.", answer: "ajuste", note: "Los pasos de ajuste afinan la colocaci&oacute;n final." }
+        ];
+        const seen = new Set();
+        let quizIndex = 0;
+        let quizScore = 0;
+        let answered = false;
+        moves.forEach(function(move, index) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "tab";
+            button.style.background = move.color;
+            button.textContent = move.name;
+            button.addEventListener("click", function() {
+                seen.add(index);
+                document.getElementById("detailTitle").textContent = move.name;
+                document.getElementById("detailText").innerHTML = move.text + " " + move.note;
+                const player = document.getElementById("player");
+                player.style.left = move.pos.left;
+                player.style.bottom = move.pos.bottom;
+                player.style.transform = move.pos.transform;
+                if (seen.size === moves.length && document.getElementById("answers").children.length === 0) renderQuiz();
+            });
+            document.getElementById("tabs").appendChild(button);
+        });
+        function renderQuiz() {
+            answered = false;
+            const item = quiz[quizIndex];
+            document.getElementById("scenarioText").innerHTML = item.q;
+            document.getElementById("status").textContent = "Resultado: " + quizScore + "/" + quiz.length;
+            document.getElementById("nextButton").disabled = true;
+            const feedback = document.getElementById("feedback");
+            feedback.className = "feedback";
+            feedback.innerHTML = "";
+            const answers = document.getElementById("answers");
+            answers.innerHTML = "";
+            moves.forEach(function(move) {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "answer";
+                button.textContent = move.name;
+                button.addEventListener("click", function() { answerQuiz(move.key); });
+                answers.appendChild(button);
+            });
+        }
+        function answerQuiz(key) {
+            if (answered) return;
+            answered = true;
+            const item = quiz[quizIndex];
+            const ok = key === item.answer;
+            if (ok) quizScore += 1;
+            const feedback = document.getElementById("feedback");
+            feedback.className = "feedback show " + (ok ? "good" : "bad");
+            feedback.innerHTML = (ok ? "<strong>&iexcl;Correcto!</strong> " : "<strong>No era esa.</strong> ") + item.note;
+            document.getElementById("status").textContent = "Resultado: " + quizScore + "/" + quiz.length;
+            document.getElementById("nextButton").disabled = false;
+        }
+        document.getElementById("nextButton").addEventListener("click", function() {
+            quizIndex += 1;
+            if (quizIndex >= quiz.length) {
+                document.getElementById("answers").innerHTML = "";
+                const feedback = document.getElementById("feedback");
+                feedback.className = "feedback show good";
+                feedback.innerHTML = "<strong>Pr&aacute;ctica completada.</strong> Terminaste con " + quizScore + "/" + quiz.length + ".";
+                document.getElementById("nextButton").disabled = true;
+                return;
+            }
+            renderQuiz();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B1M3L1 - Tipos de raquetas</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Segoe UI", Tahoma, sans-serif; min-height: 100vh; padding: 24px; background: linear-gradient(135deg, #eff6ff, #eef2ff 55%, #fdf2f8); color: #243243; }
+        .shell { max-width: 1120px; margin: 0 auto; background: rgba(255,255,255,.97); border-radius: 28px; padding: 28px; box-shadow: 0 24px 48px rgba(0,0,0,.12); }
+        .hero { text-align: center; margin-bottom: 28px; }
+        .hero h1 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 12px; color: #172554; }
+        .hero p { max-width: 780px; margin: 0 auto; line-height: 1.65; color: #526276; }
+        .progress { max-width: 620px; margin: 22px auto 0; }
+        .progress-head { display: flex; justify-content: space-between; margin-bottom: 8px; color: #475569; }
+        .progress-track { height: 12px; border-radius: 999px; background: #e2e8f0; overflow: hidden; }
+        .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #d97706, #2563eb, #7c3aed); transition: width .25s ease; }
+        .timeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 24px; }
+        .era { border: 1px solid #e2e8f0; border-radius: 20px; padding: 18px; background: #fff; cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,.05); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+        .era:hover { transform: translateY(-2px); border-color: #c7d2fe; box-shadow: 0 16px 28px rgba(0,0,0,.08); }
+        .era.active { border-color: #6366f1; box-shadow: 0 16px 28px rgba(99,102,241,.14); }
+        .era-badge { display: inline-block; padding: 6px 10px; border-radius: 999px; color: #fff; font-size: .82rem; font-weight: 700; margin-bottom: 10px; }
+        .era h2 { margin-bottom: 8px; color: #1e293b; }
+        .era p { color: #64748b; line-height: 1.55; }
+        .detail { margin-top: 26px; padding: 22px; border-radius: 24px; background: linear-gradient(135deg, #1e293b, #334155); color: #fff; }
+        .detail p { line-height: 1.65; color: #d6e1eb; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 18px; }
+        .stat { padding: 14px; border-radius: 16px; background: rgba(255,255,255,.08); }
+        .stat strong { display: block; margin-bottom: 6px; }
+        .quiz { margin-top: 26px; padding: 22px; border-radius: 24px; background: #f8fafc; border: 1px solid #e2e8f0; }
+        .quiz h3 { margin-bottom: 12px; color: #1e293b; }
+        .quiz-card { padding: 16px; border-radius: 18px; background: #fff; border: 1px solid #e5e7eb; }
+        .quiz-card p { line-height: 1.6; color: #334155; }
+        .answers { display: grid; gap: 10px; margin-top: 14px; }
+        .answer { border: 1px solid #d1d5db; background: #fff; border-radius: 14px; padding: 12px 14px; cursor: pointer; text-align: left; }
+        .quiz-feedback { display: none; margin-top: 14px; padding: 12px 14px; border-radius: 14px; }
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.good { background: #ecfdf5; color: #166534; border: 1px solid #86efac; }
+        .quiz-feedback.bad { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
+        .quiz-footer { margin-top: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .btn { border: none; border-radius: 999px; padding: 12px 18px; font-weight: 700; cursor: pointer; color: #fff; background: linear-gradient(135deg, #2563eb, #7c3aed); }
+        .btn[disabled] { opacity: .45; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <header class="hero">
+            <h1>Tipos de raquetas</h1>
+            <p>Explora cinco etapas clave de la evoluci&oacute;n de las raquetas y luego resuelve un mini quiz para comprobar si reconoces c&oacute;mo cambiaron el peso, el tama&ntilde;o y el impacto en el juego.</p>
+            <div class="progress">
+                <div class="progress-head"><span>Exploraci&oacute;n</span><span id="progressText">0/5 etapas vistas</span></div>
+                <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+            </div>
+        </header>
+
+        <section class="timeline" id="timeline"></section>
+
+        <section class="detail">
+            <h2 id="detailTitle">Selecciona una etapa</h2>
+            <p id="detailText">Haz clic en una tarjeta para abrir su explicaci&oacute;n principal.</p>
+            <div class="stats">
+                <div class="stat"><strong>Peso aproximado</strong><span id="detailWeight">-</span></div>
+                <div class="stat"><strong>Cabeza</strong><span id="detailHead">-</span></div>
+                <div class="stat"><strong>Impacto</strong><span id="detailImpact">-</span></div>
+            </div>
+        </section>
+
+        <section class="quiz">
+            <h3>Mini quiz de repaso</h3>
+            <div class="quiz-card">
+                <p id="quizQuestion">Explora primero las etapas para activar el quiz.</p>
+                <div class="answers" id="quizAnswers"></div>
+                <div class="quiz-feedback" id="quizFeedback"></div>
+                <div class="quiz-footer">
+                    <strong id="quizStatus">Resultado: 0/3</strong>
+                    <button class="btn" type="button" id="nextButton" disabled>Siguiente</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const eras = [
+            { year: "1870s", title: "Madera clasica", tone: "#b45309", badge: "Origen", desc: "Las primeras raquetas eran pesadas, con cabeza peque&ntilde;a y exig&iacute;an mucho control t&eacute;cnico.", weight: "400-450 g", head: "65-70 in2", impact: "Juego m&aacute;s lento y conservador." },
+            { year: "1970s", title: "Metal", tone: "#64748b", badge: "Cambio", desc: "El aluminio y otros metales dieron m&aacute;s resistencia y una respuesta m&aacute;s uniforme.", weight: "350-380 g", head: "75-85 in2", impact: "Mayor durabilidad y maniobrabilidad." },
+            { year: "1980s", title: "Grafito", tone: "#2563eb", badge: "Revolucion", desc: "El grafito redujo peso y vibraciones, y abri&oacute; la puerta a golpes m&aacute;s explosivos.", weight: "280-320 g", head: "90-100 in2", impact: "M&aacute;s potencia con mejor confort." },
+            { year: "2000s", title: "Composites hibridos", tone: "#475569", badge: "Ajuste", desc: "Se mezclaron varios materiales para afinar sensaciones, rigidez y balance.", weight: "250-300 g", head: "95-110 in2", impact: "M&aacute;s personalizaci&oacute;n seg&uacute;n el jugador." },
+            { year: "Actualidad", title: "Personalizacion moderna", tone: "#7c3aed", badge: "Hoy", desc: "Las raquetas modernas buscan combinar potencia, efecto, estabilidad y sensaciones m&aacute;s precisas.", weight: "260-305 g", head: "98-110 in2", impact: "Mayor ajuste entre potencia, control y confort." }
+        ];
+        const quiz = [
+            { q: "Qu&eacute; etapa se relaciona mejor con raquetas muy pesadas y cabeza peque&ntilde;a?", options: ["Madera clasica", "Grafito", "Actualidad"], answer: 0, note: "Esa descripci&oacute;n corresponde al periodo cl&aacute;sico de madera." },
+            { q: "Qu&eacute; material redujo mucho el peso y ayud&oacute; a absorber mejor vibraciones?", options: ["Metal", "Grafito", "Tripa natural"], answer: 1, note: "El grafito marc&oacute; una gran diferencia en peso y sensaciones." },
+            { q: "Qu&eacute; idea resume mejor la etapa actual?", options: ["Volver a raquetas m&aacute;s pesadas", "Menos personalizaci&oacute;n", "Buscar ajuste fino seg&uacute;n el jugador"], answer: 2, note: "Hoy importa mucho adaptar el material al estilo de juego." }
+        ];
+        const seen = new Set();
+        let quizIndex = 0;
+        let quizScore = 0;
+        let answered = false;
+
+        function renderProgress() {
+            document.getElementById("progressText").textContent = seen.size + "/5 etapas vistas";
+            document.getElementById("progressBar").style.width = ((seen.size / eras.length) * 100) + "%";
+        }
+
+        function showEra(index) {
+            const era = eras[index];
+            seen.add(index);
+            document.querySelectorAll(".era").forEach(function(card, cardIndex) {
+                card.classList.toggle("active", cardIndex === index);
+            });
+            document.getElementById("detailTitle").textContent = era.year + " - " + era.title;
+            document.getElementById("detailText").innerHTML = era.desc;
+            document.getElementById("detailWeight").textContent = era.weight;
+            document.getElementById("detailHead").textContent = era.head;
+            document.getElementById("detailImpact").textContent = era.impact;
+            renderProgress();
+            if (seen.size === eras.length && document.getElementById("quizAnswers").children.length === 0) {
+                renderQuiz();
+            }
+        }
+
+        function renderQuiz() {
+            answered = false;
+            const item = quiz[quizIndex];
+            document.getElementById("quizQuestion").innerHTML = item.q;
+            document.getElementById("quizStatus").textContent = "Resultado: " + quizScore + "/" + quiz.length;
+            document.getElementById("nextButton").disabled = true;
+            const feedback = document.getElementById("quizFeedback");
+            feedback.className = "quiz-feedback";
+            feedback.innerHTML = "";
+            const answers = document.getElementById("quizAnswers");
+            answers.innerHTML = "";
+            item.options.forEach(function(option, optionIndex) {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "answer";
+                button.textContent = String.fromCharCode(65 + optionIndex) + ") " + option;
+                button.addEventListener("click", function() { answerQuiz(optionIndex); });
+                answers.appendChild(button);
+            });
+        }
+
+        function answerQuiz(optionIndex) {
+            if (answered) return;
+            answered = true;
+            const item = quiz[quizIndex];
+            const ok = optionIndex === item.answer;
+            if (ok) quizScore += 1;
+            const feedback = document.getElementById("quizFeedback");
+            feedback.className = "quiz-feedback show " + (ok ? "good" : "bad");
+            feedback.innerHTML = (ok ? "<strong>&iexcl;Correcto!</strong> " : "<strong>No era esa.</strong> ") + item.note;
+            document.getElementById("quizStatus").textContent = "Resultado: " + quizScore + "/" + quiz.length;
+            document.getElementById("nextButton").disabled = false;
+        }
+
+        document.getElementById("nextButton").addEventListener("click", function() {
+            quizIndex += 1;
+            if (quizIndex >= quiz.length) {
+                const feedback = document.getElementById("quizFeedback");
+                feedback.className = "quiz-feedback show good";
+                feedback.innerHTML = "<strong>Repaso completado.</strong> Terminaste con " + quizScore + "/" + quiz.length + ".";
+                document.getElementById("nextButton").disabled = true;
+                document.getElementById("quizAnswers").innerHTML = "";
+                return;
+            }
+            renderQuiz();
+        });
+
+        eras.forEach(function(era, index) {
+            const card = document.createElement("article");
+            card.className = "era";
+            card.innerHTML = '<span class="era-badge" style="background:' + era.tone + ';">' + era.badge + '</span><h2>' + era.year + '</h2><p><strong>' + era.title + '</strong><br>' + era.desc + '</p>';
+            card.addEventListener("click", function() { showEra(index); });
+            document.getElementById("timeline").appendChild(card);
+        });
+
+        renderProgress();
+    </script>
+</body>
+</html>
