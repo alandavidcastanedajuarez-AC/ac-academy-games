@@ -32,6 +32,9 @@
         .quiz-footer { margin-top: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
         .btn { border: none; border-radius: 999px; padding: 12px 18px; font-weight: 700; cursor: pointer; color: #fff; background: linear-gradient(135deg, #2563eb, #16a34a); }
         .btn[disabled] { opacity: .45; cursor: not-allowed; }
+        .complete { display: none; margin-top: 14px; padding: 14px; border-radius: 16px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.24); }
+        .complete.show { display: block; }
+        .complete h4 { margin-bottom: 6px; }
         @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -68,6 +71,11 @@
                             <strong id="quizStatus">Resultado: 0/3</strong>
                             <button class="btn" type="button" id="nextButton" disabled>Siguiente</button>
                         </div>
+                        <div class="complete" id="completeBox">
+                            <h4>Quiz completado</h4>
+                            <p id="completeText">Terminaste el bloque de empunaduras.</p>
+                            <button class="btn" type="button" id="replayButton" style="margin-top:10px;">Volver a jugar</button>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -100,6 +108,7 @@
             document.getElementById("quizQuestion").innerHTML = item.q;
             document.getElementById("quizStatus").textContent = "Resultado: " + quizScore + "/" + quiz.length;
             document.getElementById("nextButton").disabled = true;
+            document.getElementById("completeBox").className = "complete";
             const feedback = document.getElementById("quizFeedback");
             feedback.className = "feedback";
             feedback.innerHTML = "";
@@ -134,10 +143,35 @@
                 feedback.className = "feedback show good";
                 feedback.innerHTML = "<strong>Quiz completado.</strong> Terminaste con " + quizScore + "/" + quiz.length + ".";
                 document.getElementById("nextButton").disabled = true;
+                document.getElementById("completeText").textContent = "Resultado final: " + quizScore + "/" + quiz.length + ". Puedes repetir para reforzar el tema.";
+                document.getElementById("completeBox").className = "complete show";
                 return;
             }
             renderQuiz();
         });
+
+        function replayGame() {
+            seen.clear();
+            quizIndex = 0;
+            quizScore = 0;
+            answered = false;
+            document.getElementById("detailTitle").textContent = "Selecciona una empunadura";
+            document.getElementById("detailText").innerHTML = "Haz clic en una tarjeta para conocer su uso principal, su ventaja y una limitaci&oacute;n habitual.";
+            document.getElementById("detailUse").textContent = "Uso principal: -";
+            document.getElementById("detailAdvantage").textContent = "Ventaja: -";
+            document.getElementById("detailCaution").textContent = "Cuidado: -";
+            document.getElementById("detailCuriosity").textContent = "Curiosidad: -";
+            document.getElementById("quizQuestion").textContent = "Explora primero las cinco empunaduras para activar el quiz.";
+            document.getElementById("quizAnswers").innerHTML = "";
+            document.getElementById("quizFeedback").className = "feedback";
+            document.getElementById("quizFeedback").innerHTML = "";
+            document.getElementById("completeBox").className = "complete";
+            document.getElementById("nextButton").disabled = true;
+            document.getElementById("quizStatus").textContent = "Resultado: 0/3";
+            updateProgress();
+        }
+
+        document.getElementById("replayButton").addEventListener("click", replayGame);
         grips.forEach(function(grip, index) {
             const button = document.createElement("button");
             button.type = "button";

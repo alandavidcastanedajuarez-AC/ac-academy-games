@@ -30,6 +30,9 @@
         .quiz-footer { margin-top: 14px; display: flex; justify-content: space-between; align-items: center; }
         .btn { border: none; border-radius: 999px; padding: 12px 18px; font-weight: 700; cursor: pointer; color: #fff; background: linear-gradient(135deg, #2563eb, #16a34a); }
         .btn[disabled] { opacity: .45; cursor: not-allowed; }
+        .complete { display: none; margin-top: 14px; padding: 14px; border-radius: 16px; background: #ecfdf5; border: 1px solid #86efac; color: #166534; }
+        .complete.show { display: block; }
+        .complete h4 { margin-bottom: 6px; }
     </style>
 </head>
 <body>
@@ -52,6 +55,11 @@
                 <div class="quiz-footer">
                     <strong id="status">Resultado: 0/4</strong>
                     <button class="btn" type="button" id="nextButton" disabled>Siguiente</button>
+                </div>
+                <div class="complete" id="completeBox">
+                    <h4>Pr&aacute;ctica completada</h4>
+                    <p id="completeText">Terminaste los escenarios de desplazamiento.</p>
+                    <button class="btn" type="button" id="replayButton" style="margin-top:10px;">Repetir escenarios</button>
                 </div>
             </div>
         </section>
@@ -97,6 +105,7 @@
             document.getElementById("scenarioText").innerHTML = item.q;
             document.getElementById("status").textContent = "Resultado: " + quizScore + "/" + quiz.length;
             document.getElementById("nextButton").disabled = true;
+            document.getElementById("completeBox").className = "complete";
             const feedback = document.getElementById("feedback");
             feedback.className = "feedback";
             feedback.innerHTML = "";
@@ -131,10 +140,34 @@
                 feedback.className = "feedback show good";
                 feedback.innerHTML = "<strong>Pr&aacute;ctica completada.</strong> Terminaste con " + quizScore + "/" + quiz.length + ".";
                 document.getElementById("nextButton").disabled = true;
+                document.getElementById("completeText").textContent = "Resultado final: " + quizScore + "/" + quiz.length + ". Puedes repetir para ganar consistencia de lectura motriz.";
+                document.getElementById("completeBox").className = "complete show";
                 return;
             }
             renderQuiz();
         });
+
+        function replayGame() {
+            seen.clear();
+            quizIndex = 0;
+            quizScore = 0;
+            answered = false;
+            document.getElementById("detailTitle").textContent = "Selecciona un desplazamiento";
+            document.getElementById("detailText").innerHTML = "Haz clic en una opci&oacute;n para ver cu&aacute;ndo se usa y qu&eacute; error suele cometerse.";
+            document.getElementById("scenarioText").textContent = "Explora primero los cuatro desplazamientos para activar el quiz.";
+            document.getElementById("answers").innerHTML = "";
+            document.getElementById("feedback").className = "feedback";
+            document.getElementById("feedback").innerHTML = "";
+            document.getElementById("status").textContent = "Resultado: 0/4";
+            document.getElementById("nextButton").disabled = true;
+            document.getElementById("completeBox").className = "complete";
+            const player = document.getElementById("player");
+            player.style.left = "50%";
+            player.style.bottom = "28px";
+            player.style.transform = "translateX(-50%)";
+        }
+
+        document.getElementById("replayButton").addEventListener("click", replayGame);
     </script>
 </body>
 </html>
