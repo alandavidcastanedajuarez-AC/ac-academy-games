@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B1M3L5 - Zonas de la cancha</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Segoe UI", Tahoma, sans-serif; min-height: 100vh; padding: 24px; background: linear-gradient(135deg, #0f172a, #16324f 55%, #1e293b); color: #fff; }
+        .shell { max-width: 1120px; margin: 0 auto; background: rgba(255,255,255,.06); border-radius: 28px; padding: 28px; border: 1px solid rgba(255,255,255,.12); }
+        .hero { text-align: center; margin-bottom: 26px; }
+        .hero h1 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 12px; }
+        .hero p { max-width: 760px; margin: 0 auto; line-height: 1.65; color: #d7e2ef; }
+        .layout { display: grid; grid-template-columns: minmax(320px, 1fr) 320px; gap: 20px; align-items: start; }
+        .court { position: relative; aspect-ratio: 3 / 2; border-radius: 24px; background: linear-gradient(180deg, #2c8f4a, #226c39); border: 8px solid #fff; overflow: hidden; }
+        .court::before { content: ""; position: absolute; inset: 50% 0 auto 0; height: 2px; background: rgba(255,255,255,.95); }
+        .court::after { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: rgba(255,255,255,.95); }
+        .zone { position: absolute; cursor: pointer; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 700; padding: 8px; transition: transform .18s ease, filter .18s ease; }
+        .zone:hover { transform: scale(1.02); filter: brightness(1.06); }
+        .zone.done { box-shadow: inset 0 0 0 4px rgba(250,204,21,.95); }
+        .zone-defense { left: 0; top: 0; width: 26%; height: 100%; background: rgba(34,197,94,.35); }
+        .zone-transition { left: 29%; top: 0; width: 16%; height: 100%; background: rgba(234,179,8,.35); }
+        .zone-attack { left: 48%; top: 0; width: 16%; height: 100%; background: rgba(239,68,68,.35); }
+        .zone-doubles-top { left: 0; top: 0; width: 100%; height: 10%; background: rgba(148,163,184,.38); }
+        .zone-doubles-bottom { left: 0; bottom: 0; width: 100%; height: 10%; background: rgba(148,163,184,.38); }
+        .panel { border: 1px solid rgba(255,255,255,.12); border-radius: 22px; padding: 18px; background: rgba(255,255,255,.06); }
+        .panel p { color: #d7e2ef; line-height: 1.65; }
+        .progress-track { height: 10px; border-radius: 999px; background: rgba(255,255,255,.12); overflow: hidden; margin-top: 8px; }
+        .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #22c55e, #facc15); transition: width .25s ease; }
+        .quiz { margin-top: 18px; padding: 16px; border-radius: 18px; background: rgba(15,23,42,.72); }
+        .answers { display: grid; gap: 10px; margin-top: 12px; }
+        .answer { border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.06); color: #fff; border-radius: 14px; padding: 12px 14px; cursor: pointer; text-align: left; }
+        .feedback { display: none; margin-top: 12px; padding: 12px 14px; border-radius: 14px; }
+        .feedback.show { display: block; }
+        .feedback.good { background: rgba(22,163,74,.18); border: 1px solid rgba(74,222,128,.4); }
+        .feedback.bad { background: rgba(220,38,38,.18); border: 1px solid rgba(248,113,113,.4); }
+        @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <header class="hero">
+            <h1>Zonas de la cancha</h1>
+            <p>Observa c&oacute;mo cambia la intenci&oacute;n t&aacute;ctica seg&uacute;n tu posici&oacute;n: fondo para construir, transici&oacute;n para decidir, red para cerrar y pasillos para entender la l&oacute;gica del dobles.</p>
+        </header>
+        <section class="layout">
+            <div class="court">
+                <button class="zone zone-defense" type="button" data-zone="defensa">Defensa</button>
+                <button class="zone zone-transition" type="button" data-zone="transicion">Transicion</button>
+                <button class="zone zone-attack" type="button" data-zone="ataque">Ataque</button>
+                <button class="zone zone-doubles-top" type="button" data-zone="dobles">Dobles</button>
+                <button class="zone zone-doubles-bottom" type="button" data-zone="dobles">Dobles</button>
+            </div>
+            <aside class="panel">
+                <h2 id="detailTitle">Selecciona una zona</h2>
+                <p id="detailText">Haz clic en una zona para leer su idea principal.</p>
+                <div style="margin-top:18px;">
+                    <strong id="progressText">0/4 zonas vistas</strong>
+                    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+                </div>
+                <div class="quiz">
+                    <h3>Mini quiz</h3>
+                    <p>Si recibes una bola corta y decides avanzar para tomar la iniciativa, en qu&eacute; zona de lectura t&aacute;ctica est&aacute;s entrando?</p>
+                    <div class="answers">
+                        <button class="answer" type="button" data-answer="defensa">Defensa</button>
+                        <button class="answer" type="button" data-answer="transicion">Transicion</button>
+                        <button class="answer" type="button" data-answer="ataque">Ataque</button>
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                </div>
+            </aside>
+        </section>
+    </main>
+    <script>
+        const zones = {
+            defensa: "Desde el fondo construyes el punto con paciencia, altura y profundidad.",
+            transicion: "Es una zona delicada: sirve para avanzar o retroceder, pero no conviene quedarse quieto mucho tiempo.",
+            ataque: "Cerca de la red o en posici&oacute;n adelantada buscas cerrar el punto con decisi&oacute;n y precisi&oacute;n.",
+            dobles: "Los pasillos ampl&iacute;an la cancha en dobles y cambian los &aacute;ngulos disponibles."
+        };
+        const seen = new Set();
+        function updateProgress() {
+            document.getElementById("progressText").textContent = seen.size + "/4 zonas vistas";
+            document.getElementById("progressBar").style.width = ((seen.size / 4) * 100) + "%";
+        }
+        document.querySelectorAll("[data-zone]").forEach(function(button) {
+            button.addEventListener("click", function() {
+                const key = button.dataset.zone;
+                seen.add(key);
+                document.getElementById("detailTitle").textContent = key.charAt(0).toUpperCase() + key.slice(1);
+                document.getElementById("detailText").innerHTML = zones[key];
+                document.querySelectorAll('[data-zone="' + key + '"]').forEach(function(item) { item.classList.add("done"); });
+                updateProgress();
+            });
+        });
+        document.querySelectorAll("[data-answer]").forEach(function(button) {
+            button.addEventListener("click", function() {
+                const ok = button.dataset.answer === "transicion";
+                const feedback = document.getElementById("feedback");
+                feedback.className = "feedback show " + (ok ? "good" : "bad");
+                feedback.innerHTML = ok ? "<strong>&iexcl;Correcto!</strong> Cuando avanzas desde el fondo tras una bola corta, entras primero en una l&oacute;gica de transici&oacute;n." : "<strong>Revisa el concepto.</strong> Ese avance inicial se interpreta mejor como una fase de transici&oacute;n.";
+            });
+        });
+        updateProgress();
+    </script>
+</body>
+</html>

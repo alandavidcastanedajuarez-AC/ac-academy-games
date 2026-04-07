@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B1M3L2 - Empunaduras basicas</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Segoe UI", Tahoma, sans-serif; min-height: 100vh; padding: 24px; background: linear-gradient(135deg, #eff6ff, #f0fdf4 55%, #fff7ed); color: #1f2937; }
+        .shell { max-width: 1080px; margin: 0 auto; background: rgba(255,255,255,.96); border-radius: 28px; padding: 28px; box-shadow: 0 24px 48px rgba(0,0,0,.12); }
+        .hero { text-align: center; margin-bottom: 28px; }
+        .hero h1 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 12px; }
+        .hero p { max-width: 740px; margin: 0 auto; line-height: 1.65; color: #5b677a; }
+        .layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; }
+        .panel { border: 1px solid #e5e7eb; border-radius: 24px; padding: 20px; background: #fff; }
+        .grip-list { display: grid; gap: 12px; }
+        .grip-btn { border: none; border-radius: 16px; padding: 14px 16px; color: #fff; text-align: left; font-weight: 700; cursor: pointer; }
+        .grip-btn small { display: block; margin-top: 4px; font-weight: 500; opacity: .92; }
+        .progress { margin-top: 16px; padding: 14px; border-radius: 16px; background: #f8fafc; }
+        .progress-track { margin-top: 8px; height: 10px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
+        .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #2563eb, #16a34a); transition: width .25s ease; }
+        .chip-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0; }
+        .chip { padding: 8px 12px; border-radius: 999px; background: #f3f4f6; font-size: .9rem; color: #374151; }
+        .quiz { margin-top: 24px; padding: 18px; border-radius: 20px; background: #0f172a; color: #fff; }
+        .quiz-options { display: grid; gap: 10px; margin-top: 14px; }
+        .quiz-option { border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.06); color: #fff; border-radius: 14px; padding: 12px 14px; cursor: pointer; text-align: left; }
+        .quiz-feedback { margin-top: 14px; padding: 12px 14px; border-radius: 14px; display: none; }
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.good { background: rgba(22,163,74,.18); border: 1px solid rgba(74,222,128,.4); }
+        .quiz-feedback.bad { background: rgba(220,38,38,.18); border: 1px solid rgba(248,113,113,.4); }
+        @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <header class="hero">
+            <h1>Empunaduras basicas</h1>
+            <p>Explora cinco empunaduras frecuentes y observa para qu&eacute; golpes resulta m&aacute;s conveniente cada una. Al final, resuelve un mini quiz de aplicaci&oacute;n.</p>
+        </header>
+        <section class="layout">
+            <aside class="panel">
+                <div class="grip-list" id="gripList"></div>
+                <div class="progress">
+                    <strong id="progressText">0/5 empunaduras vistas</strong>
+                    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+                </div>
+            </aside>
+            <section class="panel">
+                <h2 id="detailTitle">Selecciona una empunadura</h2>
+                <p id="detailText">Haz clic en una tarjeta para conocer su uso principal, su ventaja y una limitaci&oacute;n habitual.</p>
+                <div class="chip-row">
+                    <span class="chip" id="detailUse">Uso principal: -</span>
+                    <span class="chip" id="detailAdvantage">Ventaja: -</span>
+                    <span class="chip" id="detailCaution">Cuidado: -</span>
+                </div>
+                <p id="detailCuriosity">Curiosidad: -</p>
+                <div class="quiz">
+                    <h3>Mini quiz</h3>
+                    <p>Qu&eacute; empunadura se asocia mejor con una derecha moderna con topspin y buen equilibrio entre potencia y control?</p>
+                    <div class="quiz-options">
+                        <button class="quiz-option" type="button" data-answer="continental">Continental</button>
+                        <button class="quiz-option" type="button" data-answer="eastern">Eastern</button>
+                        <button class="quiz-option" type="button" data-answer="semiwestern">Semi-western</button>
+                        <button class="quiz-option" type="button" data-answer="western">Western</button>
+                    </div>
+                    <div class="quiz-feedback" id="quizFeedback"></div>
+                </div>
+            </section>
+        </section>
+    </main>
+    <script>
+        const grips = [
+            { key: "continental", name: "Continental", color: "#2563eb", sub: "Saque, volea y smash", text: "Es una empunadura vers&aacute;til para acciones r&aacute;pidas y de respuesta corta.", use: "Saque y volea", advantage: "Versatilidad", caution: "No es la mejor para topspin alto", curiosity: "Durante muchos a&ntilde;os fue una referencia universal." },
+            { key: "eastern", name: "Eastern", color: "#16a34a", sub: "Golpe plano y aprendizaje", text: "Suele ayudar a quienes est&aacute;n construyendo una derecha simple y directa.", use: "Derecha cl&aacute;sica", advantage: "Aprendizaje intuitivo", caution: "Genera menos liftado", curiosity: "Ayuda a sentir la cara de la raqueta con claridad." },
+            { key: "semiwestern", name: "Semi-western", color: "#d97706", sub: "Derecha moderna", text: "Es una de las opciones m&aacute;s usadas para golpear con potencia y efecto liftado.", use: "Derecha con topspin", advantage: "Balance potencia-control", caution: "Puede complicar bolas muy bajas", curiosity: "Es una referencia com&uacute;n en el tenis actual." },
+            { key: "western", name: "Western", color: "#dc2626", sub: "Topspin intenso", text: "Favorece mucho giro en la pelota, especialmente en botes altos.", use: "Topspin alto", advantage: "Mucho efecto", caution: "Menos c&oacute;moda en bolas bajas", curiosity: "Exige m&aacute;s tiempo y coordinaci&oacute;n." },
+            { key: "twohanded", name: "Reves a dos manos", color: "#7c3aed", sub: "Estabilidad en reves", text: "Sirve para entender el apoyo extra y la firmeza del rev&eacute;s a dos manos.", use: "Rev&eacute;s estable", advantage: "Firmeza y apoyo", caution: "Menor alcance", curiosity: "Es muy frecuente en el tenis competitivo moderno." }
+        ];
+        const seen = new Set();
+        function updateProgress() {
+            document.getElementById("progressText").textContent = seen.size + "/5 empunaduras vistas";
+            document.getElementById("progressBar").style.width = ((seen.size / grips.length) * 100) + "%";
+        }
+        grips.forEach(function(grip, index) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "grip-btn";
+            button.style.background = grip.color;
+            button.innerHTML = grip.name + "<small>" + grip.sub + "</small>";
+            button.addEventListener("click", function() {
+                seen.add(index);
+                document.getElementById("detailTitle").textContent = grip.name;
+                document.getElementById("detailText").innerHTML = grip.text;
+                document.getElementById("detailUse").textContent = "Uso principal: " + grip.use;
+                document.getElementById("detailAdvantage").textContent = "Ventaja: " + grip.advantage;
+                document.getElementById("detailCaution").textContent = "Cuidado: " + grip.caution;
+                document.getElementById("detailCuriosity").textContent = "Curiosidad: " + grip.curiosity;
+                updateProgress();
+            });
+            document.getElementById("gripList").appendChild(button);
+        });
+        document.querySelectorAll("[data-answer]").forEach(function(button) {
+            button.addEventListener("click", function() {
+                const ok = button.dataset.answer === "semiwestern";
+                const feedback = document.getElementById("quizFeedback");
+                feedback.className = "quiz-feedback show " + (ok ? "good" : "bad");
+                feedback.innerHTML = ok ? "<strong>&iexcl;Correcto!</strong> La semi-western suele asociarse con una derecha moderna de topspin." : "<strong>Revisa esa idea.</strong> La opci&oacute;n m&aacute;s ligada a esa descripci&oacute;n es la semi-western.";
+            });
+        });
+        updateProgress();
+    </script>
+</body>
+</html>

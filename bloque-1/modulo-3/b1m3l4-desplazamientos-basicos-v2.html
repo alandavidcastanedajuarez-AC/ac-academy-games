@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B1M3L4 - Desplazamientos basicos</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Segoe UI", Tahoma, sans-serif; min-height: 100vh; padding: 24px; background: linear-gradient(135deg, #dbeafe, #eff6ff 45%, #ecfeff); color: #1f2937; }
+        .shell { max-width: 1120px; margin: 0 auto; background: rgba(255,255,255,.97); border-radius: 28px; padding: 28px; box-shadow: 0 24px 48px rgba(0,0,0,.12); }
+        .hero { text-align: center; margin-bottom: 28px; }
+        .hero h1 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 12px; }
+        .hero p { max-width: 760px; margin: 0 auto; line-height: 1.65; color: #5b677a; }
+        .layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; }
+        .menu, .content { border: 1px solid #e5e7eb; border-radius: 24px; padding: 20px; background: #fff; }
+        .move-list { display: grid; gap: 10px; }
+        .move-btn { border: none; border-radius: 14px; padding: 12px 14px; color: #fff; text-align: left; font-weight: 700; cursor: pointer; }
+        .court { margin-top: 18px; height: 260px; border-radius: 22px; background: linear-gradient(180deg, #2d8a47, #236c38); border: 6px solid #fff; position: relative; overflow: hidden; }
+        .court::before { content: ""; position: absolute; inset: 50% 0 auto 0; height: 2px; background: rgba(255,255,255,.9); }
+        .court::after { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: rgba(255,255,255,.9); }
+        .player { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; border-radius: 50%; background: #ef4444; transition: left .25s ease, bottom .25s ease, transform .25s ease; }
+        .detail p { color: #5b677a; line-height: 1.65; }
+        .quiz { margin-top: 24px; padding: 18px; border-radius: 20px; background: #0f172a; color: #fff; }
+        .answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 14px; }
+        .answer { border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.06); color: #fff; border-radius: 14px; padding: 12px 14px; cursor: pointer; text-align: left; }
+        .feedback { margin-top: 14px; padding: 12px 14px; border-radius: 14px; display: none; }
+        .feedback.show { display: block; }
+        .feedback.good { background: rgba(22,163,74,.18); border: 1px solid rgba(74,222,128,.4); }
+        .feedback.bad { background: rgba(220,38,38,.18); border: 1px solid rgba(248,113,113,.4); }
+        @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <header class="hero">
+            <h1>Desplazamientos basicos</h1>
+            <p>Reconoce cuatro movimientos esenciales del tenis: split step, pasos laterales, pasos cruzados y pasos de ajuste. Cada uno cumple una funci&oacute;n distinta seg&uacute;n la distancia y el tiempo disponible.</p>
+        </header>
+        <section class="layout">
+            <aside class="menu">
+                <div class="move-list" id="moveList"></div>
+            </aside>
+            <section class="content">
+                <div class="detail">
+                    <h2 id="detailTitle">Selecciona un desplazamiento</h2>
+                    <p id="detailText">Haz clic en una opci&oacute;n para ver cu&aacute;ndo se usa y qu&eacute; error suele cometerse.</p>
+                </div>
+                <div class="court"><div class="player" id="player"></div></div>
+                <div class="quiz">
+                    <h3>Mini quiz</h3>
+                    <p>Tu rival est&aacute; a punto de golpear y t&uacute; necesitas prepararte para reaccionar en cualquier direcci&oacute;n. Qu&eacute; movimiento encaja mejor?</p>
+                    <div class="answers">
+                        <button class="answer" type="button" data-answer="split">Split step</button>
+                        <button class="answer" type="button" data-answer="laterales">Pasos laterales</button>
+                        <button class="answer" type="button" data-answer="cruzados">Pasos cruzados</button>
+                        <button class="answer" type="button" data-answer="ajuste">Pasos de ajuste</button>
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                </div>
+            </section>
+        </section>
+    </main>
+    <script>
+        const moves = [
+            { key: "split", name: "Split step", color: "#eab308", text: "Peque&ntilde;o salto de preparaci&oacute;n para activar piernas y equilibrio antes de reaccionar.", note: "Error com&uacute;n: caer pesado y perder velocidad.", pos: { left: "50%", bottom: "28px", transform: "translateX(-50%) scale(1.1)" } },
+            { key: "laterales", name: "Pasos laterales", color: "#2563eb", text: "Sirven para ajustar una pelota cercana sin cruzar las piernas y manteniendo estabilidad.", note: "Error com&uacute;n: abrir demasiado el cuerpo.", pos: { left: "34%", bottom: "44px", transform: "translateX(-50%)" } },
+            { key: "cruzados", name: "Pasos cruzados", color: "#dc2626", text: "Cubren m&aacute;s distancia cuando la pelota sale muy lejos y necesitas acelerar el desplazamiento.", note: "Error com&uacute;n: cruzar sin controlar el equilibrio.", pos: { left: "76%", bottom: "78px", transform: "translateX(-50%)" } },
+            { key: "ajuste", name: "Pasos de ajuste", color: "#16a34a", text: "Son pasitos cortos para afinar la distancia al impacto y golpear con mejor colocaci&oacute;n.", note: "Error com&uacute;n: llegar tarde y pegar forzado.", pos: { left: "56%", bottom: "52px", transform: "translateX(-50%) scale(.95)" } }
+        ];
+        moves.forEach(function(move) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "move-btn";
+            button.style.background = move.color;
+            button.textContent = move.name;
+            button.addEventListener("click", function() {
+                document.getElementById("detailTitle").textContent = move.name;
+                document.getElementById("detailText").innerHTML = move.text + " " + move.note;
+                const player = document.getElementById("player");
+                player.style.left = move.pos.left;
+                player.style.bottom = move.pos.bottom;
+                player.style.transform = move.pos.transform;
+            });
+            document.getElementById("moveList").appendChild(button);
+        });
+        document.querySelectorAll("[data-answer]").forEach(function(button) {
+            button.addEventListener("click", function() {
+                const ok = button.dataset.answer === "split";
+                const feedback = document.getElementById("feedback");
+                feedback.className = "feedback show " + (ok ? "good" : "bad");
+                feedback.innerHTML = ok ? "<strong>&iexcl;Correcto!</strong> El split step prepara la reacci&oacute;n antes del golpe rival." : "<strong>No es la mejor opci&oacute;n para ese instante.</strong> Antes de reaccionar, el movimiento de referencia es el split step.";
+            });
+        });
+    </script>
+</body>
+</html>
