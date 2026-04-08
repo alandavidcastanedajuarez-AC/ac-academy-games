@@ -1410,13 +1410,13 @@
      <p style="font-size: 1.1em; margin-bottom: 15px;">Estás fuera de la cancha. ¿Dónde deberías colocar la pelota para ganar tiempo?</p>
      <div class="interactive-court" id="interactiveCourt">
       <div class="zone" data-correct="true" style="top: 10%; left: 10%; width: 35%; height: 35%;">
-       Fondo cruzado alto ✓
+       Zona profunda cruzada
       </div>
       <div class="zone" data-correct="false" style="top: 50%; left: 35%; width: 30%; height: 35%;">
-       Medio corto ✗
+       Zona media
       </div>
       <div class="zone" data-correct="false" style="top: 10%; right: 10%; width: 35%; height: 35%;">
-       Paralelo corto ✗
+       Zona paralela corta
       </div>
      </div>
      <div id="courtFeedback" class="feedback"></div>
@@ -1846,22 +1846,16 @@
             if (isCorrect) {
                 button.classList.add('selected-correct');
                 feedbackDiv.className = 'feedback correct show';
-                feedbackDiv.textContent = '✓ ¡Correcto! ' + situation.explanation;
+                feedbackDiv.textContent = 'Buena lectura. ' + situation.explanation;
                 recognitionScore++;
                 currentStreak++;
                 updateStreakMeter();
             } else {
                 button.classList.add('selected-incorrect');
                 feedbackDiv.className = 'feedback incorrect show';
-                feedbackDiv.textContent = '✗ Incorrecto. ' + situation.explanation;
+                feedbackDiv.textContent = 'Esa lectura no es la más sólida para esta situación. ' + situation.explanation;
                 currentStreak = 0;
                 updateStreakMeter();
-                
-                allButtons.forEach(btn => {
-                    if (btn.dataset.state === situation.correctState) {
-                        btn.classList.add('selected-correct');
-                    }
-                });
             }
 
             card.classList.add('answered');
@@ -2106,21 +2100,18 @@
                 
                 document.querySelectorAll('.zone').forEach(z => {
                     z.style.pointerEvents = 'none';
-                    if (z.dataset.correct === 'true') {
-                        z.classList.add('correct-zone');
-                    } else {
-                        z.classList.add('incorrect-zone');
-                    }
                 });
 
                 if (isCorrect) {
+                    this.classList.add('correct-zone');
                     feedback.className = 'feedback correct show';
-                    feedback.textContent = '✓ ¡Perfecto! El fondo cruzado alto te da tiempo para recuperar posición.';
+                    feedback.textContent = 'Buena lectura. Una zona profunda te ayuda a recuperar tiempo y posición.';
                     score++;
                     phaseScores.defensive++;
                 } else {
+                    this.classList.add('incorrect-zone');
                     feedback.className = 'feedback incorrect show';
-                    feedback.textContent = '✗ Eso deja el punto abierto al rival. Necesitas profundidad y altura.';
+                    feedback.textContent = 'Esa elección no te da suficiente margen defensivo. En defensa conviene priorizar profundidad y altura.';
                 }
 
                 totalQuestions++;
