@@ -1,0 +1,1242 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lee al Rival - Lenguaje Corporal Táctico</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', 'Poppins', 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1e5128 0%, #2d6a4f 50%, #40916c 100%);
+      min-height: 100%;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        repeating-linear-gradient(90deg, transparent, transparent 48%, rgba(255,255,255,0.05) 48%, rgba(255,255,255,0.05) 52%, transparent 52%),
+        repeating-linear-gradient(0deg, transparent, transparent 48%, rgba(255,255,255,0.05) 48%, rgba(255,255,255,0.05) 52%, transparent 52%);
+      background-size: 80px 80px;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen {
+      display: none;
+      animation: fadeIn 0.5s ease-in;
+      width: 100%;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .intro-screen {
+      text-align: center;
+      color: white;
+      position: relative;
+      z-index: 1;
+    }
+
+    .intro-screen::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4) 20%, rgba(255,255,255,0.4) 80%, transparent);
+      box-shadow: 0 0 20px rgba(255,255,255,0.3);
+      transform: translateY(-50%);
+      z-index: -1;
+    }
+
+    .intro-title {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+      color: #ffd700;
+      letter-spacing: 2px;
+    }
+
+    .intro-subtitle {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      opacity: 0.95;
+      font-weight: 600;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .player-silhouettes {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      margin: 3rem 0;
+    }
+
+    .silhouette {
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    .silhouette:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+
+    .silhouette:nth-child(3) {
+      animation-delay: 0.6s;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .silhouette-icon {
+      font-size: 5rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .silhouette-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .intro-message {
+      font-size: 1.25rem;
+      line-height: 1.8;
+      margin: 2rem 0;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      color: #1e5128;
+      border: none;
+      padding: 1rem 3rem;
+      font-size: 1.25rem;
+      font-weight: 800;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(255,215,0,0.4), 0 0 0 3px rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(255,215,0,0.6), 0 0 0 4px rgba(255,255,255,0.5);
+      background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+    }
+
+    .game-screen {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3), 0 0 0 3px rgba(255,215,0,0.2);
+      max-width: 900px;
+      margin: 0 auto;
+      backdrop-filter: blur(10px);
+    }
+
+    .game-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 3px solid #ffd700;
+    }
+
+    .game-header h2 {
+      color: #1e5128;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      font-weight: 800;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .progress-info {
+      color: #2d6a4f;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.85rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, #2d6a4f 0%, #40916c 100%);
+      border-radius: 16px;
+      cursor: pointer;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3), 0 0 0 2px rgba(255,255,255,0.1);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.4), 0 0 0 2px rgba(255,215,0,0.3);
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card.matched {
+      animation: matchPulse 0.6s ease;
+      pointer-events: none;
+      box-shadow: 0 0 30px rgba(255,215,0,0.8), 0 0 60px rgba(255,215,0,0.4) !important;
+    }
+
+    @keyframes matchPulse {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.15) rotate(2deg); }
+      50% { transform: scale(1.1) rotate(-2deg); }
+      75% { transform: scale(1.15) rotate(1deg); }
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      border-radius: 16px;
+    }
+
+    .card-front {
+      background: linear-gradient(135deg, #2d6a4f 0%, #40916c 100%);
+      color: white;
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .card-back {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      transform: rotateY(180deg);
+      border: 3px solid #ffd700;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #1e5128;
+      line-height: 1.4;
+      font-weight: 600;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .card-emoji {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .feedback-message {
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+      min-height: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .feedback-message.correct {
+      color: #10b981;
+    }
+
+    .feedback-message.incorrect {
+      color: #ef4444;
+    }
+
+    .application-screen {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3), 0 0 0 3px rgba(255,215,0,0.2);
+      max-width: 800px;
+      margin: 0 auto;
+      backdrop-filter: blur(10px);
+    }
+
+    .scenario {
+      margin-bottom: 2rem;
+    }
+
+    .scenario-image {
+      font-size: 6rem;
+      text-align: center;
+      margin: 2rem 0;
+    }
+
+    .scenario-question {
+      font-size: 1.25rem;
+      color: #333;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .option-btn {
+      background: #f3f4f6;
+      border: 2px solid #e5e7eb;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+    }
+
+    .option-btn:hover {
+      background: #e5e7eb;
+      border-color: #667eea;
+    }
+
+    .option-btn.correct {
+      background: #d1fae5;
+      border-color: #10b981;
+      pointer-events: none;
+    }
+
+    .option-btn.incorrect {
+      background: #fee2e2;
+      border-color: #ef4444;
+      pointer-events: none;
+    }
+
+    .scenario-feedback {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 12px;
+      background: #f0f9ff;
+      border-left: 4px solid #3b82f6;
+      display: none;
+    }
+
+    .scenario-feedback.show {
+      display: block;
+      animation: slideDown 0.4s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reflection-screen {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3), 0 0 0 3px rgba(255,215,0,0.2);
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .reflection-title {
+      font-size: 1.75rem;
+      color: #1e5128;
+      margin-bottom: 1.5rem;
+      line-height: 1.8;
+      font-weight: 700;
+    }
+
+    .mirrors {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .mirror {
+      cursor: pointer;
+      padding: 1.5rem;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      border: 3px solid #ffd700;
+      transition: all 0.3s ease;
+      flex: 1;
+      max-width: 200px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .mirror:hover {
+      transform: translateY(-8px) scale(1.05);
+      border-color: #ffed4e;
+      box-shadow: 0 12px 30px rgba(255, 215, 0, 0.4);
+      background: linear-gradient(135deg, #fffef7 0%, #ffffff 100%);
+    }
+
+    .mirror-icon {
+      font-size: 4rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .mirror-label {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .coaching-message {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+      border-radius: 12px;
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #333;
+      display: none;
+    }
+
+    .coaching-message.show {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .results-screen {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      border-radius: 24px;
+      padding: 3rem 2rem;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.3), 0 0 0 4px rgba(255,215,0,0.4);
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .results-screen::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
+      animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .results-icon {
+      font-size: 6rem;
+      margin-bottom: 1rem;
+      animation: bounce 2s ease-in-out infinite;
+      position: relative;
+      z-index: 1;
+    }
+
+    .results-score {
+      font-size: 3.5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 1;
+    }
+
+    .results-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #1e5128;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .results-message {
+      font-size: 1.1rem;
+      color: #2d6a4f;
+      margin-bottom: 2rem;
+      line-height: 1.8;
+      font-weight: 500;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #2d6a4f 0%, #40916c 100%);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, #40916c 0%, #52b788 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(64, 145, 108, 0.4);
+    }
+
+    .btn-action {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      color: #1e5128;
+      border: 2px solid #ffd700;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn-action:hover {
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+      border-color: #ffed4e;
+    }
+
+    .loading-indicator {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-left: 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      .intro-title {
+        font-size: 2rem;
+      }
+
+      .intro-subtitle {
+        font-size: 1.25rem;
+      }
+
+      .cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+      }
+
+      .card-back {
+        font-size: 0.75rem;
+        padding: 0.5rem;
+      }
+
+      .card-emoji {
+        font-size: 2rem;
+      }
+
+      .player-silhouettes {
+        gap: 1.5rem;
+      }
+
+      .silhouette-icon {
+        font-size: 3rem;
+      }
+
+      .mirrors {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .mirror {
+        max-width: 250px;
+        width: 100%;
+      }
+    }
+  </style>
+  </head>
+ <body>
+  <div class="container"><!-- Pantalla 1: Portada -->
+   <div class="screen active" id="introScreen">
+    <div class="intro-screen">
+     <h1 class="intro-title" id="gameTitle">Lee al rival</h1>
+     <p class="intro-subtitle" id="gameSubtitle">El Lenguaje Corporal Táctico</p>
+     <div class="player-silhouettes">
+      <div class="silhouette"><span class="silhouette-icon">😔</span> <span class="silhouette-label">Frustrado</span>
+      </div>
+      <div class="silhouette"><span class="silhouette-icon">😎</span> <span class="silhouette-label">Seguro</span>
+      </div>
+      <div class="silhouette"><span class="silhouette-icon">🎯</span> <span class="silhouette-label">Concentrado</span>
+      </div>
+     </div>
+     <p class="intro-message" id="introText">Tu cuerpo habla.<br>
+      El del rival también.<br>
+      Aprende a leerlo y usarlo a tu favor.</p><button class="btn-primary" id="startBtn" onclick="startGame()">🧠 Empezar el juego</button>
+    </div>
+   </div><!-- Pantalla 2: Juego de Memorama -->
+   <div class="screen" id="gameScreen">
+    <div class="game-screen">
+     <div class="game-header">
+      <h2>Empareja las tarjetas</h2>
+      <p class="progress-info">🧩 Pares encontrados: <span id="matchCount">0</span> / 9 | 🎯 Puntaje: <span id="scoreCount">0</span></p>
+     </div>
+     <div class="feedback-message" id="feedbackMessage"></div>
+     <div class="cards-grid" id="cardsGrid"></div>
+    </div>
+   </div><!-- Pantalla 3: Reflexión Personal -->
+   <div class="screen" id="reflectionScreen">
+    <div class="reflection-screen">
+     <p class="reflection-title" id="reflectionMessage">Cada cuerpo habla.<br>
+      ¿Qué dice el tuyo durante los partidos?</p>
+     <div class="mirrors">
+      <div class="mirror" onclick="selectMirror('seguro')"><span class="mirror-icon">😎</span> <span class="mirror-label">Seguro</span>
+      </div>
+      <div class="mirror" onclick="selectMirror('concentrado')"><span class="mirror-icon">🎯</span> <span class="mirror-label">Concentrado</span>
+      </div>
+      <div class="mirror" onclick="selectMirror('frustrado')"><span class="mirror-icon">😔</span> <span class="mirror-label">Frustrado</span>
+      </div>
+     </div>
+     <div class="coaching-message" id="coachingMessage"></div><button class="btn-secondary" id="continueToResults" onclick="startApplicationPhase()" style="display: none;">Ir a lectura de partido</button>
+    </div>
+   </div><!-- Pantalla 4: Aplicación táctica -->
+   <div class="screen" id="applicationScreen">
+    <div class="application-screen">
+     <h2 style="text-align: center; color: #1e5128; margin-bottom: 0.5rem;">Lee la señal y decide</h2>
+     <p style="text-align: center; color: #2d6a4f; margin-bottom: 1.5rem; line-height: 1.7;">Ahora ya no basta con reconocer emociones. Toca decidir qué hacer en cancha frente a señales reales del rival.</p>
+     <div style="text-align: center; color: #1e5128; font-weight: 700; margin-bottom: 1rem;" id="scenarioProgress">Escenario 1 de 3</div>
+     <div class="scenario">
+      <div class="scenario-image" id="scenarioImage">😤</div>
+      <div class="scenario-question" id="scenarioQuestion"></div>
+      <div class="options" id="scenarioOptions"></div>
+      <div class="scenario-feedback" id="scenarioFeedback"></div>
+     </div>
+    </div>
+   </div><!-- Pantalla 5: Resultados -->
+   <div class="screen" id="resultsScreen">
+    <div class="results-screen">
+     <div class="results-icon" id="resultsIcon">
+      🏆
+     </div>
+     <div class="results-score" id="resultsScore">
+      100%
+     </div>
+     <h2 class="results-title" id="resultsTitle">Táctico mental – Nivel Experto</h2>
+     <p class="results-message" id="resultsMessage">Has leído correctamente todas las actitudes. Tu capacidad de observación está al nivel profesional.</p><button class="btn-secondary" id="restartBtn" onclick="restartGame()">🔄 Jugar de nuevo</button>
+     <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1;"><button class="btn-action" onclick="reviewScenarios()"> 🔎 Repasar escenarios </button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "Lee al rival",
+      game_subtitle: "El Lenguaje Corporal Táctico",
+      intro_text: "Tu cuerpo habla.\nEl del rival también.\nAprende a leerlo y usarlo a tu favor.",
+      start_button: "🧠 Empezar el juego",
+      continue_button: "Ir a lectura de partido",
+      restart_button: "🔄 Jugar de nuevo"
+    };
+
+    const cardPairs = [
+      {
+        id: 1,
+        type: 'body',
+        emoji: '🧍‍♂️',
+        text: 'Cabeza alta, hombros atrás',
+        match: 2
+      },
+      {
+        id: 2,
+        type: 'reading',
+        icon: '💪',
+        text: 'Confianza, energía alta',
+        practice: 'Mantén consistencia, no te precipites.',
+        match: 1
+      },
+      {
+        id: 3,
+        type: 'body',
+        emoji: '🧍‍♀️',
+        text: 'Mirada firme, cuerpo estable',
+        match: 4
+      },
+      {
+        id: 4,
+        type: 'reading',
+        icon: '🎯',
+        text: 'Enfocado y planificando',
+        practice: 'No cambies ritmo; espera su error.',
+        match: 3
+      },
+      {
+        id: 5,
+        type: 'body',
+        emoji: '🤦‍♂️',
+        text: 'Cabeza baja, mirada perdida',
+        match: 6
+      },
+      {
+        id: 6,
+        type: 'reading',
+        icon: '📉',
+        text: 'Frustración o baja energía',
+        practice: 'Ataca profundo; no lo dejes recuperar confianza.',
+        match: 5
+      },
+      {
+        id: 7,
+        type: 'body',
+        emoji: '🙆‍♂️',
+        text: 'Gestos amplios, respiración acelerada',
+        match: 8
+      },
+      {
+        id: 8,
+        type: 'reading',
+        icon: '😰',
+        text: 'Ansiedad o exceso de energía',
+        practice: 'Varía ritmo y juega con calma.',
+        match: 7
+      },
+      {
+        id: 9,
+        type: 'body',
+        emoji: '🧘‍♀️',
+        text: 'Rituales entre puntos (tocar cuerdas, botar pelota)',
+        match: 10
+      },
+      {
+        id: 10,
+        type: 'reading',
+        icon: '🧘',
+        text: 'Control emocional y enfoque',
+        practice: 'Respeta su tiempo; no te desesperes.',
+        match: 9
+      },
+      {
+        id: 11,
+        type: 'body',
+        emoji: '🧍‍♂️',
+        text: 'Postura rígida, pies poco activos',
+        match: 12
+      },
+      {
+        id: 12,
+        type: 'reading',
+        icon: '🤔',
+        text: 'Duda o inseguridad',
+        practice: 'Usa drop shots o cambios de velocidad.',
+        match: 11
+      },
+      {
+        id: 13,
+        type: 'body',
+        emoji: '💪',
+        text: 'Postura abierta, sonrisa leve',
+        match: 14
+      },
+      {
+        id: 14,
+        type: 'reading',
+        icon: '😎',
+        text: 'Autoestima y dominio mental',
+        practice: 'Juega con control, no busques romper ritmo.',
+        match: 13
+      },
+      {
+        id: 15,
+        type: 'body',
+        emoji: '😤',
+        text: 'Movimiento brusco, golpe al suelo',
+        match: 16
+      },
+      {
+        id: 16,
+        type: 'reading',
+        icon: '🔥',
+        text: 'Ira contenida',
+        practice: 'Mantén calma, evita provocaciones.',
+        match: 15
+      },
+      {
+        id: 17,
+        type: 'body',
+        emoji: '🙌',
+        text: 'Puños cerrados, respiración firme',
+        match: 18
+      },
+      {
+        id: 18,
+        type: 'reading',
+        icon: '🎖️',
+        text: 'Autoafirmación y foco total',
+        practice: 'Cambia alturas o direcciones para desestabilizarlo.',
+        match: 17
+      }
+    ];
+
+    const tacticalScenarios = [
+      {
+        emoji: '😤',
+        question: 'Tu rival aprieta la mandíbula, acelera entre puntos y golpea con exceso de fuerza tras fallar dos bolas seguidas. ¿Qué decisión táctica conviene más?',
+        options: [
+          { text: 'Subir el ritmo y buscar winners inmediatos.', correct: false },
+          { text: 'Jugar profundo y variar alturas para obligarlo a seguir gestionando su frustración.', correct: true },
+          { text: 'Regalarle pelotas cómodas para que se calme.', correct: false }
+        ],
+        feedback: 'Cuando el rival está frustrado, suele fallar más si lo obligas a tomar otra decisión incómoda. Profundidad y variación le quitan control emocional.'
+      },
+      {
+        emoji: '😎',
+        question: 'Tu rival camina erguido, respira estable y muestra confianza después de varios puntos ganados. ¿Cuál es la lectura más útil?',
+        options: [
+          { text: 'Entrar en intercambio frontal de potencia para demostrar autoridad.', correct: false },
+          { text: 'Cambiar ritmo y dirección para sacarlo de su zona de comodidad.', correct: true },
+          { text: 'Jugar siempre al mismo patrón porque está funcionando para él.', correct: false }
+        ],
+        feedback: 'Ante un rival confiado, repetir el mismo libreto lo fortalece. Conviene romperle sensaciones con cambios de ritmo, altura o dirección.'
+      },
+      {
+        emoji: '🎯',
+        question: 'Notas rituales constantes, mirada fija y pies activos: el rival está concentrado y ordenado. ¿Qué respuesta táctica es la más inteligente?',
+        options: [
+          { text: 'Asumir más riesgo del necesario para sacarlo rápido del punto.', correct: false },
+          { text: 'Construir el punto con paciencia hasta detectar una pelota realmente atacable.', correct: true },
+          { text: 'Apurar todos los saques y restos sin plan.', correct: false }
+        ],
+        feedback: 'Cuando el rival está ordenado mentalmente, regalar errores acelera su dominio. La mejor respuesta es paciencia táctica y selección de momento.'
+      }
+    ];
+
+
+
+    let gameState = {
+      flippedCards: [],
+      matchedPairs: 0,
+      score: 0,
+      pairAttempts: 0,
+      shuffledCards: [],
+      scenarioIndex: 0,
+      correctScenarios: 0,
+      selfRead: '',
+      startTime: null,
+      isProcessing: false
+    };
+
+    async function onConfigChange(config) {
+      const gameTitle = document.getElementById('gameTitle');
+      const gameSubtitle = document.getElementById('gameSubtitle');
+      const introText = document.getElementById('introText');
+      const startBtn = document.getElementById('startBtn');
+      const continueBtn = document.getElementById('continueToReflection');
+      const continueResultsBtn = document.getElementById('continueToResults');
+      const restartBtn = document.getElementById('restartBtn');
+
+      if (gameTitle) gameTitle.textContent = config.game_title || defaultConfig.game_title;
+      if (gameSubtitle) gameSubtitle.textContent = config.game_subtitle || defaultConfig.game_subtitle;
+      if (introText) {
+        const text = config.intro_text || defaultConfig.intro_text;
+        introText.innerHTML = text.replace(/\n/g, '<br>');
+      }
+      if (startBtn) startBtn.textContent = config.start_button || defaultConfig.start_button;
+      if (continueBtn) continueBtn.textContent = config.continue_button || defaultConfig.continue_button;
+      if (continueResultsBtn) continueResultsBtn.textContent = config.continue_button || defaultConfig.continue_button;
+      if (restartBtn) restartBtn.textContent = config.restart_button || defaultConfig.restart_button;
+    }
+
+    function shuffleArray(array) {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    function startGame() {
+      gameState.startTime = Date.now();
+      gameState.shuffledCards = shuffleArray(cardPairs);
+      showScreen('gameScreen');
+      initializeCards();
+    }
+
+    function initializeCards() {
+      const cardsGrid = document.getElementById('cardsGrid');
+      cardsGrid.innerHTML = '';
+
+      gameState.shuffledCards.forEach((card, index) => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'card';
+        cardElement.dataset.index = index;
+        cardElement.dataset.id = card.id;
+        
+        cardElement.innerHTML = `
+          <div class="card-front">  </div>
+          <div class="card-back">
+            ${card.emoji ? `<span class="card-emoji">${card.emoji}</span>` : ''}
+            ${card.icon ? `<span class="card-emoji">${card.icon}</span>` : ''}
+            ${card.text}
+          </div>
+        `;
+
+        cardElement.addEventListener('click', () => flipCard(index));
+        cardsGrid.appendChild(cardElement);
+      });
+    }
+
+    function flipCard(index) {
+      if (gameState.isProcessing) return;
+
+      const card = document.querySelector(`.card[data-index="${index}"]`);
+      if (!card || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+      card.classList.add('flipped');
+      gameState.flippedCards.push(index);
+
+      if (gameState.flippedCards.length === 2) {
+        gameState.isProcessing = true;
+        checkMatch();
+      }
+    }
+
+    function checkMatch() {
+      const [index1, index2] = gameState.flippedCards;
+      const card1 = gameState.shuffledCards[index1];
+      const card2 = gameState.shuffledCards[index2];
+      gameState.pairAttempts++;
+
+      const feedbackEl = document.getElementById('feedbackMessage');
+
+      if (card1.match === card2.id) {
+        gameState.score += 10;
+        feedbackEl.textContent = '✓ Lectura correcta – +10 pts 🎉';
+        feedbackEl.className = 'feedback-message correct';
+
+        setTimeout(() => {
+          const cardEl1 = document.querySelector(`.card[data-index="${index1}"]`);
+          const cardEl2 = document.querySelector(`.card[data-index="${index2}"]`);
+          cardEl1.classList.add('matched');
+          cardEl2.classList.add('matched');
+
+          gameState.matchedPairs++;
+          document.getElementById('matchCount').textContent = gameState.matchedPairs;
+          document.getElementById('scoreCount').textContent = gameState.score;
+
+          gameState.flippedCards = [];
+          gameState.isProcessing = false;
+
+          setTimeout(() => {
+            feedbackEl.textContent = '';
+            feedbackEl.className = 'feedback-message';
+          }, 1000);
+
+          if (gameState.matchedPairs === 9) {
+            setTimeout(showReflectionPhase, 1500);
+          }
+        }, 800);
+      } else {
+        feedbackEl.textContent = 'Observa mejor los detalles... 🤔';
+        feedbackEl.className = 'feedback-message incorrect';
+
+        setTimeout(() => {
+          const cardEl1 = document.querySelector(`.card[data-index="${index1}"]`);
+          const cardEl2 = document.querySelector(`.card[data-index="${index2}"]`);
+          cardEl1.classList.remove('flipped');
+          cardEl2.classList.remove('flipped');
+
+          gameState.flippedCards = [];
+          gameState.isProcessing = false;
+
+          setTimeout(() => {
+            feedbackEl.textContent = '';
+            feedbackEl.className = 'feedback-message';
+          }, 500);
+        }, 1000);
+      }
+    }
+
+    function showReflectionPhase() {
+      showScreen('reflectionScreen');
+      document.getElementById('reflectionMessage').textContent = 'Ya reconoces señales. Ahora piensa en tu propia postura mental antes de decidir en cancha.';
+    }
+
+
+
+    function selectMirror(type) {
+      const messages = {
+        'seguro': '💪 Usa tu confianza para mandar, pero sin precipitarte. La seguridad sirve cuando sigue acompañada de criterio.',
+        'concentrado': '🎯 Tu foco es tu fortaleza. Mantén el plan punto a punto y no regales decisiones apresuradas.',
+        'frustrado': '🧘 Respira, reajusta tus rituales y observa tu lenguaje corporal.'
+      };
+
+      gameState.selfRead = type;
+      const messageEl = document.getElementById('coachingMessage');
+      messageEl.textContent = messages[type];
+      messageEl.classList.add('show');
+
+      document.getElementById('continueToResults').style.display = 'inline-block';
+    }
+
+    function startApplicationPhase() {
+      gameState.scenarioIndex = 0;
+      gameState.correctScenarios = 0;
+      showScreen('applicationScreen');
+      renderScenario();
+    }
+
+    function renderScenario() {
+      const scenario = tacticalScenarios[gameState.scenarioIndex];
+      const questionEl = document.getElementById('scenarioQuestion');
+      const imageEl = document.getElementById('scenarioImage');
+      const optionsEl = document.getElementById('scenarioOptions');
+      const feedbackEl = document.getElementById('scenarioFeedback');
+      const progressEl = document.getElementById('scenarioProgress');
+
+      progressEl.textContent = `Escenario ${gameState.scenarioIndex + 1} de ${tacticalScenarios.length}`;
+      imageEl.textContent = scenario.emoji;
+      questionEl.textContent = scenario.question;
+      feedbackEl.className = 'scenario-feedback';
+      feedbackEl.textContent = '';
+      optionsEl.innerHTML = '';
+
+      scenario.options.forEach((option) => {
+        const button = document.createElement('button');
+        button.className = 'option-btn';
+        button.textContent = option.text;
+        button.addEventListener('click', () => answerScenario(button, option.correct, scenario.feedback));
+        optionsEl.appendChild(button);
+      });
+    }
+
+    function answerScenario(button, isCorrect, feedbackText) {
+      const buttons = document.querySelectorAll('#scenarioOptions .option-btn');
+      buttons.forEach((btn) => {
+        btn.disabled = true;
+        if (btn === button) {
+          btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+        }
+      });
+
+      if (isCorrect) {
+        gameState.correctScenarios++;
+      } else {
+        buttons.forEach((btn) => {
+          if (btn !== button && btn.textContent === tacticalScenarios[gameState.scenarioIndex].options.find((option) => option.correct).text) {
+            btn.classList.add('correct');
+          }
+        });
+      }
+
+      const feedbackEl = document.getElementById('scenarioFeedback');
+      feedbackEl.textContent = feedbackText;
+      feedbackEl.classList.add('show');
+
+      setTimeout(() => {
+        gameState.scenarioIndex++;
+        if (gameState.scenarioIndex < tacticalScenarios.length) {
+          renderScenario();
+        } else {
+          showResults();
+        }
+      }, 1800);
+    }
+
+    async function showResults() {
+      const totalPairs = 9;
+      const pairAccuracy = gameState.pairAttempts > 0 ? Math.round((gameState.matchedPairs / gameState.pairAttempts) * 100) : 0;
+      const scenarioAccuracy = Math.round((gameState.correctScenarios / tacticalScenarios.length) * 100);
+      const percentage = Math.round((pairAccuracy * 0.45) + (scenarioAccuracy * 0.55));
+      const completionTime = Math.floor((Date.now() - gameState.startTime) / 1000);
+      const selfReadMessages = {
+        seguro: 'Te ves seguro. Úsalo para sostener iniciativa sin regalar tiros apresurados.',
+        concentrado: 'Te ves concentrado. Ese foco te ayuda a leer mejor antes de atacar.',
+        frustrado: 'Detectaste frustración propia. Reconocerla ya es el primer paso para recuperar control.'
+      };
+
+      const resultsData = {
+        score: gameState.score,
+        total_attempts: totalPairs,
+        pair_attempts: gameState.pairAttempts,
+        scenario_hits: gameState.correctScenarios,
+        completion_time: completionTime,
+        timestamp: new Date().toISOString()
+      };
+
+      if (window.dataSdk) {
+        const createResult = await window.dataSdk.create(resultsData);
+        if (!createResult.isOk) {
+          console.error('Error saving results:', createResult.error);
+        }
+      }
+
+      const iconEl = document.getElementById('resultsIcon');
+      const scoreEl = document.getElementById('resultsScore');
+      const titleEl = document.getElementById('resultsTitle');
+      const messageEl = document.getElementById('resultsMessage');
+
+      scoreEl.textContent = `${percentage}%`;
+
+      if (percentage >= 85) {
+        iconEl.textContent = '🏆';
+        titleEl.textContent = 'Maestro de Lectura Táctica AC';
+        messageEl.innerHTML = `Lees señales, eliges respuestas útiles y sostienes criterio táctico.<br><br>Parejas eficientes: ${gameState.matchedPairs}/${totalPairs} en ${gameState.pairAttempts} intentos. Escenarios resueltos: ${gameState.correctScenarios}/${tacticalScenarios.length}.<br><br>${selfReadMessages[gameState.selfRead] || ''}`;
+      } else if (percentage >= 65) {
+        iconEl.textContent = '🎯';
+        titleEl.textContent = 'Buen lector táctico';
+        messageEl.innerHTML = `Estás desarrollando una buena lectura emocional y táctica. Ya distingues señales importantes, pero todavía puedes decidir con más precisión bajo presión.<br><br>Parejas eficientes: ${gameState.matchedPairs}/${totalPairs} en ${gameState.pairAttempts} intentos. Escenarios resueltos: ${gameState.correctScenarios}/${tacticalScenarios.length}.<br><br>${selfReadMessages[gameState.selfRead] || ''}`;
+      } else {
+        iconEl.textContent = '💬';
+        titleEl.textContent = 'Observador en desarrollo';
+        messageEl.innerHTML = `Reconoces algunas señales, pero todavía falta traducirlas en decisiones tácticas más claras. La mejora vendrá al observar mejor y precipitarte menos.<br><br>Parejas eficientes: ${gameState.matchedPairs}/${totalPairs} en ${gameState.pairAttempts} intentos. Escenarios resueltos: ${gameState.correctScenarios}/${tacticalScenarios.length}.<br><br>${selfReadMessages[gameState.selfRead] || ''}`;
+      }
+
+      showScreen('resultsScreen');
+    }
+
+    function reviewScenarios() {
+      gameState.scenarioIndex = 0;
+      gameState.correctScenarios = 0;
+      showScreen('applicationScreen');
+      renderScenario();
+    }
+
+    function restartGame() {
+      gameState = {
+        flippedCards: [],
+        matchedPairs: 0,
+        score: 0,
+        pairAttempts: 0,
+        shuffledCards: [],
+        scenarioIndex: 0,
+        correctScenarios: 0,
+        selfRead: '',
+        startTime: null,
+        isProcessing: false
+      };
+
+      document.getElementById('matchCount').textContent = '0';
+      document.getElementById('scoreCount').textContent = '0';
+      document.getElementById('feedbackMessage').textContent = '';
+      document.getElementById('feedbackMessage').className = 'feedback-message';
+      document.getElementById('coachingMessage').classList.remove('show');
+      document.getElementById('coachingMessage').textContent = '';
+      document.getElementById('continueToResults').style.display = 'none';
+      document.getElementById('scenarioFeedback').className = 'scenario-feedback';
+      document.getElementById('scenarioFeedback').textContent = '';
+      document.getElementById('scenarioOptions').innerHTML = '';
+
+      showScreen('introScreen');
+    }
+
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    const dataHandler = {
+      onDataChanged(data) {
+      }
+    };
+
+    async function initialize() {
+      if (window.dataSdk) {
+        const initResult = await window.dataSdk.init(dataHandler);
+        if (!initResult.isOk) {
+          console.error('Failed to initialize data SDK');
+        }
+      }
+
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig: defaultConfig,
+          onConfigChange: onConfigChange,
+          mapToCapabilities: (config) => ({
+            recolorables: [],
+            borderables: [],
+            fontEditable: undefined,
+            fontSizeable: undefined
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ["game_title", config.game_title || defaultConfig.game_title],
+            ["game_subtitle", config.game_subtitle || defaultConfig.game_subtitle],
+            ["intro_text", config.intro_text || defaultConfig.intro_text],
+            ["start_button", config.start_button || defaultConfig.start_button],
+            ["continue_button", config.continue_button || defaultConfig.continue_button],
+            ["restart_button", config.restart_button || defaultConfig.restart_button]
+          ])
+        });
+
+        if (window.elementSdk.config) {
+          await onConfigChange(window.elementSdk.config);
+        }
+      }
+    }
+
+    initialize();
+  </script>
+ </body>
+</html>

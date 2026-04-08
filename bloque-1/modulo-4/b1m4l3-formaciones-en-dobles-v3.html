@@ -1,0 +1,892 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formaciones en dobles</title>
+  <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100%;
+        }
+
+        .screen {
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .tennis-court {
+            width: 100%;
+            max-width: 600px;
+            height: 300px;
+            margin: 2rem auto;
+            background: #2d5016;
+            border: 3px solid white;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .court-line {
+            position: absolute;
+            background: white;
+        }
+
+        .center-line {
+            width: 2px;
+            height: 100%;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+        }
+
+        .service-line {
+            width: 100%;
+            height: 2px;
+            top: 25%;
+        }
+
+        .service-line.bottom {
+            top: 75%;
+        }
+
+        .doubles-line {
+            width: 2px;
+            height: 50%;
+            left: 25%;
+            top: 25%;
+        }
+
+        .doubles-line.right {
+            left: 75%;
+        }
+
+        .center-service-line {
+            width: 50%;
+            height: 2px;
+            left: 25%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .player {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .player.red {
+            background: #ff4757;
+            color: white;
+        }
+
+        .player.blue {
+            background: #3742fa;
+            color: white;
+        }
+
+        .player:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .animated-players {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            margin: 2rem 0;
+        }
+
+        .animated-player {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            animation: bounce 2s infinite;
+        }
+
+        .animated-player.red {
+            background: #ff4757;
+            color: white;
+        }
+
+        .animated-player.blue {
+            background: #3742fa;
+            color: white;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(45deg, #74b9ff, #0984e3);
+        }
+
+        .challenge-box {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .formation-info {
+            text-align: left;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            border-left: 4px solid #00b894;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+
+        .quiz-option {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid transparent;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: #74b9ff;
+        }
+
+        .quiz-option.correct {
+            background: rgba(0,184,148,0.3);
+            border-color: #00b894;
+        }
+
+        .quiz-option.incorrect {
+            background: rgba(255,71,87,0.3);
+            border-color: #ff4757;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00b894, #55efc4);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .curiosity-box {
+            background: linear-gradient(45deg, #fd79a8, #e84393);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            font-style: italic;
+        }
+
+        .score-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        .medal {
+            font-size: 3rem;
+            margin: 1rem 0;
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .formation-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 2rem 0;
+        }
+
+        .formation-card {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .formation-card:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: #74b9ff;
+            transform: translateY(-5px);
+        }
+
+        .formation-card.selected {
+            background: rgba(0,184,148,0.3);
+            border-color: #00b894;
+        }
+
+        .formation-card h4 {
+            margin: 0 0 0.5rem 0;
+            color: #ffeaa7;
+        }
+
+        .formation-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .scenario-box {
+            background: rgba(255,255,255,0.08);
+            border: 2px solid #74b9ff;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .scenario-title {
+            color: #ffeaa7;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .tactical-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 2rem 0;
+        }
+
+        .tactical-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #00b894;
+        }
+
+        .tactical-card h4 {
+            color: #55efc4;
+            margin: 0 0 1rem 0;
+        }
+
+        .tactical-card ul {
+            margin: 0;
+            padding-left: 1.2rem;
+        }
+
+        .tactical-card li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .situation-analyzer {
+            background: linear-gradient(45deg, rgba(116,185,255,0.2), rgba(9,132,227,0.2));
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .situation-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #74b9ff;
+            margin-bottom: 1rem;
+        }
+
+        .situation-description {
+            background: rgba(0,0,0,0.3);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .title { font-size: 2rem; }
+            .container { padding: 15px; }
+            .tennis-court { height: 250px; }
+            .tactical-grid { grid-template-columns: 1fr; }
+            .formation-selector { grid-template-columns: 1fr; }
+        }
+    </style>
+  </head>
+ <body>
+  <div class="container"><!-- Pantalla 1: Portada -->
+   <div id="home-screen" class="screen active">
+    <h1 id="game-title" class="title">Formaciones en dobles</h1>
+    <p id="game-subtitle" class="subtitle">Domina la táctica profesional en dobles</p>
+    <div class="tennis-court">
+     <div class="court-line center-line"></div>
+     <div class="court-line service-line"></div>
+     <div class="court-line service-line bottom"></div>
+     <div class="court-line doubles-line"></div>
+     <div class="court-line doubles-line right"></div>
+     <div class="court-line center-service-line"></div>
+     <div class="animated-players">
+      <div class="animated-player red" style="top: 20%; left: 20%;">
+       1
+      </div>
+      <div class="animated-player red" style="top: 70%; left: 30%;">
+       2
+      </div>
+      <div class="animated-player blue" style="top: 20%; right: 20%;">
+       3
+      </div>
+      <div class="animated-player blue" style="top: 70%; right: 30%;">
+       4
+      </div>
+     </div>
+    </div>
+    <div class="formation-info">
+     <h3>🎯 Aprende las 3 Formaciones Clave</h3>
+     <div class="tactical-grid">
+      <div class="tactical-card">
+       <h4>🏛️ Formación Clásica</h4>
+       <ul>
+        <li>Máxima cobertura defensiva</li>
+        <li>Uno en red, uno al fondo</li>
+        <li>Ideal para puntos largos</li>
+       </ul>
+      </div>
+      <div class="tactical-card">
+       <h4>🌀 Formación Australiana</h4>
+       <ul>
+        <li>Rompe patrones de devolución</li>
+        <li>Ambos sacadores del mismo lado</li>
+        <li>Confunde al equipo rival</li>
+       </ul>
+      </div>
+      <div class="tactical-card">
+       <h4>💥 I-Formation</h4>
+       <ul>
+        <li>Máximo elemento sorpresa</li>
+        <li>Sacadores alineados centralmente</li>
+        <li>Oculta la dirección del movimiento</li>
+       </ul>
+      </div>
+     </div>
+    </div><button id="start-game-btn" class="btn">¡Comenzar Entrenamiento Táctico!</button>
+   </div><!-- Pantalla 2: Análisis Táctico -->
+   <div id="tactical-screen" class="screen">
+    <h2 class="title">🧠 ANÁLISIS TÁCTICO</h2>
+    <div class="progress-bar">
+     <div class="progress-fill" style="width: 25%"></div>
+    </div>
+    <div class="situation-analyzer">
+     <div class="situation-title">
+      📊 Situación de Juego #1
+     </div>
+     <div class="situation-description">
+      "Estás jugando contra una pareja que siempre devuelve cruzado con mucha precisión. Han ganado los últimos 4 puntos con esta táctica. Tu compañero sugiere cambiar la formación para romper su ritmo y forzar errores."
+     </div>
+     <h3>¿Qué formación elegirías para neutralizar su estrategia?</h3>
+     <div class="formation-selector">
+      <div class="formation-card" data-formation="classic">
+       <h4>🏛️ Clásica</h4>
+       <p>Mantener la cobertura tradicional uno arriba, uno atrás</p>
+      </div>
+      <div class="formation-card" data-formation="australian">
+       <h4>🌀 Australiana</h4>
+       <p>Ambos sacadores del mismo lado para cambiar ángulos</p>
+      </div>
+      <div class="formation-card" data-formation="i-formation">
+       <h4>💥 I-Formation</h4>
+       <p>Alineación central para máxima sorpresa</p>
+      </div>
+     </div>
+     <div id="tactical-feedback"></div>
+    </div>
+    <div class="curiosity-box">
+     💡 <strong>Dato Profesional:</strong> En el ATP Tour, los equipos cambian a formación australiana en un 18% de los games de saque cuando el rival tiene más del 70% de efectividad en devoluciones cruzadas.
+    </div><button id="next-to-pressure" class="btn">Siguiente: Situación de Presión</button>
+   </div><!-- Pantalla 3: Situación de Presión -->
+   <div id="pressure-screen" class="screen">
+    <h2 class="title">⚡ SITUACIÓN DE PRESIÓN</h2>
+    <div class="progress-bar">
+     <div class="progress-fill" style="width: 50%"></div>
+    </div>
+    <div class="scenario-box">
+     <div class="scenario-title">
+      🎯 Escenario: Set Point en Contra
+     </div>
+     <p>Estás perdiendo 5-6 en el primer set. Tu saque. El rival está muy cómodo devolviendo y han ganado 3 de los últimos 4 puntos con winners cruzados. Necesitas una jugada que los saque de su zona de confort.</p>
+    </div>
+    <div class="challenge-box">
+     <h3>Decisión Táctica Crítica</h3>
+     <p>Tu compañero te dice: "Necesitamos algo que no se esperen". ¿Cuál es tu mejor opción?</p>
+     <div class="quiz-options">
+      <div class="quiz-option" data-correct="false"><strong>A)</strong> Mantener la formación clásica pero sacar más fuerte
+      </div>
+      <div class="quiz-option" data-correct="true"><strong>B)</strong> Usar I-Formation para ocultar completamente tu movimiento
+      </div>
+      <div class="quiz-option" data-correct="false"><strong>C)</strong> Cambiar a australiana pero telegrafiar el movimiento
+      </div>
+     </div>
+     <div id="pressure-feedback"></div>
+    </div>
+    <div class="formation-info">
+     <h4>🔥 Factores Clave en Situaciones de Presión:</h4>
+     <ul>
+      <li><strong>Elemento sorpresa:</strong> Romper patrones establecidos</li>
+      <li><strong>Comunicación:</strong> Señales claras entre compañeros</li>
+      <li><strong>Timing:</strong> Usar formaciones especiales en momentos decisivos</li>
+      <li><strong>Confianza:</strong> Ejecutar con convicción total</li>
+     </ul>
+    </div><button id="next-to-communication" class="btn">Siguiente: Comunicación en Equipo</button>
+   </div><!-- Pantalla 4: Comunicación -->
+   <div id="communication-screen" class="screen">
+    <h2 class="title">🗣️ COMUNICACIÓN EN EQUIPO</h2>
+    <div class="progress-bar">
+     <div class="progress-fill" style="width: 75%"></div>
+    </div>
+    <div class="situation-analyzer">
+     <div class="situation-title">
+      🤝 Coordinación Perfecta
+     </div>
+     <div class="situation-description">
+      "Tu compañero te hace la señal para I-Formation. Te dice discretamente: 'Saque abierto al drive, yo voy paralelo después del bote'. Necesitas entender perfectamente tu rol en esta jugada coordinada."
+     </div>
+    </div>
+    <div class="challenge-box">
+     <h3>Interpretación de Señales</h3>
+     <p>Basándote en la información de tu compañero, ¿cuál es tu movimiento correcto?</p>
+     <div class="quiz-options">
+      <div class="quiz-option" data-correct="true"><strong>A)</strong> Me muevo al lado contrario del saque para cubrir el cruzado
+      </div>
+      <div class="quiz-option" data-correct="false"><strong>B)</strong> Me quedo en el centro esperando la devolución
+      </div>
+      <div class="quiz-option" data-correct="false"><strong>C)</strong> Sigo a mi compañero al mismo lado para doblar presión
+      </div>
+     </div>
+     <div id="communication-feedback"></div>
+    </div>
+    <div class="tactical-grid">
+     <div class="tactical-card">
+      <h4>🎯 Señales Básicas</h4>
+      <ul>
+       <li>Puño cerrado = Paralelo</li>
+       <li>Dedos abiertos = Cruzado</li>
+       <li>Pulgar arriba = Centro</li>
+      </ul>
+     </div>
+     <div class="tactical-card">
+      <h4>📢 Comunicación Verbal</h4>
+      <ul>
+       <li>"Tuya" = Pelota para ti</li>
+       <li>"Cambio" = Intercambio de posiciones</li>
+       <li>"Cubro" = Yo me encargo</li>
+      </ul>
+     </div>
+    </div><button id="next-to-final" class="btn">Ronda Final: Maestría Táctica</button>
+   </div><!-- Pantalla 5: Ronda Final -->
+   <div id="final-screen" class="screen">
+    <h2 class="title">🏆 MAESTRÍA TÁCTICA</h2>
+    <p class="subtitle">Demuestra tu dominio de las formaciones profesionales</p>
+    <div class="progress-bar">
+     <div class="progress-fill" style="width: 100%"></div>
+    </div>
+    <div id="final-questions">
+     <div class="challenge-box">
+      <h3>Situación Final 1/3</h3>
+      <div class="scenario-box">
+       <div class="scenario-title">
+         Wimbledon - Cuartos de Final
+       </div>
+       <p>Estás 4-5 abajo en el tercer set decisivo. Tu saque. Los rivales han devuelto cruzado en 8 de los últimos 10 puntos con 85% de efectividad. Necesitas romper su patrón inmediatamente.</p>
+      </div>
+      <div class="quiz-options">
+       <div class="quiz-option" data-answer="classic">
+        Formación Clásica
+       </div>
+       <div class="quiz-option" data-answer="australian" data-correct="true">
+        Formación Australiana
+       </div>
+       <div class="quiz-option" data-answer="i-formation">
+        I-Formation
+       </div>
+      </div>
+     </div>
+     <div class="challenge-box" style="display: none;">
+      <h3>Situación Final 2/3</h3>
+      <div class="scenario-box">
+       <div class="scenario-title">
+        🏟️ Roland Garros - Final
+       </div>
+       <p>Punto de match a tu favor. Los rivales están desesperados y atacando todo. Necesitas la formación que te dé máxima cobertura defensiva para cerrar el partido sin riesgos.</p>
+      </div>
+      <div class="quiz-options">
+       <div class="quiz-option" data-answer="classic" data-correct="true">
+        Formación Clásica
+       </div>
+       <div class="quiz-option" data-answer="australian">
+        Formación Australiana
+       </div>
+       <div class="quiz-option" data-answer="i-formation">
+        I-Formation
+       </div>
+      </div>
+     </div>
+     <div class="challenge-box" style="display: none;">
+      <h3>Situación Final 3/3</h3>
+      <div class="scenario-box">
+       <div class="scenario-title">
+        🌟 US Open - Tie-break Decisivo
+       </div>
+       <p>6-6 en el tie-break del set decisivo. Tu saque en punto de match. Los rivales conocen perfectamente tu juego. Necesitas el máximo elemento sorpresa para ganar este punto crucial.</p>
+      </div>
+      <div class="quiz-options">
+       <div class="quiz-option" data-answer="classic">
+        Formación Clásica
+       </div>
+       <div class="quiz-option" data-answer="australian">
+        Formación Australiana
+       </div>
+       <div class="quiz-option" data-answer="i-formation" data-correct="true">
+        I-Formation
+       </div>
+      </div>
+     </div>
+    </div><button id="show-results" class="btn" style="display: none;">Ver Resultados Finales</button>
+   </div><!-- Pantalla 6: Resultados -->
+   <div id="results-screen" class="screen">
+    <h2 class="title">🏅 RESULTADOS FINALES</h2>
+    <div class="medal">
+     🏆
+    </div>
+    <div id="score-message" class="score-display"></div>
+    <div class="formation-info">
+     <h3> Análisis de tu Rendimiento</h3>
+     <div id="performance-analysis"></div>
+    </div>
+    <div id="medal-earned" class="curiosity-box"><strong>🏆 Certificación Desbloqueada:</strong><br><span id="certification-level"></span>
+    </div>
+    <div style="margin-top: 2rem;"><button id="play-again" class="btn">🔄 Entrenar de Nuevo</button> <button id="review-tactics" class="btn secondary">📘 Repasar claves tácticas</button>
+    </div>
+   </div>
+  </div>
+  <script>
+        // Configuration object
+        const defaultConfig = {
+            game_title: "Formaciones en dobles",
+            subtitle: "Domina la táctica profesional en dobles",
+            start_button_text: "¡Comenzar Entrenamiento Táctico!"
+        };
+
+        let currentScreen = 'home-screen';
+        let finalScore = 0;
+        let currentQuestion = 0;
+
+        // Initialize Element SDK
+        async function initializeElementSDK() {
+            if (window.elementSdk) {
+                await window.elementSdk.init({
+                    defaultConfig,
+                    onConfigChange: async (config) => {
+                        document.getElementById('game-title').textContent = config.game_title || defaultConfig.game_title;
+                        document.getElementById('game-subtitle').textContent = config.subtitle || defaultConfig.subtitle;
+                        document.getElementById('start-game-btn').textContent = config.start_button_text || defaultConfig.start_button_text;
+                    },
+                    mapToCapabilities: (config) => ({
+                        recolorables: [],
+                        borderables: [],
+                        fontEditable: undefined,
+                        fontSizeable: undefined
+                    }),
+                    mapToEditPanelValues: (config) => new Map([
+                        ["game_title", config.game_title || defaultConfig.game_title],
+                        ["subtitle", config.subtitle || defaultConfig.subtitle],
+                        ["start_button_text", config.start_button_text || defaultConfig.start_button_text]
+                    ])
+                });
+            }
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            currentScreen = screenId;
+        }
+
+        function showFeedback(elementId, message, isCorrect) {
+            const feedback = document.getElementById(elementId);
+            feedback.innerHTML = `<p style="color: ${isCorrect ? '#00b894' : '#ff4757'}; font-weight: bold; margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px;">${message}</p>`;
+        }
+
+        function handleQuizOption(option, feedbackId) {
+            const isCorrect = option.dataset.correct === 'true';
+            const allOptions = option.parentElement.querySelectorAll('.quiz-option');
+            
+            allOptions.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+                if (opt.dataset.correct === 'true') {
+                    opt.classList.add('correct');
+                } else if (opt === option && !isCorrect) {
+                    opt.classList.add('incorrect');
+                }
+            });
+
+            if (feedbackId) {
+                let message = '';
+                if (feedbackId === 'pressure-feedback') {
+                    message = isCorrect ? 
+                        '🎯 ¡Excelente! La I-Formation es perfecta para situaciones de máxima presión. El elemento sorpresa puede cambiar completamente la dinámica del punto.' : 
+                        '❌ En situaciones críticas, necesitas máxima sorpresa. La I-Formation oculta completamente tu intención y puede desestabilizar al rival.';
+                } else if (feedbackId === 'communication-feedback') {
+                    message = isCorrect ? 
+                        '🤝 ¡Perfecto! Entiendes la coordinación. Si tu compañero va paralelo, tú debes cubrir el cruzado para tener cobertura completa.' : 
+                        '❌ La comunicación en dobles requiere complementariedad. Si uno cubre paralelo, el otro debe ir al cruzado.';
+                } else {
+                    message = isCorrect ? '✅ ¡Correcto! Excelente lectura táctica.' : '❌ Revisa la situación y piensa en la mejor estrategia.';
+                }
+                showFeedback(feedbackId, message, isCorrect);
+            }
+
+            return isCorrect;
+        }
+
+        function handleFormationSelection(card) {
+            const allCards = document.querySelectorAll('.formation-card');
+            allCards.forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            
+            const isCorrect = card.dataset.formation === 'australian';
+            const message = isCorrect ? 
+                '🌀 ¡Excelente elección! La formación australiana es perfecta para romper patrones de devolución cruzada. Al posicionar ambos sacadores del mismo lado, fuerzas al rival a cambiar sus ángulos naturales y crear incertidumbre.' : 
+                '🤔 Piensa estratégicamente: si el rival siempre devuelve cruzado con precisión, necesitas una formación que cambie completamente sus ángulos de referencia. La australiana los saca de su zona de confort.';
+            
+            showFeedback('tactical-feedback', message, isCorrect);
+        }
+
+        function handleFinalQuestion(option) {
+            const isCorrect = option.dataset.correct === 'true';
+            if (isCorrect) finalScore++;
+            
+            handleQuizOption(option);
+            
+            setTimeout(() => {
+                currentQuestion++;
+                const questions = document.querySelectorAll('#final-questions .challenge-box');
+                
+                if (currentQuestion < questions.length) {
+                    questions[currentQuestion - 1].style.display = 'none';
+                    questions[currentQuestion].style.display = 'block';
+                } else {
+                    document.getElementById('show-results').style.display = 'inline-block';
+                }
+            }, 2000);
+        }
+
+        function showResults() {
+            const scoreMessage = document.getElementById('score-message');
+            const performanceAnalysis = document.getElementById('performance-analysis');
+            const certificationLevel = document.getElementById('certification-level');
+            
+            let message = '';
+            let analysis = '';
+            let certification = '';
+            
+            if (finalScore === 3) {
+                message = '🏆 ¡MAESTRO TÁCTICO PROFESIONAL!<br>Puntuación: 3/3';
+                analysis = 'Demuestras un dominio excepcional de las formaciones de dobles. Tu capacidad para leer situaciones de juego y elegir la táctica correcta está al nivel de los mejores equipos del circuito profesional.';
+                certification = '🥇 "Estratega de Dobles - Nivel ATP/WTA"';
+            } else if (finalScore === 2) {
+                message = ' ¡Muy buen nivel táctico!<br>Puntuación: 2/3';
+                analysis = 'Tienes una sólida comprensión de las formaciones de dobles. Con un poco más de práctica en situaciones de presión, podrás alcanzar el nivel de maestría táctica.';
+                certification = '🥈 "Táctico Avanzado - Nivel Competitivo"';
+            } else {
+                message = '📚 Sigue entrenando tu visión táctica<br>Puntuación: ' + finalScore + '/3';
+                analysis = 'Tienes las bases, pero necesitas desarrollar más tu capacidad de análisis situacional. Practica identificando cuándo usar cada formación según el contexto del partido.';
+                certification = '🥉 "Aprendiz Táctico - En Desarrollo"';
+            }
+            
+            scoreMessage.innerHTML = message;
+            performanceAnalysis.innerHTML = analysis;
+            certificationLevel.innerHTML = certification;
+            
+            showScreen('results-screen');
+        }
+
+        function resetGame() {
+            finalScore = 0;
+            currentQuestion = 0;
+            
+            // Reset all quiz options
+            document.querySelectorAll('.quiz-option').forEach(option => {
+                option.classList.remove('correct', 'incorrect');
+                option.style.pointerEvents = 'auto';
+            });
+            
+            // Reset formation cards
+            document.querySelectorAll('.formation-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Reset final questions
+            const questions = document.querySelectorAll('#final-questions .challenge-box');
+            questions.forEach((q, index) => {
+                q.style.display = index === 0 ? 'block' : 'none';
+            });
+            
+            document.getElementById('show-results').style.display = 'none';
+            
+            // Clear feedback
+            document.querySelectorAll('[id$="-feedback"]').forEach(feedback => {
+                feedback.innerHTML = '';
+            });
+            
+            showScreen('home-screen');
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeElementSDK();
+
+            // Navigation buttons
+            document.getElementById('start-game-btn').addEventListener('click', () => showScreen('tactical-screen'));
+            document.getElementById('next-to-pressure').addEventListener('click', () => showScreen('pressure-screen'));
+            document.getElementById('next-to-communication').addEventListener('click', () => showScreen('communication-screen'));
+            document.getElementById('next-to-final').addEventListener('click', () => showScreen('final-screen'));
+            document.getElementById('show-results').addEventListener('click', showResults);
+            document.getElementById('play-again').addEventListener('click', resetGame);
+            
+            // Formation selection for tactical screen
+            document.querySelectorAll('.formation-card').forEach(card => {
+                card.addEventListener('click', () => handleFormationSelection(card));
+            });
+            
+            // Quiz options for pressure screen
+            document.querySelectorAll('#pressure-screen .quiz-option').forEach(option => {
+                option.addEventListener('click', () => handleQuizOption(option, 'pressure-feedback'));
+            });
+            
+            // Quiz options for communication screen
+            document.querySelectorAll('#communication-screen .quiz-option').forEach(option => {
+                option.addEventListener('click', () => handleQuizOption(option, 'communication-feedback'));
+            });
+            
+            // Final quiz options
+            document.querySelectorAll('#final-questions .quiz-option').forEach(option => {
+                option.addEventListener('click', () => handleFinalQuestion(option));
+            });
+            
+            // Quick recap button
+            document.getElementById('review-tactics').addEventListener('click', () => {
+                const customModal = document.createElement('div');
+                customModal.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0,0,0,0.8); display: flex; align-items: center;
+                    justify-content: center; z-index: 1000;
+                `;
+                customModal.innerHTML = `
+                    <div style="background: linear-gradient(135deg, #1e3c72, #2a5298); padding: 2rem; border-radius: 15px; text-align: center; color: white; max-width: 400px;">
+                        <h3>📘 Claves tácticas del juego</h3>
+                        <p>Resumen rápido para llevar esta lección a la cancha:</p>
+                        <ul style="text-align: left; margin: 1rem 0;">
+                            <li>🎯 Usa la australiana cuando quieras romper la devolución cruzada automática.</li>
+                            <li>⚡ Recurre a la I-Formation cuando necesites sorpresa y presión.</li>
+                            <li>🤝 La comunicación en dobles vale tanto como la técnica individual.</li>
+                            <li>🏆 Bajo presión, la formación correcta simplifica la toma de decisiones.</li>
+                        </ul>
+                        <button onclick="this.parentElement.parentElement.remove()" 
+                                style="background: #ff6b6b; color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; margin-top: 1rem;">
+                            Cerrar
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(customModal);
+            });
+        });
+    </script>
+ </body>
+</html>

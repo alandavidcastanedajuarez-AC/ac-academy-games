@@ -1,0 +1,1188 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Principios tácticos en individuales</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      padding: 20px;
+    }
+
+    .screen {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      display: none;
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .title {
+      font-size: 32px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #2d3748;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      text-align: center;
+      color: #718096;
+      margin-bottom: 30px;
+    }
+
+    .animation-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+      margin: 30px 0;
+      position: relative;
+    }
+
+    .ball {
+      width: 40px;
+      height: 40px;
+      background: #ffd700;
+      border-radius: 50%;
+      position: absolute;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0) translateX(-100px);
+      }
+      25% {
+        transform: translateY(-80px) translateX(-50px);
+      }
+      50% {
+        transform: translateY(0) translateX(0);
+      }
+      75% {
+        transform: translateY(-80px) translateX(50px);
+      }
+    }
+
+    .icons-container {
+      display: flex;
+      justify-content: space-around;
+      margin: 30px 0;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .icon {
+      font-size: 48px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.2);
+      }
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 18px;
+      border-radius: 50px;
+      cursor: pointer;
+      display: block;
+      margin: 30px auto 0;
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-weight: bold;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .explanation {
+      background: #f7fafc;
+      padding: 20px;
+      border-radius: 15px;
+      margin: 20px 0;
+      border-left: 4px solid #667eea;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #2d3748;
+    }
+
+    .challenge {
+      margin: 30px 0;
+    }
+
+    .challenge-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #2d3748;
+      margin-bottom: 20px;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .option {
+      background: white;
+      border: 2px solid #e2e8f0;
+      padding: 15px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+    }
+
+    .option:hover {
+      border-color: #667eea;
+      transform: translateX(5px);
+    }
+
+    .option.correct {
+      background: #c6f6d5;
+      border-color: #48bb78;
+    }
+
+    .option.incorrect {
+      background: #fed7d7;
+      border-color: #f56565;
+    }
+
+    .option.disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .curiosity {
+      background: #fef5e7;
+      padding: 15px;
+      border-radius: 12px;
+      margin: 20px 0;
+      border-left: 4px solid #f59e0b;
+      font-size: 15px;
+      color: #78350f;
+    }
+
+    .feedback {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      display: none;
+    }
+
+    .feedback.show {
+      display: block;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .feedback.correct {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+
+    .feedback.incorrect {
+      background: #fed7d7;
+      color: #742a2a;
+    }
+
+    .score-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .score {
+      font-size: 24px;
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .stars {
+      font-size: 32px;
+      margin: 10px 0;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      transition: width 0.5s ease;
+    }
+
+    .principle-icon {
+      font-size: 64px;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .final-screen {
+      text-align: center;
+    }
+
+    .final-score {
+      font-size: 48px;
+      font-weight: bold;
+      color: #667eea;
+      margin: 20px 0;
+    }
+
+    .achievement {
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      padding: 20px;
+      border-radius: 15px;
+      margin: 20px 0;
+      font-size: 20px;
+      font-weight: bold;
+      color: #78350f;
+    }
+
+    .bonus-challenge {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f0f4ff;
+      border-radius: 15px;
+      border: 2px dashed #667eea;
+    }
+
+    .scenario-animation {
+      margin: 30px 0;
+    }
+
+    .scenario-box {
+      background: linear-gradient(135deg, #fef5e7 0%, #fff9e6 100%);
+      padding: 25px;
+      border-radius: 15px;
+      border-left: 5px solid #f59e0b;
+    }
+
+    .scenario-box p {
+      margin: 8px 0;
+      font-size: 16px;
+      color: #2d3748;
+    }
+
+    .principles-order {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .principle-card {
+      background: white;
+      border: 3px solid #e2e8f0;
+      padding: 20px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      position: relative;
+    }
+
+    .principle-card:hover {
+      border-color: #667eea;
+      transform: translateX(5px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .principle-card.selected {
+      border-color: #667eea;
+      background: #f0f4ff;
+    }
+
+    .principle-number {
+      width: 40px;
+      height: 40px;
+      background: #667eea;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .principle-card:not(.selected) .principle-number {
+      background: #e2e8f0;
+      color: #a0aec0;
+    }
+
+    .principle-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .medal-container {
+      margin: 30px 0;
+      text-align: center;
+    }
+
+    .medal {
+      font-size: 80px;
+      animation: medalShine 2s infinite;
+    }
+
+    @keyframes medalShine {
+      0%, 100% {
+        transform: scale(1) rotate(0deg);
+      }
+      50% {
+        transform: scale(1.1) rotate(5deg);
+      }
+    }
+
+    .medal-text {
+      font-size: 20px;
+      font-weight: bold;
+      color: #667eea;
+      margin-top: 10px;
+    }
+
+    .motivational-quote {
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
+      padding: 25px;
+      border-radius: 15px;
+      margin: 25px 0;
+      text-align: center;
+      color: #2d3748;
+    }
+
+    .energy-bar-container {
+      margin: 25px 0;
+    }
+
+    .energy-label {
+      font-size: 16px;
+      font-weight: bold;
+      color: #2d3748;
+      margin-bottom: 10px;
+    }
+
+    .energy-bar {
+      width: 100%;
+      height: 30px;
+      background: #e2e8f0;
+      border-radius: 15px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .energy-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+      transition: width 1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .famous-quotes {
+      background: #fef5e7;
+      padding: 20px;
+      border-radius: 15px;
+      margin: 20px 0;
+      font-style: italic;
+      color: #78350f;
+      text-align: center;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+
+    .analysis-section {
+      background: #f7fafc;
+      padding: 25px;
+      border-radius: 15px;
+      margin: 20px 0;
+      border-left: 4px solid #667eea;
+    }
+
+    .analysis-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #718096;
+    }
+
+    .recommendations {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 15px;
+    }
+
+    .recommendation-item {
+      padding: 15px;
+      margin: 10px 0;
+      background: #f0f4ff;
+      border-radius: 10px;
+      border-left: 4px solid #667eea;
+    }
+
+    .quotes-list {
+      margin-top: 15px;
+    }
+
+    .quote-item {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 15px 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      line-height: 1.6;
+    }
+
+    .quote-item strong {
+      color: #667eea;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 10px;
+      }
+
+      .screen {
+        padding: 20px;
+      }
+
+      .title {
+        font-size: 24px;
+      }
+
+      .subtitle {
+        font-size: 16px;
+      }
+
+      .btn {
+        padding: 12px 30px;
+        font-size: 16px;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      .medal {
+        font-size: 60px;
+      }
+
+      .principle-text {
+        font-size: 16px;
+      }
+    }
+  </style>
+  </head>
+ <body>
+  <div class="container"><!-- Pantalla de Inicio -->
+   <div class="screen active" id="home-screen">
+    <h1 class="title" id="game-title">Piensa como un estratega</h1>
+    <p class="subtitle" id="game-subtitle">Principios tácticos en individuales</p>
+    <div class="animation-container">
+     <div class="ball"></div>
+    </div>
+    <div class="icons-container">
+     <div class="icon" style="animation-delay: 0s">
+      🎯
+     </div>
+     <div class="icon" style="animation-delay: 0.2s">
+      🏹
+     </div>
+     <div class="icon" style="animation-delay: 0.4s">
+      ↔️
+     </div>
+     <div class="icon" style="animation-delay: 0.6s">
+      💪
+     </div>
+     <div class="icon" style="animation-delay: 0.8s">
+      ♻️
+     </div>
+    </div><button class="btn" id="start-button" onclick="startGame()">¡Comienza el desafío táctico!</button>
+   </div><!-- Principio 1: Juega Profundo -->
+   <div class="screen" id="principle-1">
+    <div class="progress-bar">
+     <div class="progress-fill" style="width: 20%"></div>
+    </div>
+    <div class="principle-icon">
+     🎯
+    </div>
+    <h2 class="title">Juega Profundo</h2>
+    <div class="explanation">
+     Jugar profundo te da tiempo, presión y control del punto. Cuanto más lejos obligues al rival a golpear, más opciones de dominar tendrás.
+    </div>
+    <div class="challenge">
+     <div class="challenge-title">
+      🎮 Desafío táctico:
+     </div>
+     <p>La pelota del rival cayó en el centro, a media pista. ¿Dónde colocarías tu golpe para ganar ventaja?</p>
+     <div class="options">
+      <div class="option" onclick="checkAnswer(this, false, 1)">
+       A) Corto al medio
+      </div>
+      <div class="option" onclick="checkAnswer(this, true, 1)">
+       B) Profundo cruzado
+      </div>
+      <div class="option" onclick="checkAnswer(this, false, 1)">
+       C) Globo al cuerpo
+      </div>
+     </div>
+    </div>
+    <div class="feedback" id="feedback-1"></div>
+    <div class="curiosity">
+     👉 Los jugadores que mantienen la pelota profunda más del 70% del tiempo reducen los errores no forzados en un 30%.
+    </div><button class="btn" style="display: none;" id="next-1" onclick="nextPrinciple(2)">Siguiente Principio →</button>
+   </div><!-- Principio 2: Ataca la Debilidad -->
+   <div class="screen" id="principle-2">
+    <div class="progress-bar">
+     <div class="progress-fill" style="width: 40%"></div>
+    </div>
+    <div class="principle-icon">
+     🎯🏹
+    </div>
+    <h2 class="title">Ataca la Debilidad del Rival</h2>
+    <div class="explanation">
+     No necesitas golpear más fuerte, solo más inteligente. Descubre la debilidad del rival y presiónala con constancia.
+    </div>
+    <div class="challenge">
+     <div class="challenge-title">
+      🎮 Desafío táctico:
+     </div>
+     <p>Detectas que tu rival falla más del lado del revés. ¿Qué harías?</p>
+     <div class="options">
+      <div class="option" onclick="checkAnswer(this, true, 2)">
+       A) Cambiar el ritmo hacia su revés
+      </div>
+      <div class="option" onclick="checkAnswer(this, false, 2)">
+       B) Jugar todo al cuerpo
+      </div>
+      <div class="option" onclick="checkAnswer(this, false, 2)">
+       C) Evitar ese lado para no errar
+      </div>
+     </div>
+    </div>
+    <div class="feedback" id="feedback-2"></div>
+    <div class="curiosity">
+     👉 ¿Qué jugador es ejemplo de este principio? Djokovic lee y castiga debilidades mejor que nadie.
+    </div><button class="btn" style="display: none;" id="next-2" onclick="nextPrinciple(3)">Siguiente Principio →</button>
+   </div><!-- Principio 3: Usa tu Mejor Golpe -->
+   <div class="screen" id="principle-3">
+    <div class="progress-bar">
+     <div class="progress-fill" style="width: 60%"></div>
+    </div>
+    <div class="principle-icon">
+     💪
+    </div>
+    <h2 class="title">Usa tu Mejor Golpe como Arma</h2>
+    <div class="explanation">
+     Tu mejor golpe es tu identidad táctica. Úsalo para dominar los intercambios, generar confianza y definir los puntos.
+    </div>
+    <div class="challenge">
+     <div class="challenge-title">
+      🎮 Desafío táctico:
+     </div>
+     <p>Tu derecha es tu golpe más sólido. Estás en estado neutral. ¿Qué plan eliges?</p>
+     <div class="options">
+      <div class="option" onclick="checkAnswer(this, true, 3)">
+       A) Buscar tu derecha y atacar cruzado
+      </div>
+      <div class="option" onclick="checkAnswer(this, false, 3)">
+       B) Cambiar de ritmo con revés slice
+      </div>
+      <div class="option" onclick="checkAnswer(this, false, 3)">
+       C) Subir sin preparación
+      </div>
+     </div>
+    </div>
+    <div class="feedback" id="feedback-3"></div>
+    <div class="curiosity">
+     👉 Federer y Nadal construyeron su carrera sobre un golpe dominante (Federer: derecha, Nadal: liftado cruzado de izquierda).
+    </div><button class="btn" style="display: none;" id="next-3" onclick="nextPrinciple(4)">Siguiente Principio →</button>
+   </div><!-- Principio 4: Mueve al Rival -->
+   <div class="screen" id="principle-4">
+    <div class="progress-bar">
+     <div class="progress-fill" style="width: 80%"></div>
+    </div>
+    <div class="principle-icon">
+     ↔️
+    </div>
+    <h2 class="title">Mueve al Rival de Lado a Lado</h2>
+    <div class="explanation">
+     Hacer moverse al rival es la forma más simple de crear espacios. Cada desplazamiento abre una nueva oportunidad.
+    </div>
+    <div class="challenge">
+     <div class="challenge-title">
+      🎮 Desafío táctico:
+     </div>
+     <p>Tienes al rival en el fondo, lado derecho. ¿Qué opción te da más ventaja?</p>
+     <div class="options">
+      <div class="option" onclick="checkAnswer(this, true, 4)">
+       A) Golpe paralelo y luego cruzado
+      </div>
+      <div class="option" onclick="checkAnswer(this, false, 4)">
+       B) Globo al centro
+      </div>
+      <div class="option" onclick="checkAnswer(this, false, 4)">
+       C) Pelota corta sin dirección
+      </div>
+     </div>
+    </div>
+    <div class="feedback" id="feedback-4"></div>
+    <div class="curiosity">
+     👉 ¿Qué se busca al mover al rival? Cansarlo y abrir espacio para el siguiente golpe ganador.
+    </div><button class="btn" style="display: none;" id="next-4" onclick="nextPrinciple(5)">Siguiente Principio →</button>
+   </div><!-- Principio 5: Mantén Consistencia -->
+   <div class="screen" id="principle-5">
+    <div class="progress-bar">
+     <div class="progress-fill" style="width: 100%"></div>
+    </div>
+    <div class="principle-icon">
+     ♻️
+    </div>
+    <h2 class="title">Mantén Consistencia</h2>
+    <div class="explanation">
+     Antes de querer ganar el punto, asegúrate de no perderlo. La consistencia es la base del tenis competitivo.
+    </div>
+    <div class="challenge">
+     <div class="challenge-title">
+      🎮 Desafío táctico:
+     </div>
+     <p>Vas ganando 40-15. El rival te lanza una pelota lenta. ¿Qué haces?</p>
+     <div class="options">
+      <div class="option" onclick="checkAnswer(this, false, 5)">
+       A) Atacas sin equilibrio
+      </div>
+      <div class="option" onclick="checkAnswer(this, true, 5)">
+       B) Mantienes el rally y esperas el error
+      </div>
+      <div class="option" onclick="checkAnswer(this, false, 5)">
+       C) Haces un drop shot arriesgado
+      </div>
+     </div>
+    </div>
+    <div class="feedback" id="feedback-5"></div>
+    <div class="curiosity">
+     👉 En promedio, los jugadores que ganan más del 60% de rallies de más de 8 golpes terminan ganando el partido.
+    </div>
+    <div class="bonus-challenge" id="bonus-5" style="display: none;">
+     <div class="challenge-title">
+      🎁 Bonus: Elige tu prioridad táctica según tu nivel actual:
+     </div>
+     <div class="options">
+      <div class="option bonus-option" onclick="selectBonus(this, 'Principiante')">
+       Principiante → "Mantener la pelota en juego"
+      </div>
+      <div class="option bonus-option" onclick="selectBonus(this, 'Intermedio')">
+       Intermedio → "Mover y controlar dirección"
+      </div>
+      <div class="option bonus-option" onclick="selectBonus(this, 'Avanzado')">
+       Avanzado → "Crear y cerrar oportunidades"
+      </div>
+     </div>
+    </div><button class="btn" style="display: none;" id="next-5" onclick="showFinalChallenge()">Ronda Final 🏁</button>
+   </div><!-- Ronda Final: Combina los Principios -->
+   <div class="screen" id="final-challenge">
+    <div class="progress-bar">
+     <div class="progress-fill" style="width: 100%"></div>
+    </div>
+    <div class="principle-icon">
+     🏁
+    </div>
+    <h2 class="title">Ronda Final: Combina los Principios</h2>
+    <div class="explanation">
+     Ahora debes pensar como un verdadero estratega. Observa la situación y decide en qué orden aplicar los principios tácticos.
+    </div>
+    <div class="scenario-animation">
+     <div class="scenario-box">
+      <p style="font-size: 18px; font-weight: bold; margin-bottom: 15px;">📍 Situación del partido:</p>
+      <p>• Tu rival acaba de devolver una pelota corta al centro</p>
+      <p>• Está cansado y ligeramente fuera de posición</p>
+      <p>• Hay espacio abierto en su lado del revés</p>
+      <p>• Tu derecha está en forma hoy</p>
+     </div>
+    </div>
+    <div class="challenge">
+     <div class="challenge-title">
+      🎮 ¿En qué orden aplicarías los principios?
+     </div>
+     <p style="margin-bottom: 20px;">Arrastra o selecciona en orden de prioridad:</p>
+     <div class="principles-order" id="principles-order">
+      <div class="principle-card" data-principle="1" onclick="selectPrinciple(this, 1)"><span class="principle-number"></span> <span class="principle-text">🎯 Jugar profundo</span>
+      </div>
+      <div class="principle-card" data-principle="2" onclick="selectPrinciple(this, 2)"><span class="principle-number"></span> <span class="principle-text">↔️ Mover al rival</span>
+      </div>
+      <div class="principle-card" data-principle="3" onclick="selectPrinciple(this, 3)"><span class="principle-number"></span> <span class="principle-text">🏹 Atacar su debilidad</span>
+      </div>
+      <div class="principle-card" data-principle="4" onclick="selectPrinciple(this, 4)"><span class="principle-number"></span> <span class="principle-text">💪 Usar tu mejor golpe</span>
+      </div>
+     </div>
+    </div>
+    <div class="feedback" id="feedback-final"></div><button class="btn" style="display: none;" id="check-order" onclick="checkPrincipleOrder()">Verificar Orden 🎯</button> <button class="btn" style="display: none;" id="next-final" onclick="showFinalScreen()">Ver Resultados 🏆</button>
+   </div><!-- Pantalla Final -->
+   <div class="screen" id="final-screen">
+    <div class="final-screen">
+     <h2 class="title">¡Desafío Completado! </h2>
+     <div class="final-score" id="final-score">
+      0/6
+     </div>
+     <div class="stars" id="final-stars"></div>
+     <div class="achievement" id="achievement"></div>
+     <div class="medal-container">
+      <div class="medal">
+       🏆
+      </div>
+      <div class="medal-text">
+       Estratega en Individuales – Nivel AC
+      </div>
+     </div>
+     <div class="motivational-quote">
+      <p style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">"Un jugador técnico puede ganar puntos.<br>
+        Un jugador táctico... gana partidos."</p>
+     </div>
+     <div class="energy-bar-container">
+      <div class="energy-label">
+       Energía Táctica Acumulada:
+      </div>
+      <div class="energy-bar">
+       <div class="energy-fill" id="energy-fill"></div>
+      </div>
+     </div>
+     <div class="famous-quotes" id="famous-quotes"></div>
+     <div class="button-group"><button class="btn" onclick="restartGame()">🔁 Volver a Jugar</button> <button class="btn" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);" onclick="showAnalysis()">🧠 Ver Análisis Táctico</button>
+     </div>
+    </div>
+   </div><!-- Pantalla de Análisis -->
+   <div class="screen" id="analysis-screen">
+    <div class="final-screen">
+     <h2 class="title">📊 Análisis Táctico Avanzado</h2>
+     <div class="analysis-section">
+      <h3 style="color: #667eea; margin-bottom: 15px;">🎯 Resumen de tu Desempeño</h3>
+      <div class="analysis-stats" id="analysis-stats"></div>
+     </div>
+     <div class="analysis-section">
+      <h3 style="color: #667eea; margin-bottom: 15px;">💡 Recomendaciones Personalizadas</h3>
+      <div class="recommendations" id="recommendations"></div>
+     </div>
+     <div class="analysis-section">
+      <h3 style="color: #667eea; margin-bottom: 15px;"> Frases de Grandes Estrategas</h3>
+      <div class="quotes-list">
+       <div class="quote-item"><strong>Novak Djokovic:</strong> "El tenis es un juego mental. Quien piensa mejor, gana más."
+       </div>
+       <div class="quote-item"><strong>Andy Murray:</strong> "La táctica no es complicar, es simplificar con inteligencia."
+       </div>
+       <div class="quote-item"><strong>Martina Hingis:</strong> "No necesitas el golpe más fuerte, necesitas el golpe más inteligente."
+       </div>
+      </div>
+     </div><button class="btn" onclick="showScreen('final-screen')">← Volver a Resultados</button>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "Piensa como un estratega",
+      game_subtitle: "Principios tácticos en individuales",
+      start_button: "¡Comienza el desafío táctico!"
+    };
+
+    let score = 0;
+    let currentPrinciple = 0;
+    let selectedOrder = [];
+    let bonusAnswered = false;
+    let finalChallengeScore = 0;
+
+    async function onConfigChange(config) {
+      const titleElement = document.getElementById('game-title');
+      const subtitleElement = document.getElementById('game-subtitle');
+      const startButtonElement = document.getElementById('start-button');
+
+      if (titleElement) {
+        titleElement.textContent = config.game_title || defaultConfig.game_title;
+      }
+      if (subtitleElement) {
+        subtitleElement.textContent = config.game_subtitle || defaultConfig.game_subtitle;
+      }
+      if (startButtonElement) {
+        startButtonElement.textContent = config.start_button || defaultConfig.start_button;
+      }
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["game_title", config.game_title || defaultConfig.game_title],
+        ["game_subtitle", config.game_subtitle || defaultConfig.game_subtitle],
+        ["start_button", config.start_button || defaultConfig.start_button]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+
+    function startGame() {
+      score = 0;
+      bonusAnswered = false;
+      finalChallengeScore = 0;
+      selectedOrder = [];
+      currentPrinciple = 1;
+      showScreen('principle-1');
+    }
+
+    function showScreen(screenId) {
+      const screens = document.querySelectorAll('.screen');
+      screens.forEach(screen => screen.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    function checkAnswer(element, isCorrect, principleNum) {
+      const options = element.parentElement.querySelectorAll('.option:not(.bonus-option)');
+      options.forEach(opt => opt.classList.add('disabled'));
+
+      const feedback = document.getElementById(`feedback-${principleNum}`);
+      
+      if (isCorrect) {
+        element.classList.add('correct');
+        feedback.textContent = '✅ ¡Excelente decisión táctica! Has aplicado el principio correctamente.';
+        feedback.className = 'feedback correct show';
+        score++;
+      } else {
+        element.classList.add('incorrect');
+        feedback.textContent = '❌ No es la mejor opción. Recuerda aplicar el principio para maximizar tu ventaja.';
+        feedback.className = 'feedback incorrect show';
+      }
+
+      if (principleNum === 5) {
+        const bonusSection = document.getElementById('bonus-5');
+        bonusSection.style.display = 'block';
+      }
+
+      document.getElementById(`next-${principleNum}`).style.display = 'block';
+    }
+
+    function selectBonus(element, level) {
+      if (bonusAnswered) return;
+      
+      const options = element.parentElement.querySelectorAll('.bonus-option');
+      options.forEach(opt => {
+        opt.classList.remove('correct');
+        opt.classList.add('disabled');
+      });
+      
+      element.classList.add('correct');
+      bonusAnswered = true;
+      score += 0.5;
+    }
+
+    function nextPrinciple(num) {
+      showScreen(`principle-${num}`);
+    }
+
+    function showFinalChallenge() {
+      showScreen('final-challenge');
+    }
+
+    function selectPrinciple(element, principleNum) {
+      if (selectedOrder.includes(principleNum)) {
+        const index = selectedOrder.indexOf(principleNum);
+        selectedOrder.splice(index, 1);
+        element.classList.remove('selected');
+        element.querySelector('.principle-number').textContent = '';
+      } else {
+        if (selectedOrder.length < 4) {
+          selectedOrder.push(principleNum);
+          element.classList.add('selected');
+          element.querySelector('.principle-number').textContent = selectedOrder.length;
+        }
+      }
+
+      if (selectedOrder.length === 4) {
+        document.getElementById('check-order').style.display = 'block';
+      } else {
+        document.getElementById('check-order').style.display = 'none';
+      }
+    }
+
+    function checkPrincipleOrder() {
+      const correctOrder = [4, 1, 3, 2];
+      const feedback = document.getElementById('feedback-final');
+      
+      let isCorrect = true;
+      for (let i = 0; i < selectedOrder.length; i++) {
+        if (selectedOrder[i] !== correctOrder[i]) {
+          isCorrect = false;
+          break;
+        }
+      }
+
+      if (isCorrect) {
+        feedback.textContent = '✅ ¡Pensaste como un estratega! Orden perfecto: Usar tu mejor golpe → Jugar profundo → Atacar debilidad → Mover al rival';
+        feedback.className = 'feedback correct show';
+        finalChallengeScore = 1;
+        score += 1;
+      } else {
+        feedback.textContent = '❌ Revisa tus prioridades tácticas. Pista: Primero usa tu arma, luego presiona profundo, ataca la debilidad y finalmente mueve al rival para abrir la cancha.';
+        feedback.className = 'feedback incorrect show';
+      }
+
+      document.getElementById('check-order').style.display = 'none';
+      document.getElementById('next-final').style.display = 'block';
+    }
+
+    function showFinalScreen() {
+      const maxScore = 6.5;
+      
+      const finalScore = document.getElementById('final-score');
+      const finalStars = document.getElementById('final-stars');
+      const achievement = document.getElementById('achievement');
+      const energyFill = document.getElementById('energy-fill');
+      const famousQuotes = document.getElementById('famous-quotes');
+
+      finalScore.textContent = `${score.toFixed(1)}/${maxScore}`;
+
+      let stars = '';
+      const starCount = Math.floor((score / maxScore) * 5);
+      for (let i = 0; i < starCount; i++) {
+        stars += '⭐';
+      }
+      finalStars.textContent = stars;
+
+      if (score >= 6) {
+        achievement.textContent = '🏆 ¡Maestro Táctico! Dominas todos los principios';
+      } else if (score >= 4.5) {
+        achievement.textContent = '🎯 ¡Buen Estratega! Vas por buen camino';
+      } else {
+        achievement.textContent = '💪 ¡Sigue Practicando! Cada partido es una oportunidad';
+      }
+
+      const energyPercent = (score / maxScore) * 100;
+      energyFill.style.width = energyPercent + '%';
+      energyFill.textContent = Math.round(energyPercent) + '%';
+
+      const quotes = [
+        '"La táctica es saber qué hacer cuando hay algo que hacer." - Djokovic',
+        '"El tenis se gana con la cabeza, no solo con el brazo." - Murray',
+        '"Juega inteligente, no solo fuerte." - Hingis'
+      ];
+      famousQuotes.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+
+      showScreen('final-screen');
+    }
+
+    function showAnalysis() {
+      const basicScore = score - (bonusAnswered ? 0.5 : 0) - (finalChallengeScore);
+      const analysisStats = document.getElementById('analysis-stats');
+      const recommendations = document.getElementById('recommendations');
+
+      analysisStats.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-value">${basicScore}/5</div>
+          <div class="stat-label">Principios Básicos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${bonusAnswered ? '✓' : '✗'}</div>
+          <div class="stat-label">Bonus Completado</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${finalChallengeScore}/1</div>
+          <div class="stat-label">Ronda Final</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${Math.round((score / 6.5) * 100)}%</div>
+          <div class="stat-label">Precisión Táctica</div>
+        </div>
+      `;
+
+      let recommendationText = '';
+      if (score >= 6) {
+        recommendationText = `
+          <div class="recommendation-item">
+            ✅ <strong>Excelente dominio táctico.</strong> Estás listo para aplicar estos principios en partidos competitivos.
+          </div>
+          <div class="recommendation-item">
+            💡 <strong>Siguiente paso:</strong> Practica combinar múltiples principios en una misma jugada.
+          </div>
+        `;
+      } else if (score >= 4.5) {
+        recommendationText = `
+          <div class="recommendation-item">
+            ✅ <strong>Buen entendimiento táctico.</strong> Tienes las bases sólidas.
+          </div>
+          <div class="recommendation-item">
+            💡 <strong>Área de mejora:</strong> Practica reconocer situaciones de partido más rápido.
+          </div>
+        `;
+      } else {
+        recommendationText = `
+          <div class="recommendation-item">
+            💪 <strong>Sigue aprendiendo.</strong> La táctica se desarrolla con práctica y experiencia.
+          </div>
+          <div class="recommendation-item">
+            💡 <strong>Recomendación:</strong> Repasa cada principio y observa partidos profesionales aplicando estos conceptos.
+          </div>
+        `;
+      }
+
+      recommendations.innerHTML = recommendationText;
+      showScreen('analysis-screen');
+    }
+
+    function restartGame() {
+      score = 0;
+      bonusAnswered = false;
+      finalChallengeScore = 0;
+      selectedOrder = [];
+      currentPrinciple = 0;
+      
+      for (let i = 1; i <= 5; i++) {
+        const options = document.querySelectorAll(`#principle-${i} .option`);
+        options.forEach(opt => {
+          opt.classList.remove('correct', 'incorrect', 'disabled');
+        });
+        
+        const feedback = document.getElementById(`feedback-${i}`);
+        feedback.classList.remove('show');
+        
+        const nextBtn = document.getElementById(`next-${i}`);
+        nextBtn.style.display = 'none';
+      }
+
+      const bonus5 = document.getElementById('bonus-5');
+      if (bonus5) bonus5.style.display = 'none';
+
+      const principleCards = document.querySelectorAll('.principle-card');
+      principleCards.forEach(card => {
+        card.classList.remove('selected');
+        card.querySelector('.principle-number').textContent = '';
+      });
+
+      const feedbackFinal = document.getElementById('feedback-final');
+      feedbackFinal.classList.remove('show');
+      
+      document.getElementById('check-order').style.display = 'none';
+      document.getElementById('next-final').style.display = 'none';
+      
+      showScreen('home-screen');
+    }
+  </script>
+ </body>
+</html>

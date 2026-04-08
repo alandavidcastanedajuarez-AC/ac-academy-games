@@ -1,0 +1,737 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curiosidades tácticas del juego</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      height: 100%;
+      overflow-x: hidden;
+    }
+    
+    html {
+      height: 100%;
+    }
+
+    .container {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    .game-card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 2.5rem;
+      max-width: 700px;
+      width: 100%;
+      margin: auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #1e3c72;
+      margin: 0 0 0.5rem 0;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #64748b;
+      margin: 0;
+    }
+
+    .tennis-emoji {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .start-screen, .question-screen, .results-screen {
+      display: none;
+    }
+
+    .start-screen.active, .question-screen.active, .results-screen.active {
+      display: block;
+    }
+
+    .intro-text {
+      font-size: 1.1rem;
+      color: #475569;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .stats-preview {
+      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      color: #78350f;
+    }
+
+    .stat-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .stat-icon {
+      font-size: 1.5rem;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: white;
+      border: none;
+      padding: 1rem 2.5rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+      width: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .progress-bar {
+      background: #e2e8f0;
+      border-radius: 10px;
+      height: 8px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #f97316 0%, #ea580c 100%);
+      height: 100%;
+      transition: width 0.5s ease;
+      border-radius: 10px;
+    }
+
+    .question-counter {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .question-text {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 2rem;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .answers-grid {
+      display: grid;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .answer-btn {
+      background: white;
+      border: 3px solid #e2e8f0;
+      padding: 1.2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #475569;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+    }
+
+    .answer-btn:hover {
+      border-color: #f97316;
+      background: #fff7ed;
+      transform: translateX(5px);
+    }
+
+    .answer-btn.selected {
+      border-color: #f97316;
+      background: #fff7ed;
+      color: #1e293b;
+    }
+
+    .answer-btn.correct {
+      border-color: #10b981;
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .answer-btn.incorrect {
+      border-color: #ef4444;
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .answer-btn:disabled {
+      cursor: not-allowed;
+    }
+
+    .curiosity-box {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      border-left: 4px solid #3b82f6;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      display: none;
+    }
+
+    .curiosity-box.show {
+      display: block;
+      animation: slideIn 0.5s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .curiosity-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #1e40af;
+      margin: 0 0 0.5rem 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .curiosity-text {
+      font-size: 1rem;
+      color: #1e3a8a;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .score-display {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .score-big {
+      font-size: 4rem;
+      font-weight: 800;
+      color: #f97316;
+      margin: 0;
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 1.1rem;
+      color: #64748b;
+      margin: 0.5rem 0 0 0;
+    }
+
+    .message-box {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .message-text {
+      font-size: 1.1rem;
+      color: #78350f;
+      font-weight: 600;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .stats-summary {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .stat-label {
+      font-size: 0.95rem;
+      color: #64748b;
+    }
+
+    .stat-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #475569;
+      margin-top: 1rem;
+    }
+
+    .btn-secondary:hover {
+      background: #cbd5e1;
+      box-shadow: 0 4px 15px rgba(100, 116, 139, 0.2);
+    }
+
+    @media (max-width: 640px) {
+      .title {
+        font-size: 2rem;
+      }
+
+      .game-card {
+        padding: 1.5rem;
+      }
+
+      .question-text {
+        font-size: 1.1rem;
+      }
+
+      .score-big {
+        font-size: 3rem;
+      }
+    }
+  </style>
+  </head>
+ <body>
+  <div class="container">
+   <div class="game-card">
+    <div class="header"><span class="tennis-emoji"></span>
+     <h1 class="title" id="main-title">Curiosidades tácticas del juego</h1>
+     <p class="subtitle" id="subtitle">Descubre los secretos que usan los profesionales</p>
+    </div><!-- Start Screen -->
+    <div class="start-screen active" id="start-screen">
+     <p class="intro-text">¿Sabías que el tenis no se gana por magia? Se gana por porcentajes, decisiones y lectura táctica. Responde estas preguntas y descubre los datos que cambiarán tu forma de ver el juego.</p>
+     <div class="stats-preview">
+      <div class="stat-item"><span class="stat-icon">📊</span> <span>10 curiosidades tácticas profesionales</span>
+      </div>
+      <div class="stat-item"><span class="stat-icon">🎯</span> <span>Datos aplicables a tu juego inmediatamente</span>
+      </div>
+      <div class="stat-item"><span class="stat-icon">🏆</span> <span>Estrategias de campeones de Grand Slam</span>
+      </div>
+     </div><button class="btn" id="start-btn">Comenzar el Juego</button>
+    </div><!-- Question Screen -->
+    <div class="question-screen" id="question-screen">
+     <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+     </div>
+     <p class="question-counter" id="question-counter">Pregunta 1 de 10</p>
+     <h2 class="question-text" id="question-text"></h2>
+     <div class="answers-grid" id="answers-grid"></div>
+     <div class="curiosity-box" id="curiosity-box">
+      <p class="curiosity-title">💡 Curiosidad Táctica</p>
+      <p class="curiosity-text" id="curiosity-text"></p>
+     </div><button class="btn" id="next-btn" style="display: none;">Siguiente</button>
+    </div><!-- Results Screen -->
+    <div class="results-screen" id="results-screen">
+     <div class="score-display">
+      <p class="score-big" id="final-score">0</p>
+      <p class="score-label">de 10 respuestas correctas</p>
+     </div>
+     <div class="message-box">
+      <p class="message-text" id="result-message"></p>
+     </div>
+     <div class="stats-summary">
+      <div class="stat-row"><span class="stat-label">Precisión</span> <span class="stat-value" id="accuracy-stat">0%</span>
+      </div>
+      <div class="stat-row"><span class="stat-label">Curiosidades descubiertas</span> <span class="stat-value">10</span>
+      </div>
+      <div class="stat-row"><span class="stat-label">Nivel táctico</span> <span class="stat-value" id="level-stat">-</span>
+      </div>
+     </div><button class="btn" id="restart-btn">Jugar de Nuevo</button> <button class="btn btn-secondary" id="review-btn">Repasar Curiosidades</button>
+    </div>
+   </div>
+  </div>
+  <script>
+    const questions = [
+      {
+        id: "q1",
+        question: "En tenis amateur, ¿qué porcentaje de puntos se pierden por errores no forzados?",
+        answers: [
+          { text: "40% - Menos de la mitad", correct: false },
+          { text: "55% - Un poco más de la mitad", correct: false },
+          { text: "70% - La gran mayoría", correct: true }
+        ],
+        curiosity: "El 70% de los puntos en tenis amateur se pierden por errores no forzados. Tu mejor estrategia: mantener la pelota en juego y dejar que tu rival falle primero."
+      },
+      {
+        id: "q2",
+        question: "En dobles, ¿qué porcentaje de puntos se define en la red?",
+        answers: [
+          { text: "50% - La mitad", correct: false },
+          { text: "65% - Casi dos tercios", correct: false },
+          { text: "80% - La gran mayoría", correct: true }
+        ],
+        curiosity: "Más del 80% de los puntos en dobles se deciden en la red. Subir a la red no es opcional, es la táctica ganadora. Quien domina la red, domina el partido."
+      },
+      {
+        id: "q3",
+        question: "¿Qué porcentaje de los winners provienen de pelotas cortas?",
+        answers: [
+          { text: "30% - Menos de un tercio", correct: false },
+          { text: "45% - Casi la mitad", correct: false },
+          { text: "60% - Más de la mitad", correct: true }
+        ],
+        curiosity: "Más del 60% de los winners nacen cuando el rival te da una pelota corta. La clave: reconocer la oportunidad y atacar sin dudar."
+      },
+      {
+        id: "q4",
+        question: "Si ganas el 55% de los puntos, ¿qué porcentaje de partidos ganarás?",
+        answers: [
+          { text: "60% - Un poco más", correct: false },
+          { text: "75% - Tres cuartos", correct: false },
+          { text: "90% - Casi todos", correct: true }
+        ],
+        curiosity: "Ganar el 55% de los puntos significa ganar el 90% de los partidos. No necesitas dominar, solo ser un poco más consistente que tu rival."
+      },
+      {
+        id: "q5",
+        question: "¿En cuántos golpes se deciden el 80% de los puntos?",
+        answers: [
+          { text: "Los primeros 4 golpes", correct: true },
+          { text: "Los primeros 8 golpes", correct: false },
+          { text: "Después de 10 golpes", correct: false }
+        ],
+        curiosity: "El 80% de los puntos se decide en los primeros 4 golpes (servicio + 1, resto + 1). Los rallies largos son espectaculares, pero no son donde se ganan los partidos."
+      },
+      {
+        id: "q6",
+        question: "Djokovic y Murray ganaban la mayoría de sus puntos por:",
+        answers: [
+          { text: "Potencia extrema en cada golpe", correct: false },
+          { text: "Consistencia y forzar errores", correct: true },
+          { text: "Winners espectaculares", correct: false }
+        ],
+        curiosity: "El 70% de los puntos de Djokovic y Murray venían de forzar errores del rival, no de winners. La defensa táctica inteligente gana más que la potencia ciega."
+      },
+      {
+        id: "q7",
+        question: "¿Cuánto aumentan tus probabilidades si subes primero a la red en dobles?",
+        answers: [
+          { text: "15% - Un poco", correct: false },
+          { text: "25% - Un cuarto más", correct: false },
+          { text: "40% - Casi la mitad más", correct: true }
+        ],
+        curiosity: "Subir primero a la red en dobles aumenta tus probabilidades de ganar el punto en un 40%. La iniciativa gana partidos, no solo la ejecución perfecta."
+      },
+      {
+        id: "q8",
+        question: "¿Cuánto reduce una pelota profunda la probabilidad de un winner del rival?",
+        answers: [
+          { text: "25% - Un cuarto menos", correct: false },
+          { text: "50% - La mitad", correct: true },
+          { text: "75% - Tres cuartos menos", correct: false }
+        ],
+        curiosity: "Una pelota profunda reduce en un 50% la probabilidad del rival de hacer un winner. Profundidad = defensa + ataque silencioso. Corto = peligro."
+      },
+      {
+        id: "q9",
+        question: "Federer ganaba el 75% de puntos con primer saque gracias a:",
+        answers: [
+          { text: "Velocidad extrema del saque", correct: false },
+          { text: "Colocación precisa del saque", correct: true },
+          { text: "Efecto del saque", correct: false }
+        ],
+        curiosity: "Federer ganaba un 75% de puntos con primer saque por su colocación, no por fuerza bruta. Precisión > Potencia. Apunta, no revientes."
+      },
+      {
+        id: "q10",
+        question: "¿Qué porcentaje de errores ocurren cuando el jugador está desequilibrado?",
+        answers: [
+          { text: "35% - Un tercio", correct: false },
+          { text: "50% - La mitad", correct: false },
+          { text: "60% - Más de la mitad", correct: true }
+        ],
+        curiosity: "Más del 60% de los errores ocurren cuando el jugador está desequilibrado. No fallan por técnica, fallan por balance. Rompe el equilibrio de tu rival, no su raqueta."
+      }
+    ];
+
+    const defaultConfig = {
+      main_title: "Curiosidades tácticas del juego",
+      subtitle: "Descubre los secretos que usan los profesionales",
+      start_button: "Comenzar el Juego",
+      next_button: "Siguiente",
+      results_title: "¡Resultados!"
+    };
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    const dataHandler = {
+      onDataChanged(data) {
+        // Data is stored but not displayed in this game
+      }
+    };
+
+    async function initApp() {
+      if (window.dataSdk) {
+        const initResult = await window.dataSdk.init(dataHandler);
+        if (!initResult.isOk) {
+          console.error("Failed to initialize data SDK");
+        }
+      }
+
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange: async (config) => {
+            const mainTitle = document.getElementById('main-title');
+            const subtitle = document.getElementById('subtitle');
+            const startBtn = document.getElementById('start-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            if (mainTitle) mainTitle.textContent = config.main_title || defaultConfig.main_title;
+            if (subtitle) subtitle.textContent = config.subtitle || defaultConfig.subtitle;
+            if (startBtn) startBtn.textContent = config.start_button || defaultConfig.start_button;
+            if (nextBtn) nextBtn.textContent = config.next_button || defaultConfig.next_button;
+          },
+          mapToCapabilities: (config) => ({
+            recolorables: [
+              {
+                get: () => config.background_color || "#1e3c72",
+                set: (value) => {
+                  config.background_color = value;
+                  window.elementSdk.setConfig({ background_color: value });
+                }
+              },
+              {
+                get: () => config.card_background || "#ffffff",
+                set: (value) => {
+                  config.card_background = value;
+                  window.elementSdk.setConfig({ card_background: value });
+                }
+              },
+              {
+                get: () => config.text_color || "#1e293b",
+                set: (value) => {
+                  config.text_color = value;
+                  window.elementSdk.setConfig({ text_color: value });
+                }
+              },
+              {
+                get: () => config.primary_action || "#f97316",
+                set: (value) => {
+                  config.primary_action = value;
+                  window.elementSdk.setConfig({ primary_action: value });
+                }
+              },
+              {
+                get: () => config.accent_color || "#3b82f6",
+                set: (value) => {
+                  config.accent_color = value;
+                  window.elementSdk.setConfig({ accent_color: value });
+                }
+              }
+            ],
+            borderables: [],
+            fontEditable: {
+              get: () => config.font_family || "Inter",
+              set: (value) => {
+                config.font_family = value;
+                window.elementSdk.setConfig({ font_family: value });
+              }
+            },
+            fontSizeable: {
+              get: () => config.font_size || 16,
+              set: (value) => {
+                config.font_size = value;
+                window.elementSdk.setConfig({ font_size: value });
+              }
+            }
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ["main_title", config.main_title || defaultConfig.main_title],
+            ["subtitle", config.subtitle || defaultConfig.subtitle],
+            ["start_button", config.start_button || defaultConfig.start_button],
+            ["next_button", config.next_button || defaultConfig.next_button],
+            ["results_title", config.results_title || defaultConfig.results_title]
+          ])
+        });
+      }
+
+      setupEventListeners();
+    }
+
+    function setupEventListeners() {
+      document.getElementById('start-btn').addEventListener('click', startGame);
+      document.getElementById('next-btn').addEventListener('click', nextQuestion);
+      document.getElementById('restart-btn').addEventListener('click', restartGame);
+      document.getElementById('review-btn').addEventListener('click', reviewCuriosities);
+    }
+
+    function startGame() {
+      currentQuestionIndex = 0;
+      score = 0;
+      showScreen('question-screen');
+      displayQuestion();
+    }
+
+    function displayQuestion() {
+      answered = false;
+      const question = questions[currentQuestionIndex];
+      
+      document.getElementById('question-counter').textContent = `Pregunta ${currentQuestionIndex + 1} de ${questions.length}`;
+      document.getElementById('question-text').textContent = question.question;
+      document.getElementById('curiosity-box').classList.remove('show');
+      document.getElementById('next-btn').style.display = 'none';
+      
+      const progressPercent = (currentQuestionIndex / questions.length) * 100;
+      document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+
+      const answersGrid = document.getElementById('answers-grid');
+      answersGrid.innerHTML = '';
+
+      question.answers.forEach((answer, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = answer.text;
+        btn.addEventListener('click', () => selectAnswer(index, answer.correct));
+        answersGrid.appendChild(btn);
+      });
+    }
+
+    async function selectAnswer(index, isCorrect) {
+      if (answered) return;
+      answered = true;
+
+      const answerBtns = document.querySelectorAll('.answer-btn');
+      answerBtns.forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === index) {
+          btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+        }
+        if (questions[currentQuestionIndex].answers[i].correct) {
+          btn.classList.add('correct');
+        }
+      });
+
+      if (isCorrect) {
+        score++;
+      }
+
+      if (window.dataSdk) {
+        const result = await window.dataSdk.create({
+          question_id: questions[currentQuestionIndex].id,
+          correct: isCorrect,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      document.getElementById('curiosity-text').textContent = questions[currentQuestionIndex].curiosity;
+      document.getElementById('curiosity-box').classList.add('show');
+      document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        displayQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      showScreen('results-screen');
+      
+      document.getElementById('final-score').textContent = score;
+      
+      const accuracy = Math.round((score / questions.length) * 100);
+      document.getElementById('accuracy-stat').textContent = `${accuracy}%`;
+
+      let level = '';
+      let message = '';
+      
+      if (score >= 9) {
+        level = 'Maestro Táctico 🏆';
+        message = '¡Increíble! Dominas las estrategias como un profesional. Estos conocimientos te darán ventaja en cada partido.';
+      } else if (score >= 7) {
+        level = 'Estratega Avanzado 🎯';
+        message = '¡Excelente! Tienes una comprensión sólida de las tácticas del tenis. Sigue aplicando estos conceptos.';
+      } else if (score >= 5) {
+        level = 'Táctico en Desarrollo 📈';
+        message = 'Buen comienzo. Estos datos te ayudarán a tomar mejores decisiones en la cancha.';
+      } else {
+        level = 'Explorador Táctico ';
+        message = 'Has descubierto información valiosa. Repasa las curiosidades y verás mejoras en tu juego.';
+      }
+
+      document.getElementById('level-stat').textContent = level;
+      document.getElementById('result-message').textContent = message;
+    }
+
+    function restartGame() {
+      startGame();
+    }
+
+    function reviewCuriosities() {
+      currentQuestionIndex = 0;
+      showScreen('question-screen');
+      displayQuestion();
+    }
+
+    function showScreen(screenId) {
+      document.querySelectorAll('.start-screen, .question-screen, .results-screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    initApp();
+  </script>
+ </body>
+</html>

@@ -1,0 +1,2447 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Centro o cruzado en dobles</title>
+  <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes ballBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.1); }
+        }
+
+        @keyframes ballSplit {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(var(--split-direction, 100px)); }
+        }
+
+        /* Pantalla de Portada */
+        .welcome-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .main-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .tennis-animation {
+            position: relative;
+            height: 200px;
+            margin: 40px 0;
+            overflow: hidden;
+        }
+
+        .tennis-ball {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, #ffff00, #ffd700, #ffb300);
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            animation: ballSplit 3s infinite;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .tennis-ball::before {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 40px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .tennis-ball::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(to right, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 2px;
+        }
+
+        @keyframes ballSplit {
+            0% { 
+                transform: translate(-50%, -50%) scale(1);
+                left: 50%;
+            }
+            25% { 
+                transform: translate(-50%, -50%) scale(1.1);
+                left: 30%;
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1);
+                left: 50%;
+            }
+            75% { 
+                transform: translate(-50%, -50%) scale(1.1);
+                left: 70%;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(1);
+                left: 50%;
+            }
+        }
+
+        @keyframes ballTransition {
+            0% { 
+                transform: translate(-50%, -50%) scale(1);
+                left: 10%;
+                top: 50%;
+            }
+            25% { 
+                transform: translate(-50%, -50%) scale(1.1);
+                left: 30%;
+                top: 50%;
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1);
+                left: 50%;
+                top: 50%;
+            }
+            75% { 
+                transform: translate(-50%, -50%) scale(1.1);
+                left: 70%;
+                top: 50%;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(1.2);
+                left: 90%;
+                top: 50%;
+            }
+        }
+
+        .court-split {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+            gap: 40px;
+        }
+
+        .court-half {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .court-half h3 {
+            color: #ffd700;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 40px;
+            box-shadow: 0 8px 20px rgba(255,107,107,0.3);
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(255,107,107,0.4);
+        }
+
+        /* Secciones del juego */
+        .game-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .court-visual {
+            width: 100%;
+            max-width: 800px;
+            height: 400px; /* Relación 2:1 */
+            margin: 30px auto;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c23 50%, #2d5016 100%);
+            border-radius: 20px;
+            position: relative;
+            border: 6px solid #ffffff;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .court-lines {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Líneas exteriores principales - relación 2:1 */
+        .court-boundary {
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 80%;
+            height: 80%;
+            border: 4px solid white;
+            border-radius: 4px;
+        }
+
+        /* Líneas interiores paralelas a 0.6 de distancia por dentro */
+        .inner-line-top,
+        .inner-line-bottom {
+            position: absolute;
+            left: 10%;
+            width: 80%;
+            height: 3px;
+            background: white;
+        }
+
+        .inner-line-top {
+            top: 22%; /* 0.6 de distancia desde el borde superior */
+        }
+
+        .inner-line-bottom {
+            bottom: 22%; /* 0.6 de distancia desde el borde inferior */
+        }
+
+        /* Red central más gruesa - divide por la mitad */
+        .net {
+            position: absolute;
+            left: 50%;
+            top: 10%;
+            width: 12px; /* Más gruesa */
+            height: 80%;
+            background: linear-gradient(to bottom, #e0e0e0 0%, #ffffff 30%, #ffffff 70%, #e0e0e0 100%);
+            transform: translateX(-50%);
+            box-shadow: 0 0 15px rgba(0,0,0,0.4);
+            border-radius: 6px;
+            z-index: 10;
+        }
+
+        /* Postes de la red */
+        .net::before,
+        .net::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 30px;
+            background: linear-gradient(135deg, #555 0%, #777 50%, #555 100%);
+            border-radius: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .net::before {
+            top: -15px;
+        }
+
+        .net::after {
+            bottom: -15px;
+        }
+
+        /* Línea H en el centro - 1/3 del ancho total - Orientación natural horizontal */
+        .h-line-vertical-left,
+        .h-line-vertical-right {
+            position: absolute;
+            top: 22%; /* Solo desde la línea paralela superior */
+            height: 56%; /* Solo hasta la línea paralela inferior (22% + 56% = 78%, dejando 22% abajo) */
+            width: 3px;
+            background: white;
+        }
+
+        .h-line-vertical-left {
+            left: 35%; /* Lado izquierdo de la H */
+        }
+
+        .h-line-vertical-right {
+            right: 35%; /* Lado derecho de la H */
+        }
+
+        /* Línea horizontal central de la H */
+        .h-line-horizontal {
+            position: absolute;
+            top: 50%;
+            left: 35%; /* Solo conecta entre las líneas verticales */
+            right: 35%; /* Solo conecta entre las líneas verticales */
+            height: 3px; /* Conecta solo entre las verticales */
+            background: white;
+            transform: translateY(-50%);
+        }
+
+        /* Línea central que divide por la mitad (parte de la H) */
+        .center-divider {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 3px;
+            height: 20%; /* Línea central más corta */
+            background: white;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+        }
+
+        .animated-ball {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ffd700;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .explanation-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin: 30px 0;
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #ffd700;
+        }
+
+        .advantages-table {
+            background: rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .advantages-table h3 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .advantage-row {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .advantage-row:last-child {
+            border-bottom: none;
+        }
+
+        .advantage-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            min-width: 30px;
+        }
+
+        .advantage-title {
+            font-weight: bold;
+            color: #ffd700;
+            margin-right: 20px;
+            min-width: 200px;
+        }
+
+        .advantage-desc {
+            flex: 1;
+            opacity: 0.9;
+        }
+
+        /* Desafíos interactivos */
+        .challenge-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 2px solid rgba(255,215,0,0.3);
+        }
+
+        .challenge-title {
+            font-size: 1.5rem;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .challenge-question {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: #ffd700;
+        }
+
+        .option-btn.correct {
+            background: rgba(76,175,80,0.3);
+            border-color: #4caf50;
+        }
+
+        .option-btn.incorrect {
+            background: rgba(244,67,54,0.3);
+            border-color: #f44336;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            text-align: center;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: rgba(76,175,80,0.2);
+            border: 2px solid #4caf50;
+            color: #81c784;
+        }
+
+        .feedback.incorrect {
+            background: rgba(244,67,54,0.2);
+            border: 2px solid #f44336;
+            color: #e57373;
+        }
+
+        .next-btn {
+            background: linear-gradient(45deg, #4caf50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(76,175,80,0.3);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        /* Jugadores arrastrables */
+        .player.draggable {
+            transition: all 0.2s ease;
+            z-index: 20;
+        }
+
+        .player.draggable:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 15px rgba(255,255,255,0.6);
+            border-color: rgba(255,255,255,0.8);
+        }
+
+        .player.dragging {
+            transform: scale(1.3);
+            z-index: 30;
+            box-shadow: 0 0 20px rgba(255,255,255,0.8);
+        }
+
+        .court-visual.edit-mode {
+            border: 3px dashed #ffd700;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c23 50%, #2d5016 100%), 
+                        repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,215,0,0.1) 10px, rgba(255,215,0,0.1) 20px);
+        }
+
+        .edit-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 14px 0 18px;
+            flex-wrap: wrap;
+        }
+
+        .edit-btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,215,0,0.55);
+            color: #ffe082;
+            padding: 8px 14px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn:hover {
+            background: rgba(255,215,0,0.18);
+            transform: translateY(-1px);
+        }
+
+        .edit-btn.active {
+            background: #ffd700;
+            color: #1e3c72;
+            font-weight: bold;
+        }
+
+        /* Estilos para pantalla final espectacular */
+        .tennis-court-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a5f1a 0%, #2d8f2d 50%, #1a5f1a 100%);
+            z-index: -1;
+        }
+
+        .court-surface {
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 80%;
+            height: 80%;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c23 50%, #2d5016 100%);
+            border-radius: 20px;
+            opacity: 0.3;
+            filter: blur(2px);
+        }
+
+        .court-outline {
+            position: absolute;
+            top: 5%;
+            left: 5%;
+            width: 90%;
+            height: 90%;
+            border: 4px solid rgba(255,255,255,0.4);
+            border-radius: 10px;
+        }
+
+        .court-center-line {
+            position: absolute;
+            left: 50%;
+            top: 5%;
+            width: 4px;
+            height: 90%;
+            background: rgba(255,255,255,0.4);
+            transform: translateX(-50%);
+        }
+
+        .court-net {
+            position: absolute;
+            left: 50%;
+            top: 45%;
+            width: 90%;
+            height: 10%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+            transform: translateX(-50%);
+            border-radius: 5px;
+        }
+
+        .floating-ball {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle at 30% 30%, #ffff00, #ffd700, #ffb300);
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            animation: floatBall 6s ease-in-out infinite;
+        }
+
+        .ball-1 {
+            top: 15%;
+            left: 20%;
+            animation-delay: 0s;
+        }
+
+        .ball-2 {
+            top: 25%;
+            right: 15%;
+            animation-delay: 1.5s;
+        }
+
+        .ball-3 {
+            bottom: 20%;
+            left: 25%;
+            animation-delay: 3s;
+        }
+
+        .ball-4 {
+            bottom: 15%;
+            right: 20%;
+            animation-delay: 4.5s;
+        }
+
+        @keyframes floatBall {
+            0%, 100% { transform: translateY(0px) scale(1); opacity: 0.7; }
+            25% { transform: translateY(-20px) scale(1.1); opacity: 1; }
+            50% { transform: translateY(-10px) scale(1.05); opacity: 0.8; }
+            75% { transform: translateY(-30px) scale(1.15); opacity: 1; }
+        }
+
+        .results-card {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            color: white;
+            text-align: center;
+            min-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .academy-logo {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #ffd700;
+            opacity: 0.9;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .final-title {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin: 60px 0 40px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-weight: bold;
+        }
+
+        .progress-circle-container {
+            position: relative;
+            display: inline-block;
+            margin: 30px 0;
+        }
+
+        .progress-circle {
+            transform: rotate(-90deg);
+        }
+
+        .progress-bg {
+            fill: none;
+            stroke: rgba(255,255,255,0.1);
+            stroke-width: 8;
+        }
+
+        .progress-bar-circle {
+            fill: none;
+            stroke: #ffd700;
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 565.48;
+            stroke-dashoffset: 565.48;
+            transition: stroke-dashoffset 2s ease-in-out;
+            filter: drop-shadow(0 0 10px #ffd700);
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .percentage-display {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 20px #ffd700;
+        }
+
+        .progress-label {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.8);
+            margin-top: 5px;
+        }
+
+        .motivational-section {
+            margin: 40px 0;
+            padding: 30px;
+            background: rgba(255,215,0,0.1);
+            border-radius: 20px;
+            border: 2px solid rgba(255,215,0,0.3);
+        }
+
+        .achievement-medal {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: medalGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes medalGlow {
+            0% { transform: scale(1); filter: drop-shadow(0 0 10px #ffd700); }
+            100% { transform: scale(1.1); filter: drop-shadow(0 0 20px #ffd700); }
+        }
+
+        .achievement-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .achievement-message {
+            font-size: 1.2rem;
+            line-height: 1.5;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            min-width: 40px;
+        }
+
+        .stat-text {
+            flex: 1;
+            text-align: left;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .medals-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .medal-item {
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            border: 2px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            opacity: 0.5;
+        }
+
+        .medal-item.earned {
+            opacity: 1;
+            border-color: #ffd700;
+            background: rgba(255,215,0,0.1);
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.3);
+        }
+
+        .medal-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .medal-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 8px;
+        }
+
+        .medal-requirement {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin: 50px 0 30px 0;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            min-width: 200px;
+            justify-content: center;
+        }
+
+        .restart-btn {
+            background: linear-gradient(45deg, #4caf50, #45a049);
+            color: white;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(76,175,80,0.4);
+        }
+
+        .video-btn {
+            background: linear-gradient(45deg, #2196f3, #1976d2);
+            color: white;
+        }
+
+        .video-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(33,150,243,0.4);
+        }
+
+        .next-btn {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+            color: white;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(255,152,0,0.4);
+        }
+
+        .btn-icon {
+            font-size: 1.3rem;
+        }
+
+        .academy-footer {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid rgba(255,215,0,0.3);
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 8px;
+        }
+
+        .footer-tagline {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.7);
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .court-split {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .game-section {
+                padding: 25px;
+            }
+            
+            .edit-controls {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                margin: 12px 0 16px;
+            }
+
+            .edit-btn {
+                width: min(220px, 100%);
+                font-size: 0.78rem;
+                padding: 7px 12px;
+            }
+
+            .results-card {
+                padding: 25px;
+                margin: 10px;
+            }
+
+            .final-title {
+                font-size: 2rem;
+            }
+
+            .percentage-display {
+                font-size: 2.5rem;
+            }
+
+            .achievement-title {
+                font-size: 1.5rem;
+            }
+
+            .stats-section {
+                grid-template-columns: 1fr;
+            }
+
+            .medals-section {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .action-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+  </head>
+ <body>
+  <div class="container"><!-- Pantalla de Portada -->
+   <div id="welcome" class="screen active">
+    <div class="welcome-screen">
+     <h1 class="main-title" id="gameTitle">Centro o cruzado en dobles</h1>
+     <p class="subtitle" id="gameSubtitle">Aprende a decidir con inteligencia táctica</p>
+     <div class="tennis-animation">
+      <div class="tennis-ball" id="animatedBall"></div>
+     </div>
+     <div class="court-split">
+      <div class="court-half">
+       <h3>🎯 Centro</h3>
+       <p>Táctica segura que crea confusión entre rivales y mantiene el control del punto.</p>
+      </div>
+      <div class="court-half">
+       <h3>⚡ Lados</h3>
+       <p>Táctica agresiva que abre espacios y genera ángulos ganadores, pero con mayor riesgo.</p>
+      </div>
+     </div>
+     <div style="font-size: 1.3rem; margin: 40px 0; padding: 30px; background: rgba(255,255,255,0.1); border-radius: 15px; border-left: 5px solid #ffd700;">
+      <p style="font-style: italic; margin-bottom: 15px; color: #ffd700;">"En dobles, elegir la dirección correcta puede cambiar todo el partido."</p>
+      <p style="font-weight: bold; margin: 0;">¿Sabes cuándo atacar al centro o a los lados?</p>
+     </div><button class="start-btn" onclick="startGame()">¡Comenzar el desafío! 🚀</button>
+    </div>
+   </div><!-- Sección 1: Ataque al Centro -->
+   <div id="centerSection" class="screen">
+    <div class="game-section">
+     <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+     </div>
+     <h2 class="section-title">🎯 ATAQUE AL CENTRO</h2>
+     <div class="court-visual">
+      <div class="court-lines"><!-- Línea exterior principal - relación 2:1 -->
+       <div class="court-boundary"></div><!-- Líneas interiores paralelas a 0.3 de distancia -->
+       <div class="inner-line-top"></div>
+       <div class="inner-line-bottom"></div><!-- Red central más gruesa que divide por la mitad -->
+       <div class="net"></div><!-- Líneas de la H en el centro (1/3 del ancho) - Orientación natural -->
+       <div class="h-line-vertical-left"></div>
+       <div class="h-line-vertical-right"></div>
+       <div class="h-line-horizontal"></div><!-- Línea central divisoria -->
+       <div class="center-divider"></div>
+      </div>
+      <div class="animated-ball" id="centerBall" style="left: 50%; top: 80%; transform: translate(-50%, -50%);"></div>
+     </div>
+     <div class="explanation-text">
+      <h3 style="color: #ffd700; margin-bottom: 15px; font-size: 1.4rem;">"A veces el punto no se gana golpeando más fuerte, sino golpeando donde nadie se espera: el centro."</h3>
+      <p style="margin: 0; font-size: 1.1rem;">Atacar al centro es una táctica inteligente y de bajo riesgo que crea confusión entre rivales y mantiene el control del punto.</p>
+     </div>
+     <div class="advantages-table">
+      <h3>🧠 Ventajas tácticas del ataque al centro</h3>
+      <div class="advantage-row"><span class="advantage-icon">✅</span> <span class="advantage-title">Más margen de error</span> <span class="advantage-desc">Línea más larga, menos posibilidad de fallar.</span>
+      </div>
+      <div class="advantage-row"><span class="advantage-icon">✅</span> <span class="advantage-title">Crea confusión</span> <span class="advantage-desc">Los rivales dudan quién debe golpear.</span>
+      </div>
+      <div class="advantage-row"><span class="advantage-icon">✅</span> <span class="advantage-title">Controla el ritmo</span> <span class="advantage-desc">Ideal para neutralizar a equipos agresivos.</span>
+      </div>
+      <div class="advantage-row"><span class="advantage-icon">✅</span> <span class="advantage-title">Facilita la volea del compañero</span> <span class="advantage-desc">El rival devuelve más predecible.</span>
+      </div>
+     </div><button class="next-btn" onclick="startCenterChallenges()">🎮 Comenzar Desafíos del Centro</button>
+    </div>
+   </div><!-- Desafíos del Centro -->
+   <div id="centerChallenges" class="screen">
+    <div class="game-section">
+     <div class="progress-bar">
+      <div class="progress-fill" style="width: 25%;"></div>
+     </div>
+     <h2 class="section-title">🎮 Desafíos - "Acierta en el centro"</h2><!-- Desafío 1 -->
+     <div class="challenge-container" id="challenge1">
+      <div class="challenge-title">
+       1️⃣ Situación Real
+      </div>
+      <div class="challenge-question">
+       "Ambos rivales están en la red y dejan un hueco entre ellos. ¿Dónde golpeas?"
+      </div>
+      <div class="positioning-instruction" style="background: rgba(255,215,0,0.1); padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #ffd700;">
+       <h4 style="color: #ffd700; margin-bottom: 10px;">🎯 Instrucción Interactiva:</h4>
+       <p style="margin: 0; font-size: 0.95rem;">Antes de responder, <strong>arrastra a los jugadores rojos y verdes</strong> para posicionarlos donde crees que deberían estar en esta situación táctica. Luego responde la pregunta.</p>
+      </div>
+            <div class="edit-controls"><button class="edit-btn" onclick="toggleEditMode(this, 'challenge1')">🔍 Explorar posiciones</button> <button class="edit-btn" onclick="resetPositions('challenge1')">↺ Restaurar</button>
+      </div>
+      <div class="court-visual" id="court-challenge1" style="height: 200px; margin: 15px 0;">
+       <div class="court-lines">
+        <div class="court-boundary"></div>
+        <div class="inner-line-top"></div>
+        <div class="inner-line-bottom"></div>
+        <div class="net"></div>
+        <div class="h-line-vertical-left"></div>
+        <div class="h-line-vertical-right"></div>
+        <div class="h-line-horizontal"></div>
+        <div class="center-divider"></div>
+       </div><!-- Pareja roja (rivales) - lado izquierdo -->
+       <div class="player draggable" data-team="red" data-player="1" data-court="challenge1" style="position: absolute; left: 25%; top: 25%; width: 15px; height: 15px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="red" data-player="2" data-court="challenge1" style="position: absolute; left: 35%; top: 35%; width: 15px; height: 15px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pareja azul (propios) - lado derecho -->
+       <div class="player draggable" data-team="blue" data-player="1" data-court="challenge1" style="position: absolute; left: 65%; top: 75%; width: 12px; height: 12px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="blue" data-player="2" data-court="challenge1" style="position: absolute; left: 75%; top: 85%; width: 12px; height: 12px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pelota con movimiento horizontal -->
+       <div class="animated-ball" style="left: 10%; top: 50%; animation: ballTransition 2s ease-in-out infinite;"></div>
+      </div>
+      <div class="options-container"><button class="option-btn" onclick="selectOption(this, false, 1)">A) Golpe cruzado</button> <button class="option-btn" onclick="selectOption(this, false, 1)">B) Globo</button> <button class="option-btn" onclick="selectOption(this, true, 1)">C) Golpe al centro</button>
+      </div>
+      <div class="feedback" id="feedback1"></div>
+     </div><!-- Desafío 2 -->
+     <div class="challenge-container" id="challenge2" style="display: none;">
+      <div class="challenge-title">
+       2️⃣ Punto Largo
+      </div>
+      <div class="challenge-question">
+       "Punto largo, 30-30. Buscas consistencia y control. ¿Qué opción eliges?"
+      </div>
+      <div class="positioning-instruction" style="background: rgba(255,215,0,0.1); padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #ffd700;">
+       <h4 style="color: #ffd700; margin-bottom: 10px;">🎯 Instrucción Interactiva:</h4>
+       <p style="margin: 0; font-size: 0.95rem;">Posiciona a los <strong>jugadores rojos y verdes</strong> en una formación típica de punto largo. Piensa en cómo se posicionarían ambas parejas en un rally de consistencia.</p>
+      </div>
+            <div class="edit-controls"><button class="edit-btn" onclick="toggleEditMode(this, 'challenge2')">🔍 Explorar posiciones</button> <button class="edit-btn" onclick="resetPositions('challenge2')">↺ Restaurar</button>
+      </div>
+      <div class="court-visual" id="court-challenge2" style="height: 200px; margin: 15px 0;">
+       <div class="court-lines">
+        <div class="court-boundary"></div>
+        <div class="inner-line-top"></div>
+        <div class="inner-line-bottom"></div>
+        <div class="net"></div>
+        <div class="h-line-vertical-left"></div>
+        <div class="h-line-vertical-right"></div>
+        <div class="h-line-horizontal"></div>
+        <div class="center-divider"></div>
+       </div><!-- Pareja roja (rivales) - lado izquierdo -->
+       <div class="player draggable" data-team="red" data-player="1" data-court="challenge2" style="position: absolute; left: 20%; top: 30%; width: 15px; height: 15px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="red" data-player="2" data-court="challenge2" style="position: absolute; left: 30%; top: 40%; width: 15px; height: 15px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pareja azul (propios) - lado derecho -->
+       <div class="player draggable" data-team="blue" data-player="1" data-court="challenge2" style="position: absolute; left: 70%; top: 70%; width: 12px; height: 12px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="blue" data-player="2" data-court="challenge2" style="position: absolute; left: 80%; top: 80%; width: 12px; height: 12px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pelota con movimiento horizontal -->
+       <div class="animated-ball" style="left: 10%; top: 50%; animation: ballTransition 2s ease-in-out infinite;"></div>
+       <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(255,215,0,0.2); padding: 5px 10px; border-radius: 5px; font-size: 0.9rem; color: #ffd700;">
+        30-30
+       </div>
+      </div>
+      <div class="options-container"><button class="option-btn" onclick="selectOption(this, false, 2)">A) Atacar por la línea</button> <button class="option-btn" onclick="selectOption(this, true, 2)">B) Golpear al centro</button> <button class="option-btn" onclick="selectOption(this, false, 2)">C) Cambiar de efecto</button>
+      </div>
+      <div class="feedback" id="feedback2"></div>
+     </div><!-- Desafío 3 -->
+     <div class="challenge-container" id="challenge3" style="display: none;">
+      <div class="challenge-title">
+       3️⃣ Formación Avanzada
+      </div>
+      <div class="challenge-question">
+       "Pareja rival en 'I-Formation'. El devolvedor no tiene clara la cobertura del centro. ¿Qué haces?"
+      </div>
+      <div class="positioning-instruction" style="background: rgba(255,215,0,0.1); padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #ffd700;">
+       <h4 style="color: #ffd700; margin-bottom: 10px;">🎯 Instrucción Interactiva:</h4>
+       <p style="margin: 0; font-size: 0.95rem;">Coloca a los <strong>jugadores rojos y verdes</strong> según la formación I de los rivales (jugadores rojos alineados verticalmente) y posiciona a los verdes en respuesta a esta táctica.</p>
+      </div>
+            <div class="edit-controls"><button class="edit-btn" onclick="toggleEditMode(this, 'challenge3')">🔍 Explorar posiciones</button> <button class="edit-btn" onclick="resetPositions('challenge3')">↺ Restaurar</button>
+      </div>
+      <div class="court-visual" id="court-challenge3" style="height: 200px; margin: 15px 0;">
+       <div class="court-lines">
+        <div class="court-boundary"></div>
+        <div class="inner-line-top"></div>
+        <div class="inner-line-bottom"></div>
+        <div class="net"></div>
+        <div class="h-line-vertical-left"></div>
+        <div class="h-line-vertical-right"></div>
+        <div class="h-line-horizontal"></div>
+        <div class="center-divider"></div>
+       </div><!-- Pareja roja (rivales) - lado izquierdo en I-Formation -->
+       <div class="player draggable" data-team="red" data-player="1" data-court="challenge3" style="position: absolute; left: 30%; top: 25%; width: 15px; height: 15px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="red" data-player="2" data-court="challenge3" style="position: absolute; left: 30%; top: 15%; width: 15px; height: 15px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pareja azul (propios) - lado derecho -->
+       <div class="player draggable" data-team="blue" data-player="1" data-court="challenge3" style="position: absolute; left: 70%; top: 75%; width: 12px; height: 12px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="blue" data-player="2" data-court="challenge3" style="position: absolute; left: 70%; top: 85%; width: 12px; height: 12px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pelota con movimiento horizontal -->
+       <div class="animated-ball" style="left: 10%; top: 50%; animation: ballTransition 2s ease-in-out infinite;"></div>
+       <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(255,107,107,0.2); padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; color: #ff6b6b;">
+        I-Formation
+       </div>
+      </div>
+      <div class="options-container"><button class="option-btn" onclick="selectOption(this, false, 3)">A) Abrir ángulo</button> <button class="option-btn" onclick="selectOption(this, true, 3)">B) Atacar al centro</button> <button class="option-btn" onclick="selectOption(this, false, 3)">C) Globo defensivo</button>
+      </div>
+      <div class="feedback" id="feedback3"></div>
+     </div><button class="next-btn" id="nextSectionBtn" style="display: none;" onclick="showSidesSection()"> Continuar a Ataque a los Lados ⚡ </button>
+    </div>
+   </div><!-- Sección 2: Ataque a los Lados -->
+   <div id="sidesSection" class="screen">
+    <div class="game-section">
+     <div class="progress-bar">
+      <div class="progress-fill" style="width: 50%;"></div>
+     </div>
+     <h2 class="section-title">⚡ ATAQUE A LOS LADOS</h2>
+     <div class="court-visual">
+      <div class="court-lines"><!-- Líneas exteriores principales -->
+       <div class="court-boundary"></div><!-- Áreas sombreadas -->
+       <div class="court-half-left"></div>
+       <div class="court-half-right"></div><!-- Líneas de dobles -->
+       <div class="doubles-alley-left"></div>
+       <div class="doubles-alley-right"></div><!-- Líneas de fondo -->
+       <div class="baseline-top"></div>
+       <div class="baseline-bottom"></div><!-- Marcas de centro -->
+       <div class="center-mark-top"></div>
+       <div class="center-mark-bottom"></div><!-- Red central con postes -->
+       <div class="net"></div><!-- Línea central de servicio -->
+       <div class="center-service-line"></div><!-- Área de servicio -->
+       <div class="service-area">
+        <div class="service-line-top"></div>
+        <div class="service-line-bottom"></div>
+        <div class="service-line-top-right"></div>
+        <div class="service-line-bottom-right"></div>
+       </div>
+      </div>
+      <div class="animated-ball" id="sidesBall" style="left: 20%; top: 30%; transform: translate(-50%, -50%);"></div>
+     </div>
+     <div class="explanation-text">
+      <h3 style="color: #ffd700; margin-bottom: 15px; font-size: 1.4rem;">"Cuando los rivales se agrupan al centro, el espacio real está en los costados."</h3>
+      <p style="margin: 0; font-size: 1.1rem;">Atacar a los lados es una táctica más arriesgada, pero puede ser decisiva si el rival cubre mal los desplazamientos o deja espacio abierto.</p>
+     </div>
+     <div class="advantages-table">
+      <h3>🧠 Ventajas y riesgos del ataque lateral</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
+       <div>
+        <h4 style="color: #4caf50; margin-bottom: 15px;">Ventajas</h4>
+        <div class="advantage-row"><span class="advantage-icon">🎯</span> <span class="advantage-desc">Abre espacios</span>
+        </div>
+        <div class="advantage-row"><span class="advantage-icon">💥</span> <span class="advantage-desc">Genera ángulos ganadores</span>
+        </div>
+        <div class="advantage-row"><span class="advantage-icon">🔁</span> <span class="advantage-desc">Rompe el patrón rival</span>
+        </div>
+       </div>
+       <div>
+        <h4 style="color: #f44336; margin-bottom: 15px;">Riesgos</h4>
+        <div class="advantage-row"><span class="advantage-icon">❌</span> <span class="advantage-desc">Mayor posibilidad de error</span>
+        </div>
+        <div class="advantage-row"><span class="advantage-icon">❌</span> <span class="advantage-desc">Deja centro libre si fallas</span>
+        </div>
+        <div class="advantage-row"><span class="advantage-icon">❌</span> <span class="advantage-desc">Menor margen de cancha</span>
+        </div>
+       </div>
+      </div>
+     </div><button class="next-btn" onclick="startSidesChallenges()">🎮 Comenzar Desafíos Laterales</button>
+    </div>
+   </div><!-- Desafíos de los Lados -->
+   <div id="sidesChallenges" class="screen">
+    <div class="game-section">
+     <div class="progress-bar">
+      <div class="progress-fill" style="width: 75%;"></div>
+     </div>
+     <h2 class="section-title">🎮 Desafíos - "Golpea al espacio"</h2><!-- Desafío 4 -->
+     <div class="challenge-container" id="challenge4">
+      <div class="challenge-title">
+       1️⃣ Rival de Red
+      </div>
+      <div class="challenge-question">
+       "El jugador de red cubre el centro y deja su línea abierta. ¿Dónde golpeas?"
+      </div>
+            <div class="edit-controls"><button class="edit-btn" onclick="toggleEditMode(this, 'challenge4')">🔍 Explorar posiciones</button> <button class="edit-btn" onclick="resetPositions('challenge4')">↺ Restaurar</button>
+      </div>
+      <div class="court-visual" id="court-challenge4" style="height: 200px; margin: 15px 0;">
+       <div class="court-lines">
+        <div class="court-boundary"></div>
+        <div class="inner-line-top"></div>
+        <div class="inner-line-bottom"></div>
+        <div class="net"></div>
+        <div class="h-line-vertical-left"></div>
+        <div class="h-line-vertical-right"></div>
+        <div class="h-line-horizontal"></div>
+        <div class="center-divider"></div>
+       </div><!-- Pareja roja (rivales) - lado izquierdo -->
+       <div class="player draggable" data-team="red" data-player="1" data-court="challenge4" style="position: absolute; left: 30%; top: 25%; width: 15px; height: 15px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="red" data-player="2" data-court="challenge4" style="position: absolute; left: 20%; top: 35%; width: 15px; height: 15px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pareja azul (propios) - lado derecho -->
+       <div class="player draggable" data-team="blue" data-player="1" data-court="challenge4" style="position: absolute; left: 70%; top: 75%; width: 12px; height: 12px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="blue" data-player="2" data-court="challenge4" style="position: absolute; left: 80%; top: 85%; width: 12px; height: 12px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pelota con movimiento horizontal -->
+       <div class="animated-ball" style="left: 10%; top: 50%; animation: ballTransition 2s ease-in-out infinite;"></div><!-- Espacio libre marcado -->
+       <div style="position: absolute; left: 20%; top: 20%; width: 30px; height: 30px; border: 2px dashed #4caf50; border-radius: 50%; background: rgba(76,175,80,0.1);"></div>
+      </div>
+      <div class="options-container"><button class="option-btn" onclick="selectOption(this, false, 4)">A) Golpear al centro</button> <button class="option-btn" onclick="selectOption(this, true, 4)">B) Paralelo rápido</button> <button class="option-btn" onclick="selectOption(this, false, 4)">C) Globo cruzado</button>
+      </div>
+      <div class="feedback" id="feedback4"></div>
+     </div><!-- Desafío 5 -->
+     <div class="challenge-container" id="challenge5" style="display: none;">
+      <div class="challenge-title">
+       2️⃣ Rival Lento
+      </div>
+      <div class="challenge-question">
+       "Rival con desplazamiento débil en el lado izquierdo. ¿Qué opción eliges?"
+      </div>
+            <div class="edit-controls"><button class="edit-btn" onclick="toggleEditMode(this, 'challenge5')">🔍 Explorar posiciones</button> <button class="edit-btn" onclick="resetPositions('challenge5')">↺ Restaurar</button>
+      </div>
+      <div class="court-visual" id="court-challenge5" style="height: 200px; margin: 15px 0;">
+       <div class="court-lines">
+        <div class="court-boundary"></div>
+        <div class="inner-line-top"></div>
+        <div class="inner-line-bottom"></div>
+        <div class="net"></div>
+        <div class="h-line-vertical-left"></div>
+        <div class="h-line-vertical-right"></div>
+        <div class="h-line-horizontal"></div>
+        <div class="center-divider"></div>
+       </div><!-- Pareja roja (rivales) - lado izquierdo -->
+       <div class="player draggable" data-team="red" data-player="1" data-court="challenge5" style="position: absolute; left: 10%; top: 15%; width: 15px; height: 15px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="red" data-player="2" data-court="challenge5" style="position: absolute; left: 20%; top: 25%; width: 15px; height: 15px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pareja azul (propios) - lado derecho -->
+       <div class="player draggable" data-team="blue" data-player="1" data-court="challenge5" style="position: absolute; left: 80%; top: 75%; width: 12px; height: 12px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="blue" data-player="2" data-court="challenge5" style="position: absolute; left: 90%; top: 85%; width: 12px; height: 12px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pelota con movimiento horizontal -->
+       <div class="animated-ball" style="left: 10%; top: 50%; animation: ballTransition 2s ease-in-out infinite;"></div><!-- Espacio libre marcado -->
+       <div style="position: absolute; left: 25%; top: 15%; width: 40px; height: 40px; border: 2px dashed #4caf50; border-radius: 50%; background: rgba(76,175,80,0.1);"></div>
+       <div style="position: absolute; left: 15%; top: 10%; background: rgba(255,107,107,0.2); padding: 3px 8px; border-radius: 5px; font-size: 0.7rem; color: #ff6b6b;">
+        Lento
+       </div>
+      </div>
+      <div class="options-container"><button class="option-btn" onclick="selectOption(this, true, 5)">A) Atacar abierto hacia ese lado</button> <button class="option-btn" onclick="selectOption(this, false, 5)">B) Seguir al centro</button> <button class="option-btn" onclick="selectOption(this, false, 5)">C) Volea al cuerpo</button>
+      </div>
+      <div class="feedback" id="feedback5"></div>
+     </div><!-- Desafío 6 -->
+     <div class="challenge-container" id="challenge6" style="display: none;">
+      <div class="challenge-title">
+       3️⃣ Tipo de Golpe
+      </div>
+      <div class="challenge-question">
+       "Para atacar efectivamente a los lados, ¿qué tipo de golpe es más efectivo?"
+      </div>
+            <div class="edit-controls"><button class="edit-btn" onclick="toggleEditMode(this, 'challenge6')">🔍 Explorar posiciones</button> <button class="edit-btn" onclick="resetPositions('challenge6')">↺ Restaurar</button>
+      </div>
+      <div class="court-visual" id="court-challenge6" style="height: 200px; margin: 15px 0;">
+       <div class="court-lines">
+        <div class="court-boundary"></div>
+        <div class="inner-line-top"></div>
+        <div class="inner-line-bottom"></div>
+        <div class="net"></div>
+        <div class="h-line-vertical-left"></div>
+        <div class="h-line-vertical-right"></div>
+        <div class="h-line-horizontal"></div>
+        <div class="center-divider"></div>
+       </div><!-- Pareja roja (rivales) - lado izquierdo -->
+       <div class="player draggable" data-team="red" data-player="1" data-court="challenge6" style="position: absolute; left: 25%; top: 25%; width: 15px; height: 15px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="red" data-player="2" data-court="challenge6" style="position: absolute; left: 35%; top: 25%; width: 15px; height: 15px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pareja azul (propios) - lado derecho -->
+       <div class="player draggable" data-team="blue" data-player="1" data-court="challenge6" style="position: absolute; left: 65%; top: 75%; width: 12px; height: 12px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="blue" data-player="2" data-court="challenge6" style="position: absolute; left: 75%; top: 85%; width: 12px; height: 12px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pelota con movimiento horizontal -->
+       <div class="animated-ball" style="left: 10%; top: 50%; animation: ballTransition 2s ease-in-out infinite;"></div><!-- Espacios libres marcados -->
+       <div style="position: absolute; left: 20%; top: 20%; width: 25px; height: 25px; border: 2px dashed #4caf50; border-radius: 50%; background: rgba(76,175,80,0.1);"></div>
+       <div style="position: absolute; left: 75%; top: 20%; width: 25px; height: 25px; border: 2px dashed #4caf50; border-radius: 50%; background: rgba(76,175,80,0.1);"></div>
+      </div>
+      <div class="options-container"><button class="option-btn" onclick="selectOption(this, true, 6)">A) Volea corta y precisa</button> <button class="option-btn" onclick="selectOption(this, false, 6)">B) Globo alto</button> <button class="option-btn" onclick="selectOption(this, false, 6)">C) Slice defensivo</button>
+      </div>
+      <div class="feedback" id="feedback6"></div>
+     </div><button class="next-btn" id="finalSectionBtn" style="display: none;" onclick="showComparison()"> Ver Comparación Final ⚖️ </button>
+    </div>
+   </div><!-- Sección Comparativa -->
+   <div id="comparisonSection" class="screen">
+    <div class="game-section">
+     <div class="progress-bar">
+      <div class="progress-fill" style="width: 85%;"></div>
+     </div>
+     <h2 class="section-title">⚖️ CENTRO VS LADOS</h2>
+     <div class="advantages-table">
+      <h3>📊 Tabla Comparativa Visual</h3>
+      <div style="overflow-x: auto;">
+       <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <thead>
+         <tr style="background: rgba(255,215,0,0.2);">
+          <th style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); text-align: left;">Aspecto</th>
+          <th style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); text-align: center; color: #4caf50;">🎯 Atacar al Centro</th>
+          <th style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); text-align: center; color: #ff6b6b;">⚡ Atacar a los Lados</th>
+         </tr>
+        </thead>
+        <tbody>
+         <tr>
+          <td style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); font-weight: bold;">🎯 Precisión necesaria</td>
+          <td style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">Media</td>
+          <td style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">Alta</td>
+         </tr>
+         <tr>
+          <td style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); font-weight: bold;">🔥 Riesgo</td>
+          <td style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">Bajo</td>
+          <td style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">Alto</td>
+         </tr>
+         <tr>
+          <td style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); font-weight: bold;">💡 Efecto</td>
+          <td style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">Control y confusión</td>
+          <td style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">Agresividad y apertura</td>
+         </tr>
+         <tr>
+          <td style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); font-weight: bold;">🧠 Cuándo usarlo</td>
+          <td style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">Punto apretado o defensa</td>
+          <td style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">Punto corto o de ataque</td>
+         </tr>
+         <tr>
+          <td style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); font-weight: bold;">👥 Coordinación</td>
+          <td style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">Facilita comunicación</td>
+          <td style="padding: 15px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">Exige cobertura rápida</td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+     </div><button class="next-btn" onclick="startFinalRound()" style="margin-top: 30px;"> 🧠 Comenzar Ronda Final - "Decide la táctica correcta" </button>
+    </div>
+   </div><!-- Ronda Final de Decisiones -->
+   <div id="finalRound" class="screen">
+    <div class="game-section">
+     <div class="progress-bar">
+      <div class="progress-fill" style="width: 95%;"></div>
+     </div>
+     <h2 class="section-title">🧠 RONDA FINAL</h2>
+     <h3 style="text-align: center; color: #ffd700; margin-bottom: 30px;">"Decide la táctica correcta"</h3><!-- Escenario 1 -->
+     <div class="challenge-container" id="scenario1">
+      <div class="challenge-title">
+       1️⃣ Escenario Táctico
+      </div>
+      <div class="challenge-question">
+       "Rival en la red, pelota flotada hacia ti. ¿Dónde golpeas?"
+      </div>
+            <div class="edit-controls"><button class="edit-btn" onclick="toggleEditMode(this, 'scenario1')">🔍 Explorar posiciones</button> <button class="edit-btn" onclick="resetPositions('scenario1')">↺ Restaurar</button>
+      </div>
+      <div class="court-visual" id="court-scenario1" style="height: 300px; margin: 20px 0;">
+       <div class="court-lines">
+        <div class="court-boundary"></div>
+        <div class="inner-line-top"></div>
+        <div class="inner-line-bottom"></div>
+        <div class="net"></div>
+        <div class="h-line-vertical-left"></div>
+        <div class="h-line-vertical-right"></div>
+        <div class="h-line-horizontal"></div>
+        <div class="center-divider"></div>
+       </div><!-- Pareja roja (rivales) - lado izquierdo en la red -->
+       <div class="player draggable" data-team="red" data-player="1" data-court="scenario1" style="position: absolute; left: 30%; top: 20%; width: 20px; height: 20px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3); transform: translate(-50%, -50%);"></div>
+       <div class="player draggable" data-team="red" data-player="2" data-court="scenario1" style="position: absolute; left: 15%; top: 30%; width: 18px; height: 18px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pareja azul (propios) - lado derecho -->
+       <div class="player draggable" data-team="blue" data-player="1" data-court="scenario1" style="position: absolute; left: 70%; top: 75%; width: 15px; height: 15px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="blue" data-player="2" data-court="scenario1" style="position: absolute; left: 85%; top: 85%; width: 15px; height: 15px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pelota con movimiento horizontal -->
+       <div class="animated-ball" style="left: 10%; top: 50%; animation: ballTransition 2s ease-in-out infinite;"></div>
+      </div>
+      <div class="options-container"><button class="option-btn" onclick="selectFinalOption(this, true, 1, 'centro')">🎯 Centro - Crear confusión</button> <button class="option-btn" onclick="selectFinalOption(this, false, 1, 'lado')">⚡ Lado - Buscar ángulo</button>
+      </div>
+      <div class="feedback" id="finalFeedback1"></div>
+     </div><!-- Escenario 2 -->
+     <div class="challenge-container" id="scenario2" style="display: none;">
+      <div class="challenge-title">
+       2️⃣ Escenario Táctico
+      </div>
+      <div class="challenge-question">
+       "Rival cubre mal el desplazamiento lateral. ¿Cuál es tu mejor opción?"
+      </div>
+            <div class="edit-controls"><button class="edit-btn" onclick="toggleEditMode(this, 'scenario2')">🔍 Explorar posiciones</button> <button class="edit-btn" onclick="resetPositions('scenario2')">↺ Restaurar</button>
+      </div>
+      <div class="court-visual" id="court-scenario2" style="height: 300px; margin: 20px 0;">
+       <div class="court-lines">
+        <div class="court-boundary"></div>
+        <div class="inner-line-top"></div>
+        <div class="inner-line-bottom"></div>
+        <div class="net"></div>
+        <div class="h-line-vertical-left"></div>
+        <div class="h-line-vertical-right"></div>
+        <div class="h-line-horizontal"></div>
+        <div class="center-divider"></div>
+       </div><!-- Pareja roja (rivales) - lado izquierdo -->
+       <div class="player draggable" data-team="red" data-player="1" data-court="scenario2" style="position: absolute; left: 25%; top: 30%; width: 20px; height: 20px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3); transform: translate(-50%, -50%);"></div>
+       <div class="player draggable" data-team="red" data-player="2" data-court="scenario2" style="position: absolute; left: 15%; top: 25%; width: 18px; height: 18px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pareja azul (propios) - lado derecho -->
+       <div class="player draggable" data-team="blue" data-player="1" data-court="scenario2" style="position: absolute; left: 75%; top: 75%; width: 15px; height: 15px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="blue" data-player="2" data-court="scenario2" style="position: absolute; left: 85%; top: 85%; width: 15px; height: 15px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pelota con movimiento horizontal -->
+       <div class="animated-ball" style="left: 10%; top: 50%; animation: ballTransition 2s ease-in-out infinite;"></div>
+      </div>
+      <div class="options-container"><button class="option-btn" onclick="selectFinalOption(this, false, 2, 'centro')">🎯 Centro - Jugar seguro</button> <button class="option-btn" onclick="selectFinalOption(this, true, 2, 'lado')">⚡ Lado - Explotar debilidad</button>
+      </div>
+      <div class="feedback" id="finalFeedback2"></div>
+     </div><!-- Escenario 3 -->
+     <div class="challenge-container" id="scenario3" style="display: none;">
+      <div class="challenge-title">
+       3️⃣ Escenario Táctico
+      </div>
+      <div class="challenge-question">
+       "Ambos rivales retroceden al fondo. ¿Qué táctica eliges?"
+      </div>
+            <div class="edit-controls"><button class="edit-btn" onclick="toggleEditMode(this, 'scenario3')">🔍 Explorar posiciones</button> <button class="edit-btn" onclick="resetPositions('scenario3')">↺ Restaurar</button>
+      </div>
+      <div class="court-visual" id="court-scenario3" style="height: 300px; margin: 20px 0;">
+       <div class="court-lines">
+        <div class="court-boundary"></div>
+        <div class="inner-line-top"></div>
+        <div class="inner-line-bottom"></div>
+        <div class="net"></div>
+        <div class="h-line-vertical-left"></div>
+        <div class="h-line-vertical-right"></div>
+        <div class="h-line-horizontal"></div>
+        <div class="center-divider"></div>
+       </div><!-- Pareja roja (rivales) - lado izquierdo en el fondo -->
+       <div class="player draggable" data-team="red" data-player="1" data-court="scenario3" style="position: absolute; left: 30%; top: 15%; width: 20px; height: 20px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3); transform: translate(-50%, -50%);"></div>
+       <div class="player draggable" data-team="red" data-player="2" data-court="scenario3" style="position: absolute; left: 20%; top: 25%; width: 20px; height: 20px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3); transform: translate(-50%, -50%);"></div><!-- Pareja azul (propios) - lado derecho -->
+       <div class="player draggable" data-team="blue" data-player="1" data-court="scenario3" style="position: absolute; left: 70%; top: 75%; width: 15px; height: 15px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="blue" data-player="2" data-court="scenario3" style="position: absolute; left: 80%; top: 85%; width: 15px; height: 15px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pelota con movimiento horizontal -->
+       <div class="animated-ball" style="left: 10%; top: 50%; animation: ballTransition 2s ease-in-out infinite;"></div>
+      </div>
+      <div class="options-container"><button class="option-btn" onclick="selectFinalOption(this, true, 3, 'centro')">🎯 Centro - Mantener presión</button> <button class="option-btn" onclick="selectFinalOption(this, false, 3, 'lado')">⚡ Lado - Buscar winner</button>
+      </div>
+      <div class="feedback" id="finalFeedback3"></div>
+     </div><!-- Escenario 4 -->
+     <div class="challenge-container" id="scenario4" style="display: none;">
+      <div class="challenge-title">
+       4️⃣ Escenario Táctico
+      </div>
+      <div class="challenge-question">
+       "Espacio abierto en diagonal, rival mal posicionado. ¿Tu decisión?"
+      </div>
+            <div class="edit-controls"><button class="edit-btn" onclick="toggleEditMode(this, 'scenario4')">🔍 Explorar posiciones</button> <button class="edit-btn" onclick="resetPositions('scenario4')">↺ Restaurar</button>
+      </div>
+      <div class="court-visual" id="court-scenario4" style="height: 300px; margin: 20px 0;">
+       <div class="court-lines">
+        <div class="court-boundary"></div>
+        <div class="inner-line-top"></div>
+        <div class="inner-line-bottom"></div>
+        <div class="net"></div>
+        <div class="h-line-vertical-left"></div>
+        <div class="h-line-vertical-right"></div>
+        <div class="h-line-horizontal"></div>
+        <div class="center-divider"></div>
+       </div><!-- Pareja roja (rivales) - lado izquierdo mal posicionados -->
+       <div class="player draggable" data-team="red" data-player="1" data-court="scenario4" style="position: absolute; left: 35%; top: 25%; width: 20px; height: 20px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3); transform: translate(-50%, -50%);"></div>
+       <div class="player draggable" data-team="red" data-player="2" data-court="scenario4" style="position: absolute; left: 20%; top: 35%; width: 18px; height: 18px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pareja azul (propios) - lado derecho -->
+       <div class="player draggable" data-team="blue" data-player="1" data-court="scenario4" style="position: absolute; left: 70%; top: 75%; width: 15px; height: 15px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="blue" data-player="2" data-court="scenario4" style="position: absolute; left: 80%; top: 85%; width: 15px; height: 15px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pelota con movimiento horizontal -->
+       <div class="animated-ball" style="left: 10%; top: 50%; animation: ballTransition 2s ease-in-out infinite;"></div>
+      </div>
+      <div class="options-container"><button class="option-btn" onclick="selectFinalOption(this, false, 4, 'centro')">🎯 Centro - Jugar conservador</button> <button class="option-btn" onclick="selectFinalOption(this, true, 4, 'lado')">⚡ Lado - Aprovechar espacio</button>
+      </div>
+      <div class="feedback" id="finalFeedback4"></div>
+     </div><!-- Escenario 5 -->
+     <div class="challenge-container" id="scenario5" style="display: none;">
+      <div class="challenge-title">
+       5️⃣ Escenario Táctico
+      </div>
+      <div class="challenge-question">
+       "Punto largo de presión, 40-40. ¿Cuál es la opción más inteligente?"
+      </div>
+            <div class="edit-controls"><button class="edit-btn" onclick="toggleEditMode(this, 'scenario5')">🔍 Explorar posiciones</button> <button class="edit-btn" onclick="resetPositions('scenario5')">↺ Restaurar</button>
+      </div>
+      <div class="court-visual" id="court-scenario5" style="height: 300px; margin: 20px 0;">
+       <div class="court-lines">
+        <div class="court-boundary"></div>
+        <div class="inner-line-top"></div>
+        <div class="inner-line-bottom"></div>
+        <div class="net"></div>
+        <div class="h-line-vertical-left"></div>
+        <div class="h-line-vertical-right"></div>
+        <div class="h-line-horizontal"></div>
+        <div class="center-divider"></div>
+       </div><!-- Pareja roja (rivales) - lado izquierdo en posición de presión -->
+       <div class="player draggable" data-team="red" data-player="1" data-court="scenario5" style="position: absolute; left: 20%; top: 20%; width: 20px; height: 20px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3); transform: translate(-50%, -50%);"></div>
+       <div class="player draggable" data-team="red" data-player="2" data-court="scenario5" style="position: absolute; left: 30%; top: 30%; width: 20px; height: 20px; background: #ff6b6b; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3); transform: translate(-50%, -50%);"></div><!-- Pareja azul (propios) - lado derecho -->
+       <div class="player draggable" data-team="blue" data-player="1" data-court="scenario5" style="position: absolute; left: 70%; top: 75%; width: 15px; height: 15px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div>
+       <div class="player draggable" data-team="blue" data-player="2" data-court="scenario5" style="position: absolute; left: 80%; top: 85%; width: 15px; height: 15px; background: #4caf50; border-radius: 50%; cursor: move; border: 2px solid rgba(255,255,255,0.3);"></div><!-- Pelota con movimiento horizontal -->
+       <div class="animated-ball" style="left: 10%; top: 50%; animation: ballTransition 2s ease-in-out infinite;"></div>
+      </div>
+      <div class="options-container"><button class="option-btn" onclick="selectFinalOption(this, true, 5, 'centro')">🎯 Centro - Minimizar riesgo</button> <button class="option-btn" onclick="selectFinalOption(this, false, 5, 'lado')">⚡ Lado - Ir por el winner</button>
+      </div>
+      <div class="feedback" id="finalFeedback5"></div>
+     </div><button class="next-btn" id="showResultsBtn" style="display: none;" onclick="showFinalResults()"> 🏆 Ver Resultados Finales </button>
+    </div>
+   </div><!-- Pantalla Final de Resultados -->
+   <div id="finalResults" class="screen"><!-- Fondo de cancha realista -->
+    <div class="tennis-court-background">
+     <div class="court-surface"><!-- Líneas de la cancha -->
+      <div class="court-outline"></div>
+      <div class="court-center-line"></div>
+      <div class="court-net"></div>
+     </div><!-- Pelotas flotantes animadas -->
+     <div class="floating-ball ball-1"></div>
+     <div class="floating-ball ball-2"></div>
+     <div class="floating-ball ball-3"></div>
+     <div class="floating-ball ball-4"></div>
+    </div><!-- Tarjeta de resultados translúcida -->
+    <div class="results-card"><!-- Logo Academia Virtual AC -->
+     <div class="academy-logo">
+      <div class="logo-icon">
+       
+      </div>
+      <div class="logo-text">
+       Academia Virtual AC
+      </div>
+     </div><!-- Título principal -->
+     <h1 class="final-title">🏁 Tu lectura táctica en dobles</h1><!-- Círculo de progreso animado -->
+     <div class="progress-circle-container">
+      <svg class="progress-circle" width="200" height="200"><circle class="progress-bg" cx="100" cy="100" r="90"></circle> <circle class="progress-bar-circle" cx="100" cy="100" r="90" id="progressCircle"></circle>
+      </svg>
+      <div class="progress-text">
+       <div class="percentage-display" id="percentageDisplay">
+        0%
+       </div>
+       <div class="progress-label">
+        Aciertos
+       </div>
+      </div>
+     </div><!-- Mensaje motivacional dinámico -->
+     <div class="motivational-section">
+      <div class="achievement-medal" id="achievementMedal">
+       🏆
+      </div>
+      <div class="achievement-title" id="achievementTitle">
+       Estratega en Dobles AC – Nivel Élite
+      </div>
+      <div class="achievement-message" id="achievementMessage">
+       Dominas la lectura táctica. Sabes cuándo abrir y cuándo cerrar la cancha.
+      </div>
+     </div><!-- Estadísticas visuales -->
+     <div class="stats-section">
+      <div class="stat-item">
+       <div class="stat-icon">
+        ⚡
+       </div>
+       <div class="stat-text"><span class="stat-label">Respuestas correctas:</span> <span class="stat-value" id="correctAnswers">0 / 11</span>
+       </div>
+      </div>
+      <div class="stat-item">
+       <div class="stat-icon">
+        🎯
+       </div>
+       <div class="stat-text"><span class="stat-label">Posicionamiento:</span> <span class="stat-value" id="positioningScore">0 / 11</span>
+       </div>
+      </div>
+      <div class="stat-item">
+       <div class="stat-icon">
+        🧩
+       </div>
+       <div class="stat-text"><span class="stat-label">Errores tácticos:</span> <span class="stat-value" id="tacticalErrors">0</span>
+       </div>
+      </div>
+      <div class="stat-item">
+       <div class="stat-icon">
+        📊
+       </div>
+       <div class="stat-text"><span class="stat-label">Precisión general:</span> <span class="stat-value" id="tacticalPrecision">Excelente</span>
+       </div>
+      </div>
+     </div><!-- Estadísticas detalladas -->
+     <div id="detailedGameStats" style="display: none;"></div><!-- Medallas y logros -->
+     <div class="medals-section">
+      <div class="medal-item" id="medalGold">
+       <div class="medal-icon">
+        🥇
+       </div>
+       <div class="medal-name">
+        Maestro de la Lectura Táctica AC
+       </div>
+       <div class="medal-requirement">
+        80-100% aciertos
+       </div>
+      </div>
+      <div class="medal-item" id="medalSilver">
+       <div class="medal-icon">
+        🥈
+       </div>
+       <div class="medal-name">
+        Jugador Estratega en Progreso
+       </div>
+       <div class="medal-requirement">
+        50-79% aciertos
+       </div>
+      </div>
+      <div class="medal-item" id="medalBronze">
+       <div class="medal-icon">
+        🥉
+       </div>
+       <div class="medal-name">
+        Aprendiz de Doble Inteligencia
+       </div>
+       <div class="medal-requirement">
+        0-49% aciertos
+       </div>
+      </div>
+     </div><!-- Botones interactivos -->
+     <div class="action-buttons"><button class="action-btn restart-btn" onclick="restartGame()"> <span class="btn-icon">🔁</span> <span class="btn-text">Volver a jugar</span> </button> <button class="action-btn video-btn" onclick="showTacticalSummary()"> <span class="btn-icon">📘</span> <span class="btn-text">Ver resumen táctico</span> </button> <button class="action-btn next-btn" onclick="reviewComparison()"> <span class="btn-icon">⚖️</span> <span class="btn-text">Repasar comparativa</span> </button>
+     </div><!-- Footer con logo -->
+     <div class="academy-footer">
+      <div class="footer-logo">
+        Academia Virtual AC
+      </div>
+      <div class="footer-tagline">
+       Táctica, mente y estrategia
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+        let currentChallenge = 0;
+        let score = 0;
+        let finalScore = 0;
+        let totalQuestions = 11; // 6 desafíos + 5 ronda final
+        
+        const defaultConfig = {
+            game_title: "Centro o cruzado en dobles",
+            game_subtitle: "Aprende a decidir con inteligencia táctica"
+        };
+
+        const challenges = {
+            1: {
+                correct: "¡Bien leído! El centro genera confusión y te da más margen de error.",
+                incorrect: "Con ambos en red dejando hueco, el centro es la opción más inteligente."
+            },
+            2: {
+                correct: "Golpear al centro mantiene el control del punto y reduce el riesgo.",
+                incorrect: "En puntos largos e importantes, el centro te da más seguridad y control."
+            },
+            3: {
+                correct: "Exacto, el centro rompe la coordinación entre ambos en formación I.",
+                incorrect: "En I-Formation, atacar el centro crea más confusión que buscar ángulos."
+            },
+            4: {
+                correct: "Perfecto. Atacaste donde el rival no puede reaccionar a tiempo.",
+                incorrect: "Si cubre el centro, hay que explotar el espacio libre en su línea."
+            },
+            5: {
+                correct: "Excelente lectura: explotaste su debilidad lateral.",
+                incorrect: "Cuando un rival es lento lateralmente, hay que aprovechar esa debilidad."
+            },
+            6: {
+                correct: "¡Correcto! La volea corta y precisa es ideal para abrir ángulos laterales.",
+                incorrect: "Los mejores voleadores usan golpes cortos y precisos para atacar espacios."
+            }
+        };
+
+        const finalChallenges = {
+            1: {
+                correct: "¡Perfecto! Con rival en red, el centro crea confusión y es más seguro.",
+                incorrect: "Con rival en red cubriendo bien, el centro es la opción más inteligente."
+            },
+            2: {
+                correct: "¡Excelente! Aprovechaste su debilidad de desplazamiento lateral.",
+                incorrect: "Si el rival cubre mal los lados, hay que explotar esa debilidad."
+            },
+            3: {
+                correct: "¡Correcto! Con ambos atrás, el centro mantiene presión sin riesgo.",
+                incorrect: "Cuando ambos están atrás, el centro es más efectivo que buscar ángulos."
+            },
+            4: {
+                correct: "¡Perfecto! Espacio abierto = oportunidad de winner lateral.",
+                incorrect: "Con espacio libre, hay que aprovecharlo atacando al lado."
+            },
+            5: {
+                correct: "¡Excelente! En puntos de presión, minimizar riesgo es clave.",
+                incorrect: "En 40-40, la seguridad del centro es más inteligente que arriesgar."
+            }
+        };
+
+        function startGame() {
+            showScreen('centerSection');
+            animateBallToCenter();
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function animateBallToCenter() {
+            const ball = document.getElementById('centerBall');
+            ball.style.animation = 'ballTransition 2s ease-in-out infinite';
+        }
+
+        function startCenterChallenges() {
+            showScreen('centerChallenges');
+            currentChallenge = 1;
+        }
+
+        function selectOption(button, isCorrect, challengeNum) {
+            const container = button.parentElement;
+            const buttons = container.querySelectorAll('.option-btn');
+            const feedback = document.getElementById(`feedback${challengeNum}`);
+            
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                if (btn === button) {
+                    btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+                } else if (btn.textContent.includes('✅')) {
+                    btn.classList.add('correct');
+                }
+            });
+            
+            feedback.textContent = isCorrect ? challenges[challengeNum].correct : challenges[challengeNum].incorrect;
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.style.display = 'block';
+            
+            // Animate ball based on correct answer
+            const challengeContainer = document.getElementById(`challenge${challengeNum}`);
+            const ball = challengeContainer.querySelector('.animated-ball');
+            if (ball && isCorrect) {
+                if (challengeNum <= 3) {
+                    // Center challenges - ball moves to center
+                    ball.style.transition = 'all 0.8s ease-out';
+                    ball.style.left = '50%';
+                    ball.style.top = '35%';
+                } else {
+                    // Side challenges - ball moves to side
+                    ball.style.transition = 'all 0.8s ease-out';
+                    ball.style.left = challengeNum % 2 === 0 ? '25%' : '75%';
+                    ball.style.top = '35%';
+                }
+            }
+            
+            if (isCorrect) score++;
+            
+            setTimeout(() => {
+                if (challengeNum < 3) {
+                    document.getElementById(`challenge${challengeNum + 1}`).style.display = 'block';
+                } else if (challengeNum === 3) {
+                    document.getElementById('nextSectionBtn').style.display = 'block';
+                } else if (challengeNum < 6) {
+                    document.getElementById(`challenge${challengeNum + 1}`).style.display = 'block';
+                } else if (challengeNum === 6) {
+                    document.getElementById('finalSectionBtn').style.display = 'block';
+                }
+            }, 2000);
+        }
+
+        function showSidesSection() {
+            showScreen('sidesSection');
+            animateBallToSides();
+        }
+
+        function animateBallToSides() {
+            const ball = document.getElementById('sidesBall');
+            ball.style.animation = 'ballBounce 1.5s infinite';
+        }
+
+        function startSidesChallenges() {
+            showScreen('sidesChallenges');
+        }
+
+        function showComparison() {
+            showScreen('comparisonSection');
+        }
+
+        function startFinalRound() {
+            showScreen('finalRound');
+            finalScore = 0;
+        }
+
+        function selectFinalOption(button, isCorrect, scenarioNum, choice) {
+            const container = button.parentElement;
+            const buttons = container.querySelectorAll('.option-btn');
+            const feedback = document.getElementById(`finalFeedback${scenarioNum}`);
+            
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                if (btn === button) {
+                    btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+                } else {
+                    btn.classList.add(isCorrect ? 'incorrect' : 'correct');
+                }
+            });
+            
+            feedback.textContent = isCorrect ? finalChallenges[scenarioNum].correct : finalChallenges[scenarioNum].incorrect;
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.style.display = 'block';
+            
+            if (isCorrect) finalScore++;
+            
+            // Animate ball based on choice
+            const ball = container.querySelector('.animated-ball');
+            if (choice === 'centro') {
+                ball.style.animation = 'ballBounce 0.5s ease-out';
+                ball.style.left = '50%';
+            } else {
+                ball.style.animation = 'ballSplit 0.5s ease-out';
+                ball.style.setProperty('--split-direction', scenarioNum % 2 === 0 ? '150px' : '-150px');
+            }
+            
+            setTimeout(() => {
+                if (scenarioNum < 5) {
+                    document.getElementById(`scenario${scenarioNum + 1}`).style.display = 'block';
+                } else {
+                    document.getElementById('showResultsBtn').style.display = 'block';
+                }
+            }, 2000);
+        }
+
+        function showFinalResults() {
+            showScreen('finalResults');
+            
+            // Calcular puntuación total correctamente
+            const totalAnswerScore = score + finalScore;
+            const maxAnswerScore = 11; // 6 desafíos + 5 ronda final
+            const answerPercentage = Math.round((totalAnswerScore / maxAnswerScore) * 100);
+            const overallPercentage = answerPercentage; // Solo respuestas tácticas
+            const errors = maxAnswerScore - totalAnswerScore;
+            
+            // Separar puntuaciones por sección
+            const centerScore = Math.min(score, 3);
+            const sidesScore = Math.max(0, Math.min(score - 3, 3));
+            
+            // Animar círculo de progreso
+            setTimeout(() => {
+                animateProgressCircle(overallPercentage);
+            }, 500);
+            
+            // Actualizar estadísticas
+            document.getElementById('correctAnswers').textContent = `${totalAnswerScore} / ${maxAnswerScore}`;
+            document.getElementById('tacticalErrors').textContent = errors;
+            
+            // Determinar precisión táctica
+            let precision = 'Excelente';
+            if (overallPercentage < 50) precision = 'En desarrollo';
+            else if (overallPercentage < 70) precision = 'Buena';
+            else if (overallPercentage < 90) precision = 'Muy buena';
+            
+            document.getElementById('tacticalPrecision').textContent = precision;
+            
+            // Ocultar estadística de posicionamiento
+            const positioningElement = document.getElementById('positioningScore');
+            if (positioningElement) {
+                positioningElement.parentElement.style.display = 'none';
+            }
+            
+            // Configurar mensaje motivacional y medalla
+            const achievementMedal = document.getElementById('achievementMedal');
+            const achievementTitle = document.getElementById('achievementTitle');
+            const achievementMessage = document.getElementById('achievementMessage');
+            
+            // Resetear todas las medallas
+            document.getElementById('medalGold').classList.remove('earned');
+            document.getElementById('medalSilver').classList.remove('earned');
+            document.getElementById('medalBronze').classList.remove('earned');
+            
+            if (overallPercentage >= 80) {
+                achievementMedal.textContent = '🏆';
+                achievementTitle.textContent = 'Maestro de la Lectura Táctica AC';
+                achievementMessage.textContent = 'Dominas la lectura táctica. Sabes cuándo abrir y cuándo cerrar la cancha.';
+                document.getElementById('medalGold').classList.add('earned');
+                
+                // Efecto dorado
+                achievementMedal.style.filter = 'drop-shadow(0 0 20px #ffd700)';
+            } else if (overallPercentage >= 50) {
+                achievementMedal.textContent = '🥈';
+                achievementTitle.textContent = 'Jugador Estratega en Progreso';
+                achievementMessage.textContent = 'Tienes visión de juego, sigue afinando tu toma de decisiones.';
+                document.getElementById('medalSilver').classList.add('earned');
+                
+                // Efecto plateado
+                achievementMedal.style.filter = 'drop-shadow(0 0 15px #c0c0c0)';
+            } else {
+                achievementMedal.textContent = '🥉';
+                achievementTitle.textContent = 'Aprendiz de Doble Inteligencia';
+                achievementMessage.textContent = 'Elige mejor tus espacios. La táctica se entrena con práctica y análisis.';
+                document.getElementById('medalBronze').classList.add('earned');
+                
+                // Efecto bronce
+                achievementMedal.style.filter = 'drop-shadow(0 0 10px #cd7f32)';
+            }
+            
+            // Mostrar estadísticas detalladas
+            showDetailedGameStats(totalAnswerScore, maxAnswerScore, overallPercentage, centerScore, sidesScore);
+        }
+        
+        function animateProgressCircle(percentage) {
+            const circle = document.getElementById('progressCircle');
+            const percentageDisplay = document.getElementById('percentageDisplay');
+            const circumference = 2 * Math.PI * 90; // radio = 90
+            
+            // Configurar círculo
+            circle.style.strokeDasharray = circumference;
+            circle.style.strokeDashoffset = circumference;
+            
+            // Animar porcentaje
+            let currentPercentage = 0;
+            const increment = percentage / 50; // 50 frames de animación
+            
+            const animatePercentage = () => {
+                if (currentPercentage < percentage) {
+                    currentPercentage += increment;
+                    if (currentPercentage > percentage) currentPercentage = percentage;
+                    
+                    percentageDisplay.textContent = Math.round(currentPercentage) + '%';
+                    
+                    // Animar círculo
+                    const offset = circumference - (currentPercentage / 100) * circumference;
+                    circle.style.strokeDashoffset = offset;
+                    
+                    requestAnimationFrame(animatePercentage);
+                }
+            };
+            
+            requestAnimationFrame(animatePercentage);
+        }
+        
+        function showDetailedGameStats(answerScore, maxAnswerScore, overallPercentage, centerScore, sidesScore) {
+            const statsContainer = document.getElementById('detailedGameStats');
+            if (!statsContainer) return;
+            
+            const answerPercentage = Math.round((answerScore / maxAnswerScore) * 100);
+            
+            let strengths = [];
+            let improvements = [];
+            
+            // Análisis de respuestas tácticas
+            if (answerPercentage >= 80) {
+                strengths.push("🧠 Excelente comprensión de las decisiones tácticas");
+            } else if (answerPercentage >= 60) {
+                strengths.push("🧠 Buena comprensión táctica");
+            } else {
+                improvements.push("🧠 Practica más la toma de decisiones tácticas");
+            }
+            
+            // Análisis por sección
+            if (centerScore >= 2) {
+                strengths.push("🎯 Dominas el juego al centro");
+            } else {
+                improvements.push("🎯 Practica más el ataque al centro");
+            }
+            
+            if (sidesScore >= 2) {
+                strengths.push("⚡ Excelente lectura de espacios laterales");
+            } else {
+                improvements.push("⚡ Mejora la identificación de espacios laterales");
+            }
+            
+            if (finalScore >= 4) {
+                strengths.push("🏆 Excelente toma de decisiones bajo presión");
+            } else if (finalScore >= 3) {
+                strengths.push("📈 Buena toma de decisiones");
+            } else {
+                improvements.push("🧩 Practica más la toma de decisiones rápidas");
+            }
+            
+            // Análisis general
+            if (overallPercentage >= 85) {
+                strengths.push("🏆 Dominio completo de tácticas de dobles");
+            } else if (overallPercentage >= 70) {
+                strengths.push("📈 Muy buen progreso en el aprendizaje táctico");
+            } else if (overallPercentage >= 50) {
+                strengths.push("📚 Progreso sólido en conceptos básicos");
+            } else {
+                improvements.push("📖 Repasa los fundamentos de tácticas de dobles");
+            }
+            
+            statsContainer.innerHTML = `
+                <div style="background: rgba(255,255,255,0.05); padding: 25px; border-radius: 15px; margin-top: 20px;">
+                    <h3 style="color: #ffd700; text-align: center; margin-bottom: 25px;">📊 Análisis Completo de Rendimiento</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px;">
+                        <div style="background: rgba(33,150,243,0.1); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid rgba(33,150,243,0.3);">
+                            <div style="font-size: 2rem; color: #2196f3; margin-bottom: 5px;">${answerPercentage}%</div>
+                            <div style="font-size: 0.9rem; opacity: 0.8;">Decisiones Tácticas</div>
+                            <div style="font-size: 0.8rem; color: #2196f3;">${answerScore}/${maxAnswerScore} correctas</div>
+                        </div>
+                        <div style="background: rgba(76,175,80,0.1); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid rgba(76,175,80,0.3);">
+                            <div style="font-size: 2rem; color: #4caf50; margin-bottom: 5px;">${centerScore}/3</div>
+                            <div style="font-size: 0.9rem; opacity: 0.8;">Ataque Centro</div>
+                            <div style="font-size: 0.8rem; color: #4caf50;">Desafíos completados</div>
+                        </div>
+                        <div style="background: rgba(255,107,107,0.1); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,107,107,0.3);">
+                            <div style="font-size: 2rem; color: #ff6b6b; margin-bottom: 5px;">${sidesScore}/3</div>
+                            <div style="font-size: 0.9rem; opacity: 0.8;">Ataque Lateral</div>
+                            <div style="font-size: 0.8rem; color: #ff6b6b;">Desafíos completados</div>
+                        </div>
+                        <div style="background: rgba(255,152,0,0.1); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,152,0,0.3);">
+                            <div style="font-size: 2rem; color: #ff9800; margin-bottom: 5px;">${finalScore}/5</div>
+                            <div style="font-size: 0.9rem; opacity: 0.8;">Ronda Final</div>
+                            <div style="font-size: 0.8rem; color: #ff9800;">Decisiones correctas</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 25px;">
+                        <div style="background: rgba(76,175,80,0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #4caf50;">
+                            <h4 style="color: #4caf50; margin-bottom: 15px;">💪 Fortalezas Identificadas</h4>
+                            ${strengths.length > 0 ? strengths.map(s => `<p style="margin: 8px 0; font-size: 0.95rem;">${s}</p>`).join('') : '<p style="opacity: 0.7;">Sigue practicando para desarrollar fortalezas</p>'}
+                        </div>
+                        <div style="background: rgba(255,152,0,0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #ff9800;">
+                            <h4 style="color: #ff9800; margin-bottom: 15px;">🎯 Áreas de Mejora</h4>
+                            ${improvements.length > 0 ? improvements.map(i => `<p style="margin: 8px 0; font-size: 0.95rem;">${i}</p>`).join('') : '<p style="color: #4caf50;">¡Excelente! Dominaste todas las áreas</p>'}
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(255,215,0,0.1); padding: 20px; border-radius: 10px; border: 1px solid rgba(255,215,0,0.3); text-align: center;">
+                        <h4 style="color: #ffd700; margin-bottom: 15px;"> Recomendaciones Personalizadas</h4>
+                        <p style="margin: 0; line-height: 1.6;">
+                            ${getPersonalizedRecommendation(answerPercentage, centerScore, sidesScore, finalScore)}
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            statsContainer.style.display = 'block';
+        }
+        
+        function getPersonalizedRecommendation(answerPerc, centerScore, sidesScore, finalScore) {
+            if (answerPerc >= 80) {
+                return "🏆 ¡Excelente dominio táctico! Estás listo para situaciones de juego real. Practica con diferentes parejas para perfeccionar tu adaptabilidad y comunicación en cancha.";
+            } else if (answerPerc >= 70) {
+                return "📈 Muy buen nivel táctico. Enfócate en situaciones de alta presión y practica la toma de decisiones rápidas durante puntos largos.";
+            } else if (centerScore > sidesScore) {
+                return "🎯 Dominas bien el juego al centro, pero mejora tu lectura de espacios laterales. Practica identificar cuándo atacar los lados abiertos.";
+            } else if (sidesScore > centerScore) {
+                return "⚡ Tienes buena visión de espacios laterales, pero afina tu juego al centro. El centro es clave para controlar puntos de presión.";
+            } else if (finalScore < 3) {
+                return "🧠 Mejora tu toma de decisiones bajo presión. Analiza más videos de partidos profesionales y practica situaciones de puntos clave.";
+            } else {
+                return "📚 Sigue practicando todos los aspectos. Combina ejercicios de centro y laterales con análisis de situaciones tácticas reales.";
+            }
+        }
+
+
+
+        function showTacticalSummary() {
+            // Crear modal de resumen táctico
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; 
+                top: 0; 
+                left: 0; 
+                width: 100%; 
+                height: 100%; 
+                background: rgba(0,0,0,0.9); 
+                z-index: 1000; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center;
+                backdrop-filter: blur(10px);
+            `;
+            
+            modal.innerHTML = `
+                <div style="
+                    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); 
+                    padding: 40px; 
+                    border-radius: 20px; 
+                    text-align: center; 
+                    max-width: 600px; 
+                    margin: 20px;
+                    border: 2px solid rgba(255,215,0,0.3);
+                    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+                    color: white;
+                ">
+                    <h2 style="color: #ffd700; margin-bottom: 25px; font-size: 2rem;">
+                        📘 Resumen táctico del juego
+                    </h2>
+                    
+                    <div style="margin: 30px 0; padding: 25px; background: rgba(255,255,255,0.1); border-radius: 15px;">
+                        <h3 style="color: #ffd700; margin-bottom: 15px;">📚 Qué debes llevarte:</h3>
+                        <div style="text-align: left; line-height: 1.8;">
+                            <p>🎯 <strong>Centro:</strong><br>
+                            úsalo cuando quieras margen, control y confusión rival en puntos tensos.</p>
+                            
+                            <p>⚡ <strong>Lados:</strong><br>
+                            ataca ahí cuando detectes espacio libre o una debilidad lateral clara.</p>
+                            
+                            <p>🧠 <strong>Lectura clave:</strong><br>
+                            primero observa posiciones, luego decide si conviene seguridad o agresión.</p>
+                            
+                            <p>🤝 <strong>Aplicación real:</strong><br>
+                            en dobles suele ganar quien interpreta mejor la cancha, no quien pega más fuerte.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 30px 0; padding: 20px; background: rgba(255,215,0,0.1); border-radius: 10px; border: 1px solid rgba(255,215,0,0.3);">
+                        <p style="font-style: italic; color: #ffd700; margin: 0;">
+                            "El mejor golpe no siempre es el más vistoso; es el que resuelve la situación."<br>
+                            <span style="font-size: 0.9rem; opacity: 0.8;">Ese es el corazón de esta lección.</span>
+                        </p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 30px;">
+                        <button onclick="this.closest('div').parentElement.remove()" style="
+                            padding: 12px 25px; 
+                            background: linear-gradient(45deg, #4caf50, #45a049); 
+                            color: white; 
+                            border: none; 
+                            border-radius: 25px; 
+                            cursor: pointer; 
+                            font-size: 1rem;
+                            transition: all 0.3s ease;
+                        " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                            ✅ Entendido
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function showExamples() {
+            showTacticalSummary();
+        }
+
+        function reviewComparison() {
+            showScreen('comparisonSection');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function restartGame() {
+            showScreen('welcome');
+            currentChallenge = 0;
+            score = 0;
+            finalScore = 0;
+            positioningScore = 0;
+            
+            // Reset all challenges
+            for (let i = 1; i <= 6; i++) {
+                const challenge = document.getElementById(`challenge${i}`);
+                if (challenge && i > 1 && i !== 4) {
+                    challenge.style.display = 'none';
+                }
+                
+                const feedback = document.getElementById(`feedback${i}`);
+                if (feedback) {
+                    feedback.style.display = 'none';
+                }
+                
+                const buttons = document.querySelectorAll(`#challenge${i} .option-btn`);
+                buttons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.classList.remove('correct', 'incorrect');
+                });
+            }
+            
+            // Reset final round
+            for (let i = 1; i <= 5; i++) {
+                const scenario = document.getElementById(`scenario${i}`);
+                if (scenario && i > 1) {
+                    scenario.style.display = 'none';
+                }
+                
+                const feedback = document.getElementById(`finalFeedback${i}`);
+                if (feedback) {
+                    feedback.style.display = 'none';
+                }
+                
+                const buttons = document.querySelectorAll(`#scenario${i} .option-btn`);
+                buttons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.classList.remove('correct', 'incorrect');
+                });
+            }
+            
+            document.getElementById('nextSectionBtn').style.display = 'none';
+            document.getElementById('finalSectionBtn').style.display = 'none';
+            document.getElementById('showResultsBtn').style.display = 'none';
+        }
+
+        // Sistema de arrastre de jugadores
+        let isDragging = false;
+        let draggedPlayer = null;
+        let editMode = {};
+
+        function toggleEditMode(button, courtId) {
+            const court = document.getElementById(`court-${courtId}`);
+            const isActive = button.classList.contains('active');
+            
+            if (isActive) {
+                button.classList.remove('active');
+                button.textContent = '🔍 Explorar posiciones';
+                court.classList.remove('edit-mode');
+                editMode[courtId] = false;
+                disableDragging(courtId);
+            } else {
+                button.classList.add('active');
+                button.textContent = '✅ Listo';
+                court.classList.add('edit-mode');
+                editMode[courtId] = true;
+                enableDragging(courtId);
+            }
+        }
+
+
+
+        function enableDragging(courtId) {
+            const players = document.querySelectorAll(`[data-court="${courtId}"].draggable`);
+            players.forEach(player => {
+                player.addEventListener('mousedown', startDrag);
+                player.addEventListener('touchstart', startDrag);
+            });
+        }
+
+        function disableDragging(courtId) {
+            const players = document.querySelectorAll(`[data-court="${courtId}"].draggable`);
+            players.forEach(player => {
+                player.removeEventListener('mousedown', startDrag);
+                player.removeEventListener('touchstart', startDrag);
+            });
+        }
+
+        function startDrag(e) {
+            e.preventDefault();
+            isDragging = true;
+            draggedPlayer = e.target;
+            draggedPlayer.classList.add('dragging');
+            
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+            document.addEventListener('touchmove', drag);
+            document.addEventListener('touchend', stopDrag);
+        }
+
+        function drag(e) {
+            if (!isDragging || !draggedPlayer) return;
+            
+            e.preventDefault();
+            const court = draggedPlayer.closest('.court-visual');
+            const courtRect = court.getBoundingClientRect();
+            
+            let clientX, clientY;
+            if (e.type === 'touchmove') {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            
+            const x = ((clientX - courtRect.left) / courtRect.width) * 100;
+            const y = ((clientY - courtRect.top) / courtRect.height) * 100;
+            
+            // Limitar movimiento dentro de la cancha
+            const clampedX = Math.max(5, Math.min(95, x));
+            const clampedY = Math.max(10, Math.min(90, y));
+            
+            draggedPlayer.style.left = clampedX + '%';
+            draggedPlayer.style.top = clampedY + '%';
+        }
+
+        function stopDrag() {
+            if (draggedPlayer) {
+                draggedPlayer.classList.remove('dragging');
+                draggedPlayer = null;
+            }
+            isDragging = false;
+            
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('touchend', stopDrag);
+        }
+
+        function resetPositions(courtId) {
+            const defaultPositions = {
+                challenge1: {
+                    red: [{ left: '25%', top: '25%' }, { left: '35%', top: '35%' }],
+                    blue: [{ left: '65%', top: '75%' }, { left: '75%', top: '85%' }]
+                },
+                challenge2: {
+                    red: [{ left: '20%', top: '30%' }, { left: '30%', top: '40%' }],
+                    blue: [{ left: '70%', top: '70%' }, { left: '80%', top: '80%' }]
+                },
+                challenge3: {
+                    red: [{ left: '30%', top: '25%' }, { left: '30%', top: '15%' }],
+                    blue: [{ left: '70%', top: '75%' }, { left: '70%', top: '85%' }]
+                },
+                challenge4: {
+                    red: [{ left: '30%', top: '25%' }, { left: '20%', top: '35%' }],
+                    blue: [{ left: '70%', top: '75%' }, { left: '80%', top: '85%' }]
+                },
+                challenge5: {
+                    red: [{ left: '10%', top: '15%' }, { left: '20%', top: '25%' }],
+                    blue: [{ left: '80%', top: '75%' }, { left: '90%', top: '85%' }]
+                },
+                challenge6: {
+                    red: [{ left: '25%', top: '25%' }, { left: '35%', top: '25%' }],
+                    blue: [{ left: '65%', top: '75%' }, { left: '75%', top: '85%' }]
+                },
+                scenario1: {
+                    red: [{ left: '30%', top: '20%' }, { left: '15%', top: '30%' }],
+                    blue: [{ left: '70%', top: '75%' }, { left: '85%', top: '85%' }]
+                },
+                scenario2: {
+                    red: [{ left: '25%', top: '30%' }, { left: '15%', top: '25%' }],
+                    blue: [{ left: '75%', top: '75%' }, { left: '85%', top: '85%' }]
+                },
+                scenario3: {
+                    red: [{ left: '30%', top: '15%' }, { left: '20%', top: '25%' }],
+                    blue: [{ left: '70%', top: '75%' }, { left: '80%', top: '85%' }]
+                },
+                scenario4: {
+                    red: [{ left: '35%', top: '25%' }, { left: '20%', top: '35%' }],
+                    blue: [{ left: '70%', top: '75%' }, { left: '80%', top: '85%' }]
+                },
+                scenario5: {
+                    red: [{ left: '20%', top: '20%' }, { left: '30%', top: '30%' }],
+                    blue: [{ left: '70%', top: '75%' }, { left: '80%', top: '85%' }]
+                }
+            };
+            
+            const positions = defaultPositions[courtId];
+            if (!positions) return;
+            
+            const redPlayers = document.querySelectorAll(`[data-court="${courtId}"][data-team="red"]`);
+            const bluePlayers = document.querySelectorAll(`[data-court="${courtId}"][data-team="blue"]`);
+            
+            redPlayers.forEach((player, index) => {
+                if (positions.red[index]) {
+                    player.style.left = positions.red[index].left;
+                    player.style.top = positions.red[index].top;
+                }
+            });
+            
+            bluePlayers.forEach((player, index) => {
+                if (positions.blue[index]) {
+                    player.style.left = positions.blue[index].left;
+                    player.style.top = positions.blue[index].top;
+                }
+            });
+        }
+
+        // Element SDK Integration
+        if (window.elementSdk) {
+            window.elementSdk.init({
+                defaultConfig: defaultConfig,
+                onConfigChange: async (config) => {
+                    const titleElement = document.getElementById('gameTitle');
+                    const subtitleElement = document.getElementById('gameSubtitle');
+                    
+                    if (titleElement) {
+                        titleElement.textContent = config.game_title || defaultConfig.game_title;
+                    }
+                    if (subtitleElement) {
+                        subtitleElement.textContent = config.game_subtitle || defaultConfig.game_subtitle;
+                    }
+                },
+                mapToCapabilities: (config) => ({
+                    recolorables: [],
+                    borderables: [],
+                    fontEditable: undefined,
+                    fontSizeable: undefined
+                }),
+                mapToEditPanelValues: (config) => new Map([
+                    ["game_title", config.game_title || defaultConfig.game_title],
+                    ["game_subtitle", config.game_subtitle || defaultConfig.game_subtitle]
+                ])
+            });
+        }
+    </script>
+ </body>
+</html>

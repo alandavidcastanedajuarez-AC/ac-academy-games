@@ -1,0 +1,2250 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domina los Estados del Juego</title>
+  <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100%;
+            overflow-x: hidden;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100%;
+        }
+
+        /* Pantalla de Portada */
+        .welcome-screen {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .welcome-screen h1 {
+            font-size: 2.5em;
+            color: #2d3748;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .tennis-court {
+            width: 300px;
+            height: 300px;
+            margin: 40px auto;
+            position: relative;
+            border: 3px solid #2d3748;
+            border-radius: 50%;
+            background: linear-gradient(to right, #ef4444 33%, #fbbf24 33%, #fbbf24 66%, #3b82f6 66%);
+        }
+
+        .ball {
+            width: 30px;
+            height: 30px;
+            background: #fde047;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            animation: moveBall 3s infinite ease-in-out;
+        }
+
+        @keyframes moveBall {
+            0%, 100% { transform: translate(-120px, -50px) scale(1); }
+            33% { transform: translate(0, -80px) scale(1.2); }
+            66% { transform: translate(120px, -50px) scale(1); }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.3em;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            margin-top: 30px;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        /* Pantallas de Fase */
+        .phase-screen {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .phase-screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .phase-header {
+            text-align: center;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .phase-header.offensive {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .phase-header.neutral {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #78350f;
+        }
+
+        .phase-header.defensive {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .phase-header h2 {
+            font-size: 2.2em;
+            margin: 0 0 15px 0;
+        }
+
+        .phase-intro {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .court-animation {
+            width: 60%;
+            max-width: 500px;
+            height: 600px;
+            margin: 30px auto;
+            position: relative;
+            background: linear-gradient(135deg, #0c4a6e 0%, #075985 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 6px solid #1e293b;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .court-surface {
+            position: absolute;
+            width: 85%;
+            height: 94%;
+            left: 7.5%;
+            top: 3%;
+            background: linear-gradient(180deg, #1e40af 0%, #1e3a8a 50%, #1e40af 100%);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.3);
+        }
+
+        .court-line {
+            position: absolute;
+            background: white;
+            z-index: 1;
+            box-shadow: 0 0 4px rgba(255,255,255,0.6);
+        }
+
+        /* Líneas de fondo (baselines) */
+        .baseline-top {
+            width: 80%;
+            height: 3px;
+            top: 6%;
+            left: 10%;
+        }
+
+        .baseline-bottom {
+            width: 80%;
+            height: 3px;
+            bottom: 6%;
+            left: 10%;
+        }
+
+        /* Líneas de saque (service lines) */
+        .service-line-top {
+            width: 80%;
+            height: 2.5px;
+            top: 28%;
+            left: 10%;
+        }
+
+        .service-line-bottom {
+            width: 80%;
+            height: 2.5px;
+            bottom: 28%;
+            left: 10%;
+        }
+
+        /* Líneas laterales de individuales (singles sidelines) */
+        .sideline-left {
+            width: 2.5px;
+            height: 88%;
+            left: 10%;
+            top: 6%;
+        }
+
+        .sideline-right {
+            width: 2.5px;
+            height: 88%;
+            right: 10%;
+            top: 6%;
+        }
+
+        /* Línea central de saque (center service line) */
+        .center-service-line {
+            width: 2.5px;
+            height: 38%;
+            left: 50%;
+            top: 28%;
+            transform: translateX(-50%);
+        }
+
+        /* Marca central (center mark) */
+        .center-mark-top {
+            width: 2px;
+            height: 3%;
+            left: 50%;
+            top: 6%;
+            transform: translateX(-50%);
+        }
+
+        .center-mark-bottom {
+            width: 2px;
+            height: 3%;
+            left: 50%;
+            bottom: 6%;
+            transform: translateX(-50%);
+        }
+
+        .net {
+            position: absolute;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+        }
+
+        .net::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 50px;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 8px,
+                rgba(255, 255, 255, 0.15) 8px,
+                rgba(255, 255, 255, 0.15) 9px
+            );
+            top: -25px;
+            left: 0;
+        }
+
+        .net::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 50px;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 8px,
+                rgba(255, 255, 255, 0.1) 8px,
+                rgba(255, 255, 255, 0.1) 9px
+            );
+            top: -25px;
+            left: 0;
+        }
+
+        .net-post-left {
+            position: absolute;
+            width: 8px;
+            height: 60px;
+            background: linear-gradient(180deg, #374151 0%, #1f2937 100%);
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 3;
+            border-radius: 4px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+        }
+
+        .net-post-right {
+            position: absolute;
+            width: 8px;
+            height: 60px;
+            background: linear-gradient(180deg, #374151 0%, #1f2937 100%);
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 3;
+            border-radius: 4px;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+        }
+
+        .player {
+            position: absolute;
+            z-index: 3;
+        }
+
+        .player-body {
+            width: 35px;
+            height: 45px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 18px 18px 6px 6px;
+            position: relative;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        }
+
+        .player-head {
+            width: 24px;
+            height: 24px;
+            background: radial-gradient(circle at 35% 35%, #fde047, #fbbf24);
+            border-radius: 50%;
+            position: absolute;
+            top: -12px;
+            left: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .player-racket {
+            width: 10px;
+            height: 40px;
+            background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
+            position: absolute;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .racket-head {
+            width: 26px;
+            height: 30px;
+            border: 4px solid #dc2626;
+            border-radius: 50%;
+            position: absolute;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .racket-head::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: rgba(220, 38, 38, 0.3);
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+        }
+
+        .racket-head::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: rgba(220, 38, 38, 0.3);
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+        }
+
+        .player.offensive-position {
+            bottom: 38%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .player.offensive-position .player-body {
+            background: #ef4444;
+        }
+
+        .player.offensive-position .player-racket {
+            right: -15px;
+            top: 10px;
+            transform: rotate(-45deg);
+        }
+
+        .player.offensive-position .racket-head {
+            top: -20px;
+            left: -6px;
+        }
+
+        .player.neutral-left {
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .player.neutral-left .player-body {
+            background: #3b82f6;
+        }
+
+        .player.neutral-left .player-racket {
+            right: -10px;
+            top: 15px;
+            transform: rotate(-20deg);
+        }
+
+        .player.neutral-left .racket-head {
+            top: -18px;
+            left: -6px;
+        }
+
+        .player.neutral-right {
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .player.neutral-right .player-body {
+            background: #8b5cf6;
+        }
+
+        .player.neutral-right .player-racket {
+            left: -10px;
+            top: 15px;
+            transform: rotate(20deg);
+        }
+
+        .player.neutral-right .racket-head {
+            top: -18px;
+            right: -6px;
+        }
+
+        .player.defensive-position {
+            bottom: 8%;
+            left: 20%;
+        }
+
+        .player.defensive-position .player-body {
+            background: #3b82f6;
+            transform: skewX(-15deg);
+        }
+
+        .player.defensive-position .player-racket {
+            right: -20px;
+            top: 20px;
+            transform: rotate(-60deg);
+        }
+
+        .player.defensive-position .racket-head {
+            top: -18px;
+            left: -6px;
+        }
+
+        .animated-ball {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: radial-gradient(circle at 35% 35%, #fef08a, #fde047, #facc15);
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5), inset -2px -2px 4px rgba(0,0,0,0.2);
+            z-index: 4;
+            border: 1px solid rgba(250, 204, 21, 0.8);
+        }
+
+        .animated-ball::before {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            top: 3px;
+            left: 5px;
+            filter: blur(2px);
+        }
+
+        .ball-shadow {
+            position: absolute;
+            width: 18px;
+            height: 9px;
+            background: radial-gradient(ellipse, rgba(0,0,0,0.4), transparent);
+            border-radius: 50%;
+            filter: blur(4px);
+            z-index: 1;
+        }
+
+        .trajectory-line {
+            position: absolute;
+            height: 3px;
+            background: linear-gradient(90deg, rgba(251, 191, 36, 0.7), rgba(251, 191, 36, 0.2));
+            z-index: 2;
+            border-radius: 3px;
+            box-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
+        }
+
+        .trajectory-line::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .position-marker {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 3px dashed #ef4444;
+            border-radius: 50%;
+            z-index: 1;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .question-card {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .question-card h3 {
+            color: #2d3748;
+            font-size: 1.4em;
+            margin-bottom: 20px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #e2e8f0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-size: 1.1em;
+            color: #2d3748;
+        }
+
+        .option-btn:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateX(5px);
+        }
+
+        .option-btn.correct {
+            background: #d1fae5;
+            border-color: #10b981;
+            animation: correctPulse 0.5s ease;
+        }
+
+        .option-btn.incorrect {
+            background: #fee2e2;
+            border-color: #ef4444;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.correct {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #10b981;
+        }
+
+        .feedback.incorrect {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 2px solid #ef4444;
+        }
+
+        .curiosity-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 30px 0;
+            border-left: 5px solid #f59e0b;
+        }
+
+        .curiosity-box h4 {
+            color: #78350f;
+            margin: 0 0 10px 0;
+            font-size: 1.3em;
+        }
+
+        .curiosity-box p {
+            color: #78350f;
+            margin: 0;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.5em;
+            color: #2d3748;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .medal {
+            display: inline-block;
+            font-size: 3em;
+            margin: 0 10px;
+            animation: medalPop 0.5s ease;
+        }
+
+        @keyframes medalPop {
+            0% { transform: scale(0) rotate(-180deg); }
+            50% { transform: scale(1.2) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(16, 185, 129, 0.6);
+        }
+
+        .btn-next:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Pantalla Final */
+        .final-screen {
+            display: none;
+            text-align: center;
+            background: white;
+            border-radius: 20px;
+            padding: 50px 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .final-screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .final-screen h2 {
+            font-size: 2.5em;
+            color: #2d3748;
+            margin-bottom: 30px;
+        }
+
+        .final-score {
+            font-size: 4em;
+            color: #667eea;
+            font-weight: bold;
+            margin: 30px 0;
+        }
+
+        .medals-display {
+            margin: 40px 0;
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.3em;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        /* Ronda Final - Reconocimiento Visual */
+        .recognition-round {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .recognition-round.active {
+            display: block;
+        }
+
+        .recognition-header {
+            text-align: center;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .recognition-header h2 {
+            font-size: 2.2em;
+            margin: 0 0 10px 0;
+        }
+
+        .situation-card {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 25px 0;
+            border: 3px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .situation-card.answered {
+            border-color: #10b981;
+        }
+
+        .situation-visual {
+            width: 60%;
+            max-width: 450px;
+            height: 550px;
+            background: linear-gradient(135deg, #0c4a6e 0%, #075985 100%);
+            border-radius: 12px;
+            position: relative;
+            margin: 20px auto;
+            border: 6px solid #1e293b;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .situation-court-surface {
+            position: absolute;
+            width: 85%;
+            height: 94%;
+            left: 7.5%;
+            top: 3%;
+            background: linear-gradient(180deg, #1e40af 0%, #1e3a8a 50%, #1e40af 100%);
+            box-shadow: inset 0 0 25px rgba(0,0,0,0.3);
+        }
+
+        /* Líneas específicas para canchas de situación */
+        .situation-baseline-top {
+            position: absolute;
+            width: 80%;
+            height: 3px;
+            top: 6%;
+            left: 10%;
+            background: white;
+            z-index: 1;
+            box-shadow: 0 0 4px rgba(255,255,255,0.6);
+        }
+
+        .situation-baseline-bottom {
+            position: absolute;
+            width: 80%;
+            height: 3px;
+            bottom: 6%;
+            left: 10%;
+            background: white;
+            z-index: 1;
+            box-shadow: 0 0 4px rgba(255,255,255,0.6);
+        }
+
+        .situation-service-line-top {
+            position: absolute;
+            width: 80%;
+            height: 2.5px;
+            top: 28%;
+            left: 10%;
+            background: white;
+            z-index: 1;
+            box-shadow: 0 0 4px rgba(255,255,255,0.6);
+        }
+
+        .situation-service-line-bottom {
+            position: absolute;
+            width: 80%;
+            height: 2.5px;
+            bottom: 28%;
+            left: 10%;
+            background: white;
+            z-index: 1;
+            box-shadow: 0 0 4px rgba(255,255,255,0.6);
+        }
+
+        .situation-sideline-left {
+            position: absolute;
+            width: 2.5px;
+            height: 88%;
+            left: 10%;
+            top: 6%;
+            background: white;
+            z-index: 1;
+            box-shadow: 0 0 4px rgba(255,255,255,0.6);
+        }
+
+        .situation-sideline-right {
+            position: absolute;
+            width: 2.5px;
+            height: 88%;
+            right: 10%;
+            top: 6%;
+            background: white;
+            z-index: 1;
+            box-shadow: 0 0 4px rgba(255,255,255,0.6);
+        }
+
+        .situation-center-service-line {
+            position: absolute;
+            width: 2.5px;
+            height: 38%;
+            left: 50%;
+            top: 28%;
+            transform: translateX(-50%);
+            background: white;
+            z-index: 1;
+            box-shadow: 0 0 4px rgba(255,255,255,0.6);
+        }
+
+        .situation-center-mark-top {
+            position: absolute;
+            width: 2px;
+            height: 3%;
+            left: 50%;
+            top: 6%;
+            transform: translateX(-50%);
+            background: white;
+            z-index: 1;
+        }
+
+        .situation-center-mark-bottom {
+            position: absolute;
+            width: 2px;
+            height: 3%;
+            left: 50%;
+            bottom: 6%;
+            transform: translateX(-50%);
+            background: white;
+            z-index: 1;
+        }
+
+        .situation-net {
+            position: absolute;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.5);
+        }
+
+        .situation-net::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 40px;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 7px,
+                rgba(255, 255, 255, 0.15) 7px,
+                rgba(255, 255, 255, 0.15) 8px
+            );
+            top: -20px;
+            left: 0;
+        }
+
+        .situation-net::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 40px;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 7px,
+                rgba(255, 255, 255, 0.1) 7px,
+                rgba(255, 255, 255, 0.1) 8px
+            );
+            top: -20px;
+            left: 0;
+        }
+
+        .situation-player {
+            position: absolute;
+            z-index: 3;
+        }
+
+        .situation-player-body {
+            width: 32px;
+            height: 42px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 16px 16px 5px 5px;
+            position: relative;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        }
+
+        .situation-player-head {
+            width: 22px;
+            height: 22px;
+            background: radial-gradient(circle at 35% 35%, #fde047, #fbbf24);
+            border-radius: 50%;
+            position: absolute;
+            top: -11px;
+            left: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .situation-player-racket {
+            width: 9px;
+            height: 36px;
+            background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
+            position: absolute;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .situation-racket-head {
+            width: 24px;
+            height: 28px;
+            border: 4px solid #dc2626;
+            border-radius: 50%;
+            position: absolute;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .situation-racket-head::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: rgba(220, 38, 38, 0.3);
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+        }
+
+        .situation-racket-head::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: rgba(220, 38, 38, 0.3);
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+        }
+
+        .situation-ball {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle at 35% 35%, #fef08a, #fde047, #facc15);
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset -2px -2px 4px rgba(0,0,0,0.2);
+            z-index: 4;
+            border: 1px solid rgba(250, 204, 21, 0.8);
+        }
+
+        .situation-ball::before {
+            content: '';
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            top: 3px;
+            left: 4px;
+            filter: blur(2px);
+        }
+
+        .situation-ball-shadow {
+            position: absolute;
+            width: 16px;
+            height: 8px;
+            background: radial-gradient(ellipse, rgba(0,0,0,0.4), transparent);
+            border-radius: 50%;
+            filter: blur(3px);
+            z-index: 1;
+        }
+
+        .situation-arrow {
+            position: absolute;
+            z-index: 2;
+        }
+
+        .arrow-line {
+            stroke: #ef4444;
+            stroke-width: 3;
+            stroke-dasharray: 8, 4;
+            fill: none;
+            animation: dashMove 1s linear infinite;
+        }
+
+        @keyframes dashMove {
+            to {
+                stroke-dashoffset: -12;
+            }
+        }
+
+        .arrow-head {
+            fill: #ef4444;
+        }
+
+        .state-options {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .state-btn {
+            padding: 20px 40px;
+            border: 3px solid;
+            border-radius: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .state-btn.offensive {
+            background: white;
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .state-btn.offensive:hover {
+            background: #ef4444;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .state-btn.neutral {
+            background: white;
+            border-color: #fbbf24;
+            color: #f59e0b;
+        }
+
+        .state-btn.neutral:hover {
+            background: #fbbf24;
+            color: #78350f;
+            transform: scale(1.05);
+        }
+
+        .state-btn.defensive {
+            background: white;
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .state-btn.defensive:hover {
+            background: #3b82f6;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .state-btn.selected-correct {
+            animation: correctPulse 0.5s ease;
+            transform: scale(1.1);
+        }
+
+        .state-btn.selected-incorrect {
+            animation: shake 0.5s ease;
+            opacity: 0.5;
+        }
+
+        .timer-display {
+            text-align: center;
+            font-size: 2em;
+            color: #667eea;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .streak-meter {
+            background: #f3f4f6;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .streak-meter h3 {
+            color: #2d3748;
+            margin: 0 0 15px 0;
+        }
+
+        .fire-icons {
+            font-size: 2em;
+            letter-spacing: 5px;
+        }
+
+        .fire-icons .active {
+            animation: fireFlicker 0.5s ease infinite;
+        }
+
+        @keyframes fireFlicker {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .interactive-court {
+            width: 100%;
+            height: 250px;
+            background: #10b981;
+            border-radius: 10px;
+            position: relative;
+            margin: 20px 0;
+            border: 3px solid white;
+            cursor: pointer;
+        }
+
+        .zone {
+            position: absolute;
+            border: 2px dashed white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .zone:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+
+        .zone.correct-zone {
+            background: rgba(16, 185, 129, 0.3);
+        }
+
+        .zone.incorrect-zone {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .welcome-screen h1 {
+                font-size: 1.8em;
+            }
+
+            .tennis-court {
+                width: 200px;
+                height: 200px;
+            }
+
+            .phase-header h2 {
+                font-size: 1.6em;
+            }
+
+            .btn-primary, .btn-next, .btn-restart {
+                padding: 15px 35px;
+                font-size: 1.1em;
+            }
+        }
+    </style>
+  </head>
+ <body>
+  <div class="container"><!-- Pantalla de Bienvenida -->
+   <div id="welcomeScreen" class="welcome-screen">
+    <h1 id="gameTitle">Domina los estados del juego</h1>
+    <div class="tennis-court">
+     <div class="ball"></div>
+    </div>
+    <p style="font-size: 1.3em; color: #4b5563; margin: 20px 0;">Aprende a identificar y dominar los tres estados tácticos del tenis: ofensivo, neutral y defensivo.</p><button id="startBtn" class="btn-primary">Empezar el juego</button>
+   </div><!-- Fase 1: Estado Ofensivo -->
+   <div id="offensivePhase" class="phase-screen">
+    <div class="phase-header offensive">
+     <h2 id="offensiveTitle">🔴 ESTADO OFENSIVO</h2>
+     <p class="phase-intro">Tomar la iniciativa, presionar y cerrar el punto.</p>
+    </div>
+    <div class="court-animation">
+     <div class="court-surface">
+      <div class="court-line baseline-top"></div>
+      <div class="court-line baseline-bottom"></div>
+      <div class="court-line service-line-top"></div>
+      <div class="court-line service-line-bottom"></div>
+      <div class="court-line sideline-left"></div>
+      <div class="court-line sideline-right"></div>
+      <div class="court-line center-service-line"></div>
+      <div class="court-line center-mark-top"></div>
+      <div class="court-line center-mark-bottom"></div>
+     </div>
+     <div class="net"></div>
+     <div class="net-post-left"></div>
+     <div class="net-post-right"></div>
+     <div class="position-marker" style="bottom: 38%; left: 50%; transform: translateX(-50%);"></div>
+     <div class="player offensive-position">
+      <div class="player-head"></div>
+      <div class="player-body">
+       <div class="player-racket">
+        <div class="racket-head"></div>
+       </div>
+      </div>
+     </div>
+     <div class="animated-ball" id="offensiveBall" style="bottom: 45%; left: 50%;"></div>
+     <div class="ball-shadow" id="offensiveShadow" style="bottom: 35%; left: 51%;"></div>
+    </div>
+    <p style="font-size: 1.2em; text-align: center; color: #2d3748; margin: 20px 0;">"Estás en posición ofensiva. Es tu momento de atacar, pero también de decidir con precisión."</p>
+    <div class="progress-bar">
+     <div class="progress-fill" id="offensiveProgress" style="width: 0%"></div>
+    </div>
+    <div id="offensiveQuestions"></div>
+    <div class="curiosity-box">
+     <h4>💡 Curiosidad Táctica</h4>
+     <p>En promedio, los jugadores profesionales ganan más del 70% de los puntos cuando atacan tras una pelota corta.</p>
+    </div><button id="nextToNeutral" class="btn-next" disabled>Continuar a Fase Neutral →</button>
+   </div><!-- Fase 2: Estado Neutral -->
+   <div id="neutralPhase" class="phase-screen">
+    <div class="phase-header neutral">
+     <h2 id="neutralTitle">🟡 ESTADO NEUTRAL</h2>
+     <p class="phase-intro">Ambos jugadores sostienen el punto desde el fondo. Es equilibrio táctico.</p>
+    </div>
+    <div class="court-animation">
+     <div class="court-surface">
+      <div class="court-line baseline-top"></div>
+      <div class="court-line baseline-bottom"></div>
+      <div class="court-line service-line-top"></div>
+      <div class="court-line service-line-bottom"></div>
+      <div class="court-line sideline-left"></div>
+      <div class="court-line sideline-right"></div>
+      <div class="court-line center-service-line"></div>
+      <div class="court-line center-mark-top"></div>
+      <div class="court-line center-mark-bottom"></div>
+     </div>
+     <div class="net"></div>
+     <div class="net-post-left"></div>
+     <div class="net-post-right"></div>
+     <div class="player neutral-left">
+      <div class="player-head"></div>
+      <div class="player-body">
+       <div class="player-racket">
+        <div class="racket-head"></div>
+       </div>
+      </div>
+     </div>
+     <div class="player neutral-right">
+      <div class="player-head"></div>
+      <div class="player-body">
+       <div class="player-racket">
+        <div class="racket-head"></div>
+       </div>
+      </div>
+     </div>
+     <div class="animated-ball" id="neutralBall" style="top: 50%; left: 50%;"></div>
+     <div class="ball-shadow" id="neutralShadow" style="top: 50%; left: 51%;"></div>
+    </div>
+    <p style="font-size: 1.2em; text-align: center; color: #2d3748; margin: 20px 0;">"El punto está en balance. No hay dominio claro. Tu misión: mantener consistencia, dirección y paciencia."</p>
+    <div class="progress-bar">
+     <div class="progress-fill" id="neutralProgress" style="width: 0%"></div>
+    </div>
+    <div id="neutralQuestions"></div>
+    <div class="curiosity-box">
+     <h4>💡 Curiosidad Táctica</h4>
+     <p>El 60% de los puntos en tenis se desarrollan en estado neutral. Dominar esta fase = dominar el ritmo del partido.</p>
+    </div><button id="nextToDefensive" class="btn-next" disabled>Continuar a Fase Defensiva →</button>
+   </div><!-- Fase 3: Estado Defensivo -->
+   <div id="defensivePhase" class="phase-screen">
+    <div class="phase-header defensive">
+     <h2 id="defensiveTitle">🔵 ESTADO DEFENSIVO</h2>
+     <p class="phase-intro">Recuperar control, ganar tiempo y reconstruir el punto.</p>
+    </div>
+    <div class="court-animation">
+     <div class="court-surface">
+      <div class="court-line baseline-top"></div>
+      <div class="court-line baseline-bottom"></div>
+      <div class="court-line service-line-top"></div>
+      <div class="court-line service-line-bottom"></div>
+      <div class="court-line sideline-left"></div>
+      <div class="court-line sideline-right"></div>
+      <div class="court-line center-service-line"></div>
+      <div class="court-line center-mark-top"></div>
+      <div class="court-line center-mark-bottom"></div>
+     </div>
+     <div class="net"></div>
+     <div class="net-post-left"></div>
+     <div class="net-post-right"></div>
+     <div class="trajectory-line" style="bottom: 8%; left: 18%; width: 35%; transform: rotate(25deg);"></div>
+     <div class="player defensive-position">
+      <div class="player-head"></div>
+      <div class="player-body">
+       <div class="player-racket">
+        <div class="racket-head"></div>
+       </div>
+      </div>
+     </div>
+     <div class="animated-ball" id="defensiveBall" style="bottom: 10%; left: 25%;"></div>
+     <div class="ball-shadow" id="defensiveShadow" style="bottom: 5%; left: 26%;"></div>
+    </div>
+    <p style="font-size: 1.2em; text-align: center; color: #2d3748; margin: 20px 0;">"Estás en modo defensivo. No se trata de sobrevivir… se trata de transformar el punto."</p>
+    <div class="progress-bar">
+     <div class="progress-fill" id="defensiveProgress" style="width: 0%"></div>
+    </div>
+    <div id="defensiveQuestions"></div>
+    <div class="curiosity-box">
+     <h4>💡 Curiosidad Táctica</h4>
+     <p>Los mejores defensores (como Nadal o Djokovic) convierten defensa en ataque con bolas profundas y liftadas que cambian el ritmo del punto.</p>
+    </div>
+    <div class="question-card">
+     <h3>🎯 Reto Visual Interactivo</h3>
+     <p style="font-size: 1.1em; margin-bottom: 15px;">Estás fuera de la cancha. ¿Dónde deberías colocar la pelota para ganar tiempo?</p>
+     <div class="interactive-court" id="interactiveCourt">
+      <div class="zone" data-correct="true" style="top: 10%; left: 10%; width: 35%; height: 35%;">
+       Fondo cruzado alto ✓
+      </div>
+      <div class="zone" data-correct="false" style="top: 50%; left: 35%; width: 30%; height: 35%;">
+       Medio corto ✗
+      </div>
+      <div class="zone" data-correct="false" style="top: 10%; right: 10%; width: 35%; height: 35%;">
+       Paralelo corto ✗
+      </div>
+     </div>
+     <div id="courtFeedback" class="feedback"></div>
+    </div><button id="finishGame" class="btn-next" disabled>Ver Resultados Finales →</button>
+   </div><!-- Ronda Final - Reconocimiento de Estados -->
+   <div id="recognitionRound" class="recognition-round">
+    <div class="recognition-header">
+     <h2>🧩 Ronda Final - Reconocimiento de Estados</h2>
+     <p style="font-size: 1.2em; margin: 10px 0 0 0;">Identifica el estado táctico en cada situación</p>
+    </div>
+    <div class="timer-display" id="timerDisplay">
+     ⏱️ 10s
+    </div>
+    <div class="streak-meter">
+     <h3>🔥 Racha de Aciertos</h3>
+     <div class="fire-icons" id="streakIcons"><span>🔥</span><span>🔥</span><span>🔥</span>
+     </div>
+    </div>
+    <div id="recognitionQuestions"></div><button id="showFinalResults" class="btn-next" disabled>Ver Resultados Finales 🏆</button>
+   </div><!-- Pantalla Final -->
+   <div id="finalScreen" class="final-screen">
+    <h2>🏆 ¡Felicitaciones!</h2>
+    <p style="font-size: 1.3em; color: #4b5563;">Has completado el entrenamiento táctico</p>
+    <div class="final-score" id="finalScore">
+     0/15
+    </div>
+    <div class="score-display">
+     Puntuación: <span id="scorePercentage">0%</span>
+    </div>
+    <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 15px; padding: 25px; margin: 30px 0; border: 3px solid #f59e0b;">
+     <h3 style="color: #78350f; margin: 0 0 15px 0; font-size: 1.5em;">🏅 Medalla Desbloqueada</h3>
+     <div style="font-size: 4em; margin: 15px 0;">
+      🏆
+     </div>
+     <p style="color: #78350f; font-size: 1.3em; font-weight: bold; margin: 0;" id="medalTitle">Lector de Juego AC – Nivel 1</p>
+    </div>
+    <div class="medals-display" id="medalsDisplay"></div>
+    <div style="background: #f0f4ff; border-radius: 15px; padding: 25px; margin: 30px 0; border-left: 5px solid #667eea;">
+     <p style="font-size: 1.3em; color: #2d3748; margin: 0; line-height: 1.6; font-style: italic;">"El secreto no está en golpear más fuerte…<br>
+       está en saber en qué estado estás y qué hacer en cada momento."</p>
+    </div>
+    <p style="font-size: 1.2em; color: #2d3748; margin: 30px 0;" id="finalMessage"></p>
+    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 30px;"><button id="restartBtn" class="btn-restart">🔁 Volver a Jugar</button>
+    </div>
+   </div>
+  </div>
+  <script>
+        const defaultConfig = {
+            game_title: "Domina los estados del juego",
+            start_button_text: "Empezar el juego",
+            offensive_title: "🔴 ESTADO OFENSIVO",
+            neutral_title: "🟡 ESTADO NEUTRAL",
+            defensive_title: "🔵 ESTADO DEFENSIVO"
+        };
+
+        let currentPhase = 'welcome';
+        let score = 0;
+        let totalQuestions = 0;
+        let phaseScores = { offensive: 0, neutral: 0, defensive: 0 };
+        let recognitionScore = 0;
+        let currentStreak = 0;
+        let timerInterval = null;
+        let timeLeft = 10;
+
+        const offensiveQuestions = [
+            {
+                question: "¿Qué caracteriza un estado ofensivo?",
+                options: [
+                    { text: "A) Controlar el punto", correct: true },
+                    { text: "B) Esperar errores del rival", correct: false },
+                    { text: "C) Defender desde el fondo", correct: false }
+                ],
+                feedback: {
+                    correct: "¡Exacto! En estado ofensivo controlas el punto y dictas el ritmo.",
+                    incorrect: "No del todo. El estado ofensivo se trata de tomar control y presionar al rival."
+                }
+            },
+            {
+                question: "¿Qué tipo de bola suele darte una oportunidad ofensiva?",
+                options: [
+                    { text: "A) Profunda y con peso", correct: false },
+                    { text: "B) Corta o flotada", correct: true },
+                    { text: "C) Alta y defensiva", correct: false }
+                ],
+                feedback: {
+                    correct: "¡Correcto! Una bola corta o flotada te permite avanzar y atacar.",
+                    incorrect: "Piénsalo de nuevo. Las bolas cortas te dan la oportunidad de acercarte a la red."
+                }
+            },
+            {
+                question: "¿Qué acción táctica deberías realizar?",
+                options: [
+                    { text: "A) Atacar y subir a la red", correct: true },
+                    { text: "B) Jugar un globo", correct: false },
+                    { text: "C) Esperar el error", correct: false }
+                ],
+                feedback: {
+                    correct: "¡Perfecto! Atacar y subir a la red es la jugada ofensiva ideal.",
+                    incorrect: "No es la mejor opción. En estado ofensivo debes ser proactivo y atacar."
+                }
+            },
+            {
+                question: "Situación: Pelota corta en el centro. ¿Qué haces?",
+                options: [
+                    { text: "A) Golpear cruzado y subir", correct: true },
+                    { text: "B) Retroceder", correct: false },
+                    { text: "C) Mantener el rally", correct: false }
+                ],
+                feedback: {
+                    correct: "¡Excelente decisión táctica! Aprovechas la oportunidad para presionar.",
+                    incorrect: "Esa no es la mejor opción. Una pelota corta es tu oportunidad de atacar."
+                }
+            }
+        ];
+
+        const neutralQuestions = [
+            {
+                question: "¿Qué define un estado neutral?",
+                options: [
+                    { text: "A) Ningún jugador tiene ventaja", correct: true },
+                    { text: "B) Uno de los dos ataca", correct: false },
+                    { text: "C) Ambos defienden", correct: false }
+                ],
+                feedback: {
+                    correct: "¡Correcto! En estado neutral hay equilibrio entre ambos jugadores.",
+                    incorrect: "No exactamente. Neutral significa que ninguno domina el punto."
+                }
+            },
+            {
+                question: "¿Qué golpe predomina aquí?",
+                options: [
+                    { text: "A) Golpes agresivos", correct: false },
+                    { text: "B) Pelotas regulares con buena profundidad", correct: true },
+                    { text: "C) Globos", correct: false }
+                ],
+                feedback: {
+                    correct: "¡Exacto! La consistencia y profundidad son clave en estado neutral.",
+                    incorrect: "Piensa mejor. En neutral buscas consistencia, no agresividad extrema."
+                }
+            },
+            {
+                question: "¿Qué actitud mental necesitas mantener?",
+                options: [
+                    { text: "A) Impulsividad", correct: false },
+                    { text: "B) Paciencia y claridad", correct: true },
+                    { text: "C) Desconfianza", correct: false }
+                ],
+                feedback: {
+                    correct: "¡Perfecto! La paciencia es fundamental para esperar tu oportunidad.",
+                    incorrect: "No es la actitud correcta. En neutral necesitas paciencia para crear oportunidades."
+                }
+            },
+            {
+                question: "Tu rival mantiene el rally. ¿Qué deberías hacer?",
+                options: [
+                    { text: "A) Cambiar de ritmo o altura para crear oportunidad", correct: true },
+                    { text: "B) Atacar sin posición", correct: false },
+                    { text: "C) Esperar sin mover los pies", correct: false }
+                ],
+                feedback: {
+                    correct: "¡Excelente! Variar el ritmo te ayuda a romper el equilibrio.",
+                    incorrect: "Esa no es la mejor estrategia. Debes buscar crear oportunidades con variación."
+                }
+            }
+        ];
+
+        const recognitionSituations = [
+            {
+                description: "Situación 1: Pelota corta en el centro de la cancha",
+                visual: "short-ball",
+                correctState: "offensive",
+                explanation: "Una pelota corta es tu oportunidad de atacar y tomar control del punto."
+            },
+            {
+                description: "Situación 2: Rally equilibrado desde el fondo",
+                visual: "baseline-rally",
+                correctState: "neutral",
+                explanation: "Ambos jugadores mantienen el punto desde el fondo sin ventaja clara."
+            },
+            {
+                description: "Situación 3: Carrera lateral defensiva fuera de la cancha",
+                visual: "defensive-run",
+                correctState: "defensive",
+                explanation: "Estás fuera de posición y necesitas recuperar el control del punto."
+            }
+        ];
+
+        const defensiveQuestions = [
+            {
+                question: "¿Qué debes priorizar en un estado defensivo?",
+                options: [
+                    { text: "A) Potencia", correct: false },
+                    { text: "B) Altura, profundidad y tiempo", correct: true },
+                    { text: "C) Golpes planos", correct: false }
+                ],
+                feedback: {
+                    correct: "¡Correcto! Ganar tiempo y profundidad te permite recuperarte.",
+                    incorrect: "No es lo ideal. En defensa necesitas tiempo para reposicionarte."
+                }
+            },
+            {
+                question: "¿Qué golpe suele ayudarte a recuperarte?",
+                options: [
+                    { text: "A) Globo alto", correct: true },
+                    { text: "B) Slice corto", correct: false },
+                    { text: "C) Drop shot", correct: false }
+                ],
+                feedback: {
+                    correct: "¡Perfecto! El globo alto te da tiempo para volver a posición.",
+                    incorrect: "Piénsalo mejor. Necesitas un golpe que te dé tiempo para recuperarte."
+                }
+            },
+            {
+                question: "¿Qué objetivo táctico buscas?",
+                options: [
+                    { text: "A) Resistir y volver al estado neutral", correct: true },
+                    { text: "B) Atacar sin equilibrio", correct: false },
+                    { text: "C) Finalizar el punto", correct: false }
+                ],
+                feedback: {
+                    correct: "¡Excelente! El objetivo es neutralizar la ventaja del rival.",
+                    incorrect: "No es el objetivo correcto. En defensa buscas recuperar el equilibrio."
+                }
+            }
+        ];
+
+        function renderRecognitionRound() {
+            const container = document.getElementById('recognitionQuestions');
+            container.innerHTML = '';
+
+            recognitionSituations.forEach((situation, index) => {
+                const card = document.createElement('div');
+                card.className = 'situation-card';
+                card.id = `situation-${index}`;
+                
+                let visualHTML = '';
+                if (situation.visual === 'short-ball') {
+                    visualHTML = `
+                        <div class="situation-visual">
+                            <div class="situation-court-surface">
+                                <div class="situation-baseline-top"></div>
+                                <div class="situation-baseline-bottom"></div>
+                                <div class="situation-service-line-top"></div>
+                                <div class="situation-service-line-bottom"></div>
+                                <div class="situation-sideline-left"></div>
+                                <div class="situation-sideline-right"></div>
+                                <div class="situation-center-service-line"></div>
+                                <div class="situation-center-mark-top"></div>
+                                <div class="situation-center-mark-bottom"></div>
+                            </div>
+                            <div class="situation-net"></div>
+                            <svg class="situation-arrow" style="position: absolute; bottom: 32%; left: 45%; width: 100px; height: 80px;">
+                                <defs>
+                                    <marker id="arrowhead1" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                        <polygon class="arrow-head" points="0 0, 10 3, 0 6" />
+                                    </marker>
+                                </defs>
+                                <path class="arrow-line" d="M 10 70 Q 30 40, 50 10" marker-end="url(#arrowhead1)" />
+                            </svg>
+                            <div class="situation-player" style="bottom: 38%; left: 50%; transform: translateX(-50%);">
+                                <div class="situation-player-head"></div>
+                                <div class="situation-player-body">
+                                    <div class="situation-player-racket" style="right: -12px; top: 12px; transform: rotate(-40deg);">
+                                        <div class="situation-racket-head" style="top: -18px; left: -5px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="situation-ball" style="bottom: 62%; left: 50%; transform: translateX(-50%);"></div>
+                            <div class="situation-ball-shadow" style="bottom: 38%; left: 50%; transform: translateX(-50%);"></div>
+                            <div style="position: absolute; top: 10px; left: 10px; background: rgba(239, 68, 68, 0.95); padding: 10px 18px; border-radius: 10px; font-weight: bold; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                                ⚡ Pelota corta - Oportunidad de ataque
+                            </div>
+                        </div>
+                    `;
+                } else if (situation.visual === 'baseline-rally') {
+                    visualHTML = `
+                        <div class="situation-visual">
+                            <div class="situation-court-surface">
+                                <div class="situation-baseline-top"></div>
+                                <div class="situation-baseline-bottom"></div>
+                                <div class="situation-service-line-top"></div>
+                                <div class="situation-service-line-bottom"></div>
+                                <div class="situation-sideline-left"></div>
+                                <div class="situation-sideline-right"></div>
+                                <div class="situation-center-service-line"></div>
+                                <div class="situation-center-mark-top"></div>
+                                <div class="situation-center-mark-bottom"></div>
+                            </div>
+                            <div class="situation-net"></div>
+                            <div class="situation-player" style="bottom: 10%; left: 50%; transform: translateX(-50%);">
+                                <div class="situation-player-head"></div>
+                                <div class="situation-player-body">
+                                    <div class="situation-player-racket" style="right: -10px; top: 15px; transform: rotate(-20deg);">
+                                        <div class="situation-racket-head" style="top: -18px; left: -5px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="situation-player" style="top: 10%; left: 50%; transform: translateX(-50%);">
+                                <div class="situation-player-head"></div>
+                                <div class="situation-player-body" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                                    <div class="situation-player-racket" style="left: -10px; top: 15px; transform: rotate(20deg);">
+                                        <div class="situation-racket-head" style="top: -18px; right: -5px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="situation-ball" style="top: 48%; left: 50%; transform: translateX(-50%);"></div>
+                            <div class="situation-ball-shadow" style="top: 48%; left: 50%; transform: translateX(-50%);"></div>
+                            <div style="position: absolute; top: 10px; left: 10px; background: rgba(251, 191, 36, 0.95); padding: 10px 18px; border-radius: 10px; font-weight: bold; color: #78350f; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                                ⚖️ Rally equilibrado desde el fondo
+                            </div>
+                        </div>
+                    `;
+                } else if (situation.visual === 'defensive-run') {
+                    visualHTML = `
+                        <div class="situation-visual">
+                            <div class="situation-court-surface">
+                                <div class="situation-baseline-top"></div>
+                                <div class="situation-baseline-bottom"></div>
+                                <div class="situation-service-line-top"></div>
+                                <div class="situation-service-line-bottom"></div>
+                                <div class="situation-sideline-left"></div>
+                                <div class="situation-sideline-right"></div>
+                                <div class="situation-center-service-line"></div>
+                                <div class="situation-center-mark-top"></div>
+                                <div class="situation-center-mark-bottom"></div>
+                            </div>
+                            <div class="situation-net"></div>
+                            <svg class="situation-arrow" style="position: absolute; bottom: 10%; left: 8%; width: 120px; height: 100px;">
+                                <defs>
+                                    <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                        <polygon class="arrow-head" points="0 0, 10 3, 0 6" />
+                                    </marker>
+                                </defs>
+                                <path class="arrow-line" d="M 10 90 Q 40 50, 80 20" marker-end="url(#arrowhead2)" />
+                            </svg>
+                            <div class="situation-player" style="bottom: 8%; left: 20%;">
+                                <div class="situation-player-head"></div>
+                                <div class="situation-player-body" style="transform: skewX(-12deg);">
+                                    <div class="situation-player-racket" style="right: -18px; top: 18px; transform: rotate(-55deg);">
+                                        <div class="situation-racket-head" style="top: -18px; left: -5px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="situation-ball" style="bottom: 15%; left: 25%;"></div>
+                            <div class="situation-ball-shadow" style="bottom: 8%; left: 26%;"></div>
+                            <div style="position: absolute; top: 10px; left: 10px; background: rgba(59, 130, 246, 0.95); padding: 10px 18px; border-radius: 10px; font-weight: bold; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                                🏃 Carrera defensiva - Fuera de posición
+                            </div>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <h3 style="color: #2d3748; margin-bottom: 15px;">${situation.description}</h3>
+                    ${visualHTML}
+                    <p style="font-size: 1.2em; color: #4b5563; margin: 20px 0;">¿En qué estado táctico se encuentra el jugador?</p>
+                    <div class="state-options">
+                        <button class="state-btn offensive" data-state="offensive" data-situation="${index}">
+                            🔴 OFENSIVO
+                        </button>
+                        <button class="state-btn neutral" data-state="neutral" data-situation="${index}">
+                            🟡 NEUTRAL
+                        </button>
+                        <button class="state-btn defensive" data-state="defensive" data-situation="${index}">
+                            🔵 DEFENSIVO
+                        </button>
+                    </div>
+                    <div class="feedback" id="recognition-feedback-${index}"></div>
+                `;
+                
+                container.appendChild(card);
+            });
+
+            document.querySelectorAll('.state-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    handleRecognitionAnswer(this);
+                });
+            });
+
+            startTimer();
+        }
+
+        function startTimer() {
+            timeLeft = 10;
+            updateTimerDisplay();
+            
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const timerDisplay = document.getElementById('timerDisplay');
+            timerDisplay.textContent = `⏱️ ${timeLeft}s`;
+            
+            if (timeLeft <= 3) {
+                timerDisplay.style.color = '#ef4444';
+            } else if (timeLeft <= 5) {
+                timerDisplay.style.color = '#f59e0b';
+            } else {
+                timerDisplay.style.color = '#667eea';
+            }
+        }
+
+        function handleRecognitionAnswer(button) {
+            const situationIndex = parseInt(button.dataset.situation);
+            const selectedState = button.dataset.state;
+            const situation = recognitionSituations[situationIndex];
+            const isCorrect = selectedState === situation.correctState;
+            
+            const card = document.getElementById(`situation-${situationIndex}`);
+            const feedbackDiv = document.getElementById(`recognition-feedback-${situationIndex}`);
+            const allButtons = card.querySelectorAll('.state-btn');
+            
+            allButtons.forEach(btn => {
+                btn.disabled = true;
+                btn.style.pointerEvents = 'none';
+            });
+
+            if (isCorrect) {
+                button.classList.add('selected-correct');
+                feedbackDiv.className = 'feedback correct show';
+                feedbackDiv.textContent = '✓ ¡Correcto! ' + situation.explanation;
+                recognitionScore++;
+                currentStreak++;
+                updateStreakMeter();
+            } else {
+                button.classList.add('selected-incorrect');
+                feedbackDiv.className = 'feedback incorrect show';
+                feedbackDiv.textContent = '✗ Incorrecto. ' + situation.explanation;
+                currentStreak = 0;
+                updateStreakMeter();
+                
+                allButtons.forEach(btn => {
+                    if (btn.dataset.state === situation.correctState) {
+                        btn.classList.add('selected-correct');
+                    }
+                });
+            }
+
+            card.classList.add('answered');
+            
+            const answeredCards = document.querySelectorAll('.situation-card.answered').length;
+            if (answeredCards === recognitionSituations.length) {
+                document.getElementById('showFinalResults').disabled = false;
+                if (timerInterval) clearInterval(timerInterval);
+            }
+        }
+
+        function updateStreakMeter() {
+            const streakIcons = document.getElementById('streakIcons');
+            const icons = streakIcons.querySelectorAll('span');
+            
+            icons.forEach((icon, index) => {
+                if (index < currentStreak) {
+                    icon.classList.add('active');
+                } else {
+                    icon.classList.remove('active');
+                }
+            });
+        }
+
+        function renderQuestions(questions, containerId, progressId, phase) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            questions.forEach((q, index) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                card.innerHTML = `
+                    <h3>${q.question}</h3>
+                    <div class="options" id="${phase}-options-${index}">
+                        ${q.options.map((opt, optIndex) => `
+                            <button class="option-btn" data-question="${index}" data-option="${optIndex}" data-correct="${opt.correct}">
+                                ${opt.text}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div class="feedback" id="${phase}-feedback-${index}"></div>
+                `;
+                container.appendChild(card);
+            });
+
+            container.querySelectorAll('.option-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    handleAnswer(this, questions, progressId, phase);
+                });
+            });
+        }
+
+        function handleAnswer(button, questions, progressId, phase) {
+            const questionIndex = parseInt(button.dataset.question);
+            const isCorrect = button.dataset.correct === 'true';
+            const optionsContainer = button.parentElement;
+            const feedbackDiv = document.getElementById(`${phase}-feedback-${questionIndex}`);
+            
+            optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = true;
+                if (btn.dataset.correct === 'true') {
+                    btn.classList.add('correct');
+                }
+            });
+
+            if (isCorrect) {
+                button.classList.add('correct');
+                feedbackDiv.className = 'feedback correct show';
+                feedbackDiv.textContent = '✓ ' + questions[questionIndex].feedback.correct;
+                score++;
+                phaseScores[phase]++;
+            } else {
+                button.classList.add('incorrect');
+                feedbackDiv.className = 'feedback incorrect show';
+                feedbackDiv.textContent = '✗ ' + questions[questionIndex].feedback.incorrect;
+            }
+
+            totalQuestions++;
+            updateProgress(progressId, phase);
+        }
+
+        function updateProgress(progressId, phase) {
+            const progressBar = document.getElementById(progressId);
+            let questionsInPhase = 4;
+            if (phase === 'defensive') questionsInPhase = 3;
+            
+            // Contar cuántas preguntas han sido respondidas en esta fase
+            const allOptionsInPhase = document.querySelectorAll(`#${phase}Questions .options`);
+            let answeredCount = 0;
+            
+            allOptionsInPhase.forEach(optionsContainer => {
+                const hasDisabledButton = optionsContainer.querySelector('.option-btn:disabled');
+                if (hasDisabledButton) {
+                    answeredCount++;
+                }
+            });
+            
+            const progress = (answeredCount / questionsInPhase) * 100;
+            progressBar.style.width = progress + '%';
+
+            // Habilitar botón de siguiente fase cuando todas las preguntas estén respondidas
+            if (answeredCount === questionsInPhase) {
+                if (phase === 'offensive') {
+                    document.getElementById('nextToNeutral').disabled = false;
+                } else if (phase === 'neutral') {
+                    document.getElementById('nextToDefensive').disabled = false;
+                }
+            }
+        }
+
+        function animateBall(ballId, pattern) {
+            const ball = document.getElementById(ballId);
+            const shadowId = ballId.replace('Ball', 'Shadow');
+            const shadow = document.getElementById(shadowId);
+            if (!ball) return;
+
+            if (pattern === 'offensive') {
+                // Animación de ataque: pelota va desde el fondo, cruza la red y ataca corto
+                let progress = 0;
+                const interval = setInterval(() => {
+                    if (progress >= 100) {
+                        progress = 0;
+                    }
+                    progress += 1.2;
+                    
+                    // La pelota va desde abajo (10%) hasta arriba (70%)
+                    const verticalProgress = 10 + (progress * 0.6);
+                    
+                    // Parábola realista: sube hasta la mitad, luego baja
+                    const height = Math.sin((progress / 100) * Math.PI) * 35;
+                    
+                    // Posición horizontal centrada con ligera variación
+                    const xPos = 48 + Math.sin((progress / 100) * Math.PI * 2) * 3;
+                    
+                    ball.style.left = xPos + '%';
+                    ball.style.bottom = verticalProgress + height + '%';
+                    
+                    if (shadow) {
+                        shadow.style.left = (xPos + 1) + '%';
+                        shadow.style.bottom = verticalProgress + '%';
+                        // Sombra más visible cuando la pelota está baja
+                        shadow.style.opacity = 0.5 - (height / 100);
+                        // Sombra más grande cuando la pelota está alta
+                        const scale = 1 + (height / 50);
+                        shadow.style.transform = `scale(${scale})`;
+                    }
+                }, 25);
+            } else if (pattern === 'neutral') {
+                // Animación neutral: rally de fondo a fondo cruzando la red
+                let progress = 0;
+                let direction = 1;
+                const interval = setInterval(() => {
+                    progress += direction * 1;
+                    if (progress >= 100) {
+                        direction = -1;
+                        progress = 100;
+                    } else if (progress <= 0) {
+                        direction = 1;
+                        progress = 0;
+                    }
+                    
+                    // La pelota va de un extremo al otro (de 8% a 92% verticalmente)
+                    const verticalProgress = 8 + (progress * 0.84);
+                    
+                    // Parábola que cruza la red en el medio
+                    const height = Math.sin((progress / 100) * Math.PI) * 30;
+                    
+                    // Ligero movimiento horizontal (efecto cruzado)
+                    const xPos = 45 + Math.sin((progress / 100) * Math.PI) * 8;
+                    
+                    ball.style.left = xPos + '%';
+                    ball.style.bottom = verticalProgress + height + '%';
+                    
+                    if (shadow) {
+                        shadow.style.left = (xPos + 1) + '%';
+                        shadow.style.bottom = verticalProgress + '%';
+                        shadow.style.opacity = 0.5 - (height / 80);
+                        const scale = 1 + (height / 60);
+                        shadow.style.transform = `scale(${scale})`;
+                    }
+                }, 25);
+            } else if (pattern === 'defensive') {
+                // Animación defensiva: globo alto desde posición defensiva
+                let progress = 0;
+                const interval = setInterval(() => {
+                    if (progress >= 100) {
+                        progress = 0;
+                    }
+                    progress += 0.9;
+                    
+                    // La pelota va desde abajo (8%) hasta arriba (85%)
+                    const verticalProgress = 8 + (progress * 0.77);
+                    
+                    // Globo alto: parábola más pronunciada
+                    const height = Math.sin((progress / 100) * Math.PI) * 50;
+                    
+                    // Movimiento desde la esquina hacia el centro-fondo
+                    const xPos = 20 + (progress * 0.25);
+                    
+                    ball.style.left = xPos + '%';
+                    ball.style.bottom = verticalProgress + height + '%';
+                    
+                    if (shadow) {
+                        shadow.style.left = (xPos + 1) + '%';
+                        shadow.style.bottom = verticalProgress + '%';
+                        shadow.style.opacity = 0.5 - (height / 120);
+                        const scale = 1 + (height / 70);
+                        shadow.style.transform = `scale(${scale})`;
+                    }
+                }, 30);
+            }
+        }
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('offensivePhase').classList.add('active');
+            currentPhase = 'offensive';
+            renderQuestions(offensiveQuestions, 'offensiveQuestions', 'offensiveProgress', 'offensive');
+            animateBall('offensiveBall', 'offensive');
+        });
+
+        document.getElementById('nextToNeutral').addEventListener('click', () => {
+            document.getElementById('offensivePhase').classList.remove('active');
+            document.getElementById('neutralPhase').classList.add('active');
+            currentPhase = 'neutral';
+            renderQuestions(neutralQuestions, 'neutralQuestions', 'neutralProgress', 'neutral');
+            animateBall('neutralBall', 'neutral');
+        });
+
+        document.getElementById('nextToDefensive').addEventListener('click', () => {
+            document.getElementById('neutralPhase').classList.remove('active');
+            document.getElementById('defensivePhase').classList.add('active');
+            currentPhase = 'defensive';
+            renderQuestions(defensiveQuestions, 'defensiveQuestions', 'defensiveProgress', 'defensive');
+            animateBall('defensiveBall', 'defensive');
+        });
+
+        document.querySelectorAll('.zone').forEach(zone => {
+            zone.addEventListener('click', function() {
+                const isCorrect = this.dataset.correct === 'true';
+                const feedback = document.getElementById('courtFeedback');
+                
+                document.querySelectorAll('.zone').forEach(z => {
+                    z.style.pointerEvents = 'none';
+                    if (z.dataset.correct === 'true') {
+                        z.classList.add('correct-zone');
+                    } else {
+                        z.classList.add('incorrect-zone');
+                    }
+                });
+
+                if (isCorrect) {
+                    feedback.className = 'feedback correct show';
+                    feedback.textContent = '✓ ¡Perfecto! El fondo cruzado alto te da tiempo para recuperar posición.';
+                    score++;
+                    phaseScores.defensive++;
+                } else {
+                    feedback.className = 'feedback incorrect show';
+                    feedback.textContent = '✗ Eso deja el punto abierto al rival. Necesitas profundidad y altura.';
+                }
+
+                totalQuestions++;
+                document.getElementById('finishGame').disabled = false;
+            });
+        });
+
+        document.getElementById('finishGame').addEventListener('click', () => {
+            document.getElementById('defensivePhase').classList.remove('active');
+            document.getElementById('recognitionRound').classList.add('active');
+            renderRecognitionRound();
+        });
+
+        document.getElementById('showFinalResults').addEventListener('click', () => {
+            document.getElementById('recognitionRound').classList.remove('active');
+            showFinalScreen();
+        });
+
+        function showFinalScreen() {
+            const finalScreen = document.getElementById('finalScreen');
+            const finalScore = document.getElementById('finalScore');
+            const scorePercentage = document.getElementById('scorePercentage');
+            const medalsDisplay = document.getElementById('medalsDisplay');
+            const finalMessage = document.getElementById('finalMessage');
+            const medalTitle = document.getElementById('medalTitle');
+
+            const totalScore = score + recognitionScore;
+            const totalPossible = totalQuestions + recognitionSituations.length;
+            
+            finalScore.textContent = `${totalScore}/${totalPossible}`;
+            const percentage = Math.round((totalScore / totalPossible) * 100);
+            scorePercentage.textContent = percentage + '%';
+
+            let medals = '';
+            if (phaseScores.offensive >= 3) medals += '<span class="medal">🥇</span>';
+            if (phaseScores.neutral >= 3) medals += '<span class="medal">🥈</span>';
+            if (phaseScores.defensive >= 3) medals += '<span class="medal">🥉</span>';
+            
+            let recognitionMessage = '';
+            if (recognitionScore === 3) {
+                recognitionMessage = '<div style="background: #d1fae5; padding: 15px; border-radius: 10px; margin: 15px 0;"><p style="color: #065f46; font-size: 1.2em; margin: 0; font-weight: bold;">🎯 Control total del juego</p></div>';
+            } else if (recognitionScore === 2) {
+                recognitionMessage = '<div style="background: #fef3c7; padding: 15px; border-radius: 10px; margin: 15px 0;"><p style="color: #78350f; font-size: 1.2em; margin: 0; font-weight: bold;">👍 Buen lector del juego</p></div>';
+            } else {
+                recognitionMessage = '<div style="background: #fee2e2; padding: 15px; border-radius: 10px; margin: 15px 0;"><p style="color: #991b1b; font-size: 1.2em; margin: 0; font-weight: bold;">💪 A seguir entrenando tu lectura táctica</p></div>';
+            }
+            
+            medalsDisplay.innerHTML = medals + recognitionMessage;
+
+            if (percentage >= 90) {
+                finalMessage.textContent = '¡Excelente! Dominas los estados del juego como un profesional.';
+                medalTitle.textContent = 'Lector de Juego AC – Nivel Experto 🌟';
+            } else if (percentage >= 70) {
+                finalMessage.textContent = '¡Muy bien! Tienes un buen entendimiento táctico.';
+                medalTitle.textContent = 'Lector de Juego AC – Nivel Avanzado';
+            } else if (percentage >= 50) {
+                finalMessage.textContent = 'Buen intento. Sigue practicando para mejorar tu táctica.';
+                medalTitle.textContent = 'Lector de Juego AC – Nivel Intermedio';
+            } else {
+                finalMessage.textContent = 'Sigue aprendiendo. La práctica hace al maestro.';
+                medalTitle.textContent = 'Lector de Juego AC – Nivel Principiante';
+            }
+
+            finalScreen.classList.add('active');
+        }
+
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            score = 0;
+            totalQuestions = 0;
+            phaseScores = { offensive: 0, neutral: 0, defensive: 0 };
+            recognitionScore = 0;
+            currentStreak = 0;
+            
+            if (timerInterval) clearInterval(timerInterval);
+            
+            document.getElementById('finalScreen').classList.remove('active');
+            document.getElementById('welcomeScreen').style.display = 'block';
+            
+            document.getElementById('offensiveProgress').style.width = '0%';
+            document.getElementById('neutralProgress').style.width = '0%';
+            document.getElementById('defensiveProgress').style.width = '0%';
+            
+            document.getElementById('nextToNeutral').disabled = true;
+            document.getElementById('nextToDefensive').disabled = true;
+            document.getElementById('finishGame').disabled = true;
+            document.getElementById('showFinalResults').disabled = true;
+            
+            document.querySelectorAll('.zone').forEach(z => {
+                z.style.pointerEvents = 'auto';
+                z.classList.remove('correct-zone', 'incorrect-zone');
+            });
+            document.getElementById('courtFeedback').className = 'feedback';
+            
+            document.getElementById('recognitionQuestions').innerHTML = '';
+            updateStreakMeter();
+        });
+
+        async function onConfigChange(config) {
+            document.getElementById('gameTitle').textContent = config.game_title || defaultConfig.game_title;
+            document.getElementById('startBtn').textContent = config.start_button_text || defaultConfig.start_button_text;
+            document.getElementById('offensiveTitle').textContent = config.offensive_title || defaultConfig.offensive_title;
+            document.getElementById('neutralTitle').textContent = config.neutral_title || defaultConfig.neutral_title;
+            document.getElementById('defensiveTitle').textContent = config.defensive_title || defaultConfig.defensive_title;
+        }
+
+        if (window.elementSdk) {
+            window.elementSdk.init({
+                defaultConfig: defaultConfig,
+                onConfigChange: onConfigChange,
+                mapToCapabilities: (config) => ({
+                    recolorables: [],
+                    borderables: [],
+                    fontEditable: undefined,
+                    fontSizeable: undefined
+                }),
+                mapToEditPanelValues: (config) => new Map([
+                    ["game_title", config.game_title || defaultConfig.game_title],
+                    ["start_button_text", config.start_button_text || defaultConfig.start_button_text],
+                    ["offensive_title", config.offensive_title || defaultConfig.offensive_title],
+                    ["neutral_title", config.neutral_title || defaultConfig.neutral_title],
+                    ["defensive_title", config.defensive_title || defaultConfig.defensive_title]
+                ])
+            });
+        }
+    </script>
+ </body>
+</html>
