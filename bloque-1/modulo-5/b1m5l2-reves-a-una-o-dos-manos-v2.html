@@ -1,0 +1,1696 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    window.elementSdk = window.elementSdk || {
+      config: null,
+      init: async function () { return { isOk: true }; },
+      setConfig: function () {}
+    };
+    window.dataSdk = window.dataSdk || {
+      init: async function () { return { isOk: true }; },
+      create: async function () { return { isOk: true }; }
+    };
+  </script>
+  <title>¿Qué revés es para ti?</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1a1a2e;
+      color: #ffffff;
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 0;
+      min-height: 100%;
+    }
+
+    .screen {
+      display: none;
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Portada con cancha */
+    .hero {
+      text-align: center;
+      padding: 0;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%);
+      overflow: hidden;
+    }
+
+    .tennis-court {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      opacity: 0.9;
+    }
+
+    .court-lines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .court-line {
+      position: absolute;
+      background: white;
+      opacity: 0.8;
+    }
+
+    .center-line {
+      left: 50%;
+      top: 0;
+      width: 3px;
+      height: 100%;
+      transform: translateX(-50%);
+    }
+
+    .service-line-left {
+      left: 25%;
+      top: 30%;
+      width: 3px;
+      height: 40%;
+      transform: translateX(-50%);
+    }
+
+    .service-line-right {
+      right: 25%;
+      top: 30%;
+      width: 3px;
+      height: 40%;
+      transform: translateX(50%);
+    }
+
+    .baseline-top {
+      top: 10%;
+      left: 20%;
+      width: 60%;
+      height: 3px;
+    }
+
+    .baseline-bottom {
+      bottom: 10%;
+      left: 20%;
+      width: 60%;
+      height: 3px;
+    }
+
+    .sideline-left {
+      left: 20%;
+      top: 10%;
+      width: 3px;
+      height: 80%;
+    }
+
+    .sideline-right {
+      right: 20%;
+      top: 10%;
+      width: 3px;
+      height: 80%;
+    }
+
+    .net {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.6);
+      transform: translateY(-50%);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      padding: 3rem 2rem;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      text-shadow: 3px 3px 8px rgba(0,0,0,0.5);
+      line-height: 1.2;
+      color: #ffffff;
+    }
+
+    .hero p {
+      font-size: 1.5rem;
+      margin-bottom: 3rem;
+      opacity: 0.95;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+    }
+
+    .animation-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6rem;
+      margin: 3rem 0;
+      min-height: 250px;
+      position: relative;
+    }
+
+    .player-silhouette {
+      width: 180px;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: all 0.6s ease;
+    }
+
+    .silhouette-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+    }
+
+    .player-silhouette.pulse .silhouette-svg {
+      transform: scale(1.15);
+      filter: drop-shadow(0 15px 30px rgba(255, 255, 255, 0.8));
+    }
+
+    .player-label {
+      position: absolute;
+      bottom: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      font-weight: 600;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      white-space: nowrap;
+    }
+
+    .tennis-ball {
+      width: 60px;
+      height: 60px;
+      position: absolute;
+      animation: moveBall 2.5s ease-in-out infinite;
+      z-index: 5;
+    }
+
+    .tennis-ball-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 8px 15px rgba(199, 255, 0, 0.6));
+    }
+
+    @keyframes moveBall {
+      0% { 
+        left: 15%;
+        top: 20%;
+        transform: scale(0.8);
+      }
+      50% { 
+        left: 50%;
+        top: 50%;
+        transform: scale(1.2);
+      }
+      100% { 
+        left: 85%;
+        top: 20%;
+        transform: scale(0.8);
+      }
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      border: none;
+      padding: 1.2rem 3rem;
+      font-size: 1.3rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
+      font-weight: 600;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(245, 87, 108, 0.6);
+    }
+
+    .btn:active {
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4);
+    }
+
+    .btn-secondary:hover {
+      box-shadow: 0 15px 40px rgba(79, 172, 254, 0.6);
+    }
+
+    /* Pantalla comparativa */
+    .comparison-screen {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 100%);
+      min-height: 100%;
+      padding: 3rem 2rem;
+    }
+
+    .comparison-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .comparison-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #fbbf24;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+    }
+
+    /* Cards comparativas */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3rem;
+      margin: 2rem auto;
+      max-width: 1400px;
+    }
+
+    .card {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2.5rem;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .card h2 {
+      font-size: 2rem;
+      margin: 0;
+      color: #ffffff;
+    }
+
+    .card-animation {
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      animation: cardIconPulse 2.2s ease-in-out infinite;
+    }
+
+    @keyframes cardIconPulse {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.1) rotate(5deg); }
+    }
+
+    .advantages, .disadvantages {
+      margin: 2rem 0;
+    }
+
+    .advantages h3 {
+      font-size: 1.4rem;
+      margin-bottom: 1.2rem;
+      color: #4ade80;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .disadvantages h3 {
+      font-size: 1.4rem;
+      margin-bottom: 1.2rem;
+      color: #f87171;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .advantages ul, .disadvantages ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .advantages li, .disadvantages li {
+      padding: 0.8rem 0;
+      padding-left: 2.5rem;
+      position: relative;
+      line-height: 1.8;
+      font-size: 1.05rem;
+    }
+
+    .advantages li::before {
+      content: "✔";
+      position: absolute;
+      left: 0;
+      color: #4ade80;
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+
+    .disadvantages li::before {
+      content: "❌";
+      position: absolute;
+      left: 0;
+      font-size: 1.2rem;
+    }
+
+    .players {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid rgba(255, 255, 255, 0.2);
+      background: rgba(251, 191, 36, 0.1);
+      padding: 1.5rem;
+      border-radius: 10px;
+    }
+
+    .players strong {
+      display: block;
+      margin-bottom: 0.8rem;
+      color: #fbbf24;
+      font-size: 1.1rem;
+    }
+
+    .players span {
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+
+    /* Situaciones de juego */
+    .situations-screen {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      min-height: 100%;
+      padding: 2rem;
+    }
+
+    .situation-container {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(30, 58, 138, 0.15) 100%);
+      backdrop-filter: blur(15px);
+      border-radius: 25px;
+      padding: 3rem;
+      margin: 2rem auto;
+      max-width: 900px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .situation-container::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
+      animation: rotateGlow 10s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes rotateGlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .situation-visual-container {
+      position: relative;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 2rem 0;
+      z-index: 1;
+    }
+
+    .situation-visual {
+      font-size: 7rem;
+      position: relative;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .situation-visual.alta {
+      animation: ballHigh 1.5s ease-in-out infinite;
+    }
+
+    .situation-visual.rapida {
+      animation: ballFast 0.8s linear infinite;
+    }
+
+    .situation-visual.baja {
+      animation: ballLow 1.5s ease-in-out infinite;
+    }
+
+    .situation-visual.angulo {
+      animation: ballAngle 1.8s ease-in-out infinite;
+    }
+
+    .situation-visual.resto {
+      animation: ballServe 1.2s ease-in-out infinite;
+    }
+
+    @keyframes ballHigh {
+      0%, 100% { 
+        transform: translateY(0) scale(1); 
+        filter: drop-shadow(0 10px 20px rgba(199, 255, 0, 0.4));
+      }
+      50% { 
+        transform: translateY(-60px) scale(1.2); 
+        filter: drop-shadow(0 30px 40px rgba(199, 255, 0, 0.6));
+      }
+    }
+
+    @keyframes ballFast {
+      0% { 
+        transform: translateX(-100px) scale(0.8); 
+        opacity: 0.5;
+      }
+      50% { 
+        transform: translateX(0) scale(1.1); 
+        opacity: 1;
+      }
+      100% { 
+        transform: translateX(100px) scale(0.8); 
+        opacity: 0.5;
+      }
+    }
+
+    @keyframes ballLow {
+      0%, 100% { 
+        transform: translateY(30px) scale(1); 
+      }
+      50% { 
+        transform: translateY(10px) scale(0.95); 
+      }
+    }
+
+    @keyframes ballAngle {
+      0% { 
+        transform: translate(-80px, -40px) scale(0.9); 
+      }
+      50% { 
+        transform: translate(0, 0) scale(1.1); 
+      }
+      100% { 
+        transform: translate(80px, 40px) scale(0.9); 
+      }
+    }
+
+    @keyframes ballServe {
+      0% { 
+        transform: translateY(-50px) scale(0.7); 
+        opacity: 0.7;
+      }
+      50% { 
+        transform: translateY(0) scale(1.2); 
+        opacity: 1;
+      }
+      100% { 
+        transform: translateY(20px) scale(1); 
+        opacity: 1;
+      }
+    }
+
+    .situation-title {
+      font-size: 2.2rem;
+      margin-bottom: 1.5rem;
+      color: #fbbf24;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+      position: relative;
+      z-index: 10;
+    }
+
+    .situation-description {
+      font-size: 1.3rem;
+      margin-bottom: 2.5rem;
+      opacity: 0.95;
+      line-height: 1.8;
+      position: relative;
+      z-index: 10;
+    }
+
+    .choices {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 100;
+    }
+
+    .choice-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      padding: 1.5rem 2.5rem;
+      font-size: 1.2rem;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      min-width: 200px;
+      position: relative;
+      z-index: 100;
+    }
+
+    .choice-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .choice-btn.correct {
+      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+      border-color: #34d399;
+    }
+
+    .choice-btn.incorrect {
+      background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+      border-color: #f87171;
+    }
+
+    .feedback {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      font-size: 1.1rem;
+      display: none;
+      position: relative;
+      z-index: 10;
+    }
+
+    .feedback.show {
+      display: block;
+      animation: slideDown 0.5s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .progress {
+      text-align: center;
+      margin: 2rem 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    /* Simulador */
+    .simulator-court {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      border-radius: 20px;
+      padding: 3rem;
+      min-height: 400px;
+      position: relative;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .incoming-ball {
+      width: 80px;
+      height: 80px;
+      background: #c7ff00;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #1e3a8a;
+      margin: 2rem 0;
+      animation: incomingBall 1.5s ease-in-out;
+      box-shadow: 0 10px 30px rgba(199, 255, 0, 0.6);
+    }
+
+    @keyframes incomingBall {
+      0% { transform: translateY(-200px) scale(0.5); opacity: 0; }
+      50% { transform: translateY(0) scale(1.2); opacity: 1; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .ball-label {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+    }
+
+    .label-alta { background: #3b82f6; }
+    .label-rapida { background: #fbbf24; color: #1e3a8a; }
+    .label-abierta { background: #ef4444; }
+    .label-baja { background: #10b981; }
+    .label-lenta { background: #8b5cf6; }
+    .label-profunda { background: #ec4899; }
+
+    .simulator-choices {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .simulator-result {
+      margin-top: 2rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      display: none;
+    }
+
+    .simulator-result.show {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    /* Test de personalidad */
+    .quiz-container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .question-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2rem;
+      margin: 2rem 0;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .question-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: #fbbf24;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .quiz-option {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.1rem;
+    }
+
+    .quiz-option:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateX(5px);
+    }
+
+    .quiz-option.selected {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border-color: #f5576c;
+    }
+
+    /* Resultados finales */
+    .results-container {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .results-container h1 {
+      font-size: 3rem;
+      margin-bottom: 2rem;
+    }
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .score-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2rem;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .score-card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      color: #fbbf24;
+    }
+
+    .score-value {
+      font-size: 3rem;
+      font-weight: bold;
+      margin: 1rem 0;
+    }
+
+    .circular-progress {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: conic-gradient(#f093fb var(--progress), rgba(255,255,255,0.2) 0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 2rem auto;
+      position: relative;
+      box-shadow: 0 10px 40px rgba(240, 147, 251, 0.4);
+    }
+
+    .circular-progress::before {
+      content: '';
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: #1e293b;
+    }
+
+    .circular-progress-text {
+      position: relative;
+      z-index: 2;
+      font-size: 3rem;
+      font-weight: bold;
+      color: #fbbf24;
+    }
+
+    .level-badge {
+      display: inline-block;
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border-radius: 50px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 2rem 0;
+      box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
+    }
+
+    .recommendation {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2rem;
+      margin: 2rem 0;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .recommendation h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #fbbf24;
+    }
+
+    .recommendation p {
+      font-size: 1.2rem;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .hero p {
+        font-size: 1.2rem;
+      }
+
+      .animation-container {
+        gap: 2rem;
+      }
+
+      .backhand-silhouette {
+        width: 100px;
+        height: 100px;
+        font-size: 3rem;
+      }
+
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .choices {
+        flex-direction: column;
+      }
+
+      .choice-btn {
+        width: 100%;
+      }
+    }
+  </style>
+  
+  <style>
+    @media (max-width: 768px) {
+      body {
+        overflow-x: hidden !important;
+      }
+
+      .container,
+      .game-container,
+      .game-card,
+      .screen,
+      .results-screen,
+      .cover-screen,
+      .hero,
+      .intro-screen,
+      .phase-container {
+        max-width: 100% !important;
+      }
+
+      .container,
+      .game-container {
+        padding: 16px !important;
+      }
+
+      .cover-title,
+      .main-title,
+      .intro-title,
+      .game-title,
+      .section-title,
+      .final-title,
+      .game-title,
+      .title,
+      .game-header h1,
+      h1[style],
+      h2[style] {
+        font-size: clamp(1.8rem, 7vw, 2.5rem) !important;
+        line-height: 1.15 !important;
+      }
+
+      .subtitle,
+      .intro-subtitle,
+      .game-subtitle,
+      .instruction-text,
+      .game-instruction,
+      .construction-instructions,
+      .game-header p,
+      p[style] {
+        line-height: 1.55 !important;
+      }
+
+      .buttons-row,
+      .nav-buttons,
+      .button-group {
+        gap: 0.75rem !important;
+      }
+
+      .recommendation {
+        padding: 1.5rem !important;
+      }
+
+      .recommendation p {
+        font-size: 1rem !important;
+        line-height: 1.7 !important;
+      }
+
+      #screen-results > div[style*="display: flex"] {
+        flex-direction: column !important;
+        align-items: stretch !important;
+      }
+
+      #screen-results > div[style*="display: flex"] .btn {
+        width: 100% !important;
+      }
+
+      [style*="grid-template-columns: 1fr 1fr"] {
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+ <body>
+  <div class="container"><!-- PANTALLA 1: PORTADA -->
+   <div id="screen-home" class="screen active">
+    <div class="hero"><!-- Cancha de tenis -->
+     <div class="tennis-court"></div>
+     <div class="court-lines">
+      <div class="court-line center-line"></div>
+      <div class="court-line service-line-left"></div>
+      <div class="court-line service-line-right"></div>
+      <div class="court-line baseline-top"></div>
+      <div class="court-line baseline-bottom"></div>
+      <div class="court-line sideline-left"></div>
+      <div class="court-line sideline-right"></div>
+      <div class="net"></div>
+     </div><!-- Contenido sobre la cancha -->
+     <div class="hero-content">
+      <h1 id="main-title">¿Qué revés es para ti?</h1>
+      <p id="subtitle">Una Mano vs Dos Manos – Decide, Aprende y Domina</p>
+      <div class="animation-container"><!-- Jugador 1: Una Mano -->
+       <div class="player-silhouette" id="oneHandAnim">
+        <svg class="silhouette-svg" viewbox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="40" r="25" fill="#f093fb" /> <ellipse cx="100" cy="90" rx="30" ry="40" fill="#f5576c" /> <rect x="70" y="90" width="8" height="60" rx="4" fill="#f5576c" transform="rotate(-30 100 90)" /> <rect x="122" y="90" width="8" height="80" rx="4" fill="#f093fb" transform="rotate(45 100 90)" /> <rect x="85" y="130" width="10" height="70" rx="5" fill="#f5576c" /> <rect x="105" y="130" width="10" height="70" rx="5" fill="#f5576c" />
+        </svg>
+        <div class="player-label">
+         Una Mano
+        </div>
+       </div><!-- Pelota animada -->
+       <div class="tennis-ball">
+        <svg class="tennis-ball-svg" viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="#c7ff00" /> <path d="M 20 30 Q 50 50 20 70" stroke="white" stroke-width="3" fill="none" /> <path d="M 80 30 Q 50 50 80 70" stroke="white" stroke-width="3" fill="none" />
+        </svg>
+       </div><!-- Jugador 2: Dos Manos -->
+       <div class="player-silhouette" id="twoHandsAnim">
+        <svg class="silhouette-svg" viewbox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="40" r="25" fill="#4facfe" /> <ellipse cx="100" cy="90" rx="30" ry="40" fill="#00f2fe" /> <rect x="75" y="90" width="8" height="65" rx="4" fill="#4facfe" transform="rotate(-15 100 90)" /> <rect x="117" y="90" width="8" height="65" rx="4" fill="#4facfe" transform="rotate(15 100 90)" /> <rect x="85" y="130" width="10" height="70" rx="5" fill="#00f2fe" /> <rect x="105" y="130" width="10" height="70" rx="5" fill="#00f2fe" />
+        </svg>
+        <div class="player-label">
+         Dos Manos
+        </div>
+       </div>
+      </div><button class="btn" id="btn-start">🎾 <span id="start-button-text">Comenzar el juego</span></button>
+     </div>
+    </div>
+   </div><!-- PANTALLA 2: INTRODUCCIÓN MAGISTRAL -->
+   <div id="screen-intro" class="screen">
+    <div class="comparison-screen">
+     <div class="comparison-header">
+      <h1>📚 Entender las Diferencias</h1>
+      <p>Conoce las ventajas y limitaciones de cada técnica</p>
+     </div>
+     <div class="comparison-grid"><!-- Tarjeta Revés a Una Mano -->
+      <div class="card">
+       <div class="card-header">
+        <h2>Revés a Una Mano</h2>
+        <div class="card-animation">
+         🎾
+        </div>
+       </div>
+       <div class="advantages">
+        <h3>✔ Ventajas</h3>
+        <ul>
+         <li>Alcance superior → excelente para pelotas abiertas o altas</li>
+         <li>Versatilidad total: slice profundo, slice bajo, topspin penetrante</li>
+         <li>Elegante y fluido: movimiento más largo y artístico</li>
+        </ul>
+       </div>
+       <div class="disadvantages">
+        <h3>❌ Desventajas</h3>
+        <ul>
+         <li>Menos estabilidad bajo presión</li>
+         <li>Más difícil en bolas rápidas al cuerpo</li>
+         <li>Requiere mejor timing y preparación</li>
+        </ul>
+       </div>
+       <div class="players"><strong>🏆 Jugadores referentes:</strong> <span id="one-hand-players">Federer, Wawrinka, Thiem, Gasquet</span>
+       </div>
+      </div><!-- Tarjeta Revés a Dos Manos -->
+      <div class="card">
+       <div class="card-header">
+        <h2>Revés a Dos Manos</h2>
+        <div class="card-animation">
+         🎾
+        </div>
+       </div>
+       <div class="advantages">
+        <h3>✔ Ventajas</h3>
+        <ul>
+         <li>Más control y precisión, especialmente en defensa</li>
+         <li>Mayor potencia en pelotas rápidas</li>
+         <li>Más estable bajo presión y al resto</li>
+        </ul>
+       </div>
+       <div class="disadvantages">
+        <h3>❌ Desventajas</h3>
+        <ul>
+         <li>Menor alcance lateral</li>
+         <li>Dificultad para defender pelotas muy abiertas</li>
+        </ul>
+       </div>
+       <div class="players"><strong>🏆 Jugadores referentes:</strong> <span id="two-hands-players">Djokovic, Murray, Medvedev, Osaka</span>
+       </div>
+      </div>
+     </div>
+     <div style="text-align: center; margin-top: 3rem;"><button class="btn" id="btn-to-game">🎾 Jugar: decide la técnica correcta</button>
+     </div>
+    </div>
+   </div><!-- PANTALLA 3: JUEGO DE SITUACIONES -->
+   <div id="screen-situations" class="screen">
+    <div class="situations-screen">
+     <div style="text-align: center; padding: 2rem 1rem 1rem 1rem;">
+      <h1 style="font-size: 2.5rem; color: #fbbf24; margin-bottom: 0.5rem; text-shadow: 2px 2px 6px rgba(0,0,0,0.5);">🎯 Elige la Técnica Correcta</h1>
+      <p style="font-size: 1.2rem; opacity: 0.9; margin-bottom: 1rem;">Decide qué revés es más eficiente según la situación</p>
+      <div class="progress"><span>Situación <span id="current-situation">1</span> de 5</span>
+      </div>
+     </div>
+     <div class="situation-container" id="situation-display"><!-- Contenido dinámico de situaciones -->
+     </div>
+    </div>
+   </div><!-- PANTALLA 4: SIMULADOR -->
+   <div id="screen-simulator" class="screen">
+    <h1 style="text-align: center; margin-bottom: 2rem;">🎯 Micro Simulador: Golpea el Revés Correcto</h1>
+    <div class="progress"><span>Pelota <span id="current-ball">1</span> de 6</span>
+    </div>
+    <div class="simulator-court" id="simulator-display"><!-- Contenido dinámico del simulador -->
+    </div>
+   </div><!-- PANTALLA 5: TEST DE PERSONALIDAD -->
+   <div id="screen-quiz" class="screen">
+    <h1 style="text-align: center; margin-bottom: 2rem;">🧠 Test de Personalidad Técnica</h1>
+    <div class="quiz-container" id="quiz-container"><!-- Preguntas dinámicas -->
+    </div>
+    <div style="text-align: center; margin-top: 3rem;"><button class="btn" id="btn-finish-quiz" style="display: none;">Ver Resultados 🏆</button>
+    </div>
+   </div><!-- PANTALLA 6: RESULTADOS FINALES -->
+   <div id="screen-results" class="screen">
+    <div class="results-container">
+     <h1 style="font-size: 2.8rem; margin-bottom: 1rem;">🏆 Tus Resultados AC</h1>
+     <p style="font-size: 1.2rem; opacity: 0.9; margin-bottom: 3rem;">Análisis completo de tu perfil técnico</p>
+     <div class="circular-progress" id="circular-progress">
+      <div class="circular-progress-text" id="total-percentage">
+       0%
+      </div>
+     </div>
+     <div class="score-grid">
+      <div class="score-card">
+       <h3>🎯 Precisión Táctica</h3>
+       <div class="score-value" id="tactical-score">
+        0/5
+       </div>
+       <p style="opacity: 0.8;">Decisiones correctas en situaciones</p>
+      </div>
+      <div class="score-card">
+       <h3>⚡ Simulador</h3>
+       <div class="score-value" id="simulator-score">
+        0/60
+       </div>
+       <p style="opacity: 0.8;">Puntos de lectura de pelota</p>
+      </div>
+      <div class="score-card">
+       <h3>🧠 Tu Estilo Natural</h3>
+       <div class="score-value" id="style-result">
+        -
+       </div>
+       <p style="opacity: 0.8;">Basado en tu perfil técnico</p>
+      </div>
+     </div>
+     <div class="level-badge" id="level-badge">
+      -
+     </div>
+     <div class="recommendation">
+      <h2>💡 Tu Perfil Recomendado</h2>
+      <p id="final-recommendation" style="line-height: 1.9;">-</p>
+     </div>
+     <div class="recommendation" style="background: rgba(251, 191, 36, 0.15); border-color: #fbbf24;">
+      <h2 style="color: #fbbf24;">✨ Mensaje AC</h2>
+      <p style="font-size: 1.3rem; font-weight: 500; line-height: 1.8; font-style: italic;">"La técnica no es destino, es evolución.<br>
+        Aprende lo que eres… y entrena lo que quieres ser."</p>
+     </div>
+     <div style="text-align: center; margin-top: 3rem; display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;"><button class="btn" id="btn-restart">🔄 Volver a jugar</button> <button class="btn btn-secondary" id="btn-demo">📘 Repasar perfiles</button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      main_title: "¿Qué revés es para ti?",
+      subtitle: "Una Mano vs Dos Manos – Decide, Aprende y Domina",
+      start_button: "Comenzar el juego",
+      one_hand_players: "Federer, Wawrinka, Thiem, Gasquet",
+      two_hands_players: "Djokovic, Murray, Medvedev, Osaka",
+      background_color: "#667eea",
+      surface_color: "#ffffff",
+      text_color: "#ffffff",
+      primary_action_color: "#f5576c",
+      secondary_action_color: "#4facfe",
+      font_family: "Inter",
+      font_size: 16
+    };
+
+    let gameState = {
+      currentSituation: 0,
+      situationsCorrect: 0,
+      currentBall: 0,
+      simulatorCorrect: 0,
+      quizAnswers: [],
+      situations: [
+        {
+          title: "Situación 1 – Pelota abierta y alta",
+          description: "La pelota viene alta y fuera de tu zona de confort. Necesitas alcanzar una bola difícil que se abre hacia el lateral.",
+          visual: "🎾",
+          animationClass: "alta",
+          correctAnswer: "one",
+          feedback: "¡Correcto! Una mano te da más alcance y control en bolas abiertas. La extensión del brazo permite llegar a pelotas que con dos manos serían imposibles."
+        },
+        {
+          title: "Situación 2 – Pelota rápida al cuerpo",
+          description: "La pelota viene fuerte y directa a tu zona media. Necesitas reaccionar rápido con estabilidad.",
+          visual: "⚡",
+          animationClass: "rapida",
+          correctAnswer: "two",
+          feedback: "¡Perfecto! La dos manos absorbe mejor la velocidad y te da estabilidad. Con ambas manos controlas mejor el impacto de pelotas rápidas."
+        },
+        {
+          title: "Situación 3 – Pelota baja y lenta",
+          description: "Una pelota baja que requiere variación táctica. Perfecta para cambiar el ritmo del punto.",
+          visual: "🔽",
+          animationClass: "baja",
+          correctAnswer: "one",
+          feedback: "¡Excelente! El slice profundo de una mano es la opción táctica dominante en bolas bajas. Puedes crear un golpe bajo y penetrante."
+        },
+        {
+          title: "Situación 4 – Ángulo corto cruzado",
+          description: "Necesitas crear un ángulo agudo desde la esquina. La pelota debe cruzar muy cerrada.",
+          visual: "↗️",
+          animationClass: "angulo",
+          correctAnswer: "two",
+          feedback: "¡Bien! Dos manos permite crear más ángulo con menos preparación. La postura compacta facilita cambios de dirección rápidos."
+        },
+        {
+          title: "Situación 5 – Resto agresivo a segundo saque",
+          description: "Tienes oportunidad de atacar el segundo saque. Momento clave para tomar la iniciativa.",
+          visual: "💥",
+          animationClass: "resto",
+          correctAnswer: "two",
+          feedback: "¡Correcto! Dos manos te da estabilidad y control en la devolución agresiva. Puedes atacar con precisión y potencia."
+        }
+      ],
+      balls: [
+        { type: "Alta", label: "label-alta", emoji: "🔵", correctAnswer: "one", points: 0 },
+        { type: "Rápida", label: "label-rapida", emoji: "🟡", correctAnswer: "two", points: 0 },
+        { type: "Abierta", label: "label-abierta", emoji: "🔴", correctAnswer: "one", points: 0 },
+        { type: "Baja", label: "label-baja", emoji: "🟢", correctAnswer: "one", points: 0 },
+        { type: "Lenta", label: "label-lenta", emoji: "🟣", correctAnswer: "one", points: 0 },
+        { type: "Al cuerpo", label: "label-profunda", emoji: "🟠", correctAnswer: "two", points: 0 }
+      ],
+      simulatorPoints: 0,
+      quizQuestions: [
+        {
+          question: "¿Cómo te gusta sentir tu swing?",
+          options: [
+            { text: "Fluido, largo y elegante", value: "one" },
+            { text: "Compacto, explosivo y controlado", value: "two" }
+          ]
+        },
+        {
+          question: "¿Eres más explosivo o más fluido?",
+          options: [
+            { text: "Fluido: me gusta el ritmo y la variación", value: "one" },
+            { text: "Explosivo: potencia y velocidad de brazo", value: "two" }
+          ]
+        },
+        {
+          question: "¿Qué golpe disfrutas más: slice o drive?",
+          options: [
+            { text: "Slice: me encanta cortar y variar", value: "one" },
+            { text: "Drive con topspin: agresivo y penetrante", value: "two" }
+          ]
+        },
+        {
+          question: "¿Cómo manejas bolas rápidas al cuerpo?",
+          options: [
+            { text: "Me cuesta un poco, prefiero espacio", value: "one" },
+            { text: "Las controlo bien, me siento estable", value: "two" }
+          ]
+        }
+      ]
+    };
+
+    async function onConfigChange(config) {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const baseFontStack = 'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
+      
+      document.getElementById('main-title').textContent = config.main_title || defaultConfig.main_title;
+      document.getElementById('main-title').style.fontFamily = `${customFont}, ${baseFontStack}`;
+      document.getElementById('main-title').style.fontSize = `${baseSize * 3}px`;
+      document.getElementById('main-title').style.color = config.text_color || defaultConfig.text_color;
+      
+      document.getElementById('subtitle').textContent = config.subtitle || defaultConfig.subtitle;
+      document.getElementById('subtitle').style.fontFamily = `${customFont}, ${baseFontStack}`;
+      document.getElementById('subtitle').style.fontSize = `${baseSize * 1.5}px`;
+      document.getElementById('subtitle').style.color = config.text_color || defaultConfig.text_color;
+      
+      document.getElementById('start-button-text').textContent = config.start_button || defaultConfig.start_button;
+      document.getElementById('btn-start').style.fontFamily = `${customFont}, ${baseFontStack}`;
+      document.getElementById('btn-start').style.fontSize = `${baseSize * 1.3}px`;
+      document.getElementById('btn-start').style.background = `linear-gradient(135deg, ${config.primary_action_color || defaultConfig.primary_action_color} 0%, #f093fb 100%)`;
+      
+      document.getElementById('one-hand-players').textContent = config.one_hand_players || defaultConfig.one_hand_players;
+      document.getElementById('two-hands-players').textContent = config.two_hands_players || defaultConfig.two_hands_players;
+      
+      document.body.style.background = `linear-gradient(135deg, ${config.background_color || defaultConfig.background_color} 0%, #764ba2 100%)`;
+      document.body.style.color = config.text_color || defaultConfig.text_color;
+      document.body.style.fontFamily = `${customFont}, ${baseFontStack}`;
+      document.body.style.fontSize = `${baseSize}px`;
+
+      const allButtons = document.querySelectorAll('.btn, .choice-btn, .quiz-option');
+      allButtons.forEach(btn => {
+        btn.style.fontFamily = `${customFont}, ${baseFontStack}`;
+      });
+
+      const allCards = document.querySelectorAll('.card, .situation-container, .score-card, .recommendation');
+      allCards.forEach(card => {
+        card.style.background = `rgba(255, 255, 255, 0.1)`;
+        card.style.color = config.text_color || defaultConfig.text_color;
+      });
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.surface_color || defaultConfig.surface_color,
+              set: (value) => {
+                config.surface_color = value;
+                window.elementSdk.setConfig({ surface_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_action_color || defaultConfig.primary_action_color,
+              set: (value) => {
+                config.primary_action_color = value;
+                window.elementSdk.setConfig({ primary_action_color: value });
+              }
+            },
+            {
+              get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+              set: (value) => {
+                config.secondary_action_color = value;
+                window.elementSdk.setConfig({ secondary_action_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["main_title", config.main_title || defaultConfig.main_title],
+          ["subtitle", config.subtitle || defaultConfig.subtitle],
+          ["start_button", config.start_button || defaultConfig.start_button],
+          ["one_hand_players", config.one_hand_players || defaultConfig.one_hand_players],
+          ["two_hands_players", config.two_hands_players || defaultConfig.two_hands_players]
+        ])
+      });
+    }
+
+    const dataHandler = {
+      onDataChanged(data) {
+        // Simplemente actualizar visualización si fuera necesario
+      }
+    };
+
+    if (window.dataSdk) {
+      window.dataSdk.init(dataHandler);
+    }
+
+    // Animación de portada
+    let animationInterval;
+    function startPortadaAnimation() {
+      const oneHand = document.getElementById('oneHandAnim');
+      const twoHands = document.getElementById('twoHandsAnim');
+      let toggle = false;
+
+      animationInterval = setInterval(() => {
+        if (toggle) {
+          oneHand.classList.add('pulse');
+          twoHands.classList.remove('pulse');
+        } else {
+          oneHand.classList.remove('pulse');
+          twoHands.classList.add('pulse');
+        }
+        toggle = !toggle;
+      }, 1250);
+    }
+
+    startPortadaAnimation();
+
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    document.getElementById('btn-start').addEventListener('click', () => {
+      clearInterval(animationInterval);
+      showScreen('screen-intro');
+    });
+
+    document.getElementById('btn-to-game').addEventListener('click', () => {
+      showScreen('screen-situations');
+      showSituation(0);
+    });
+
+    function showSituation(index) {
+      if (index >= gameState.situations.length) {
+        showScreen('screen-simulator');
+        showBall(0);
+        return;
+      }
+
+      gameState.currentSituation = index;
+      document.getElementById('current-situation').textContent = index + 1;
+
+      const situation = gameState.situations[index];
+      const display = document.getElementById('situation-display');
+      
+      display.innerHTML = `
+        <div class="situation-visual-container">
+          <div class="situation-visual ${situation.animationClass}">${situation.visual}</div>
+        </div>
+        <h2 class="situation-title">${situation.title}</h2>
+        <p class="situation-description">${situation.description}</p>
+        <div class="choices">
+          <button class="choice-btn" data-answer="one">🎾 Una Mano</button>
+          <button class="choice-btn" data-answer="two">🎾 Dos Manos</button>
+        </div>
+        <div class="feedback" id="situation-feedback"></div>
+      `;
+
+      const choiceBtns = display.querySelectorAll('.choice-btn');
+      choiceBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const answer = e.target.dataset.answer;
+          const isCorrect = answer === situation.correctAnswer;
+          
+          if (isCorrect) {
+            gameState.situationsCorrect++;
+            e.target.classList.add('correct');
+          } else {
+            e.target.classList.add('incorrect');
+            choiceBtns.forEach(b => {
+              if (b.dataset.answer === situation.correctAnswer) {
+                b.classList.add('correct');
+              }
+            });
+          }
+
+          choiceBtns.forEach(b => b.disabled = true);
+
+          const feedback = document.getElementById('situation-feedback');
+          feedback.textContent = situation.feedback;
+          feedback.classList.add('show');
+
+          setTimeout(() => {
+            showSituation(index + 1);
+          }, 4000);
+        });
+      });
+    }
+
+    function showBall(index) {
+      if (index >= gameState.balls.length) {
+        showScreen('screen-quiz');
+        showQuiz();
+        return;
+      }
+
+      gameState.currentBall = index;
+      document.getElementById('current-ball').textContent = index + 1;
+
+      const ball = gameState.balls[index];
+      const display = document.getElementById('simulator-display');
+      
+      display.innerHTML = `
+        <h2 style="font-size: 1.8rem; margin-bottom: 1rem; color: #fbbf24;">Lee la pelota y decide</h2>
+        <div class="ball-label ${ball.label}">${ball.emoji} ${ball.type}</div>
+        <div class="incoming-ball">🎾</div>
+        <div style="text-align: center; margin: 1.5rem 0;">
+          <p style="font-size: 1.5rem; font-weight: 600;">Puntos: <span id="current-points">${gameState.simulatorPoints}</span> / 60</p>
+        </div>
+        <div class="simulator-choices">
+          <button class="choice-btn" data-answer="one">🎾 Una Mano</button>
+          <button class="choice-btn" data-answer="two">🎾 Dos Manos</button>
+        </div>
+        <div class="simulator-result" id="simulator-result"></div>
+      `;
+
+      const choiceBtns = display.querySelectorAll('.choice-btn');
+      choiceBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const answer = e.target.dataset.answer;
+          const isCorrect = answer === ball.correctAnswer;
+          
+          if (isCorrect) {
+            gameState.simulatorCorrect++;
+            gameState.balls[index].points = 10;
+            gameState.simulatorPoints += 10;
+            e.target.classList.add('correct');
+            document.getElementById('simulator-result').textContent = '✅ ¡Golpe perfecto! +10 puntos';
+            document.getElementById('current-points').textContent = gameState.simulatorPoints;
+          } else {
+            e.target.classList.add('incorrect');
+            document.getElementById('simulator-result').textContent = '❌ Golpe fallado • 0 puntos';
+          }
+
+          choiceBtns.forEach(b => b.disabled = true);
+          document.getElementById('simulator-result').classList.add('show');
+
+          setTimeout(() => {
+            showBall(index + 1);
+          }, 2000);
+        });
+      });
+    }
+
+    function showQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      gameState.quizQuestions.forEach((q, index) => {
+        const questionCard = document.createElement('div');
+        questionCard.className = 'question-card';
+        questionCard.innerHTML = `
+          <h3>${index + 1}. ${q.question}</h3>
+          <div class="quiz-options">
+            ${q.options.map(opt => `
+              <div class="quiz-option" data-question="${index}" data-value="${opt.value}">
+                ${opt.text}
+              </div>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(questionCard);
+      });
+
+      const quizOptions = document.querySelectorAll('.quiz-option');
+      quizOptions.forEach(option => {
+        option.addEventListener('click', (e) => {
+          const questionIndex = parseInt(e.target.dataset.question);
+          const value = e.target.dataset.value;
+          
+          document.querySelectorAll(`.quiz-option[data-question="${questionIndex}"]`).forEach(opt => {
+            opt.classList.remove('selected');
+          });
+          e.target.classList.add('selected');
+
+          gameState.quizAnswers[questionIndex] = value;
+
+          if (gameState.quizAnswers.filter(a => a).length === gameState.quizQuestions.length) {
+            document.getElementById('btn-finish-quiz').style.display = 'inline-block';
+          }
+        });
+      });
+    }
+
+    function showBackhandRecapModal() {
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position: fixed; inset: 0; background: rgba(15, 23, 42, 0.82); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 1000;';
+      modal.innerHTML = `
+        <div style="background: white; color: #1e293b; border-radius: 20px; max-width: 560px; width: 100%; padding: 28px 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.35);">
+          <h3 style="margin: 0 0 14px; color: #4f46e5; font-size: 1.5rem;">Repaso rápido del revés</h3>
+          <p style="line-height: 1.7; margin: 0 0 12px;">El revés a una mano suele favorecer alcance, slice y sensación táctica; el de dos manos suele dar más estabilidad, respuesta al cuerpo y seguridad en ritmo alto.</p>
+          <p style="line-height: 1.7; margin: 0 0 18px;">Ninguno es superior por sí mismo. La clave es reconocer qué patrón técnico encaja mejor con tu timing, tu físico y tus decisiones en partido.</p>
+          <button style="background: linear-gradient(135deg, #4f46e5 0%, #ec4899 100%); color: white; border: none; border-radius: 999px; padding: 12px 20px; font-weight: 700; cursor: pointer;" onclick="this.closest('div').parentElement.remove()">Cerrar</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    document.getElementById('btn-demo').addEventListener('click', showBackhandRecapModal);
+
+    document.getElementById('btn-finish-quiz').addEventListener('click', async () => {
+      const oneHandCount = gameState.quizAnswers.filter(a => a === 'one').length;
+      const twoHandsCount = gameState.quizAnswers.filter(a => a === 'two').length;
+      const recommendedStyle = oneHandCount > twoHandsCount ? 'Una Mano' : 'Dos Manos';
+
+      const tacticalScore = gameState.situationsCorrect;
+      const simulatorPoints = gameState.simulatorPoints;
+      const maxPossiblePoints = (5 * 20) + 60;
+      const totalPoints = (tacticalScore * 20) + simulatorPoints;
+      const totalPercent = Math.round((totalPoints / maxPossiblePoints) * 100);
+
+      let level = '';
+      let levelColor = '';
+      if (totalPercent >= 85) {
+        level = '🏆 Maestro del Revés AC';
+        levelColor = '#fbbf24';
+      } else if (totalPercent >= 65) {
+        level = '🎯 Buen Lector del Revés';
+      } else {
+        level = '  ️ Revés en Desarrollo';
+      }
+
+      document.getElementById('tactical-score').textContent = `${tacticalScore}/5`;
+      document.getElementById('simulator-score').textContent = `${simulatorPoints}/60`;
+      document.getElementById('total-percentage').textContent = `${totalPercent}%`;
+      
+      const progressCircle = document.getElementById('circular-progress');
+      progressCircle.style.setProperty('--progress', `${totalPercent * 3.6}deg`);
+      document.getElementById('style-result').textContent = recommendedStyle;
+      document.getElementById('level-badge').textContent = level;
+      document.getElementById('level-badge').style.background = `linear-gradient(135deg, ${levelColor} 0%, ${levelColor}dd 100%)`;
+      
+      const recommendation = recommendedStyle === 'Una Mano' 
+        ? '<strong>Perfil 1: Revés a Una Mano</strong><br><br>Tu estilo natural privilegia la fluidez, la extensión y la variación. Tienes afinidad por movimientos largos y elegantes. Te sientes cómodo con el slice y disfrutas del control táctil del golpe.<br><br><strong>Recomendación:</strong> Trabaja tu timing, fortalece tu muñeca y aprovecha tu alcance superior. El slice profundo será tu arma secreta.'
+        : '<strong>Perfil 2: Revés a Dos Manos</strong><br><br>Tu juego es estable, técnico y agresivo desde el fondo de la cancha. Valoras el control, la potencia y la estabilidad bajo presión. Te sientes seguro en intercambios rápidos y pelotas al cuerpo.<br><br><strong>Recomendación:</strong> Aprovecha tu solidez defensiva, desarrolla ángulos cruzados agudos y mantén tu agresividad en el resto.';
+      
+      document.getElementById('final-recommendation').innerHTML = recommendation;
+
+      if (window.dataSdk) {
+        const loadingBtn = document.getElementById('btn-finish-quiz');
+        const originalText = loadingBtn.textContent;
+        loadingBtn.textContent = 'Guardando resultados...';
+        loadingBtn.disabled = true;
+
+        const result = await window.dataSdk.create({
+          timestamp: new Date().toISOString(),
+          decisions_correct: tacticalScore,
+          simulator_points: simulatorPoints,
+          total_percentage: totalPercent,
+          recommended_style: recommendedStyle,
+          level_achieved: level
+        });
+
+        loadingBtn.textContent = originalText;
+        loadingBtn.disabled = false;
+
+        if (!result.isOk) {
+          const errorMsg = document.createElement('div');
+          errorMsg.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: rgba(248, 113, 113, 0.95); padding: 1rem 1.5rem; border-radius: 10px; color: white; font-weight: 600; z-index: 1000;';
+          errorMsg.textContent = '⚠️ Error al guardar resultados';
+          document.body.appendChild(errorMsg);
+          setTimeout(() => errorMsg.remove(), 3000);
+        }
+      }
+
+      showScreen('screen-results');
+    });
+
+    document.getElementById('btn-restart').addEventListener('click', () => {
+      gameState = {
+        currentSituation: 0,
+        situationsCorrect: 0,
+        currentBall: 0,
+        simulatorCorrect: 0,
+        quizAnswers: [],
+        situations: gameState.situations,
+        balls: gameState.balls,
+        quizQuestions: gameState.quizQuestions
+      };
+      
+      document.getElementById('btn-finish-quiz').style.display = 'none';
+      showScreen('screen-home');
+      startPortadaAnimation();
+    });
+  </script>
+ </body>
+</html>

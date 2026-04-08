@@ -1,0 +1,2532 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    window.elementSdk = window.elementSdk || {
+      config: null,
+      init: async function () { return { isOk: true }; },
+      setConfig: function () {}
+    };
+    window.dataSdk = window.dataSdk || {
+      init: async function () { return { isOk: true }; },
+      create: async function () { return { isOk: true }; }
+    };
+  </script>
+  <title>Smash Total AC</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .game-container {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 900px;
+      animation: fadeIn 0.6s ease-in;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Pantalla de Bienvenida */
+    .welcome-screen {
+      text-align: center;
+      color: white;
+      padding: 40px 20px;
+    }
+
+    .main-title {
+      font-size: 56px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+      letter-spacing: 2px;
+    }
+
+    .main-subtitle {
+      font-size: 22px;
+      margin-bottom: 50px;
+      opacity: 0.95;
+    }
+
+    .phases-preview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
+      margin: 40px 0;
+    }
+
+    .phase-badge {
+      background: rgba(255,255,255,0.15);
+      padding: 25px 15px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255,255,255,0.3);
+      transition: all 0.3s ease;
+    }
+
+    .phase-badge:hover {
+      transform: translateY(-5px);
+      background: rgba(255,255,255,0.25);
+    }
+
+    .phase-number {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .phase-name {
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .btn-primary {
+      background: #f97316;
+      color: white;
+      border: none;
+      padding: 20px 50px;
+      font-size: 22px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .btn-primary:hover {
+      background: #ea580c;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(249, 115, 22, 0.6);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Contenedor de Contenido */
+    .content-box {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 32px;
+      color: #1e3c72;
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: bold;
+    }
+
+    /* Fase 1: Mecánica */
+    .mechanics-grid {
+      display: grid;
+      gap: 25px;
+    }
+
+    .mechanic-card {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-left: 6px solid #0ea5e9;
+      padding: 25px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .mechanic-card:hover {
+      transform: translateX(10px);
+      box-shadow: 0 5px 20px rgba(14, 165, 233, 0.3);
+    }
+
+    .mechanic-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .mechanic-icon {
+      font-size: 48px;
+    }
+
+    .mechanic-number {
+      background: #0ea5e9;
+      color: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .mechanic-title {
+      font-size: 22px;
+      font-weight: bold;
+      color: #0c4a6e;
+      flex: 1;
+    }
+
+    .mechanic-content h4 {
+      font-size: 16px;
+      color: #0369a1;
+      margin-bottom: 10px;
+    }
+
+    .mechanic-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .mechanic-list li {
+      padding: 8px 0;
+      color: #0c4a6e;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .mechanic-list li:before {
+      content: "✓ ";
+      color: #10b981;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    .visual-representation {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      margin-top: 15px;
+      font-size: 15px;
+      color: #64748b;
+      border: 2px dashed #cbd5e1;
+    }
+
+    /* Fase 2: Drag & Drop */
+    .construction-game {
+      padding: 20px;
+    }
+
+    .construction-instructions {
+      text-align: center;
+      font-size: 18px;
+      color: #64748b;
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+
+    .timeline-container {
+      background: #f1f5f9;
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+    }
+
+    .timeline-slots {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .timeline-slot {
+      background: white;
+      border: 3px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 30px 20px;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      position: relative;
+      font-size: 16px;
+      font-weight: bold;
+      color: #94a3b8;
+    }
+
+    .timeline-slot:before {
+      content: attr(data-label);
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 12px;
+      font-weight: bold;
+      color: #94a3b8;
+    }
+
+    .timeline-slot.drag-over {
+      background: #dbeafe;
+      border-color: #3b82f6;
+      transform: scale(1.05);
+    }
+
+    .timeline-slot.filled {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      border-color: #10b981;
+      border-style: solid;
+      color: #065f46;
+    }
+
+    .timeline-slot.incorrect {
+      background: #fee2e2;
+      border-color: #ef4444;
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .draggable-pieces {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 15px;
+    }
+
+    .draggable-piece {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border: 2px solid #f59e0b;
+      padding: 20px;
+      border-radius: 12px;
+      cursor: move;
+      text-align: center;
+      font-weight: bold;
+      color: #92400e;
+      transition: all 0.3s ease;
+      font-size: 16px;
+      user-select: none;
+    }
+
+    .draggable-piece:hover:not(.used) {
+      transform: scale(1.08);
+      box-shadow: 0 5px 20px rgba(245, 158, 11, 0.4);
+    }
+
+    .draggable-piece.dragging {
+      opacity: 0.4;
+    }
+
+    .draggable-piece.used {
+      opacity: 0.3;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .reset-phase2-btn {
+      background: #64748b;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 16px;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    .reset-phase2-btn:hover {
+      background: #475569;
+    }
+
+    /* Fase 3: Simulador Técnico */
+    .technical-simulator {
+      padding: 20px;
+    }
+
+    .court-simulation {
+      position: relative;
+      background: linear-gradient(180deg, #bae6fd 0%, #7dd3fc 50%, #38bdf8 100%);
+      height: 400px;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      overflow: hidden;
+      border: 4px solid #0284c7;
+    }
+
+    .court-floor {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(180deg, #86efac 0%, #4ade80 100%);
+      border-top: 3px solid #16a34a;
+    }
+
+    .net {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 120px;
+      width: 4px;
+      height: 60px;
+      background: #64748b;
+    }
+
+    .player-silhouette {
+      position: absolute;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 80px;
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+    }
+
+    .ball-trajectory {
+      position: absolute;
+      font-size: 50px;
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2));
+    }
+
+    .phase-indicator {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255,255,255,0.95);
+      padding: 15px 25px;
+      border-radius: 12px;
+      font-weight: bold;
+      color: #1e3c72;
+      font-size: 18px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .timing-indicator {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(249, 115, 22, 0.95);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 18px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .score-indicator {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(139, 92, 246, 0.95);
+      color: white;
+      padding: 12px 30px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .action-button {
+      background: #8b5cf6;
+      color: white;
+      border: none;
+      padding: 20px 40px;
+      font-size: 20px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+      font-weight: bold;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .action-button:hover:not(:disabled) {
+      background: #7c3aed;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+    }
+
+    .action-button:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .feedback-box {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+      font-size: 16px;
+      text-align: center;
+      min-height: 60px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid #e2e8f0;
+      line-height: 1.5;
+    }
+
+    .feedback-box.success {
+      background: #d1fae5;
+      border-color: #10b981;
+      color: #065f46;
+      display: flex;
+    }
+
+    .feedback-box.error {
+      background: #fee2e2;
+      border-color: #ef4444;
+      color: #991b1b;
+      display: flex;
+    }
+
+    .feedback-box.info {
+      background: #dbeafe;
+      border-color: #3b82f6;
+      color: #1e40af;
+      display: flex;
+    }
+
+    /* Fase 4: Simulador Táctico */
+    .tactical-simulator {
+      padding: 20px;
+    }
+
+    .scenario-display {
+      background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 25px;
+      border: 3px solid #a855f7;
+    }
+
+    .scenario-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #581c87;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .scenario-description {
+      text-align: center;
+      font-size: 16px;
+      color: #7c3aed;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .ball-animation-container {
+      position: relative;
+      height: 200px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 12px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+
+    .animated-ball {
+      position: absolute;
+      font-size: 60px;
+      animation: ballMovement 3s ease-in-out infinite;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2));
+    }
+
+    @keyframes ballMovement {
+      0% { left: 10%; top: 60%; transform: scale(1); }
+      50% { left: 50%; top: 10%; transform: scale(0.6); }
+      100% { left: 10%; top: 60%; transform: scale(1); }
+    }
+
+    .ball-characteristics {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .ball-trait {
+      background: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      color: #6b21a8;
+      font-size: 14px;
+    }
+
+    .tactical-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .tactical-option {
+      background: white;
+      border: 3px solid #cbd5e1;
+      padding: 25px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      font-weight: bold;
+      color: #334155;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+
+    .tactical-option:hover:not(.disabled) {
+      background: #f8fafc;
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      border-color: #94a3b8;
+    }
+
+    .tactical-option.correct {
+      background: #10b981;
+      color: white;
+      border-color: #059669;
+      transform: scale(1.05);
+    }
+
+    .tactical-option.incorrect {
+      background: #ef4444;
+      color: white;
+      border-color: #dc2626;
+      animation: shake 0.5s ease;
+    }
+
+    .tactical-option.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* Fase 5: Examen */
+    .exam-container {
+      padding: 20px;
+    }
+
+    .question-card {
+      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 25px;
+      border: 3px solid #fb923c;
+    }
+
+    .question-number {
+      background: #f97316;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0 auto 15px;
+    }
+
+    .question-text {
+      font-size: 20px;
+      font-weight: bold;
+      color: #7c2d12;
+      margin-bottom: 25px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .answer-options {
+      display: grid;
+      gap: 12px;
+    }
+
+    .answer-option {
+      background: white;
+      border: 2px solid #fed7aa;
+      padding: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 16px;
+      color: #7c2d12;
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    .answer-option:hover:not(.disabled) {
+      background: #fffbeb;
+      border-color: #fb923c;
+      transform: translateX(5px);
+    }
+
+    .answer-option.selected {
+      background: #fbbf24;
+      color: white;
+      border-color: #f59e0b;
+    }
+
+    .answer-option.correct {
+      background: #10b981;
+      color: white;
+      border-color: #059669;
+    }
+
+    .answer-option.incorrect {
+      background: #ef4444;
+      color: white;
+      border-color: #dc2626;
+    }
+
+    .answer-option.disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      background: rgba(255,255,255,0.2);
+      height: 35px;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 25px;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+
+    .progress-bar {
+      background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+      height: 100%;
+      transition: width 0.5s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      min-width: 80px;
+    }
+
+    /* Results Screen */
+    .results-screen {
+      text-align: center;
+      color: white;
+      padding: 30px 20px;
+    }
+
+    .results-title {
+      font-size: 42px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .score-display {
+      background: white;
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      margin: 30px auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+      position: relative;
+    }
+
+    .score-display:before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%);
+      z-index: -1;
+    }
+
+    .final-score {
+      font-size: 72px;
+      font-weight: bold;
+      color: #1e3c72;
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 18px;
+      color: #64748b;
+      margin-top: 10px;
+    }
+
+    .rank-display {
+      background: rgba(255,255,255,0.2);
+      padding: 25px 40px;
+      border-radius: 20px;
+      margin: 30px 0;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255,255,255,0.4);
+    }
+
+    .rank-text {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .rank-description {
+      font-size: 18px;
+      opacity: 0.9;
+      line-height: 1.4;
+    }
+
+    .phase-breakdown {
+      background: rgba(255,255,255,0.15);
+      padding: 25px;
+      border-radius: 15px;
+      margin: 25px 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .breakdown-title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .breakdown-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      font-size: 16px;
+    }
+
+    .breakdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .breakdown-score {
+      font-weight: bold;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #1e3c72;
+      border: none;
+      padding: 15px 35px;
+      font-size: 18px;
+      border-radius: 25px;
+      cursor: pointer;
+      margin: 10px;
+      transition: all 0.3s ease;
+      font-weight: bold;
+    }
+
+    .btn-secondary:hover {
+      background: #f1f5f9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 25px;
+      flex-wrap: wrap;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      max-width: 600px;
+      max-height: 80%;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    .modal-title {
+      color: #1e3c72;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 28px;
+    }
+
+    .modal-text {
+      white-space: pre-wrap;
+      font-family: Arial;
+      line-height: 1.8;
+      color: #334155;
+      margin-bottom: 20px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main-title {
+        font-size: 38px;
+      }
+
+      .main-subtitle {
+        font-size: 18px;
+      }
+
+      .phases-preview {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .section-title {
+        font-size: 24px;
+      }
+
+      .content-box {
+        padding: 25px;
+      }
+
+      .timeline-slots {
+        grid-template-columns: 1fr;
+      }
+
+      .court-simulation {
+        height: 300px;
+      }
+
+      .player-silhouette {
+        font-size: 60px;
+      }
+
+      .ball-trajectory {
+        font-size: 35px;
+      }
+
+      .score-display {
+        width: 200px;
+        height: 200px;
+      }
+
+      .final-score {
+        font-size: 56px;
+      }
+
+      .results-title {
+        font-size: 32px;
+      }
+
+      .mechanic-header {
+        flex-wrap: wrap;
+      }
+
+      .tactical-options {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-title {
+        font-size: 28px;
+      }
+
+      .main-subtitle {
+        font-size: 16px;
+      }
+
+      .btn-primary {
+        padding: 15px 35px;
+        font-size: 18px;
+      }
+
+      .phases-preview {
+        grid-template-columns: 1fr;
+      }
+
+      .content-box {
+        padding: 20px;
+      }
+
+      .section-title {
+        font-size: 20px;
+      }
+    }
+  </style>
+  
+  <style>
+    @media (max-width: 768px) {
+      body {
+        overflow-x: hidden !important;
+      }
+
+      .container,
+      .game-container,
+      .game-card,
+      .screen,
+      .results-screen,
+      .cover-screen,
+      .hero,
+      .intro-screen,
+      .phase-container {
+        max-width: 100% !important;
+      }
+
+      .container,
+      .game-container {
+        padding: 16px !important;
+      }
+
+      .cover-title,
+      .main-title,
+      .intro-title,
+      .game-title,
+      .section-title,
+      .final-title,
+      .game-title,
+      .title,
+      .game-header h1,
+      h1[style],
+      h2[style] {
+        font-size: clamp(1.8rem, 7vw, 2.5rem) !important;
+        line-height: 1.15 !important;
+      }
+
+      .subtitle,
+      .intro-subtitle,
+      .game-subtitle,
+      .instruction-text,
+      .game-instruction,
+      .construction-instructions,
+      .game-header p,
+      p[style] {
+        line-height: 1.55 !important;
+      }
+
+      .buttons-row,
+      .nav-buttons,
+      .button-group {
+        gap: 0.75rem !important;
+      }
+
+      .nav-buttons {
+        flex-direction: column !important;
+      }
+
+      .nav-buttons .btn-primary,
+      .nav-buttons .btn-secondary {
+        width: 100% !important;
+      }
+
+      .breakdown-item {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.35rem !important;
+      }
+
+      .modal-content {
+        padding: 22px !important;
+      }
+
+      .modal-title {
+        font-size: 1.6rem !important;
+      }
+
+      .modal-text {
+        font-size: 0.98rem !important;
+        line-height: 1.7 !important;
+      }
+
+      [style*="grid-template-columns: 1fr 1fr"] {
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+ <body>
+  <div class="game-container"><!-- PANTALLA DE BIENVENIDA -->
+   <div id="welcome-screen" class="screen active welcome-screen">
+    <div class="main-title" id="game-title">
+     Smash Total AC
+    </div>
+    <div class="main-subtitle" id="game-subtitle">
+     Domina técnica, mecánica y lectura táctica del smash
+    </div>
+    <div class="phases-preview">
+     <div class="phase-badge">
+      <div class="phase-number">
+       1️⃣
+      </div>
+      <div class="phase-name">
+       La Mecánica
+      </div>
+     </div>
+     <div class="phase-badge">
+      <div class="phase-number">
+       2️⃣
+      </div>
+      <div class="phase-name">
+       Construye
+      </div>
+     </div>
+     <div class="phase-badge">
+      <div class="phase-number">
+       3️⃣
+      </div>
+      <div class="phase-name">
+       Simulador Técnico
+      </div>
+     </div>
+     <div class="phase-badge">
+      <div class="phase-number">
+       4️⃣
+      </div>
+      <div class="phase-name">
+       Simulador Táctico
+      </div>
+     </div>
+     <div class="phase-badge">
+      <div class="phase-number">
+       5️⃣
+      </div>
+      <div class="phase-name">
+       Examen Final
+      </div>
+     </div>
+    </div><button id="start-button" class="btn-primary">🎾 Comenzar Entrenamiento</button>
+   </div><!-- FASE 1: MECÁNICA DEL SMASH -->
+   <div id="phase1-screen" class="screen">
+    <div class="content-box">
+     <div class="section-title" id="phase1-title">
+      🎯 Fase 1: La Mecánica del Smash
+     </div>
+     <div class="progress-container">
+      <div class="progress-bar" style="width: 20%;">
+       20% - Fase 1 de 5
+      </div>
+     </div>
+     <div class="mechanics-grid">
+      <div class="mechanic-card">
+       <div class="mechanic-header">
+        <div class="mechanic-number">
+         1
+        </div>
+        <div class="mechanic-icon">
+         👁️
+        </div>
+        <div class="mechanic-title">
+         DETECCIÓN DEL GLOBO
+        </div>
+       </div>
+       <div class="mechanic-content">
+        <h4>Lectura inicial:</h4>
+        <ul class="mechanic-list">
+         <li>Levanta la vista INMEDIATAMENTE</li>
+         <li>La primera reacción afecta todo lo demás</li>
+         <li>Lee trayectorias: alto, corto, lateral, rápido</li>
+         <li>Anticipa el punto de impacto</li>
+        </ul>
+        <div class="visual-representation">
+         🎾 ↗️ 👀 | Pelota subiendo → Ojos atentos
+        </div>
+       </div>
+      </div>
+      <div class="mechanic-card">
+       <div class="mechanic-header">
+        <div class="mechanic-number">
+         2
+        </div>
+        <div class="mechanic-icon">
+           
+        </div>
+        <div class="mechanic-title">
+         PASOS CRUZADOS HACIA ATRÁS
+        </div>
+       </div>
+       <div class="mechanic-content">
+        <h4>Footwork técnico verdadero:</h4>
+        <ul class="mechanic-list">
+         <li>Retroceder recto ≠ equilibrio</li>
+         <li>Retroceder cruzado = estar debajo de la pelota</li>
+         <li>Los pasos cruzados permiten velocidad</li>
+         <li>Mantienen torso abierto y preparado</li>
+        </ul>
+        <div class="visual-representation">
+         🦶↩️🦶 | Pies cruzándose hacia atrás
+        </div>
+       </div>
+      </div>
+      <div class="mechanic-card">
+       <div class="mechanic-header">
+        <div class="mechanic-number">
+         3
+        </div>
+        <div class="mechanic-icon">
+         🏸
+        </div>
+        <div class="mechanic-title">
+         PREPARACIÓN COMO EL SAQUE
+        </div>
+       </div>
+       <div class="mechanic-content">
+        <h4>Biomecánica real:</h4>
+        <ul class="mechanic-list">
+         <li>Es literalmente un saque desde movimiento</li>
+         <li>Posición de trofeo corta</li>
+         <li>Codo arriba, raqueta cargando detrás</li>
+         <li>Hombro derecho ligeramente retrasado</li>
+         <li>NO girar demasiado el cuerpo</li>
+        </ul>
+        <div class="visual-representation">
+         🏸⬆️ | Posición de trofeo compacta
+        </div>
+       </div>
+      </div>
+      <div class="mechanic-card">
+       <div class="mechanic-header">
+        <div class="mechanic-number">
+         4
+        </div>
+        <div class="mechanic-icon">
+         💥
+        </div>
+        <div class="mechanic-title">
+         IMPACTO ALTO + TERMINACIÓN
+        </div>
+       </div>
+       <div class="mechanic-content">
+        <h4>El momento definitivo:</h4>
+        <ul class="mechanic-list">
+         <li>Impacto más ALTO posible</li>
+         <li>No bajar → subir directo</li>
+         <li>Uso de pronación al final</li>
+         <li>Terminar dentro de la cancha</li>
+         <li>Swing compacto y vertical</li>
+        </ul>
+        <div class="visual-representation">
+         💥⬆️➡️ | Extensión vertical + avance
+        </div>
+       </div>
+      </div>
+     </div>
+     <div class="nav-buttons"><button class="btn-primary" onclick="goToPhase2()">👉 Construye el Smash</button>
+     </div>
+    </div>
+   </div><!-- FASE 2: CONSTRUYE EL SMASH -->
+   <div id="phase2-screen" class="screen">
+    <div class="content-box">
+     <div class="section-title" id="phase2-title">
+      🔨 Fase 2: Construye el Smash
+     </div>
+     <div class="progress-container">
+      <div class="progress-bar" id="phase2-progress" style="width: 0%;">
+       0% - Fase 2 de 5
+      </div>
+     </div>
+     <div class="construction-game">
+      <p class="construction-instructions"><strong>Arrastra las fases en el orden correcto</strong> para construir el smash perfecto.<br>
+        La técnica debe fluir en secuencia: desde la detección hasta el impacto final.</p>
+      <div class="timeline-container">
+       <div class="timeline-slots" id="timeline-slots">
+        <div class="timeline-slot" data-position="1" data-label="PASO 1"></div>
+        <div class="timeline-slot" data-position="2" data-label="PASO 2"></div>
+        <div class="timeline-slot" data-position="3" data-label="PASO 3"></div>
+        <div class="timeline-slot" data-position="4" data-label="PASO 4"></div>
+       </div>
+       <div style="text-align: center;"><button class="reset-phase2-btn" onclick="resetPhase2()">🔄 Reintentar</button>
+       </div>
+      </div>
+      <div class="draggable-pieces" id="draggable-container">
+       <div class="draggable-piece" draggable="true" data-step="3">
+        🏸<br>
+        Preparación
+       </div>
+       <div class="draggable-piece" draggable="true" data-step="1">
+        👁️<br>
+        Detectar
+       </div>
+       <div class="draggable-piece" draggable="true" data-step="4">
+        💥<br>
+        Impacto Alto
+       </div>
+       <div class="draggable-piece" draggable="true" data-step="2">
+        👟<br>
+        Pasos Cruzados
+       </div>
+      </div>
+      <div id="phase2-feedback" class="feedback-box"></div>
+     </div>
+    </div>
+   </div><!-- FASE 3: SIMULADOR TÉCNICO -->
+   <div id="phase3-screen" class="screen">
+    <div class="content-box">
+     <div class="section-title" id="phase3-title">
+      ⚡ Fase 3: Simulador Técnico
+     </div>
+     <div class="progress-container">
+      <div class="progress-bar" id="phase3-progress" style="width: 0%;">
+       0% - Fase 3 de 5
+      </div>
+     </div>
+     <div class="technical-simulator">
+      <p class="construction-instructions"><strong>Presiona el botón en el momento exacto</strong> de cada fase del smash.<br>
+        El timing es fundamental para una ejecución perfecta.</p>
+      <div class="court-simulation">
+       <div class="phase-indicator" id="current-phase-label">
+        Preparado
+       </div>
+       <div class="timing-indicator" id="timing-feedback">
+        Esperando...
+       </div>
+       <div class="score-indicator" id="phase3-score-display">
+        Puntos: 0
+       </div>
+       <div class="ball-trajectory" id="technical-ball">
+        🎾
+       </div>
+       <div class="player-silhouette" id="technical-player">
+        🧍
+       </div>
+       <div class="net"></div>
+       <div class="court-floor"></div>
+      </div><button class="action-button" id="timing-action-button"> ▶️ Comenzar Simulación </button>
+      <div id="phase3-feedback" class="feedback-box"></div>
+     </div>
+    </div>
+   </div><!-- FASE 4: SIMULADOR TÁCTICO -->
+   <div id="phase4-screen" class="screen">
+    <div class="content-box">
+     <div class="section-title" id="phase4-title">
+      🧠 Fase 4: Simulador Táctico
+     </div>
+     <div class="progress-container">
+      <div class="progress-bar" id="phase4-progress" style="width: 0%;">
+       0% - Fase 4 de 5
+      </div>
+     </div>
+     <div class="tactical-simulator">
+      <p class="construction-instructions"><strong>Analiza cada tipo de globo</strong> y toma la mejor decisión táctica.<br>
+        La lectura correcta del juego es clave para dominar el smash.</p>
+      <div class="scenario-display">
+       <div class="scenario-title" id="scenario-title">
+        Escenario 1 de 5
+       </div>
+       <div class="scenario-description" id="scenario-description">
+        Cargando escenario...
+       </div>
+       <div class="ball-animation-container">
+        <div class="animated-ball">
+         🎾
+        </div>
+       </div>
+       <div class="ball-characteristics" id="ball-characteristics">
+        <div class="ball-trait">
+         🎯 Analizando...
+        </div>
+       </div>
+      </div>
+      <div class="tactical-options" id="tactical-options"></div>
+      <div id="phase4-feedback" class="feedback-box"></div>
+     </div>
+    </div>
+   </div><!-- FASE 5: EXAMEN FINAL -->
+   <div id="phase5-screen" class="screen">
+    <div class="content-box">
+     <div class="section-title" id="phase5-title">
+      📝 Fase 5: Examen Final
+     </div>
+     <div class="progress-container">
+      <div class="progress-bar" id="phase5-progress" style="width: 0%;">
+       0% - Fase 5 de 5
+      </div>
+     </div>
+     <p class="construction-instructions"><strong>Responde todas las preguntas</strong> para demostrar tu conocimiento completo del smash.<br>
+       Cada respuesta cuenta para tu puntuación final.</p>
+     <div class="exam-container" id="exam-questions"></div>
+    </div>
+   </div><!-- PANTALLA DE RESULTADOS -->
+   <div id="results-screen" class="screen results-screen">
+    <div class="results-title">
+     🏆 Smash PowerScore AC
+    </div>
+    <div class="score-display">
+     <div class="final-score" id="final-score-display">
+      0%
+     </div>
+     <div class="score-label">
+      Puntuación Final
+     </div>
+    </div>
+    <div class="rank-display">
+     <div class="rank-text" id="rank-emoji-text">
+      🎯
+     </div>
+     <div class="rank-description" id="rank-description-text">
+      Calculando...
+     </div>
+    </div>
+    <div class="phase-breakdown">
+     <div class="breakdown-title">
+      📊 Desglose por Fase
+     </div>
+     <div class="breakdown-item"><span>Mecánica del Smash:</span> <span class="breakdown-score" id="mechanics-score-display">-</span>
+     </div>
+     <div class="breakdown-item"><span>Construcción Técnica:</span> <span class="breakdown-score" id="construction-score-display">-</span>
+     </div>
+     <div class="breakdown-item"><span>Simulador Técnico:</span> <span class="breakdown-score" id="technical-score-display">-</span>
+     </div>
+     <div class="breakdown-item"><span>Simulador Táctico:</span> <span class="breakdown-score" id="tactical-score-display">-</span>
+     </div>
+     <div class="breakdown-item"><span>Examen Final:</span> <span class="breakdown-score" id="exam-score-display">-</span>
+     </div>
+    </div>
+    <div class="nav-buttons"><button class="btn-secondary" onclick="restartGame()">🔁 Volver a jugar</button> <button class="btn-secondary" onclick="showAnalysisModal()">📊 Ver análisis detallado</button>
+    </div>
+   </div>
+  </div><!-- MODAL PARA ANÁLISIS -->
+  <div id="analysis-modal" class="modal-overlay">
+   <div class="modal-content">
+    <h2 class="modal-title">📊 Análisis Detallado</h2>
+    <div id="modal-analysis-text" class="modal-text"></div><button class="btn-primary" onclick="closeAnalysisModal()" style="width: 100%;">Cerrar</button>
+   </div>
+  </div>
+  <script>
+    // Configuración por defecto
+    const defaultConfig = {
+      game_title: "Smash Total AC",
+      game_subtitle: "Domina técnica, mecánica y lectura táctica del smash",
+      start_button: "🎾 Comenzar Entrenamiento",
+      phase1_title: "🎯 Fase 1: La Mecánica del Smash",
+      phase2_title: "🔨 Fase 2: Construye el Smash",
+      phase3_title: "⚡ Fase 3: Simulador Técnico",
+      phase4_title: "🧠 Fase 4: Simulador Táctico",
+      phase5_title: "📝 Fase 5: Examen Final",
+      background_color: "#1e3c72",
+      surface_color: "#ffffff",
+      text_color: "#333333",
+      primary_action_color: "#f97316",
+      secondary_action_color: "#7e22ce",
+      font_family: "Arial",
+      font_size: 16
+    };
+
+    // Estado del juego
+    let gameState = {
+      phase1Complete: false,
+      phase2Score: 0,
+      phase3Score: 0,
+      phase4Score: 0,
+      phase5Score: 0,
+      currentTechnicalStep: 0,
+      currentTacticalScenario: 0,
+      currentExamQuestion: 0,
+      technicalTiming: [],
+      tacticalResponses: [],
+      examAnswers: []
+    };
+
+    // Escenarios tácticos
+    const tacticalScenarios = [
+      {
+        title: "Globo Altísimo y Profundo",
+        description: "El rival envía un globo muy alto que va al fondo de la pista. Tienes tiempo pero debes posicionarte bien.",
+        traits: ["📏 Muy Alto", "🎯 Profundo", "⏱️ Tiempo disponible"],
+        options: [
+          { text: "👟 Retroceder con pasos cruzados para posicionarme", correct: true },
+          { text: "💥 Smash directo sin retroceder", correct: false },
+          { text: "⏸️ Dejar botar y esperar", correct: false },
+          { text: "🎾 Devolución defensiva con globo", correct: false }
+        ],
+        feedback: {
+          correct: "¡Perfecto! Los pasos cruzados te dan tiempo para posicionarte bajo la pelota con equilibrio. Esto te permite llegar al punto de impacto ideal manteniendo el control.",
+          incorrect: "El globo es alto y profundo. Necesitas retroceder con pasos cruzados para mantener el equilibrio y llegar al punto de impacto ideal. Sin posicionamiento correcto, perderás potencia y control."
+        }
+      },
+      {
+        title: "Globo Corto (cerca de la red)",
+        description: "El globo quedó corto, justo después de la red. Es una oportunidad clara de ataque.",
+        traits: ["📍 Corto", "⚡ Oportunidad clara", "🏃 Sin tiempo para retroceder"],
+        options: [
+          { text: "💥 Smash directo potente sin retroceder", correct: true },
+          { text: "👟 Retroceder con pasos cruzados", correct: false },
+          { text: "🎾 Golpe de drive suave", correct: false },
+          { text: "⏸️ Dejar botar primero", correct: false }
+        ],
+        feedback: {
+          correct: "¡Excelente decisión! Un globo corto es una oportunidad clara para smash directo. No hay tiempo ni razón para retroceder. Aprovecha la ventaja con potencia.",
+          incorrect: "Este globo es corto y te da ventaja posicional. No necesitas retroceder ni esperar. Aprovecha con un smash directo potente desde donde estás."
+        }
+      },
+      {
+        title: "Globo Lateral (hacia el lado del revés)",
+        description: "El globo viene alto pero desplazado hacia tu lado de revés. Necesitas ajustar tu posición lateralmente.",
+        traits: ["➡️ Lateral", "🎯 Hacia el revés", "⚖️ Requiere ajuste"],
+        options: [
+          { text: "👟 Ajustar con pasos laterales cruzados", correct: true },
+          { text: "🏸 Intentar smash de revés", correct: false },
+          { text: "⏸️ Dejar pasar la pelota", correct: false },
+          { text: "💥 Smash forzado sin ajustar", correct: false }
+        ],
+        feedback: {
+          correct: "¡Correcto! Ajustar con pasos laterales cruzados te permite posicionarte correctamente sin perder equilibrio. Mantienes el control y puedes ejecutar un smash de derecha efectivo.",
+          incorrect: "Un globo lateral requiere ajuste de posición. Los pasos laterales cruzados mantienen tu equilibrio mientras te colocas. Forzar el smash sin ajustar reduce efectividad."
+        }
+      },
+      {
+        title: "Globo Rápido y Tenso",
+        description: "El rival hace un globo bajo y rápido. La pelota viene con velocidad, dejando poco tiempo de reacción.",
+        traits: ["⚡ Rápido", "💨 Tenso", "⏱️ Poco tiempo de reacción"],
+        options: [
+          { text: "🏸 Preparación rápida y compacta", correct: true },
+          { text: "💥 Swing completo de potencia", correct: false },
+          { text: "⏸️ Dejar botar para ganar tiempo", correct: false },
+          { text: "🎾 Bloqueo defensivo", correct: false }
+        ],
+        feedback: {
+          correct: "¡Perfecto! Un globo rápido requiere preparación compacta. No hay tiempo para movimientos amplios. La clave es reaccionar con eficiencia y control.",
+          incorrect: "El globo es rápido y tenso. Necesitas una preparación rápida y compacta, sin movimientos amplios que consuman tiempo. La velocidad requiere economía de movimiento."
+        }
+      },
+      {
+        title: "Globo Muy Profundo (cerca del fondo)",
+        description: "El globo va muy al fondo, cerca de la línea de fondo. Forzar un smash desde ahí es arriesgado.",
+        traits: ["🎯 Muy Profundo", "⚠️ Cerca de la línea de fondo", "🤔 Decisión táctica"],
+        options: [
+          { text: "⏸️ Dejar botar y golpear drive potente", correct: false },
+          { text: "💥 Smash forzado desde el fondo", correct: false },
+          { text: "🏃 Retroceder al máximo y smash", correct: false },
+          { text: "🎾 Globo de contra ataque de respuesta", correct: true }
+        ],
+        feedback: {
+          correct: "¡Excelente lectura táctica! Un globo muy profundo es mejor responderlo con un globo de contra ataque. Mantienes el control del punto sin riesgo innecesario y recuperas posición.",
+          incorrect: "Este globo es demasiado profundo. Forzar un smash te pone en riesgo y reduce tu control. Es mejor responder con un globo de contra ataque, manteniendo presión sin exponerte."
+        }
+      }
+    ];
+
+    // Preguntas del examen
+    const examQuestions = [
+      {
+        question: "¿Cuál es el primer paso CRÍTICO en un smash exitoso?",
+        options: [
+          "Retroceder inmediatamente hacia atrás",
+          "Levantar la vista y detectar el globo",
+          "Preparar la raqueta en posición de trofeo",
+          "Saltar hacia arriba para ganar altura"
+        ],
+        correct: 1,
+        explanation: "La detección temprana del globo determina todo lo demás. Si no ves el globo rápidamente, no puedes posicionarte correctamente ni ejecutar el smash de forma óptima."
+      },
+      {
+        question: "¿Por qué son importantes los pasos cruzados en lugar de retroceder recto?",
+        options: [
+          "Son más rápidos solamente",
+          "Se ven más profesionales",
+          "Mantienen el equilibrio y permiten estar debajo de la pelota",
+          "Ahorran energía durante el partido"
+        ],
+        correct: 2,
+        explanation: "Los pasos cruzados mantienen tu equilibrio, velocidad y te permiten mantener el torso abierto mientras te posicionas bajo la pelota. Retroceder recto te desequilibra y dificulta el smash."
+      },
+      {
+        question: "La preparación del smash se parece más a:",
+        options: [
+          "Un drive de derecha potente",
+          "Un saque desde movimiento",
+          "Una volea alta de derecha",
+          "Un revés cortado con slice"
+        ],
+        correct: 1,
+        explanation: "El smash es esencialmente un saque ejecutado desde movimiento, con la misma mecánica de trophy position, extensión vertical y pronación final."
+      },
+      {
+        question: "¿En qué momento se debe realizar el impacto en el smash?",
+        options: [
+          "Cuando la pelota está bajando hacia el pecho",
+          "En el punto MÁS ALTO posible con brazo extendido",
+          "A la altura de la cintura para más control",
+          "Justo antes de que la pelota bote en el suelo"
+        ],
+        correct: 1,
+        explanation: "El impacto debe ser en el punto más alto posible con el brazo completamente extendido. Esto maximiza el ángulo de ataque, la potencia y la efectividad del golpe."
+      },
+      {
+        question: "¿Qué NO debes hacer en la terminación del smash?",
+        options: [
+          "Usar pronación del antebrazo",
+          "Terminar el movimiento dentro de la cancha",
+          "Hacer un swing amplio y lateral",
+          "Mantener el movimiento vertical y compacto"
+        ],
+        correct: 2,
+        explanation: "El swing debe ser compacto y vertical. Un swing amplio y lateral reduce control, potencia y además te desequilibra, comprometiendo tu recuperación."
+      },
+      {
+        question: "Ante un globo corto cerca de la red, la mejor decisión es:",
+        options: [
+          "Retroceder con pasos cruzados para preparar mejor",
+          "Dejar botar primero para analizar",
+          "Smash directo potente sin retroceder",
+          "Hacer un drive defensivo y seguro"
+        ],
+        correct: 2,
+        explanation: "Un globo corto es una oportunidad clara que debes aprovechar. No hay razón para retroceder o dejar botar. Ejecuta el smash directo desde tu posición ventajosa."
+      },
+      {
+        question: "Si un globo es demasiado profundo y cerca de la línea de fondo, deberías:",
+        options: [
+          "Forzar un smash al máximo de potencia",
+          "Dejar botar y golpear drive potente",
+          "Hacer un globo de contra ataque de respuesta",
+          "Retroceder hasta el fondo y hacer smash"
+        ],
+        correct: 2,
+        explanation: "Un globo muy profundo es mejor responderlo con un globo de contra ataque. Forzar un smash te pone en desventaja y riesgo innecesario. Mantén el control con un globo de respuesta."
+      },
+      {
+        question: "La clave para mantener equilibrio mientras retrocedes es:",
+        options: [
+          "Correr lo más rápido posible hacia atrás",
+          "Mantener la vista fija en tu compañero",
+          "Usar pasos cruzados mientras miras la pelota",
+          "Saltar hacia atrás con ambos pies"
+        ],
+        correct: 2,
+        explanation: "Los pasos cruzados son la clave para mantener equilibrio, velocidad y control mientras retrocedes hacia el punto de impacto, siempre manteniendo la vista en la pelota."
+      }
+    ];
+
+    // Data SDK Handler
+    const dataHandler = {
+      onDataChanged(data) {
+        // No se llaman métodos del SDK aquí
+      }
+    };
+
+    // Inicializar SDKs
+    async function initSDKs() {
+      if (window.dataSdk) {
+        const initResult = await window.dataSdk.init(dataHandler);
+        if (!initResult.isOk) {
+          console.error("Error al inicializar Data SDK");
+        }
+      }
+
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange: async (config) => {
+            const baseSize = config.font_size || defaultConfig.font_size;
+            const customFont = config.font_family || defaultConfig.font_family;
+            const baseFontStack = 'Tahoma, Geneva, Verdana, sans-serif';
+
+            // Actualizar textos
+            document.getElementById('game-title').textContent = config.game_title || defaultConfig.game_title;
+            document.getElementById('game-subtitle').textContent = config.game_subtitle || defaultConfig.game_subtitle;
+            document.getElementById('start-button').textContent = config.start_button || defaultConfig.start_button;
+            document.getElementById('phase1-title').textContent = config.phase1_title || defaultConfig.phase1_title;
+            document.getElementById('phase2-title').textContent = config.phase2_title || defaultConfig.phase2_title;
+            document.getElementById('phase3-title').textContent = config.phase3_title || defaultConfig.phase3_title;
+            document.getElementById('phase4-title').textContent = config.phase4_title || defaultConfig.phase4_title;
+            document.getElementById('phase5-title').textContent = config.phase5_title || defaultConfig.phase5_title;
+
+            // Actualizar colores
+            const bgColor = config.background_color || defaultConfig.background_color;
+            const secondaryColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+            document.querySelector('.game-container').style.background = 
+              `linear-gradient(135deg, ${bgColor} 0%, ${secondaryColor} 100%)`;
+
+            document.querySelectorAll('.content-box').forEach(el => {
+              el.style.background = config.surface_color || defaultConfig.surface_color;
+            });
+
+            document.querySelectorAll('.section-title').forEach(el => {
+              el.style.color = bgColor;
+            });
+
+            document.querySelectorAll('.btn-primary').forEach(el => {
+              el.style.background = config.primary_action_color || defaultConfig.primary_action_color;
+            });
+
+            // Actualizar tipografía
+            document.querySelector('.main-title').style.fontSize = `${baseSize * 3.5}px`;
+            document.querySelector('.main-subtitle').style.fontSize = `${baseSize * 1.375}px`;
+            document.querySelectorAll('.section-title').forEach(el => {
+              el.style.fontSize = `${baseSize * 2}px`;
+            });
+
+            document.body.style.fontFamily = `${customFont}, ${baseFontStack}`;
+          },
+          mapToCapabilities: (config) => ({
+            recolorables: [
+              {
+                get: () => config.background_color || defaultConfig.background_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.config.background_color = value;
+                    window.elementSdk.setConfig({ background_color: value });
+                  }
+                }
+              },
+              {
+                get: () => config.surface_color || defaultConfig.surface_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.config.surface_color = value;
+                    window.elementSdk.setConfig({ surface_color: value });
+                  }
+                }
+              },
+              {
+                get: () => config.text_color || defaultConfig.text_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.config.text_color = value;
+                    window.elementSdk.setConfig({ text_color: value });
+                  }
+                }
+              },
+              {
+                get: () => config.primary_action_color || defaultConfig.primary_action_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.config.primary_action_color = value;
+                    window.elementSdk.setConfig({ primary_action_color: value });
+                  }
+                }
+              },
+              {
+                get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.config.secondary_action_color = value;
+                    window.elementSdk.setConfig({ secondary_action_color: value });
+                  }
+                }
+              }
+            ],
+            borderables: [],
+            fontEditable: {
+              get: () => config.font_family || defaultConfig.font_family,
+              set: (value) => {
+                if (window.elementSdk) {
+                  window.elementSdk.config.font_family = value;
+                  window.elementSdk.setConfig({ font_family: value });
+                }
+              }
+            },
+            fontSizeable: {
+              get: () => config.font_size || defaultConfig.font_size,
+              set: (value) => {
+                if (window.elementSdk) {
+                  window.elementSdk.config.font_size = value;
+                  window.elementSdk.setConfig({ font_size: value });
+                }
+              }
+            }
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ["game_title", config.game_title || defaultConfig.game_title],
+            ["game_subtitle", config.game_subtitle || defaultConfig.game_subtitle],
+            ["start_button", config.start_button || defaultConfig.start_button],
+            ["phase1_title", config.phase1_title || defaultConfig.phase1_title],
+            ["phase2_title", config.phase2_title || defaultConfig.phase2_title],
+            ["phase3_title", config.phase3_title || defaultConfig.phase3_title],
+            ["phase4_title", config.phase4_title || defaultConfig.phase4_title],
+            ["phase5_title", config.phase5_title || defaultConfig.phase5_title]
+          ])
+        });
+      }
+    }
+
+    initSDKs();
+
+    // Navegación de pantallas
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const screen = document.getElementById(screenId);
+      if (screen) {
+        screen.classList.add('active');
+        window.scrollTo(0, 0);
+      }
+    }
+
+    // Botón de inicio
+    document.getElementById('start-button').addEventListener('click', () => {
+      showScreen('phase1-screen');
+    });
+
+    // FASE 1: Ir a Fase 2
+    function goToPhase2() {
+      gameState.phase1Complete = true;
+      showScreen('phase2-screen');
+      initPhase2();
+    }
+
+    // FASE 2: Drag and Drop
+    let draggedElement = null;
+    let completedSlots = 0;
+    let phase2Initialized = false;
+
+    function initPhase2() {
+      if (phase2Initialized) return;
+      phase2Initialized = true;
+      
+      completedSlots = 0;
+      const draggables = document.querySelectorAll('.draggable-piece');
+      const slots = document.querySelectorAll('.timeline-slot');
+
+      draggables.forEach(piece => {
+        piece.addEventListener('dragstart', (e) => {
+          if (!piece.classList.contains('used')) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+          }
+        });
+
+        piece.addEventListener('dragend', (e) => {
+          e.target.classList.remove('dragging');
+        });
+      });
+
+      slots.forEach(slot => {
+        slot.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          if (!slot.classList.contains('filled')) {
+            slot.classList.add('drag-over');
+          }
+        });
+
+        slot.addEventListener('dragleave', () => {
+          slot.classList.remove('drag-over');
+        });
+
+        slot.addEventListener('drop', (e) => {
+          e.preventDefault();
+          slot.classList.remove('drag-over');
+
+          if (draggedElement && !slot.classList.contains('filled')) {
+            const stepNumber = draggedElement.dataset.step;
+            const position = slot.dataset.position;
+
+            if (stepNumber === position) {
+              slot.innerHTML = draggedElement.innerHTML;
+              slot.classList.add('filled');
+              draggedElement.classList.add('used');
+              completedSlots++;
+
+              const progress = (completedSlots / 4) * 100;
+              updateProgressBar('phase2-progress', progress, 'Fase 2 de 5');
+
+              showFeedback('phase2-feedback', '✅ ¡Correcto! Fase colocada perfectamente.', 'success');
+
+              if (completedSlots === 4) {
+                gameState.phase2Score = 20;
+                setTimeout(() => {
+                  showFeedback('phase2-feedback', '🎉 ¡Perfecto! Smash construido correctamente. Avanzando al simulador...', 'success');
+                  setTimeout(() => {
+                    goToPhase3();
+                  }, 2000);
+                }, 800);
+              }
+            } else {
+              slot.classList.add('incorrect');
+              showFeedback('phase2-feedback', '❌ Incorrecto. El Smash fluye en secuencia: Detección → Pasos → Preparación → Impacto. Reintenta.', 'error');
+              setTimeout(() => {
+                slot.classList.remove('incorrect');
+              }, 1000);
+            }
+          }
+        });
+      });
+    }
+
+    function resetPhase2() {
+      const slots = document.querySelectorAll('.timeline-slot');
+      const pieces = document.querySelectorAll('.draggable-piece');
+      
+      slots.forEach(slot => {
+        slot.classList.remove('filled', 'incorrect');
+        slot.innerHTML = '';
+      });
+      
+      pieces.forEach(piece => {
+        piece.classList.remove('used');
+      });
+      
+      completedSlots = 0;
+      gameState.phase2Score = 0;
+      updateProgressBar('phase2-progress', 0, 'Fase 2 de 5');
+      
+      const feedback = document.getElementById('phase2-feedback');
+      feedback.style.display = 'none';
+      feedback.className = 'feedback-box';
+    }
+
+    function updateProgressBar(id, percentage, label) {
+      const bar = document.getElementById(id);
+      if (bar) {
+        bar.style.width = `${Math.max(percentage, 5)}%`;
+        bar.textContent = `${Math.round(percentage)}% - ${label}`;
+      }
+    }
+
+    function showFeedback(id, message, type) {
+      const feedback = document.getElementById(id);
+      if (feedback) {
+        feedback.textContent = message;
+        feedback.className = `feedback-box ${type}`;
+        feedback.style.display = 'flex';
+      }
+    }
+
+    // FASE 3: Simulador Técnico
+    function goToPhase3() {
+      showScreen('phase3-screen');
+      initPhase3();
+    }
+
+    let technicalPhases = [
+      { 
+        name: "Detección", 
+        icon: "👁️", 
+        ballPos: { left: '20%', top: '50%' }, 
+        playerIcon: "🧍", 
+        timing: { min: 800, max: 2000 } 
+      },
+      { 
+        name: "Pasos Cruzados", 
+        icon: "👟", 
+        ballPos: { left: '50%', top: '15%' }, 
+        playerIcon: "🏃", 
+        timing: { min: 1500, max: 3000 } 
+      },
+      { 
+        name: "Preparación", 
+        icon: "🏸", 
+        ballPos: { left: '52%', top: '8%' }, 
+        playerIcon: "🙋", 
+        timing: { min: 2200, max: 3800 } 
+      },
+      { 
+        name: "Impacto Alto", 
+        icon: "💥", 
+        ballPos: { left: '55%', top: '5%' }, 
+        playerIcon: "🤾", 
+        timing: { min: 2800, max: 4500 } 
+      }
+    ];
+
+    let currentTechPhase = -1;
+    let phaseStartTime = 0;
+    let phase3Initialized = false;
+
+    function initPhase3() {
+      if (phase3Initialized) return;
+      phase3Initialized = true;
+
+      currentTechPhase = -1;
+      gameState.phase3Score = 0;
+      gameState.technicalTiming = [];
+      
+      const button = document.getElementById('timing-action-button');
+      button.textContent = "▶️ Comenzar Simulación";
+      button.disabled = false;
+      button.onclick = startTechnicalSimulation;
+
+      document.getElementById('phase3-feedback').style.display = 'none';
+      document.getElementById('current-phase-label').textContent = 'Preparado';
+      document.getElementById('timing-feedback').textContent = 'Esperando...';
+      document.getElementById('phase3-score-display').textContent = 'Puntos: 0';
+      
+      resetBallAndPlayer();
+    }
+
+    function resetBallAndPlayer() {
+      const ball = document.getElementById('technical-ball');
+      const player = document.getElementById('technical-player');
+      if (ball) {
+        ball.style.left = '20%';
+        ball.style.top = '60%';
+      }
+      if (player) {
+        player.textContent = '🧍';
+      }
+    }
+
+    function startTechnicalSimulation() {
+      const button = document.getElementById('timing-action-button');
+      button.textContent = "⏳ Simulación en curso...";
+      button.disabled = true;
+
+      currentTechPhase = 0;
+      phaseStartTime = Date.now();
+      
+      document.getElementById('phase3-feedback').style.display = 'none';
+      
+      runTechnicalPhase();
+    }
+
+    function runTechnicalPhase() {
+      if (currentTechPhase >= technicalPhases.length) {
+        finishPhase3();
+        return;
+      }
+
+      const phase = technicalPhases[currentTechPhase];
+      document.getElementById('current-phase-label').textContent = `${phase.icon} ${phase.name}`;
+      document.getElementById('timing-feedback').textContent = '⏱️ ¡PRESIONA AHORA!';
+
+      const ball = document.getElementById('technical-ball');
+      const player = document.getElementById('technical-player');
+      
+      if (ball) {
+        ball.style.left = phase.ballPos.left;
+        ball.style.top = phase.ballPos.top;
+      }
+      if (player) {
+        player.textContent = phase.playerIcon;
+      }
+
+      phaseStartTime = Date.now();
+
+      const button = document.getElementById('timing-action-button');
+      button.textContent = `${phase.icon} Ejecutar ${phase.name}`;
+      button.disabled = false;
+      button.onclick = () => executePhase(phase);
+    }
+
+    function executePhase(phase) {
+      const reactionTime = Date.now() - phaseStartTime;
+      const button = document.getElementById('timing-action-button');
+      button.disabled = true;
+
+      let feedback = '';
+      let points = 0;
+      let feedbackType = 'info';
+
+      if (reactionTime < phase.timing.min) {
+        feedback = `⚠️ Muy rápido (${Math.round(reactionTime)}ms). Espera el momento exacto de la fase.`;
+        points = 3;
+        feedbackType = 'error';
+      } else if (reactionTime > phase.timing.max) {
+        feedback = `⏰ Muy tarde (${Math.round(reactionTime)}ms). Has perdido el punto óptimo de impacto.`;
+        points = 3;
+        feedbackType = 'error';
+      } else {
+        const percentage = ((reactionTime - phase.timing.min) / (phase.timing.max - phase.timing.min)) * 100;
+        if (percentage >= 30 && percentage <= 70) {
+          feedback = `🏆 ¡TIMING PERFECTO! (${Math.round(reactionTime)}ms) Ejecución magistral.`;
+          points = 7.5;
+        } else {
+          feedback = `✅ Buen timing (${Math.round(reactionTime)}ms). Ejecución correcta.`;
+          points = 6;
+        }
+        feedbackType = 'success';
+      }
+
+      gameState.technicalTiming.push({ phase: phase.name, time: reactionTime, points });
+      gameState.phase3Score += points;
+
+      document.getElementById('phase3-score-display').textContent = `Puntos: ${gameState.phase3Score.toFixed(1)}`;
+
+      showFeedback('phase3-feedback', feedback, feedbackType);
+      
+      const progress = ((currentTechPhase + 1) / technicalPhases.length) * 100;
+      updateProgressBar('phase3-progress', progress, 'Fase 3 de 5');
+
+      currentTechPhase++;
+      
+      setTimeout(() => {
+        if (currentTechPhase < technicalPhases.length) {
+          runTechnicalPhase();
+        } else {
+          finishPhase3();
+        }
+      }, 1800);
+    }
+
+    function finishPhase3() {
+      const totalScore = gameState.phase3Score;
+      let finalMessage = '';
+
+      if (totalScore >= 25) {
+        finalMessage = `🏆 ¡MAESTRO DEL TIMING! ${totalScore.toFixed(1)}/30 puntos. Tu sincronización es impecable.`;
+      } else if (totalScore >= 18) {
+        finalMessage = `👍 Muy buen timing: ${totalScore.toFixed(1)}/30 puntos. Con práctica alcanzarás la perfección.`;
+      } else if (totalScore >= 12) {
+        finalMessage = `⚡ Timing aceptable: ${totalScore.toFixed(1)}/30 puntos. Sigue practicando la sincronización.`;
+      } else {
+        finalMessage = `📚 Timing a mejorar: ${totalScore.toFixed(1)}/30 puntos. La práctica constante hará la diferencia.`;
+      }
+
+      showFeedback('phase3-feedback', finalMessage, 'info');
+
+      const button = document.getElementById('timing-action-button');
+      button.textContent = '➡️ Continuar a Simulador Táctico';
+      button.disabled = false;
+      button.onclick = goToPhase4;
+    }
+
+    // FASE 4: Simulador Táctico
+    function goToPhase4() {
+      showScreen('phase4-screen');
+      initPhase4();
+    }
+
+    let currentScenarioIndex = 0;
+    let phase4Initialized = false;
+
+    function initPhase4() {
+      if (phase4Initialized) return;
+      phase4Initialized = true;
+
+      currentScenarioIndex = 0;
+      gameState.phase4Score = 0;
+      gameState.tacticalResponses = [];
+      loadTacticalScenario();
+    }
+
+    function loadTacticalScenario() {
+      if (currentScenarioIndex >= tacticalScenarios.length) {
+        finishPhase4();
+        return;
+      }
+
+      const scenario = tacticalScenarios[currentScenarioIndex];
+      
+      document.getElementById('scenario-title').textContent = `Escenario ${currentScenarioIndex + 1} de ${tacticalScenarios.length}: ${scenario.title}`;
+      document.getElementById('scenario-description').textContent = scenario.description;
+      
+      const traitsContainer = document.getElementById('ball-characteristics');
+      traitsContainer.innerHTML = scenario.traits.map(trait => 
+        `<div class="ball-trait">${trait}</div>`
+      ).join('');
+
+      const optionsContainer = document.getElementById('tactical-options');
+      optionsContainer.innerHTML = scenario.options.map((option, index) => 
+        `<button class="tactical-option" data-index="${index}">${option.text}</button>`
+      ).join('');
+
+      document.querySelectorAll('.tactical-option').forEach(btn => {
+        btn.onclick = () => handleTacticalChoice(parseInt(btn.dataset.index));
+      });
+
+      document.getElementById('phase4-feedback').style.display = 'none';
+
+      const progress = (currentScenarioIndex / tacticalScenarios.length) * 100;
+      updateProgressBar('phase4-progress', progress, 'Fase 4 de 5');
+    }
+
+    function handleTacticalChoice(choiceIndex) {
+      const scenario = tacticalScenarios[currentScenarioIndex];
+      const choice = scenario.options[choiceIndex];
+      
+      document.querySelectorAll('.tactical-option').forEach(btn => {
+        btn.classList.add('disabled');
+        const btnIndex = parseInt(btn.dataset.index);
+        if (btnIndex === choiceIndex) {
+          btn.classList.add(choice.correct ? 'correct' : 'incorrect');
+        }
+        if (scenario.options[btnIndex].correct) {
+          btn.classList.add('correct');
+        }
+      });
+
+      const feedback = choice.correct ? scenario.feedback.correct : scenario.feedback.incorrect;
+      const feedbackType = choice.correct ? 'success' : 'error';
+      
+      if (choice.correct) {
+        gameState.phase4Score += 5;
+      }
+
+      gameState.tacticalResponses.push({
+        scenario: scenario.title,
+        choice: choice.text,
+        correct: choice.correct
+      });
+
+      showFeedback('phase4-feedback', (choice.correct ? '✅ ' : '❌ ') + feedback, feedbackType);
+
+      currentScenarioIndex++;
+      
+      setTimeout(() => {
+        loadTacticalScenario();
+      }, 4000);
+    }
+
+    function finishPhase4() {
+      const totalScore = gameState.phase4Score;
+      const maxScore = tacticalScenarios.length * 5;
+      
+      let finalMessage = '';
+      if (totalScore === maxScore) {
+        finalMessage = `🏆 ¡ESTRATEGA PERFECTO! ${totalScore}/${maxScore} puntos. Dominas completamente la táctica del smash.`;
+      } else if (totalScore >= maxScore * 0.8) {
+        finalMessage = `🧠 Excelente lectura táctica: ${totalScore}/${maxScore} puntos. Tomas decisiones muy acertadas.`;
+      } else if (totalScore >= maxScore * 0.6) {
+        finalMessage = `👍 Buena comprensión táctica: ${totalScore}/${maxScore} puntos. Sigue desarrollando tu lectura.`;
+      } else {
+        finalMessage = `📚 Táctica a mejorar: ${totalScore}/${maxScore} puntos. Revisa los conceptos de situaciones de juego.`;
+      }
+
+      showFeedback('phase4-feedback', finalMessage, 'info');
+
+      const optionsContainer = document.getElementById('tactical-options');
+      optionsContainer.innerHTML = `
+        <button class="tactical-option" style="grid-column: 1 / -1; background: #8b5cf6; color: white; border-color: #7c3aed;" onclick="goToPhase5()">
+          ➡️ Ir al Examen Final
+        </button>
+      `;
+    }
+
+    // FASE 5: Examen Final
+    function goToPhase5() {
+      showScreen('phase5-screen');
+      initPhase5();
+    }
+
+    let currentExamIndex = 0;
+    let phase5Initialized = false;
+
+    function initPhase5() {
+      if (phase5Initialized) return;
+      phase5Initialized = true;
+
+      currentExamIndex = 0;
+      gameState.phase5Score = 0;
+      gameState.examAnswers = [];
+      renderExamQuestions();
+    }
+
+    function renderExamQuestions() {
+      const container = document.getElementById('exam-questions');
+      container.innerHTML = '';
+
+      examQuestions.forEach((q, index) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question-${index}`;
+        
+        card.innerHTML = `
+          <div class="question-number">${index + 1}</div>
+          <div class="question-text">${q.question}</div>
+          <div class="answer-options">
+            ${q.options.map((opt, i) => `
+              <button class="answer-option" data-question="${index}" data-answer="${i}">
+                ${opt}
+              </button>
+            `).join('')}
+          </div>
+          <div class="feedback-box" id="feedback-${index}"></div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      document.querySelectorAll('.answer-option').forEach(btn => {
+        btn.onclick = () => handleExamAnswer(
+          parseInt(btn.dataset.question),
+          parseInt(btn.dataset.answer)
+        );
+      });
+    }
+
+    function handleExamAnswer(questionIndex, answerIndex) {
+      const question = examQuestions[questionIndex];
+      const card = document.getElementById(`question-${questionIndex}`);
+      const buttons = card.querySelectorAll('.answer-option');
+      
+      buttons.forEach(btn => {
+        btn.classList.add('disabled');
+        const btnAnswer = parseInt(btn.dataset.answer);
+        
+        if (btnAnswer === answerIndex) {
+          btn.classList.add(answerIndex === question.correct ? 'correct' : 'incorrect');
+        }
+        
+        if (btnAnswer === question.correct && answerIndex !== question.correct) {
+          btn.classList.add('correct');
+        }
+      });
+
+      const isCorrect = answerIndex === question.correct;
+      if (isCorrect) {
+        gameState.phase5Score += (25 / examQuestions.length);
+      }
+
+      gameState.examAnswers.push({
+        question: question.question,
+        answer: question.options[answerIndex],
+        correct: isCorrect
+      });
+
+      const feedbackBox = document.getElementById(`feedback-${questionIndex}`);
+      feedbackBox.textContent = (isCorrect ? '✅ Correcto. ' : '❌ Incorrecto. ') + question.explanation;
+      feedbackBox.className = `feedback-box ${isCorrect ? 'success' : 'error'}`;
+      feedbackBox.style.display = 'flex';
+
+      currentExamIndex++;
+      
+      const progress = (currentExamIndex / examQuestions.length) * 100;
+      updateProgressBar('phase5-progress', progress, 'Fase 5 de 5');
+
+      if (currentExamIndex === examQuestions.length) {
+        setTimeout(() => {
+          showResults();
+        }, 3000);
+      }
+    }
+
+    // RESULTADOS FINALES
+    async function showResults() {
+      const mechanicsScore = 0;
+      const constructionScore = gameState.phase2Score;
+      const technicalScore = gameState.phase3Score;
+      const tacticalScore = gameState.phase4Score;
+      const examScore = gameState.phase5Score;
+
+      const totalScore = Math.round(constructionScore + technicalScore + tacticalScore + examScore);
+
+      let rankEmoji = '';
+      let rankText = '';
+      let rankDescription = '';
+
+      if (totalScore >= 85) {
+        rankEmoji = '🏆';
+        rankText = 'SMASH MASTER';
+        rankDescription = '¡Dominio total! Eres un maestro de la técnica, mecánica y táctica del smash.';
+      } else if (totalScore >= 70) {
+        rankEmoji = '🎯';
+        rankText = 'REMATADOR AVANZADO';
+        rankDescription = 'Excelente nivel. Tu comprensión del smash es muy sólida. Sigue perfeccionando.';
+      } else if (totalScore >= 55) {
+        rankEmoji = '⚡';
+        rankText = 'REMATADOR COMPETENTE';
+        rankDescription = 'Buen conocimiento general. Con práctica constante alcanzarás el nivel avanzado.';
+      } else if (totalScore >= 40) {
+        rankEmoji = '📚';
+        rankText = 'REMATADOR EN DESARROLLO';
+        rankDescription = 'Base adecuada. Necesitas fortalecer fundamentos técnicos y tácticos.';
+      } else {
+        rankEmoji = '🎓';
+        rankText = 'APRENDIZ';
+        rankDescription = 'Sigue estudiando y practicando. Cada sesión te acerca a la maestría.';
+      }
+
+      document.getElementById('final-score-display').textContent = `${totalScore}%`;
+      document.getElementById('rank-emoji-text').textContent = rankEmoji;
+      document.getElementById('rank-description-text').textContent = `${rankText} - ${rankDescription}`;
+
+      document.getElementById('mechanics-score-display').textContent = '✓ Completado';
+      document.getElementById('construction-score-display').textContent = `${constructionScore}/20`;
+      document.getElementById('technical-score-display').textContent = `${technicalScore.toFixed(1)}/30`;
+      document.getElementById('tactical-score-display').textContent = `${tacticalScore}/25`;
+      document.getElementById('exam-score-display').textContent = `${examScore.toFixed(1)}/25`;
+
+      showScreen('results-screen');
+
+      if (window.dataSdk) {
+        const result = await window.dataSdk.create({
+          player_name: "Jugador",
+          final_score: totalScore,
+          phase_scores: JSON.stringify({
+            mechanics: mechanicsScore,
+            construction: constructionScore,
+            technical: technicalScore,
+            tactical: tacticalScore,
+            exam: examScore
+          }),
+          completed_at: new Date().toISOString(),
+          rank: rankText,
+          mechanics_score: mechanicsScore,
+          construction_score: constructionScore,
+          technical_score: technicalScore,
+          tactical_score: tacticalScore,
+          exam_score: examScore
+        });
+
+        if (!result.isOk) {
+          console.error("Error al guardar resultado");
+        }
+      }
+    }
+
+    function restartGame() {
+      gameState = {
+        phase1Complete: false,
+        phase2Score: 0,
+        phase3Score: 0,
+        phase4Score: 0,
+        phase5Score: 0,
+        currentTechnicalStep: 0,
+        currentTacticalScenario: 0,
+        currentExamQuestion: 0,
+        technicalTiming: [],
+        tacticalResponses: [],
+        examAnswers: []
+      };
+
+      phase2Initialized = false;
+      phase3Initialized = false;
+      phase4Initialized = false;
+      phase5Initialized = false;
+
+      resetPhase2();
+
+      showScreen('welcome-screen');
+    }
+
+    function showAnalysisModal() {
+      const totalScore = Math.round(
+        gameState.phase2Score + 
+        gameState.phase3Score + 
+        gameState.phase4Score + 
+        gameState.phase5Score
+      );
+
+      let analysis = `📊 ANÁLISIS DETALLADO DE TU DESEMPEÑO\n\n`;
+      
+      analysis += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+      
+      analysis += `🔨 CONSTRUCCIÓN TÉCNICA: ${gameState.phase2Score}/20\n`;
+      if (gameState.phase2Score === 20) {
+        analysis += `   ✅ Perfecto: Comprendes el orden técnico correcto.\n`;
+      } else {
+        analysis += `   ⚠️ Revisa: La secuencia debe ser: Detección → Pasos → Preparación → Impacto.\n`;
+      }
+      analysis += `\n`;
+
+      analysis += `⚡ SIMULADOR TÉCNICO: ${gameState.phase3Score.toFixed(1)}/30\n`;
+      if (gameState.phase3Score >= 25) {
+        analysis += `   ✅ Excelente: Tu sincronización es magistral.\n`;
+      } else if (gameState.phase3Score >= 18) {
+        analysis += `   👍 Bien: Buen timing, con práctica alcanzarás la perfección.\n`;
+      } else if (gameState.phase3Score >= 12) {
+        analysis += `   ⚠️ Regular: Trabaja en la sincronización de cada fase.\n`;
+      } else {
+        analysis += `   ❌ A mejorar: El timing es fundamental. Practica más.\n`;
+      }
+      analysis += `\n`;
+
+      analysis += `🧠 DECISIÓN TÁCTICA: ${gameState.phase4Score}/25\n`;
+      const tacticalPercentage = (gameState.phase4Score / 25) * 100;
+      if (tacticalPercentage === 100) {
+        analysis += `   ✅ Perfecto: Dominas completamente las situaciones tácticas.\n`;
+      } else if (tacticalPercentage >= 80) {
+        analysis += `   ✅ Excelente: Muy buena lectura del juego.\n`;
+      } else if (tacticalPercentage >= 60) {
+        analysis += `   👍 Bien: Comprensión táctica adecuada, sigue mejorando.\n`;
+      } else {
+        analysis += `   ⚠️ A mejorar: Estudia más las diferentes situaciones de globos.\n`;
+      }
+      analysis += `\n`;
+
+      analysis += `📝 CONOCIMIENTO TEÓRICO: ${gameState.phase5Score.toFixed(1)}/25\n`;
+      const examPercentage = (gameState.phase5Score / 25) * 100;
+      if (examPercentage >= 80) {
+        analysis += `   ✅ Excelente: Dominio conceptual sobresaliente.\n`;
+      } else if (examPercentage >= 60) {
+        analysis += `   👍 Bien: Conocimientos sólidos, sigue estudiando.\n`;
+      } else {
+        analysis += `   ⚠️ A mejorar: Refuerza los fundamentos teóricos del smash.\n`;
+      }
+      analysis += `\n`;
+
+      analysis += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+      analysis += `🎯 PUNTUACIÓN TOTAL: ${totalScore}/100\n\n`;
+
+      if (totalScore >= 85) {
+        analysis += `🏆 Felicidades, eres un MAESTRO del smash. Tu conocimiento y ejecución son excepcionales. Mantén este nivel y continúa puliendo detalles.`;
+      } else if (totalScore >= 70) {
+        analysis += `🎯 Muy bien, tienes un nivel AVANZADO. Estás muy cerca de la maestría. Sigue practicando las áreas donde perdiste puntos.`;
+      } else if (totalScore >= 55) {
+        analysis += `⚡ Buen trabajo, nivel COMPETENTE. Tienes una base sólida. Concéntrate en mejorar timing y decisiones tácticas.`;
+      } else if (totalScore >= 40) {
+        analysis += `📚 Vas por buen camino. Fortalece tus fundamentos técnicos y practica constantemente cada fase del smash.`;
+      } else {
+        analysis += `🎓 No te desanimes. El smash es un golpe complejo. Estudia cada fase con atención y practica regularmente.`;
+      }
+
+      document.getElementById('modal-analysis-text').textContent = analysis;
+      document.getElementById('analysis-modal').classList.add('active');
+    }
+
+    function closeAnalysisModal() {
+      document.getElementById('analysis-modal').classList.remove('active');
+    }
+
+    document.getElementById('analysis-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'analysis-modal') {
+        closeAnalysisModal();
+      }
+    });
+  </script>
+ </body>
+</html>

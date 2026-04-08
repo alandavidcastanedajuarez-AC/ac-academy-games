@@ -1,0 +1,1129 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    window.elementSdk = window.elementSdk || {
+      config: null,
+      init: async function () { return { isOk: true }; },
+      setConfig: function () {}
+    };
+    window.dataSdk = window.dataSdk || {
+      init: async function () { return { isOk: true }; },
+      create: async function () { return { isOk: true }; }
+    };
+  </script>
+  <title>Volea básica</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: #ffffff;
+      overflow-x: hidden;
+      min-height: 100%;
+      height: 100%;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .container {
+      width: 100%;
+      min-height: 100%;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 900px;
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .welcome-screen {
+      text-align: center;
+    }
+
+    .game-title {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      line-height: 1.2;
+    }
+
+    .game-subtitle {
+      font-size: 24px;
+      margin-bottom: 50px;
+      opacity: 0.9;
+    }
+
+    .tennis-animation {
+      width: 300px;
+      height: 300px;
+      margin: 0 auto 40px;
+      position: relative;
+    }
+
+    .player-icon {
+      width: 80px;
+      height: 120px;
+      background: #ffd700;
+      border-radius: 50% 50% 0 0;
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: playerJump 2s ease-in-out infinite;
+    }
+
+    @keyframes playerJump {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-10px); }
+    }
+
+    .ball-icon {
+      width: 40px;
+      height: 40px;
+      background: #76ff03;
+      border-radius: 50%;
+      position: absolute;
+      top: 30px;
+      right: 60px;
+      animation: ballMove 2s ease-in-out infinite;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    @keyframes ballMove {
+      0%, 100% { transform: translateX(0) translateY(0); }
+      50% { transform: translateX(-40px) translateY(20px); }
+    }
+
+    .net-line {
+      width: 100%;
+      height: 3px;
+      background: #ffffff;
+      position: absolute;
+      bottom: 40px;
+      opacity: 0.5;
+    }
+
+    .btn-primary {
+      background: #ff6b35;
+      color: #ffffff;
+      border: none;
+      padding: 18px 48px;
+      font-size: 22px;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(255,107,53,0.4);
+      margin-top: 20px;
+    }
+
+    .btn-primary:hover {
+      background: #e55a2b;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255,107,53,0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.2);
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      padding: 14px 36px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 10px;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      margin: 40px 0;
+    }
+
+    .step-card {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+
+    .step-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      border-color: #ffd700;
+    }
+
+    .step-number {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      background: #ffd700;
+      color: #1e3c72;
+      border-radius: 50%;
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 50px;
+      margin-bottom: 15px;
+    }
+
+    .step-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #ffd700;
+    }
+
+    .step-description {
+      font-size: 16px;
+      line-height: 1.6;
+      opacity: 0.95;
+    }
+
+    .step-icon {
+      width: 100px;
+      height: 100px;
+      margin: 20px auto;
+      position: relative;
+    }
+
+    .quiz-question {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .question-text {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 30px;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .option-btn {
+      background: rgba(255,255,255,0.2);
+      color: #ffffff;
+      border: 2px solid rgba(255,255,255,0.3);
+      padding: 20px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .option-btn:hover {
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.05);
+    }
+
+    .option-btn.correct {
+      background: #4caf50;
+      border-color: #4caf50;
+      animation: correctPulse 0.5s ease;
+    }
+
+    .option-btn.incorrect {
+      background: #f44336;
+      border-color: #f44336;
+      animation: incorrectShake 0.5s ease;
+    }
+
+    .option-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    @keyframes correctPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    @keyframes incorrectShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .feedback-message {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      display: none;
+    }
+
+    .feedback-message.show {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .feedback-message.success {
+      background: rgba(76,175,80,0.3);
+      border: 2px solid #4caf50;
+    }
+
+    .feedback-message.error {
+      background: rgba(244,67,54,0.3);
+      border: 2px solid #f44336;
+    }
+
+    .score-display {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ffd700, #ff6b35);
+      border-radius: 10px;
+      transition: width 0.5s ease;
+    }
+
+    .results-circle {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: conic-gradient(#ffd700 0deg, #ffd700 var(--progress-deg), rgba(255,255,255,0.2) var(--progress-deg));
+      margin: 40px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .results-inner {
+      width: 160px;
+      height: 160px;
+      background: #1e3c72;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .results-percentage {
+      font-size: 48px;
+      font-weight: 800;
+      color: #ffd700;
+    }
+
+    .results-label {
+      font-size: 16px;
+      opacity: 0.8;
+    }
+
+    .results-title {
+      font-size: 36px;
+      font-weight: 800;
+      text-align: center;
+      margin: 30px 0 20px;
+    }
+
+    .results-message {
+      font-size: 20px;
+      text-align: center;
+      margin-bottom: 40px;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    .buttons-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .section-title {
+      font-size: 36px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .simulator-container {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .ball-situation {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 30px;
+      color: #ffd700;
+    }
+
+    .situation-description {
+      font-size: 20px;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+
+    .loading-spinner {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .loading-spinner.show {
+      display: block;
+    }
+
+    .spinner {
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid #ffd700;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .leaderboard {
+      background: rgba(255,255,255,0.1);
+      border-radius: 15px;
+      padding: 30px;
+      margin-top: 40px;
+    }
+
+    .leaderboard-title {
+      font-size: 28px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 25px;
+      color: #ffd700;
+    }
+
+    .leaderboard-item {
+      background: rgba(255,255,255,0.1);
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .leaderboard-rank {
+      font-weight: 700;
+      font-size: 20px;
+      color: #ffd700;
+      min-width: 40px;
+    }
+
+    .leaderboard-name {
+      flex: 1;
+      margin-left: 15px;
+      font-size: 18px;
+    }
+
+    .leaderboard-score {
+      font-weight: 700;
+      font-size: 20px;
+      color: #76ff03;
+    }
+
+    @media (max-width: 768px) {
+      .game-title {
+        font-size: 32px;
+      }
+
+      .game-subtitle {
+        font-size: 18px;
+      }
+
+      .steps-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .question-text {
+        font-size: 22px;
+      }
+
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  
+  <style>
+    @media (max-width: 768px) {
+      body {
+        overflow-x: hidden !important;
+      }
+
+      .container,
+      .game-container,
+      .game-card,
+      .screen,
+      .results-screen,
+      .cover-screen,
+      .hero,
+      .intro-screen,
+      .phase-container {
+        max-width: 100% !important;
+      }
+
+      .container,
+      .game-container {
+        padding: 16px !important;
+      }
+
+      .cover-title,
+      .main-title,
+      .intro-title,
+      .game-title,
+      .section-title,
+      .final-title,
+      .game-title,
+      .title,
+      .game-header h1,
+      h1[style],
+      h2[style] {
+        font-size: clamp(1.8rem, 7vw, 2.5rem) !important;
+        line-height: 1.15 !important;
+      }
+
+      .subtitle,
+      .intro-subtitle,
+      .game-subtitle,
+      .instruction-text,
+      .game-instruction,
+      .construction-instructions,
+      .game-header p,
+      p[style] {
+        line-height: 1.55 !important;
+      }
+
+      .buttons-row,
+      .nav-buttons,
+      .button-group {
+        gap: 0.75rem !important;
+      }
+
+      .buttons-row {
+        flex-direction: column !important;
+      }
+
+      .buttons-row .btn-primary,
+      .buttons-row .btn-secondary {
+        width: 100% !important;
+      }
+
+      .leaderboard {
+        padding: 1.25rem !important;
+      }
+
+      [style*="grid-template-columns: 1fr 1fr"] {
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+ <body>
+  <div class="container"><!-- PANTALLA 1: Portada -->
+   <div id="screen-welcome" class="screen active">
+    <div class="welcome-screen">
+     <h1 class="game-title" id="main-title">Volea básica</h1>
+     <p class="game-subtitle" id="main-subtitle">Domina la técnica básica de la volea</p>
+     <div class="tennis-animation">
+      <div class="net-line"></div>
+      <div class="player-icon"></div>
+      <div class="ball-icon"></div>
+     </div><button class="btn-primary" id="btn-start" onclick="startGame()">🎾 Empezar</button>
+    </div>
+   </div><!-- PANTALLA 2: Los 4 Pasos -->
+   <div id="screen-steps" class="screen">
+    <h2 class="section-title">Los 4 Pasos Fundamentales</h2>
+    <div class="steps-grid">
+     <div class="step-card">
+      <div class="step-number">
+       1
+      </div>
+      <h3 class="step-title">🎯 SPLIT STEP</h3>
+      <div class="step-icon">
+       <svg viewbox="0 0 100 100" style="animation: playerJump 1.5s ease-in-out infinite;"><rect x="35" y="20" width="30" height="40" fill="#ffd700" rx="15" /> <circle cx="50" cy="15" r="10" fill="#ffd700" /> <line x1="35" y1="60" x2="25" y2="80" stroke="#ffd700" stroke-width="5" /> <line x1="65" y1="60" x2="75" y2="80" stroke="#ffd700" stroke-width="5" />
+       </svg>
+      </div>
+      <p class="step-description">Reacciona rápido. Este pequeño salto te activa antes de la pelota.</p>
+     </div>
+     <div class="step-card">
+      <div class="step-number">
+       2
+      </div>
+      <h3 class="step-title">✋ AGARRE CONTINENTAL</h3>
+      <div class="step-icon">
+       <svg viewbox="0 0 100 100"><rect x="30" y="30" width="40" height="50" fill="#ffffff" opacity="0.3" rx="5" /> <rect x="25" y="60" width="15" height="30" fill="#ffd700" rx="3" /> <circle cx="50" cy="45" r="3" fill="#ff6b35" /> <line x1="50" y1="30" x2="50" y2="60" stroke="#ffffff" stroke-width="2" />
+       </svg>
+      </div>
+      <p class="step-description">El mismo agarre para volea de derecha y revés. Cero cambios.</p>
+     </div>
+     <div class="step-card">
+      <div class="step-number">
+       3
+      </div>
+      <h3 class="step-title">⚡ GOLPE CORTO</h3>
+      <div class="step-icon">
+       <svg viewbox="0 0 100 100"><rect x="20" y="40" width="50" height="5" fill="#ffffff" opacity="0.3" rx="2" /> <rect x="20" y="40" width="50" height="5" fill="#ffd700" rx="2">
+         <animatetransform attributename="transform" type="translate" from="0 0" to="15 0" dur="0.8s" repeatcount="indefinite" />
+        </rect> <circle cx="75" cy="42" r="8" fill="#76ff03" />
+       </svg>
+      </div>
+      <p class="step-description">Nada de swings. Solo bloquea la pelota con firmeza.</p>
+     </div>
+     <div class="step-card">
+      <div class="step-number">
+       4
+      </div>
+      <h3 class="step-title">    PASO ADELANTE</h3>
+      <div class="step-icon">
+       <svg viewbox="0 0 100 100"><ellipse cx="35" cy="70" rx="15" ry="8" fill="#ffd700" /> <ellipse cx="65" cy="70" rx="15" ry="8" fill="#ffd700" opacity="0.5">
+         <animatetransform attributename="transform" type="translate" from="0 0" to="15 -5" dur="1s" repeatcount="indefinite" />
+        </ellipse> <path d="M 40 50 L 50 30 L 55 50" stroke="#ffffff" stroke-width="3" fill="none" />
+       </svg>
+      </div>
+      <p class="step-description">Termina siempre entrando al punto. Control y firmeza.</p>
+     </div>
+    </div>
+    <div style="text-align: center;"><button class="btn-primary" onclick="startQuiz()">🧠 Aprender jugándolo</button>
+    </div>
+   </div><!-- PANTALLA 3: Juego de Situaciones -->
+   <div id="screen-quiz" class="screen">
+    <h2 class="section-title">Elige el Paso Correcto</h2>
+    <div class="score-display">
+     Puntuación: <span id="quiz-score">0</span> pts
+    </div>
+    <div class="progress-bar">
+     <div class="progress-fill" id="quiz-progress" style="width: 0%"></div>
+    </div>
+    <div id="quiz-container"></div>
+    <div class="buttons-row" id="quiz-buttons" style="display: none;"><button class="btn-primary" onclick="startSimulator()">▶️ Continuar al Simulador</button>
+    </div>
+   </div><!-- PANTALLA 4: Simulador en Tiempo Real -->
+   <div id="screen-simulator" class="screen">
+    <h2 class="section-title">Simulador en Tiempo Real</h2>
+    <div class="score-display">
+     Puntuación: <span id="sim-score">0</span> pts
+    </div>
+    <div class="progress-bar">
+     <div class="progress-fill" id="sim-progress" style="width: 0%"></div>
+    </div>
+    <div class="simulator-container">
+     <div class="ball-situation" id="ball-type"></div>
+     <div class="situation-description">
+      ¿Qué paso aplicas AHORA?
+     </div>
+     <div class="options-grid"><button class="option-btn" onclick="checkSimAnswer('split')">SPLIT STEP</button> <button class="option-btn" onclick="checkSimAnswer('continental')">CONTINENTAL</button> <button class="option-btn" onclick="checkSimAnswer('corto')">GOLPE CORTO</button> <button class="option-btn" onclick="checkSimAnswer('adelante')">PASO ADELANTE</button>
+     </div>
+     <div class="feedback-message" id="sim-feedback"></div>
+    </div>
+    <div class="buttons-row" id="sim-buttons" style="display: none;"><button class="btn-primary" onclick="startFinalQuiz()">▶️ Quiz Final</button>
+    </div>
+   </div><!-- PANTALLA 5: Mini Quiz Final -->
+   <div id="screen-final-quiz" class="screen">
+    <h2 class="section-title">Mini Quiz Final</h2>
+    <div class="score-display">
+     Puntuación: <span id="final-score">0</span> pts
+    </div>
+    <div class="progress-bar">
+     <div class="progress-fill" id="final-progress" style="width: 0%"></div>
+    </div>
+    <div id="final-quiz-container"></div>
+    <div class="buttons-row" id="final-buttons" style="display: none;"><button class="btn-primary" onclick="showResults()">🏆 Ver Resultados</button>
+    </div>
+   </div><!-- PANTALLA 6: Resultados -->
+   <div id="screen-results" class="screen">
+    <h2 class="section-title">¡Resultados Finales!</h2>
+    <div class="results-circle" id="results-circle">
+     <div class="results-inner">
+      <div class="results-percentage" id="results-percentage">
+       0%
+      </div>
+      <div class="results-label">
+       Nivel AC
+      </div>
+     </div>
+    </div>
+    <h3 class="results-title" id="results-title">Voleador en Progreso</h3>
+    <p class="results-message" id="results-message">Repite la secuencia para dominar la técnica.</p>
+    <div class="loading-spinner" id="save-spinner">
+     <div class="spinner"></div>
+     <p>Guardando tu resultado...</p>
+    </div>
+    <div class="buttons-row"><button class="btn-secondary" onclick="restartGame()">🔁 Repetir</button> <button class="btn-primary" onclick="showVolleyRecap()">📘 Repasar técnica</button>
+    </div>
+    <div class="leaderboard">
+     <h3 class="leaderboard-title">🏆 Mejores Puntuaciones</h3>
+     <div id="leaderboard-list"></div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "Volea básica",
+      subtitle: "Domina la técnica básica de la volea",
+      start_button: "🎾 Empezar"
+    };
+
+    let gameState = {
+      quizScore: 0,
+      simScore: 0,
+      finalScore: 0,
+      currentQuestion: 0,
+      currentSim: 0,
+      currentFinal: 0,
+      totalScore: 0
+    };
+
+    const quizQuestions = [
+      {
+        question: "Rival te tira una pelota rápida al cuerpo. ¿Qué paso es tu prioridad?",
+        options: ["SPLIT STEP", "CONTINENTAL", "GOLPE CORTO", "PASO ADELANTE"],
+        correct: 2,
+        feedback: "¡Correcto! En pelotas rápidas, la clave es un golpe corto y firme."
+      },
+      {
+        question: "Estás en transición hacia la red. ¿Qué paso debes hacer ANTES de volear?",
+        options: ["SPLIT STEP", "CONTINENTAL", "GOLPE CORTO", "PASO ADELANTE"],
+        correct: 0,
+        feedback: "¡Exacto! El Split Step te prepara para reaccionar rápido."
+      },
+      {
+        question: "Tienes la volea fácil y alta. ¿Qué parte asegura que cierres el punto?",
+        options: ["SPLIT STEP", "CONTINENTAL", "GOLPE CORTO", "PASO ADELANTE"],
+        correct: 3,
+        feedback: "¡Perfecto! El paso adelante te da control y firmeza para cerrar."
+      },
+      {
+        question: "Rival te devuelve bajo y lento. ¿Qué asegura control?",
+        options: ["SPLIT STEP", "CONTINENTAL", "GOLPE CORTO", "PASO ADELANTE"],
+        correct: 1,
+        feedback: "¡Bien! El agarre Continental es clave para el control."
+      },
+      {
+        question: "Pelota centrada a media altura. ¿Qué define buena volea?",
+        options: ["SPLIT STEP", "CONTINENTAL", "GOLPE CORTO", "PASO ADELANTE"],
+        correct: 2,
+        feedback: "¡Correcto! Un golpe corto asegura precisión y control."
+      }
+    ];
+
+    const simSituations = [
+      { type: "🎾 Pelota Alta", correct: "adelante" },
+      { type: "⚡ Pelota Baja", correct: "corto" },
+      { type: "💨 Pelota Rápida", correct: "corto" },
+      { type: "🎯 Pelota Lenta", correct: "continental" },
+      { type: "🔥 Pelota al Cuerpo", correct: "corto" },
+      { type: "📍 Pelota Abierta", correct: "split" }
+    ];
+
+    const finalQuestions = [
+      {
+        question: "El swing en la volea debe ser...",
+        options: ["Largo", "Corto", "Hacia atrás"],
+        correct: 1,
+        feedback: "¡Correcto! El swing debe ser corto y compacto."
+      },
+      {
+        question: "El agarre ideal para volear es...",
+        options: ["Este", "Oeste", "Continental"],
+        correct: 2,
+        feedback: "¡Exacto! El agarre Continental es perfecto para voleas."
+      },
+      {
+        question: "¿Qué pasa si no haces split step en la red?",
+        options: ["Reaccionas lento", "Golpeas más fuerte", "No afecta"],
+        correct: 0,
+        feedback: "¡Correcto! Sin split step, tu reacción será más lenta."
+      }
+    ];
+
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    function startGame() {
+      showScreen('screen-steps');
+    }
+
+    function startQuiz() {
+      gameState.currentQuestion = 0;
+      gameState.quizScore = 0;
+      showScreen('screen-quiz');
+      loadQuizQuestion();
+    }
+
+    function loadQuizQuestion() {
+      const container = document.getElementById('quiz-container');
+      const question = quizQuestions[gameState.currentQuestion];
+      
+      const progress = ((gameState.currentQuestion + 1) / quizQuestions.length) * 100;
+      document.getElementById('quiz-progress').style.width = progress + '%';
+
+      container.innerHTML = `
+        <div class="quiz-question">
+          <div class="question-text">${question.question}</div>
+          <div class="options-grid">
+            ${question.options.map((opt, idx) => 
+              `<button class="option-btn" onclick="checkQuizAnswer(${idx})">${opt}</button>`
+            ).join('')}
+          </div>
+          <div class="feedback-message" id="quiz-feedback"></div>
+        </div>
+      `;
+    }
+
+    function checkQuizAnswer(selected) {
+      const question = quizQuestions[gameState.currentQuestion];
+      const buttons = document.querySelectorAll('#quiz-container .option-btn');
+      const feedback = document.getElementById('quiz-feedback');
+
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === question.correct) {
+          btn.classList.add('correct');
+        } else if (idx === selected && idx !== question.correct) {
+          btn.classList.add('incorrect');
+        }
+      });
+
+      if (selected === question.correct) {
+        gameState.quizScore += 10;
+        feedback.className = 'feedback-message success show';
+        feedback.textContent = '✅ ' + question.feedback;
+      } else {
+        feedback.className = 'feedback-message error show';
+        feedback.textContent = '❌ Incorrecto. ' + question.feedback;
+      }
+
+      document.getElementById('quiz-score').textContent = gameState.quizScore;
+
+      setTimeout(() => {
+        gameState.currentQuestion++;
+        if (gameState.currentQuestion < quizQuestions.length) {
+          loadQuizQuestion();
+        } else {
+          document.getElementById('quiz-buttons').style.display = 'flex';
+          document.getElementById('quiz-container').innerHTML = '<div class="quiz-question"><h3 style="color: #ffd700;">¡Fase Completada!</h3><p style="font-size: 20px;">Has terminado las situaciones de decisión.</p></div>';
+        }
+      }, 2000);
+    }
+
+    function startSimulator() {
+      gameState.currentSim = 0;
+      gameState.simScore = 0;
+      showScreen('screen-simulator');
+      loadSimSituation();
+    }
+
+    function loadSimSituation() {
+      const situation = simSituations[gameState.currentSim];
+      document.getElementById('ball-type').textContent = situation.type;
+      document.getElementById('sim-feedback').classList.remove('show');
+      
+      const progress = ((gameState.currentSim + 1) / simSituations.length) * 100;
+      document.getElementById('sim-progress').style.width = progress + '%';
+
+      document.querySelectorAll('.simulator-container .option-btn').forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('correct', 'incorrect');
+      });
+    }
+
+    function checkSimAnswer(answer) {
+      const situation = simSituations[gameState.currentSim];
+      const buttons = document.querySelectorAll('.simulator-container .option-btn');
+      const feedback = document.getElementById('sim-feedback');
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      if (answer === situation.correct) {
+        gameState.simScore += 10;
+        feedback.className = 'feedback-message success show';
+        feedback.textContent = '✅ ¡Excelente decisión!';
+        buttons.forEach(btn => {
+          if (btn.textContent.toLowerCase().includes(answer)) {
+            btn.classList.add('correct');
+          }
+        });
+      } else {
+        feedback.className = 'feedback-message error show';
+        feedback.textContent = '❌ No es la mejor opción para esta situación.';
+      }
+
+      document.getElementById('sim-score').textContent = gameState.simScore;
+
+      setTimeout(() => {
+        gameState.currentSim++;
+        if (gameState.currentSim < simSituations.length) {
+          loadSimSituation();
+        } else {
+          document.getElementById('sim-buttons').style.display = 'flex';
+          document.querySelector('.simulator-container').innerHTML = '<div class="question-text" style="color: #ffd700;">¡Simulador Completado!</div><p style="font-size: 20px; margin-top: 20px;">Excelente trabajo en tiempo real.</p>';
+        }
+      }, 2000);
+    }
+
+    function startFinalQuiz() {
+      gameState.currentFinal = 0;
+      gameState.finalScore = 0;
+      showScreen('screen-final-quiz');
+      loadFinalQuestion();
+    }
+
+    function loadFinalQuestion() {
+      const container = document.getElementById('final-quiz-container');
+      const question = finalQuestions[gameState.currentFinal];
+      
+      const progress = ((gameState.currentFinal + 1) / finalQuestions.length) * 100;
+      document.getElementById('final-progress').style.width = progress + '%';
+
+      container.innerHTML = `
+        <div class="quiz-question">
+          <div class="question-text">${question.question}</div>
+          <div class="options-grid">
+            ${question.options.map((opt, idx) => 
+              `<button class="option-btn" onclick="checkFinalAnswer(${idx})">${opt}</button>`
+            ).join('')}
+          </div>
+          <div class="feedback-message" id="final-feedback"></div>
+        </div>
+      `;
+    }
+
+    function checkFinalAnswer(selected) {
+      const question = finalQuestions[gameState.currentFinal];
+      const buttons = document.querySelectorAll('#final-quiz-container .option-btn');
+      const feedback = document.getElementById('final-feedback');
+
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === question.correct) {
+          btn.classList.add('correct');
+        } else if (idx === selected && idx !== question.correct) {
+          btn.classList.add('incorrect');
+        }
+      });
+
+      if (selected === question.correct) {
+        gameState.finalScore += 10;
+        feedback.className = 'feedback-message success show';
+        feedback.textContent = '✅ ' + question.feedback;
+      } else {
+        feedback.className = 'feedback-message error show';
+        feedback.textContent = '❌ Incorrecto. ' + question.feedback;
+      }
+
+      document.getElementById('final-score').textContent = gameState.finalScore;
+
+      setTimeout(() => {
+        gameState.currentFinal++;
+        if (gameState.currentFinal < finalQuestions.length) {
+          loadFinalQuestion();
+        } else {
+          document.getElementById('final-buttons').style.display = 'flex';
+          document.getElementById('final-quiz-container').innerHTML = '<div class="quiz-question"><h3 style="color: #ffd700;">¡Quiz Final Completado!</h3><p style="font-size: 20px;">Prepárate para ver tus resultados.</p></div>';
+        }
+      }, 2000);
+    }
+
+    async function showResults() {
+      gameState.totalScore = gameState.quizScore + gameState.simScore + gameState.finalScore;
+      const maxScore = (quizQuestions.length + simSituations.length + finalQuestions.length) * 10;
+      const percentage = Math.round((gameState.totalScore / maxScore) * 100);
+
+      showScreen('screen-results');
+
+      const circle = document.getElementById('results-circle');
+      const progressDeg = (percentage / 100) * 360;
+      circle.style.setProperty('--progress-deg', progressDeg + 'deg');
+
+      document.getElementById('results-percentage').textContent = percentage + '%';
+
+      let title, message;
+      if (percentage >= 85) {
+        title = "🏆 Voleador Pro AC";
+        message = "Compacto, firme y rápido. La red es tu zona.";
+      } else if (percentage >= 65) {
+        title = "🎯 Buen Voleador";
+        message = "Tienes la base, trabaja timing.";
+      } else {
+        title = "⚙️ Volea en Progreso";
+        message = "Repite la secuencia para dominar la técnica.";
+      }
+
+      document.getElementById('results-title').textContent = title;
+      document.getElementById('results-message').textContent = message;
+
+      document.getElementById('save-spinner').classList.add('show');
+
+      const result = await window.dataSdk.create({
+        player_name: "Jugador",
+        score: gameState.totalScore,
+        level: title,
+        completed_at: new Date().toISOString()
+      });
+
+      document.getElementById('save-spinner').classList.remove('show');
+
+      if (!result.isOk) {
+        console.error("Error saving score");
+      }
+    }
+
+    function restartGame() {
+      gameState = {
+        quizScore: 0,
+        simScore: 0,
+        finalScore: 0,
+        currentQuestion: 0,
+        currentSim: 0,
+        currentFinal: 0,
+        totalScore: 0
+      };
+      showScreen('screen-welcome');
+    }
+
+    function showVolleyRecap() {
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position: fixed; inset: 0; background: rgba(15, 23, 42, 0.82); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 1000;';
+      modal.innerHTML = `
+        <div style="background: white; color: #1e293b; border-radius: 20px; max-width: 560px; width: 100%; padding: 28px 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.35);">
+          <h3 style="margin: 0 0 14px; color: #1d4ed8; font-size: 1.5rem;">Claves rápidas de la volea</h3>
+          <p style="line-height: 1.7; margin: 0 0 12px;">La volea funciona mejor cuando llegas con base activa, agarre continental y un gesto corto. No se trata de golpear más, sino de interceptar antes y dirigir con firmeza.</p>
+          <p style="line-height: 1.7; margin: 0 0 18px;">Piensa la volea como control de espacio: paso adelante, cara estable de la raqueta y decisión simple. Compacto gana a aparatoso.</p>
+          <button style="background: linear-gradient(135deg, #2563eb 0%, #76ff03 100%); color: #0f172a; border: none; border-radius: 999px; padding: 12px 20px; font-weight: 700; cursor: pointer;" onclick="this.closest('div').parentElement.remove()">Cerrar</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    function renderLeaderboard(data) {
+      const list = document.getElementById('leaderboard-list');
+      const sortedData = [...data].sort((a, b) => b.score - a.score).slice(0, 5);
+
+      if (sortedData.length === 0) {
+        list.innerHTML = '<p style="text-align: center; opacity: 0.7;">No hay resultados todavía.</p>';
+        return;
+      }
+
+      list.innerHTML = sortedData.map((record, idx) => `
+        <div class="leaderboard-item">
+          <div class="leaderboard-rank">#${idx + 1}</div>
+          <div class="leaderboard-name">${record.level}</div>
+          <div class="leaderboard-score">${record.score} pts</div>
+        </div>
+      `).join('');
+    }
+
+    const dataHandler = {
+      onDataChanged(data) {
+        renderLeaderboard(data);
+      }
+    };
+
+    async function onConfigChange(config) {
+      const title = config.game_title || defaultConfig.game_title;
+      const subtitle = config.subtitle || defaultConfig.subtitle;
+      const startButton = config.start_button || defaultConfig.start_button;
+
+      document.getElementById('main-title').textContent = title;
+      document.getElementById('main-subtitle').textContent = subtitle;
+      document.getElementById('btn-start').textContent = startButton;
+    }
+
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange,
+      mapToCapabilities: (config) => ({
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ["game_title", config.game_title || defaultConfig.game_title],
+        ["subtitle", config.subtitle || defaultConfig.subtitle],
+        ["start_button", config.start_button || defaultConfig.start_button]
+      ])
+    });
+
+    window.dataSdk.init(dataHandler);
+  </script>
+ </body>
+</html>
