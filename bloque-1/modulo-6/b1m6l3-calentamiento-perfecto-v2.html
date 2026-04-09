@@ -1,0 +1,1731 @@
+<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calentamiento perfecto</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 30px 20px;
+      min-height: 100%;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 35px;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    .header h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 38px;
+      font-weight: 800;
+      margin: 10px 0;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.25);
+      letter-spacing: -0.5px;
+    }
+
+    .header .subtitle {
+      font-family: 'Poppins', sans-serif;
+      font-size: 20px;
+      font-weight: 500;
+      opacity: 0.95;
+      margin: 8px 0;
+    }
+
+    .header .lesson-tag {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      background: rgba(255,255,255,0.25);
+      padding: 6px 18px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-top: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    .score-display {
+      background: rgba(255,255,255,0.25);
+      backdrop-filter: blur(15px);
+      padding: 18px 35px;
+      border-radius: 50px;
+      display: inline-block;
+      margin-top: 20px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: white;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .game-container {
+      background: white;
+      border-radius: 25px;
+      padding: 50px;
+      box-shadow: 0 25px 70px rgba(0,0,0,0.35);
+      animation: slideUp 0.6s ease-out;
+    }
+
+    .section-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: #2d3748;
+      text-align: center;
+      margin-bottom: 15px;
+      letter-spacing: -0.5px;
+    }
+
+    .section-description {
+      font-family: 'Poppins', sans-serif;
+      color: #718096;
+      font-size: 17px;
+      text-align: center;
+      margin-bottom: 35px;
+      line-height: 1.6;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .step-card {
+      background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 25px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 3px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .step-card:hover::before {
+      opacity: 1;
+    }
+
+    .step-card:hover {
+      transform: translateY(-8px) scale(1.01);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+      border-color: #667eea;
+    }
+
+    .step-card.active {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #e6fffa 0%, #d4f4ff 100%);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.25);
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-number {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      margin-right: 18px;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      flex-shrink: 0;
+    }
+
+    .step-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: #2d3748;
+      letter-spacing: -0.3px;
+    }
+
+    .step-content {
+      color: #4a5568;
+      line-height: 1.8;
+      font-size: 16px;
+      margin-top: 15px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-content strong {
+      color: #2d3748;
+      font-weight: 600;
+    }
+
+    .step-details {
+      background: rgba(255, 255, 255, 0.7);
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 12px;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .step-importance {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      padding: 18px;
+      border-radius: 12px;
+      margin-top: 15px;
+      font-style: italic;
+      color: #5a67d8;
+      font-weight: 500;
+      font-size: 16px;
+      border-left: 4px solid #667eea;
+      line-height: 1.6;
+    }
+
+    .draggable-area {
+      background: #f7fafc;
+      border: 3px dashed #cbd5e0;
+      border-radius: 20px;
+      padding: 35px;
+      min-height: 450px;
+      margin: 25px 0;
+    }
+
+    .drag-item {
+      background: white;
+      border: 3px solid #e2e8f0;
+      border-radius: 15px;
+      padding: 20px 25px;
+      margin: 12px 0;
+      cursor: move;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .drag-item:hover {
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+      transform: translateY(-3px) scale(1.02);
+      border-color: #cbd5e0;
+    }
+
+    .drag-item.dragging {
+      opacity: 0.4;
+      transform: scale(0.95);
+    }
+
+    .drag-item.correct {
+      background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+      border-color: #48bb78;
+      animation: successPulse 0.6s ease;
+    }
+
+    .drag-item.incorrect {
+      animation: errorShake 0.6s ease;
+      border-color: #fc8181;
+      background: #fff5f5;
+    }
+
+    .drag-item-icon {
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+
+    .drag-item-text {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 17px;
+      color: #2d3748;
+    }
+
+    .drop-zone {
+      background: white;
+      border: 3px dashed #cbd5e0;
+      border-radius: 15px;
+      padding: 25px;
+      margin: 12px 0;
+      min-height: 90px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .drop-zone.drag-over {
+      background: linear-gradient(135deg, #e6fffa 0%, #c4f1f9 100%);
+      border-color: #4fd1c5;
+      transform: scale(1.03);
+      box-shadow: 0 5px 20px rgba(79, 209, 197, 0.3);
+    }
+
+    .drop-zone.filled {
+      border-style: solid;
+      border-color: #667eea;
+      background: #f7fafc;
+    }
+
+    .drop-zone-label {
+      font-family: 'Montserrat', sans-serif;
+      color: #a0aec0;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 35px;
+      margin-top: 35px;
+    }
+
+    .column-title {
+      font-family: 'Montserrat', sans-serif;
+      color: #2d3748;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid #667eea;
+    }
+
+    .situation-card {
+      background: linear-gradient(135deg, #fef5e7 0%, #fdeaa3 100%);
+      border-radius: 20px;
+      padding: 35px;
+      margin: 25px 0;
+      border-left: 6px solid #f59e0b;
+      box-shadow: 0 10px 30px rgba(245, 158, 11, 0.15);
+    }
+
+    .situation-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 22px;
+      color: #78350f;
+      font-weight: 600;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .options-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .option-btn {
+      background: white;
+      border: 3px solid #e2e8f0;
+      border-radius: 15px;
+      padding: 18px 30px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: 'Poppins', sans-serif;
+      font-size: 17px;
+      font-weight: 500;
+      color: #2d3748;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background: #f7fafc;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      border-color: #cbd5e0;
+    }
+
+    .option-btn.correct {
+      background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+      color: white;
+      border-color: #48bb78;
+      animation: successPulse 0.6s ease;
+      box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+    }
+
+    .option-btn.incorrect {
+      background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+      color: white;
+      border-color: #fc8181;
+      animation: errorShake 0.6s ease;
+    }
+
+    .option-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .error-scene {
+      background: white;
+      border-radius: 20px;
+      padding: 35px;
+      margin: 20px 0;
+      border: 3px solid #e2e8f0;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+
+    .error-scene:hover {
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+      transform: translateY(-5px);
+      border-color: #cbd5e0;
+    }
+
+    .error-scene.revealed {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    }
+
+    .scene-emoji {
+      font-size: 64px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .scene-description {
+      font-family: 'Poppins', sans-serif;
+      font-size: 19px;
+      color: #2d3748;
+      text-align: center;
+      font-weight: 500;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .error-explanation {
+      background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+      border-left: 5px solid #fc8181;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+      color: #742a2a;
+      font-size: 16px;
+      line-height: 1.7;
+      font-weight: 500;
+    }
+
+    .error-explanation strong {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 8px;
+      font-size: 17px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 18px 45px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+      display: inline-block;
+      margin: 12px;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-primary:active {
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 3px solid #667eea;
+      border-radius: 50px;
+      padding: 18px 45px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-block;
+      margin: 12px;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-secondary:hover {
+      background: #667eea;
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .progress-bar {
+      background: rgba(255,255,255,0.3);
+      height: 12px;
+      border-radius: 20px;
+      margin: 25px 0;
+      overflow: hidden;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+      height: 100%;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 20px;
+      box-shadow: 0 2px 10px rgba(72, 187, 120, 0.5);
+    }
+
+    .final-score {
+      text-align: center;
+      padding: 50px 30px;
+    }
+
+    .final-score-number {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 96px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 25px 0;
+      letter-spacing: -2px;
+      text-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .level-badge {
+      display: inline-block;
+      padding: 20px 40px;
+      border-radius: 50px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      margin: 25px 0;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      letter-spacing: 0.5px;
+    }
+
+    .level-champion {
+      background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+      color: #7c2d12;
+    }
+
+    .level-good {
+      background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+      color: #065f46;
+    }
+
+    .level-medium {
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      color: #744210;
+    }
+
+    .level-beginner {
+      background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
+      color: #7c2d12;
+    }
+
+    .level-description {
+      font-family: 'Poppins', sans-serif;
+      color: #4a5568;
+      font-size: 19px;
+      margin: 25px auto;
+      max-width: 600px;
+      line-height: 1.7;
+    }
+
+    .feedback-message {
+      background: #edf2f7;
+      border-radius: 15px;
+      padding: 25px;
+      margin: 25px 0;
+      text-align: center;
+      font-family: 'Poppins', sans-serif;
+      font-size: 17px;
+      color: #2d3748;
+      animation: fadeIn 0.5s ease;
+      line-height: 1.6;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+
+    .feedback-message.success {
+      background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+      color: #22543d;
+      border-left: 5px solid #48bb78;
+    }
+
+    .feedback-message.error {
+      background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+      color: #742a2a;
+      border-left: 5px solid #fc8181;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes successPulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.08);
+      }
+    }
+
+    @keyframes errorShake {
+      0%, 100% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(-12px);
+      }
+      50% {
+        transform: translateX(12px);
+      }
+      75% {
+        transform: translateX(-8px);
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .mb-20 {
+      margin-bottom: 20px;
+    }
+
+    .mt-30 {
+      margin-top: 30px;
+    }
+
+    .info-box {
+      background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
+      border-left: 5px solid #38b2ac;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #234e52;
+    }
+
+    .info-box strong {
+      display: block;
+      margin-bottom: 8px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px 15px;
+      }
+
+      .game-container {
+        padding: 30px 20px;
+      }
+
+      .header h1 {
+        font-size: 28px;
+      }
+
+      .header .subtitle {
+        font-size: 17px;
+      }
+
+      .grid-layout {
+        grid-template-columns: 1fr;
+        gap: 25px;
+      }
+
+      .final-score-number {
+        font-size: 72px;
+      }
+
+      .section-title {
+        font-size: 26px;
+      }
+
+      .step-title {
+        font-size: 20px;
+      }
+
+      .level-badge {
+        font-size: 20px;
+        padding: 15px 30px;
+      }
+    }
+      /* Standalone cleanup helpers */
+    .hidden { display: none !important; }
+    .text-center, .center { text-align: center !important; }
+    .mt-30 { margin-top: 30px !important; }
+    @media (max-width: 768px) {
+      .container,
+      .game-container,
+      .game-area,
+      .game-section,
+      .section,
+      .phase-container,
+      .minigame-section,
+      .header,
+      .modal-content {
+        padding: 18px !important;
+      }
+      .header h1,
+      .game-title,
+      #gameTitle,
+      #game-title,
+      .intro-title,
+      .cover-title,
+      h1 {
+        font-size: clamp(1.9rem, 8vw, 2.4rem) !important;
+        line-height: 1.15 !important;
+      }
+      .header h2,
+      .section-title,
+      .phase-title,
+      .minigame-title,
+      h2 {
+        font-size: clamp(1.25rem, 6vw, 1.75rem) !important;
+        line-height: 1.25 !important;
+      }
+      .header p,
+      .section-description,
+      .game-subtitle,
+      .subtitle,
+      .scenario-text,
+      .situation-question,
+      .step-content,
+      .detail-section li,
+      .teaching-text,
+      .option-button,
+      .info-item,
+      .level-description {
+        font-size: 1rem !important;
+        line-height: 1.55 !important;
+      }
+      .info-boxes,
+      .body-map,
+      .injury-cards,
+      .scene-grid,
+      .options,
+      .phase-buttons,
+      .cards-grid,
+      .options-grid,
+      .cards-container {
+        grid-template-columns: 1fr !important;
+      }
+      .chain-builder,
+      .final-buttons,
+      .buttons-row,
+      .nav-buttons,
+      .button-group,
+      .buttons-group {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+      }
+      .btn,
+      .btn-primary,
+      .btn-secondary,
+      .phase-button,
+      .action-btn,
+      .next-button,
+      .option-btn,
+      .option-button {
+        width: 100% !important;
+      }
+      .score-display {
+        position: static !important;
+        display: block !important;
+        width: fit-content;
+        max-width: 100%;
+        margin: 0 auto 16px auto !important;
+        font-size: 1rem !important;
+        padding: 12px 16px !important;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }    /* Standalone cleanup helpers */
+    .hidden { display: none !important; }
+    .text-center, .center { text-align: center !important; }
+    .mt-30 { margin-top: 30px !important; }
+    @media (max-width: 768px) {
+      .container,
+      .game-container,
+      .game-area,
+      .game-section,
+      .section,
+      .phase-container,
+      .minigame-section,
+      .header,
+      .modal-content {
+        padding: 18px !important;
+      }
+      .header h1,
+      .game-title,
+      #gameTitle,
+      #game-title,
+      .intro-title,
+      .cover-title,
+      h1 {
+        font-size: clamp(1.9rem, 8vw, 2.4rem) !important;
+        line-height: 1.15 !important;
+      }
+      .header h2,
+      .section-title,
+      .phase-title,
+      .minigame-title,
+      h2 {
+        font-size: clamp(1.25rem, 6vw, 1.75rem) !important;
+        line-height: 1.25 !important;
+      }
+      .header p,
+      .section-description,
+      .game-subtitle,
+      .subtitle,
+      .scenario-text,
+      .situation-question,
+      .step-content,
+      .detail-section li,
+      .teaching-text,
+      .option-button,
+      .info-item,
+      .level-description {
+        font-size: 1rem !important;
+        line-height: 1.55 !important;
+      }
+      .info-boxes,
+      .body-map,
+      .injury-cards,
+      .scene-grid,
+      .options,
+      .phase-buttons,
+      .cards-grid,
+      .options-grid,
+      .cards-container {
+        grid-template-columns: 1fr !important;
+      }
+      .chain-builder,
+      .final-buttons,
+      .buttons-row,
+      .nav-buttons,
+      .button-group,
+      .buttons-group {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+      }
+      .btn,
+      .btn-primary,
+      .btn-secondary,
+      .phase-button,
+      .action-btn,
+      .next-button,
+      .option-btn,
+      .option-button {
+        width: 100% !important;
+      }
+      .score-display {
+        position: static !important;
+        display: block !important;
+        width: fit-content;
+        max-width: 100%;
+        margin: 0 auto 16px auto !important;
+        font-size: 1rem !important;
+        padding: 12px 16px !important;
+      }
+    }
+  </style>
+    <script>
+    window.elementSdk = window.elementSdk || { init: async function () { return { isOk: true, value: null }; }, on: function () {}, emit: function () { return { isOk: true, value: null }; } };
+    window.dataSdk = window.dataSdk || { init: async function () { return { isOk: true, value: null }; }, create: async function () { return { isOk: true, value: null }; }, list: async function () { return { isOk: true, value: [] }; }, update: async function () { return { isOk: true, value: null }; } };
+  </script>
+</head>
+ <body>
+  <div class="container">
+   <header class="header">
+    <h1 id="gameTitle">🎮 ACTIVA TU CUERPO AC 🔥🎾</h1>
+    <div class="subtitle">
+     El Calentamiento Perfecto
+    </div>
+    <div class="lesson-tag" id="lessonNumber">
+     📘 LECCIÓN 3
+    </div>
+    <div class="score-display" id="scoreDisplay">
+     Score: 0%
+    </div>
+   </header>
+   <div class="progress-bar">
+    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+   </div>
+   <div class="game-container"><!-- PARTE 1: EXPLORACIÓN GUIADA -->
+    <div id="part1" class="game-part">
+     <h2 class="section-title">🟢 PARTE 1: ENTIENDE LOS PASOS</h2>
+     <p class="section-description">Descubre cada etapa del calentamiento profesional. Cada paso tiene un propósito específico que maximiza tu rendimiento y protege tu cuerpo.</p>
+     <div class="step-card" data-step="1">
+      <div class="step-header"><span class="step-number">1</span> <span class="step-title">🔸 Movilidad Articular</span>
+      </div>
+      <div class="step-content"><strong>¿Qué incluye?</strong>
+       <div class="step-details">
+        • <strong>Cuello:</strong> Rotaciones suaves y flexiones laterales<br>
+         • <strong>Hombros:</strong> Círculos amplios hacia adelante y atrás<br>
+         • <strong>Cadera:</strong> Círculos pélvicos y balanceos<br>
+         • <strong>Tobillos:</strong> Rotaciones completas en ambas direcciones<br>
+         • <strong>Muñecas:</strong> Giros circulares preparando el agarre de la raqueta
+       </div>
+       <div class="step-importance">
+        💡 <strong>Por qué es crítico:</strong> Las articulaciones necesitan lubricación sinovial antes del movimiento explosivo. Esto previene lesiones por movimientos bruscos en frío y aumenta tu rango de movimiento hasta un 15-20%.
+       </div>
+      </div>
+     </div>
+     <div class="step-card" data-step="2">
+      <div class="step-header"><span class="step-number">2</span> <span class="step-title">🔸 Activación Muscular</span>
+      </div>
+      <div class="step-content"><strong>¿Qué incluye?</strong>
+       <div class="step-details">
+        • <strong>Saltos cortos:</strong> 20-30 saltos suaves en el lugar<br>
+         • <strong>Skipping bajo:</strong> Elevaciones rápidas de rodillas alternadas<br>
+         • <strong>Trote suave:</strong> 2-3 minutos aumentando gradualmente<br>
+         • <strong>Desplazamientos laterales:</strong> Simulando movimientos de cancha<br>
+         • <strong>Aceleraciones progresivas:</strong> De 50% a 70% de tu velocidad máxima
+       </div>
+       <div class="step-importance">
+        💡 <strong>Por qué funciona:</strong> Activa tu sistema neuromuscular, aumenta tu frecuencia cardíaca de forma controlada y eleva la temperatura muscular. Músculos calientes responden 20% más rápido a los estímulos nerviosos.
+       </div>
+      </div>
+     </div>
+     <div class="step-card" data-step="3">
+      <div class="step-header"><span class="step-number">3</span> <span class="step-title">🔸 Estiramientos Dinámicos</span>
+      </div>
+      <div class="step-content"><strong>Ejemplos específicos:</strong>
+       <div class="step-details">
+        • <strong>Balanceo de pierna:</strong> Adelante-atrás y lateral (10 repeticiones cada lado)<br>
+         • <strong>Rotaciones de tronco:</strong> Con brazos extendidos manteniendo caderas estables<br>
+         • <strong>Caminata con elevación de rodilla:</strong> Llevando rodilla al pecho alternadamente<br>
+         • <strong>Zancadas con giro:</strong> Combinando flexibilidad de piernas con rotación de tronco<br>
+         • <strong>Arcos de brazos:</strong> Círculos amplios preparando el movimiento del servicio
+       </div>
+       <div class="step-importance">
+        💡 <strong>Ventaja competitiva:</strong> A diferencia del estiramiento estático (que reduce potencia), el dinámico mejora la amplitud de movimiento SIN perder explosividad. Ideal para deportes de raqueta donde necesitas potencia Y flexibilidad.
+       </div>
+      </div>
+     </div>
+     <div class="step-card" data-step="4">
+      <div class="step-header"><span class="step-number">4</span> <span class="step-title">🔸 Movimientos con Raqueta</span>
+      </div>
+      <div class="step-content"><strong>Secuencia progresiva:</strong>
+       <div class="step-details">
+        • <strong>Golpes al aire:</strong> Derecha, revés, volea - sin pelota, 70% velocidad<br>
+         • <strong>Swings de servicio:</strong> Movimiento completo con énfasis en rotación de hombros<br>
+         • <strong>Sombras de desplazamiento:</strong> Simulando puntos con cambios de dirección<br>
+         • <strong>Gestos técnicos lentos:</strong> Enfocándote en la mecánica correcta<br>
+         • <strong>Aumento progresivo:</strong> De 50% a 80% de tu velocidad normal
+       </div>
+       <div class="step-importance">
+        💡 <strong>Sincronización neuromuscular:</strong> Tu cerebro reactiva los patrones motores específicos del tenis. Esto reduce el riesgo de lesión por gestos técnicos incorrectos y mejora tu precisión desde el primer peloteo.
+       </div>
+      </div>
+     </div>
+     <div class="step-card" data-step="5">
+      <div class="step-header"><span class="step-number">5</span> <span class="step-title">🔸 Peloteo Ligero</span>
+      </div>
+      <div class="step-content"><strong>Protocolo de peloteo:</strong>
+       <div class="step-details">
+        • <strong>Duración:</strong> 5-8 minutos mínimo<br>
+         • <strong>Distancia inicial:</strong> Línea de servicio, luego fondo de cancha<br>
+         • <strong>Intensidad:</strong> 60-70% de potencia, enfoque en ritmo y control<br>
+         • <strong>Variedad:</strong> Derechas, revés, slice, efectos - todos tus golpes<br>
+         • <strong>Objetivo mental:</strong> Conectar timing visual-motor y entrar en "zona de juego"
+       </div>
+       <div class="step-importance">
+        💡 <strong>Integración total:</strong> Este es el momento donde todo se unifica: músculos calientes + articulaciones móviles + técnica activada + coordinación ojo-pelota. Tu cuerpo y mente están 100% listos para competir al máximo nivel.
+       </div>
+      </div>
+     </div>
+     <div class="info-box"><strong>🎯 Dato profesional:</strong> Estudios deportivos muestran que un calentamiento completo de 15-20 minutos reduce el riesgo de lesión en un 40-50% y mejora el rendimiento en los primeros 15 minutos de juego en un 25-30%. ¡El calentamiento no es opcional, es parte de tu entrenamiento!
+     </div>
+     <div class="text-center mt-30"><button class="btn-primary" onclick="startPart2()">👉 Construir mi calentamiento</button>
+     </div>
+    </div><!-- PARTE 2: ARMA TU CALENTAMIENTO -->
+    <div id="part2" class="game-part hidden">
+     <h2 class="section-title">🟠 PARTE 2: ARMA TU PROPIO CALENTAMIENTO</h2>
+     <p class="section-description">Ahora que conoces cada paso, demuestra que entiendes el orden correcto. Arrastra cada tarjeta a su posición correspondiente del 1 al 5.</p>
+     <div id="feedbackPart2"></div>
+     <div class="grid-layout">
+      <div>
+       <h3 class="column-title">📋 Pasos disponibles</h3>
+       <div id="dragSource">
+        <div class="drag-item" draggable="true" data-order="1" data-name="Movilidad Articular"><span class="drag-item-icon">🔄</span> <span class="drag-item-text">Movilidad Articular</span>
+        </div>
+        <div class="drag-item" draggable="true" data-order="2" data-name="Activación Muscular"><span class="drag-item-icon">⚡</span> <span class="drag-item-text">Activación Muscular</span>
+        </div>
+        <div class="drag-item" draggable="true" data-order="3" data-name="Estiramientos Dinámicos"><span class="drag-item-icon">🤸</span> <span class="drag-item-text">Estiramientos Dinámicos</span>
+        </div>
+        <div class="drag-item" draggable="true" data-order="4" data-name="Movimientos con Raqueta"><span class="drag-item-icon">🎾</span> <span class="drag-item-text">Movimientos con Raqueta</span>
+        </div>
+        <div class="drag-item" draggable="true" data-order="5" data-name="Peloteo Suave"><span class="drag-item-icon">  </span> <span class="drag-item-text">Peloteo Suave</span>
+        </div>
+       </div>
+      </div>
+      <div>
+       <h3 class="column-title">✅ Tu secuencia correcta</h3>
+       <div id="dropZones">
+        <div class="drop-zone" data-position="1"><span class="drop-zone-label">PASO 1</span>
+        </div>
+        <div class="drop-zone" data-position="2"><span class="drop-zone-label">PASO 2</span>
+        </div>
+        <div class="drop-zone" data-position="3"><span class="drop-zone-label">PASO 3</span>
+        </div>
+        <div class="drop-zone" data-position="4"><span class="drop-zone-label">PASO 4</span>
+        </div>
+        <div class="drop-zone" data-position="5"><span class="drop-zone-label">PASO 5</span>
+        </div>
+       </div>
+      </div>
+     </div>
+     <div class="text-center mt-30"><button class="btn-primary" id="checkOrderBtn" onclick="checkOrder()" style="display: none;">Verificar mi secuencia</button> <button class="btn-primary" id="continuePart3Btn" onclick="startPart3()" style="display: none;">Continuar a Parte 3 →</button>
+     </div>
+    </div><!-- PARTE 3: SIMULADOR DE DECISIÓN -->
+    <div id="part3" class="game-part hidden">
+     <h2 class="section-title">🔵 PARTE 3: ¿QUÉ HAGO SI MI CUERPO SIENTE...?</h2>
+     <p class="section-description">Situaciones reales que enfrentan los jugadores. Aprende a identificar qué parte del calentamiento necesitas según las señales de tu cuerpo.</p>
+     <div id="situationsContainer"></div>
+     <div class="text-center mt-30"><button class="btn-primary" id="continuePart4Btn" onclick="startPart4()" style="display: none;">Continuar a Parte 4 →</button>
+     </div>
+    </div><!-- PARTE 4: DETECTA EL ERROR -->
+    <div id="part4" class="game-part hidden">
+     <h2 class="section-title">🟣 PARTE 4: DETECTA EL ERROR</h2>
+     <p class="section-description">Estos son errores comunes que cometen jugadores principiantes e intermedios. ¿Puedes identificar qué está mal y por qué es peligroso?</p>
+     <div id="errorsContainer"></div>
+     <div class="text-center mt-30"><button class="btn-primary" id="continuePart5Btn" onclick="startPart5()" style="display: none;">Continuar a Evaluación Final →</button>
+     </div>
+    </div><!-- PARTE 5: EVALUACIÓN FINAL -->
+    <div id="part5" class="game-part hidden">
+     <h2 class="section-title">🧠 PARTE 5: EVALUACIÓN FINAL</h2>
+     <p class="section-description">Tres preguntas clave para certificar tu conocimiento sobre el calentamiento profesional. ¡Demuestra lo que has aprendido!</p>
+     <div id="questionsContainer"></div>
+     <div class="text-center mt-30"><button class="btn-primary" id="showResultsBtn" onclick="showFinalResults()" style="display: none;">🏆 Ver Mi Calentamiento AC Score</button>
+     </div>
+    </div><!-- RESULTADOS FINALES -->
+    <div id="finalResults" class="game-part hidden">
+     <div class="final-score">
+      <h2 class="section-title">🏁 CALENTAMIENTO AC SCORE</h2>
+      <div class="final-score-number" id="finalScoreNumber">
+       0%
+      </div>
+      <div class="level-badge" id="levelBadge"></div>
+      <p class="level-description" id="levelDescription"></p>
+      <div class="text-center mt-30"><button class="btn-primary" onclick="restartGame()">🔄 Volver a jugar</button> <button class="btn-secondary" onclick="showVideoMessage()">📹 Repasar calentamiento</button>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "ACTIVA TU CUERPO AC",
+      lesson_number: "Lección 3",
+      primary_color: "#667eea",
+      secondary_color: "#764ba2",
+      background_color: "#ffffff",
+      text_color: "#2d3748",
+      success_color: "#48bb78"
+    };
+
+    let config = { ...defaultConfig };
+
+    let gameState = {
+      currentPart: 1,
+      scores: {
+        part2: 0,
+        part3: 0,
+        part4: 0,
+        part5: 0
+      },
+      totalScore: 0,
+      part2Complete: false,
+      part3Complete: false,
+      part4Complete: false,
+      part5Complete: false,
+      currentSituation: 0,
+      currentError: 0,
+      currentQuestion: 0,
+      droppedItems: {}
+    };
+
+    const situations = [
+      {
+        text: '"Me siento muy rígido de la cadera y zona lumbar, como si no pudiera moverme con fluidez."',
+        options: ['Activación Muscular', 'Movilidad Articular', 'Peloteo Ligero'],
+        correct: 1,
+        explanation: '✓ Correcto: La movilidad articular es específicamente para reducir rigidez en articulaciones y mejorar el rango de movimiento. Círculos de cadera y rotaciones lumbares son ideales para esta sensación.'
+      },
+      {
+        text: '"Mi cuerpo está lento, sin energía y me siento dormido. No tengo chispa ni reactividad."',
+        options: ['Estiramiento Dinámico', 'Activación Muscular', 'Movimientos con Raqueta'],
+        correct: 1,
+        explanation: '✓ Correcto: La activación muscular (saltos, skipping, trote) despierta tu sistema nervioso y aumenta tu frecuencia cardíaca. Es el paso que te da energía y reactividad.'
+      },
+      {
+        text: '"Siento que mis gestos técnicos no están finos, hay descoordinación entre mi cuerpo y la raqueta."',
+        options: ['Movilidad Articular', 'Activación Muscular', 'Movimientos con Raqueta'],
+        correct: 2,
+        explanation: '✓ Correcto: Los movimientos con raqueta reactivan tus patrones motores técnicos específicos del tenis. Tu cerebro necesita "recordar" los gestos correctos antes de jugar.'
+      },
+      {
+        text: '"Ya estoy caliente y técnicamente preparado, pero necesito sentir la pelota y ajustar mi timing visual."',
+        options: ['Activación Muscular', 'Estiramientos Dinámicos', 'Peloteo Suave'],
+        correct: 2,
+        explanation: '✓ Correcto: El peloteo suave es la integración final. Aquí ajustas tu coordinación ojo-pelota-raqueta y entras mentalmente en ritmo de juego real.'
+      }
+    ];
+
+    const errorScenes = [
+      {
+        emoji: '🧘‍♂️',
+        description: 'Un jugador está haciendo estiramientos estáticos profundos (tocando dedos de los pies sin moverse) durante 3 minutos antes de su partido',
+        error: '❌ Error crítico: El estiramiento estático prolongado ANTES del juego reduce la capacidad explosiva muscular hasta un 30%. Los músculos pierden tensión y potencia.',
+        learning: '✅ Lo correcto: Estiramientos DINÁMICOS (con movimiento) antes del juego. Los estáticos se hacen DESPUÉS como parte del enfriamiento.'
+      },
+      {
+        emoji: '🎾',
+        description: 'Un jugador llega a la cancha, toma su raqueta y empieza directamente a pelotear fuerte desde el fondo de la cancha',
+        error: '❌ Error peligroso: Empezar con movimientos explosivos en frío aumenta el riesgo de desgarros musculares, tendinitis y lesiones articulares. Las fibras musculares no están preparadas.',
+        learning: '✅ Lo correcto: Siempre comenzar con movilidad articular y activación general antes de tocar la raqueta. Mínimo 5-8 minutos de preparación corporal.'
+      },
+      {
+        emoji: '💪',
+        description: 'Un jugador hace jumping jacks y activa intensamente sus brazos, pero se olvida completamente de activar piernas, cadera y tobillos',
+        error: '❌ Error de preparación incompleta: El tenis requiere explosividad de piernas, estabilidad de cadera y movilidad de tobillos. Activar solo el tren superior deja el cuerpo desbalanceado.',
+        learning: '✅ Lo correcto: La activación debe ser INTEGRAL - piernas, core, brazos y articulaciones. El 70% de la potencia del tenis viene del tren inferior.'
+      },
+      {
+        emoji: '🏃‍♂️',
+        description: 'Un jugador hace swings de servicio a máxima velocidad sin haber calentado previamente sus hombros ni rotadores',
+        error: '❌ Error biomecánico: El servicio es el gesto más explosivo y exigente para el hombro. Hacerlo a máxima potencia sin preparación puede causar lesiones en el manguito rotador.',
+        learning: '✅ Lo correcto: Primero movilidad de hombros → luego gestos técnicos al 50-70% → gradualmente aumentar hasta velocidad competitiva.'
+      }
+    ];
+
+    const finalQuestions = [
+      {
+        question: '¿Cuál debe ser SIEMPRE el primer paso de un calentamiento efectivo y por qué?',
+        options: [
+          'Activación muscular - para subir la frecuencia cardíaca',
+          'Movilidad articular - para preparar articulaciones y prevenir lesiones',
+          'Peloteo ligero - para entrar en ritmo de juego'
+        ],
+        correct: 1,
+        explanation: 'La movilidad articular prepara las estructuras anatómicas (articulaciones, líquido sinovial, ligamentos) para los movimientos que vienen. Es la base de todo.'
+      },
+      {
+        question: '¿Qué problema específico previene la activación muscular progresiva?',
+        options: [
+          'Sensación de lentitud corporal y mayor riesgo de lesión muscular por arranques bruscos',
+          'Pérdida de flexibilidad en las articulaciones',
+          'Falta de precisión técnica en los golpes'
+        ],
+        correct: 0,
+        explanation: 'La activación despierta gradualmente tu sistema neuromuscular, evitando que músculos "dormidos" sufran desgarros por demandas súbitas de explosividad.'
+      },
+      {
+        question: '¿Cuál es la función principal del estiramiento dinámico en el calentamiento?',
+        options: [
+          'Aumentar la fuerza explosiva de los músculos',
+          'Ampliar el rango de movimiento manteniendo la capacidad de generar potencia',
+          'Reducir la frecuencia cardíaca antes del esfuerzo'
+        ],
+        correct: 1,
+        explanation: 'A diferencia del estiramiento estático (que relaja), el dinámico mejora flexibilidad SIN perder explosividad - perfecto para deportes que requieren potencia Y amplitud.'
+      }
+    ];
+
+    function updateScore() {
+      const total = Math.round(
+        gameState.scores.part2 * 0.25 +
+        gameState.scores.part3 * 0.30 +
+        gameState.scores.part4 * 0.20 +
+        gameState.scores.part5 * 0.25
+      );
+      gameState.totalScore = total;
+      
+      const scoreDisplay = document.getElementById('scoreDisplay');
+      scoreDisplay.textContent = `Score: ${total}%`;
+      
+      const progressBar = document.getElementById('progressBar');
+      progressBar.style.width = `${(gameState.currentPart / 6) * 100}%`;
+    }
+
+    function startPart2() {
+      document.getElementById('part1').classList.add('hidden');
+      document.getElementById('part2').classList.remove('hidden');
+      gameState.currentPart = 2;
+      updateScore();
+      setupDragAndDrop();
+    }
+
+    function setupDragAndDrop() {
+      const dragItems = document.querySelectorAll('.drag-item');
+      const dropZones = document.querySelectorAll('.drop-zone');
+
+      dragItems.forEach(item => {
+        item.addEventListener('dragstart', handleDragStart);
+        item.addEventListener('dragend', handleDragEnd);
+      });
+
+      dropZones.forEach(zone => {
+        zone.addEventListener('dragover', handleDragOver);
+        zone.addEventListener('dragleave', handleDragLeave);
+        zone.addEventListener('drop', handleDrop);
+      });
+    }
+
+    let draggedElement = null;
+
+    function handleDragStart(e) {
+      draggedElement = e.target;
+      e.target.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragEnd(e) {
+      e.target.classList.remove('dragging');
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      e.currentTarget.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+      e.currentTarget.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      const dropZone = e.currentTarget;
+      dropZone.classList.remove('drag-over');
+
+      if (draggedElement && dropZone.classList.contains('drop-zone')) {
+        const position = dropZone.dataset.position;
+        
+        if (gameState.droppedItems[position]) {
+          const existingItem = gameState.droppedItems[position];
+          document.getElementById('dragSource').appendChild(existingItem);
+        }
+
+        dropZone.innerHTML = '';
+        const clonedItem = draggedElement.cloneNode(true);
+        clonedItem.draggable = false;
+        dropZone.appendChild(clonedItem);
+        dropZone.classList.add('filled');
+        
+        gameState.droppedItems[position] = draggedElement;
+        draggedElement.style.display = 'none';
+
+        const allFilled = Object.keys(gameState.droppedItems).length === 5;
+        document.getElementById('checkOrderBtn').style.display = allFilled ? 'inline-block' : 'none';
+      }
+    }
+
+    function checkOrder() {
+      let correct = 0;
+      const dropZones = document.querySelectorAll('.drop-zone');
+      
+      dropZones.forEach(zone => {
+        const position = zone.dataset.position;
+        const item = zone.querySelector('.drag-item');
+        
+        if (item) {
+          const correctOrder = item.dataset.order;
+          if (correctOrder === position) {
+            item.classList.add('correct');
+            correct++;
+          } else {
+            item.classList.add('incorrect');
+            setTimeout(() => {
+              item.classList.remove('incorrect');
+            }, 1000);
+          }
+        }
+      });
+
+      const feedback = document.getElementById('feedbackPart2');
+      
+      if (correct === 5) {
+        feedback.innerHTML = '<div class="feedback-message success"><strong>¡Excelente trabajo!</strong> Has ordenado perfectamente la secuencia de calentamiento profesional. Ahora conoces el orden científico que usan atletas de alto rendimiento. 🎉</div>';
+        gameState.scores.part2 = 100;
+        gameState.part2Complete = true;
+        document.getElementById('checkOrderBtn').style.display = 'none';
+        document.getElementById('continuePart3Btn').style.display = 'inline-block';
+      } else {
+        feedback.innerHTML = '<div class="feedback-message error">⚠️ <strong>Recuerda la secuencia lógica:</strong><br>1️⃣ Articulaciones (preparar estructuras) → 2️⃣ Activación (despertar músculos) → 3️⃣ Estiramientos (ampliar rango) → 4️⃣ Técnica (patrones motores) → 5️⃣ Pelota (integración final)</div>';
+        
+        setTimeout(() => {
+          resetPart2();
+        }, 3000);
+      }
+      
+      updateScore();
+    }
+
+    function resetPart2() {
+      const dropZones = document.querySelectorAll('.drop-zone');
+      dropZones.forEach(zone => {
+        zone.innerHTML = '<span class="drop-zone-label">PASO ' + zone.dataset.position + '</span>';
+        zone.classList.remove('filled');
+      });
+
+      const dragItems = document.querySelectorAll('#dragSource .drag-item');
+      dragItems.forEach(item => {
+        item.style.display = 'flex';
+        item.classList.remove('correct', 'incorrect');
+      });
+
+      gameState.droppedItems = {};
+      document.getElementById('checkOrderBtn').style.display = 'none';
+      document.getElementById('feedbackPart2').innerHTML = '';
+    }
+
+    function startPart3() {
+      document.getElementById('part2').classList.add('hidden');
+      document.getElementById('part3').classList.remove('hidden');
+      gameState.currentPart = 3;
+      gameState.currentSituation = 0;
+      updateScore();
+      showNextSituation();
+    }
+
+    function showNextSituation() {
+      const container = document.getElementById('situationsContainer');
+      
+      if (gameState.currentSituation >= situations.length) {
+        gameState.part3Complete = true;
+        container.innerHTML += '<div class="info-box"><strong>🎓 Conocimiento aplicado:</strong> Has demostrado que sabes interpretar las señales de tu cuerpo y aplicar el paso correcto del calentamiento. Esta habilidad te hará un atleta más inteligente y menos propenso a lesiones.</div>';
+        document.getElementById('continuePart4Btn').style.display = 'inline-block';
+        return;
+      }
+
+      const situation = situations[gameState.currentSituation];
+      
+      container.innerHTML = `
+        <div class="situation-card">
+          <div class="situation-text">${situation.text}</div>
+          <div class="options-container">
+            ${situation.options.map((option, index) => 
+              `<button class="option-btn" onclick="checkSituation(${index})">${option}</button>`
+            ).join('')}
+          </div>
+          <div id="situationFeedback"></div>
+        </div>
+      `;
+    }
+
+    function checkSituation(selectedIndex) {
+      const situation = situations[gameState.currentSituation];
+      const buttons = document.querySelectorAll('.situation-card .option-btn');
+      const feedback = document.getElementById('situationFeedback');
+      
+      buttons.forEach((btn, index) => {
+        btn.disabled = true;
+        if (index === situation.correct) {
+          btn.classList.add('correct');
+        } else if (index === selectedIndex) {
+          btn.classList.add('incorrect');
+        }
+      });
+
+      if (selectedIndex === situation.correct) {
+        feedback.innerHTML = `<div class="feedback-message success">${situation.explanation}</div>`;
+        gameState.scores.part3 += 25;
+      } else {
+        feedback.innerHTML = `<div class="feedback-message error"><strong>Incorrecto.</strong> ${situation.explanation}</div>`;
+      }
+
+      updateScore();
+
+      setTimeout(() => {
+        gameState.currentSituation++;
+        showNextSituation();
+      }, 7000);
+    }
+
+    function startPart4() {
+      document.getElementById('part3').classList.add('hidden');
+      document.getElementById('part4').classList.remove('hidden');
+      gameState.currentPart = 4;
+      gameState.currentError = 0;
+      updateScore();
+      showNextError();
+    }
+
+    function showNextError() {
+      const container = document.getElementById('errorsContainer');
+      
+      if (gameState.currentError >= errorScenes.length) {
+        gameState.part4Complete = true;
+        container.innerHTML += '<div class="info-box"><strong>⚠️ Prevención aprendida:</strong> Conocer estos errores comunes te protegerá de lesiones que afectan a miles de jugadores cada año. Ahora puedes corregir a tus compañeros y entrenar de forma más segura.</div>';
+        document.getElementById('continuePart5Btn').style.display = 'inline-block';
+        return;
+      }
+
+      const scene = errorScenes[gameState.currentError];
+      
+      container.innerHTML = `
+        <div class="error-scene" id="errorScene${gameState.currentError}">
+          <div class="scene-emoji">${scene.emoji}</div>
+          <div class="scene-description">${scene.description}</div>
+          <div style="text-align: center; margin-top: 20px;">
+            <button class="btn-secondary" onclick="revealError(${gameState.currentError})">🔍 ¿Cuál es el error?</button>
+          </div>
+          <div id="errorExplanation${gameState.currentError}"></div>
+        </div>
+      `;
+    }
+
+    function revealError(index) {
+      const scene = errorScenes[index];
+      const sceneDiv = document.getElementById(`errorScene${index}`);
+      const explanationDiv = document.getElementById(`errorExplanation${index}`);
+      
+      sceneDiv.classList.add('revealed');
+      
+      explanationDiv.innerHTML = `
+        <div class="error-explanation">
+          <strong>${scene.error}</strong><br><br>
+          ${scene.learning}
+        </div>
+      `;
+
+      gameState.scores.part4 += 25;
+      updateScore();
+
+      setTimeout(() => {
+        gameState.currentError++;
+        showNextError();
+      }, 10000);
+    }
+
+    function startPart5() {
+      document.getElementById('part4').classList.add('hidden');
+      document.getElementById('part5').classList.remove('hidden');
+      gameState.currentPart = 5;
+      gameState.currentQuestion = 0;
+      updateScore();
+      showNextQuestion();
+    }
+
+    function showNextQuestion() {
+      const container = document.getElementById('questionsContainer');
+      
+      if (gameState.currentQuestion >= finalQuestions.length) {
+        gameState.part5Complete = true;
+        document.getElementById('showResultsBtn').style.display = 'inline-block';
+        return;
+      }
+
+      const question = finalQuestions[gameState.currentQuestion];
+      
+      container.innerHTML = `
+        <div class="situation-card">
+          <div class="situation-text">❓ ${question.question}</div>
+          <div class="options-container">
+            ${question.options.map((option, index) => 
+              `<button class="option-btn" onclick="checkQuestion(${index})">${option}</button>`
+            ).join('')}
+          </div>
+          <div id="questionFeedback"></div>
+        </div>
+      `;
+    }
+
+    function checkQuestion(selectedIndex) {
+      const question = finalQuestions[gameState.currentQuestion];
+      const buttons = document.querySelectorAll('#part5 .option-btn');
+      const feedback = document.getElementById('questionFeedback');
+      
+      buttons.forEach((btn, index) => {
+        btn.disabled = true;
+        if (index === question.correct) {
+          btn.classList.add('correct');
+        } else if (index === selectedIndex) {
+          btn.classList.add('incorrect');
+        }
+      });
+
+      if (selectedIndex === question.correct) {
+        feedback.innerHTML = `<div class="feedback-message success"><strong>¡Correcto! ✓</strong><br>${question.explanation}</div>`;
+        gameState.scores.part5 += 33.33;
+      } else {
+        feedback.innerHTML = `<div class="feedback-message error"><strong>Incorrecto.</strong><br><strong>Respuesta correcta:</strong> ${question.options[question.correct]}<br><br>${question.explanation}</div>`;
+      }
+
+      updateScore();
+
+      setTimeout(() => {
+        gameState.currentQuestion++;
+        showNextQuestion();
+      }, 7000);
+    }
+
+    function showFinalResults() {
+      document.getElementById('part5').classList.add('hidden');
+      document.getElementById('finalResults').classList.remove('hidden');
+      gameState.currentPart = 6;
+      updateScore();
+
+      const finalScore = gameState.totalScore;
+      document.getElementById('finalScoreNumber').textContent = finalScore + '%';
+
+      const levelBadge = document.getElementById('levelBadge');
+      const levelDescription = document.getElementById('levelDescription');
+
+      if (finalScore >= 90) {
+        levelBadge.textContent = '🏆 ATLETA INTELIGENTE AC';
+        levelBadge.className = 'level-badge level-champion';
+        levelDescription.textContent = '¡Sobresaliente! Dominas perfectamente la ciencia del calentamiento. Estás preparado para entrenar y competir con el enfoque de un profesional. Tu conocimiento te protegerá de lesiones y maximizará tu rendimiento desde el primer minuto.';
+      } else if (finalScore >= 70) {
+        levelBadge.textContent = '🎯 BUEN MANEJO DEL CALENTAMIENTO';
+        levelBadge.className = 'level-badge level-good';
+        levelDescription.textContent = 'Muy bien hecho. Comprendes los conceptos fundamentales del calentamiento efectivo. Con un poco más de práctica y repaso, llegarás al nivel de atleta inteligente. Sigue aplicando lo aprendido.';
+      } else if (finalScore >= 50) {
+        levelBadge.textContent = '⚙️ AÚN DESORGANIZADO';
+        levelBadge.className = 'level-badge level-medium';
+        levelDescription.textContent = 'Vas por buen camino, pero necesitas repasar algunos conceptos clave. Te recomendamos volver a jugar y prestar especial atención a la Parte 1 (fundamentos) y Parte 4 (errores comunes). ¡La práctica hace al maestro!';
+      } else {
+        levelBadge.textContent = '🛠️ REPITE LA SECUENCIA BÁSICA';
+        levelBadge.className = 'level-badge level-beginner';
+        levelDescription.textContent = 'Es fundamental que repases todo el proceso de calentamiento desde el principio. Tómate tu tiempo para entender cada paso y su propósito. Un buen calentamiento es la base de tu seguridad y rendimiento deportivo.';
+      }
+
+      const progressBar = document.getElementById('progressBar');
+      progressBar.style.width = '100%';
+    }
+
+    function restartGame() {
+      gameState = {
+        currentPart: 1,
+        scores: { part2: 0, part3: 0, part4: 0, part5: 0 },
+        totalScore: 0,
+        part2Complete: false,
+        part3Complete: false,
+        part4Complete: false,
+        part5Complete: false,
+        currentSituation: 0,
+        currentError: 0,
+        currentQuestion: 0,
+        droppedItems: {}
+      };
+
+      document.querySelectorAll('.game-part').forEach(part => {
+        part.classList.add('hidden');
+      });
+      document.getElementById('part1').classList.remove('hidden');
+      
+      updateScore();
+      
+      const dragItems = document.querySelectorAll('#dragSource .drag-item');
+      dragItems.forEach(item => {
+        item.style.display = 'flex';
+        item.classList.remove('correct', 'incorrect');
+      });
+
+      const dropZones = document.querySelectorAll('.drop-zone');
+      dropZones.forEach(zone => {
+        zone.innerHTML = '<span class="drop-zone-label">PASO ' + zone.dataset.position + '</span>';
+        zone.classList.remove('filled');
+      });
+
+      document.getElementById('checkOrderBtn').style.display = 'none';
+      document.getElementById('continuePart3Btn').style.display = 'none';
+      document.getElementById('continuePart4Btn').style.display = 'none';
+      document.getElementById('continuePart5Btn').style.display = 'none';
+      document.getElementById('showResultsBtn').style.display = 'none';
+      document.getElementById('feedbackPart2').innerHTML = '';
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showVideoMessage() {
+      const recap = document.createElement('div');
+      recap.style.cssText = 'position: fixed; inset: 0; background: rgba(15, 23, 42, 0.84); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 1000;';
+      recap.innerHTML = 
+        <div style="background: #ffffff; color: #1f2937; border-radius: 24px; max-width: 680px; width: 100%; padding: 28px; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);">
+          <h2 style="margin-top: 0; font-size: 1.9rem; color: #4f46e5;">Repaso rapido del calentamiento</h2>
+          <p style="line-height: 1.7; color: #475569;">Antes de entrenar conviene activar la movilidad, elevar la temperatura corporal y preparar los patrones del tenis de forma progresiva. Si quieres repetir el juego, vuelve al inicio y reconstruye la secuencia completa.</p>
+          <ul style="margin: 18px 0; padding-left: 20px; color: #334155; line-height: 1.7;">
+            <li>Empieza con movilidad general y activacion suave.</li>
+            <li>Sube la intensidad con desplazamientos y coordinacion.</li>
+            <li>Termina con gestos especificos de tenis antes de golpear fuerte.</li>
+          </ul>
+          <button class="btn-primary" style="width: 100%;" onclick="this.closest('div').parentElement.remove()">Cerrar</button>
+        </div>;
+      document.body.appendChild(recap);
+    }
+
+    async function onConfigChange(newConfig) {
+      if (newConfig.game_title !== undefined) {
+        document.getElementById('gameTitle').textContent = `🎮 ${newConfig.game_title} 🔥🎾`;
+      }
+      
+      if (newConfig.lesson_number !== undefined) {
+        document.getElementById('lessonNumber').textContent = `📘 ${newConfig.lesson_number.toUpperCase()}`;
+      }
+
+      const elements = {
+        primary: document.querySelectorAll('.btn-primary, .step-number, .progress-fill'),
+        background: document.querySelectorAll('.game-container'),
+        text: document.querySelectorAll('.step-title, .situation-text, .section-title'),
+        success: document.querySelectorAll('.feedback-message.success')
+      };
+
+      if (newConfig.primary_color) {
+        elements.primary.forEach(el => {
+          if (el.classList.contains('btn-primary')) {
+            el.style.background = `linear-gradient(135deg, ${newConfig.primary_color} 0%, ${config.secondary_color || defaultConfig.secondary_color} 100%)`;
+          } else {
+            el.style.background = newConfig.primary_color;
+          }
+        });
+      }
+
+      if (newConfig.background_color) {
+        elements.background.forEach(el => {
+          el.style.background = newConfig.background_color;
+        });
+      }
+
+      if (newConfig.text_color) {
+        elements.text.forEach(el => {
+          el.style.color = newConfig.text_color;
+        });
+      }
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (cfg) => ({
+          recolorables: [
+            {
+              get: () => cfg.primary_color || defaultConfig.primary_color,
+              set: (value) => {
+                cfg.primary_color = value;
+                window.elementSdk.setConfig({ primary_color: value });
+              }
+            },
+            {
+              get: () => cfg.secondary_color || defaultConfig.secondary_color,
+              set: (value) => {
+                cfg.secondary_color = value;
+                window.elementSdk.setConfig({ secondary_color: value });
+              }
+            },
+            {
+              get: () => cfg.background_color || defaultConfig.background_color,
+              set: (value) => {
+                cfg.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => cfg.text_color || defaultConfig.text_color,
+              set: (value) => {
+                cfg.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => cfg.success_color || defaultConfig.success_color,
+              set: (value) => {
+                cfg.success_color = value;
+                window.elementSdk.setConfig({ success_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (cfg) => new Map([
+          ['game_title', cfg.game_title || defaultConfig.game_title],
+          ['lesson_number', cfg.lesson_number || defaultConfig.lesson_number]
+        ])
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateScore();
+    });
+  </script>
+ <script>
+(function(){function acGameScrollTop(){try{window.scrollTo(0,0);}catch(e){}['.container','.game-container','.game-area','.game-section','.section','.phase-container','.results-screen','.modal-content'].forEach(function(selector){document.querySelectorAll(selector).forEach(function(element){if(!element){return;}try{if(typeof element.scrollTo==='function'){element.scrollTo(0,0);}else{element.scrollTop=0;}}catch(e){element.scrollTop=0;}});});}window.acGameScrollTop=acGameScrollTop;document.addEventListener('click',function(event){var trigger=event.target.closest('button, .btn, .btn-primary, .btn-secondary, .option-btn, .option-button, .action-btn, .phase-button');if(!trigger){return;}setTimeout(acGameScrollTop,40);setTimeout(acGameScrollTop,220);},true);document.addEventListener('DOMContentLoaded',function(){acGameScrollTop();setTimeout(acGameScrollTop,120);});})();
+</script>
+</body>
+</html>

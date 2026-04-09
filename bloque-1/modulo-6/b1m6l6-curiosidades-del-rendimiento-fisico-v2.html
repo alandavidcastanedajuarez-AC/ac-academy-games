@@ -1,0 +1,1235 @@
+<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Física del Tenis AC - Juega, Responde y Aprende</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      color: #ffffff;
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    .game-container {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+      animation: slideDown 0.6s ease-out;
+    }
+
+    .header h1 {
+      font-size: 2.2rem;
+      margin: 0 0 0.5rem 0;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b, #ef4444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin: 0;
+    }
+
+    .progress-bar {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      height: 12px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #fbbf24, #f59e0b);
+      height: 100%;
+      width: 0%;
+      transition: width 0.5s ease;
+      border-radius: 20px;
+    }
+
+    .minigame-section {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .minigame-title {
+      font-size: 1.8rem;
+      margin: 0 0 1rem 0;
+      color: #fbbf24;
+      text-align: center;
+    }
+
+    .minigame-subtitle {
+      text-align: center;
+      font-size: 1.1rem;
+      opacity: 0.85;
+      margin-bottom: 2rem;
+    }
+
+    .situation-card {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .situation-title {
+      font-size: 1.4rem;
+      color: #60a5fa;
+      margin: 0 0 1rem 0;
+      font-weight: bold;
+    }
+
+    .situation-question {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .options-container {
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .option-button {
+      background: rgba(96, 165, 250, 0.2);
+      border: 2px solid rgba(96, 165, 250, 0.4);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      color: #ffffff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .option-button:hover:not(:disabled) {
+      background: rgba(96, 165, 250, 0.35);
+      border-color: #60a5fa;
+      transform: translateX(8px);
+    }
+
+    .option-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .option-button.correct {
+      background: rgba(34, 197, 94, 0.3);
+      border-color: #22c55e;
+      animation: pulse 0.5s ease;
+    }
+
+    .option-button.incorrect {
+      background: rgba(239, 68, 68, 0.3);
+      border-color: #ef4444;
+    }
+
+    .teaching-box {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2));
+      border: 2px solid #fbbf24;
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-top: 1rem;
+      display: none;
+      animation: slideUp 0.4s ease-out;
+    }
+
+    .teaching-box.show {
+      display: block;
+    }
+
+    .teaching-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .teaching-text {
+      font-size: 1.15rem;
+      font-weight: 600;
+      line-height: 1.6;
+      color: #fef3c7;
+    }
+
+    .next-button {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      border: none;
+      border-radius: 12px;
+      padding: 1rem 2rem;
+      color: #0f172a;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      margin-top: 1.5rem;
+      display: none;
+      box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+    }
+
+    .next-button.show {
+      display: block;
+    }
+
+    .next-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(251, 191, 36, 0.6);
+    }
+
+    .phase-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .phase-btn {
+      background: rgba(139, 92, 246, 0.2);
+      border: 2px solid rgba(139, 92, 246, 0.4);
+      border-radius: 12px;
+      padding: 1.2rem;
+      color: #ffffff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .phase-btn:hover {
+      background: rgba(139, 92, 246, 0.35);
+      border-color: #8b5cf6;
+      transform: scale(1.05);
+    }
+
+    .phase-btn.revealed {
+      background: rgba(251, 191, 36, 0.25);
+      border-color: #fbbf24;
+    }
+
+    .phase-number {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #fbbf24;
+      margin-bottom: 0.3rem;
+    }
+
+    .phase-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .phase-detail {
+      display: none;
+      font-size: 0.95rem;
+      margin-top: 0.5rem;
+      opacity: 0.9;
+      line-height: 1.4;
+    }
+
+    .phase-btn.revealed .phase-detail {
+      display: block;
+    }
+
+    .final-teaching {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.2));
+      border: 2px solid #8b5cf6;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      text-align: center;
+      display: none;
+    }
+
+    .final-teaching.show {
+      display: block;
+      animation: slideUp 0.5s ease-out;
+    }
+
+    .final-teaching-text {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #c4b5fd;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.03);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 1.6rem;
+      }
+
+      .phase-buttons {
+        grid-template-columns: 1fr;
+      }
+    }
+      /* Standalone cleanup helpers */
+    .hidden { display: none !important; }
+    .text-center, .center { text-align: center !important; }
+    .mt-30 { margin-top: 30px !important; }
+    @media (max-width: 768px) {
+      .container,
+      .game-container,
+      .game-area,
+      .game-section,
+      .section,
+      .phase-container,
+      .minigame-section,
+      .header,
+      .modal-content {
+        padding: 18px !important;
+      }
+      .header h1,
+      .game-title,
+      #gameTitle,
+      #game-title,
+      .intro-title,
+      .cover-title,
+      h1 {
+        font-size: clamp(1.9rem, 8vw, 2.4rem) !important;
+        line-height: 1.15 !important;
+      }
+      .header h2,
+      .section-title,
+      .phase-title,
+      .minigame-title,
+      h2 {
+        font-size: clamp(1.25rem, 6vw, 1.75rem) !important;
+        line-height: 1.25 !important;
+      }
+      .header p,
+      .section-description,
+      .game-subtitle,
+      .subtitle,
+      .scenario-text,
+      .situation-question,
+      .step-content,
+      .detail-section li,
+      .teaching-text,
+      .option-button,
+      .info-item,
+      .level-description {
+        font-size: 1rem !important;
+        line-height: 1.55 !important;
+      }
+      .info-boxes,
+      .body-map,
+      .injury-cards,
+      .scene-grid,
+      .options,
+      .phase-buttons,
+      .cards-grid,
+      .options-grid,
+      .cards-container {
+        grid-template-columns: 1fr !important;
+      }
+      .chain-builder,
+      .final-buttons,
+      .buttons-row,
+      .nav-buttons,
+      .button-group,
+      .buttons-group {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+      }
+      .btn,
+      .btn-primary,
+      .btn-secondary,
+      .phase-button,
+      .action-btn,
+      .next-button,
+      .option-btn,
+      .option-button {
+        width: 100% !important;
+      }
+      .score-display {
+        position: static !important;
+        display: block !important;
+        width: fit-content;
+        max-width: 100%;
+        margin: 0 auto 16px auto !important;
+        font-size: 1rem !important;
+        padding: 12px 16px !important;
+      }
+    }
+    @media (max-width: 768px) {
+      .game-container {
+        padding: 16px 12px 28px !important;
+      }
+
+      .header {
+        margin-bottom: 18px !important;
+      }
+
+      .header h1 {
+        font-size: clamp(1.7rem, 7vw, 2rem) !important;
+        line-height: 1.12 !important;
+      }
+
+      .header p {
+        font-size: 0.98rem !important;
+        line-height: 1.55 !important;
+      }
+
+      .minigame-section {
+        padding: 18px 14px !important;
+        margin-bottom: 16px !important;
+        border-radius: 16px !important;
+      }
+
+      .minigame-title {
+        font-size: clamp(1.15rem, 5.3vw, 1.4rem) !important;
+        line-height: 1.3 !important;
+        margin-bottom: 12px !important;
+      }
+
+      .minigame-subtitle,
+      .situation-question,
+      .teaching-text,
+      .option-button,
+      .final-teaching-text {
+        font-size: 0.98rem !important;
+        line-height: 1.58 !important;
+      }
+
+      .situation-card,
+      .teaching-box,
+      .final-teaching {
+        padding: 16px 14px !important;
+        border-radius: 14px !important;
+      }
+
+      .situation-title {
+        font-size: 1.05rem !important;
+      }
+
+      .options-container,
+      .phase-buttons {
+        gap: 10px !important;
+      }
+
+      .phase-buttons {
+        grid-template-columns: 1fr !important;
+      }
+
+      .phase-btn {
+        padding: 14px 12px !important;
+        text-align: left !important;
+      }
+
+      .phase-number {
+        font-size: 1.2rem !important;
+      }
+
+      .phase-name {
+        font-size: 1rem !important;
+      }
+
+      .next-button,
+      .option-button {
+        width: 100% !important;
+        padding: 14px 14px !important;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }    /* Standalone cleanup helpers */
+    .hidden { display: none !important; }
+    .text-center, .center { text-align: center !important; }
+    .mt-30 { margin-top: 30px !important; }
+    @media (max-width: 768px) {
+      .container,
+      .game-container,
+      .game-area,
+      .game-section,
+      .section,
+      .phase-container,
+      .minigame-section,
+      .header,
+      .modal-content {
+        padding: 18px !important;
+      }
+      .header h1,
+      .game-title,
+      #gameTitle,
+      #game-title,
+      .intro-title,
+      .cover-title,
+      h1 {
+        font-size: clamp(1.9rem, 8vw, 2.4rem) !important;
+        line-height: 1.15 !important;
+      }
+      .header h2,
+      .section-title,
+      .phase-title,
+      .minigame-title,
+      h2 {
+        font-size: clamp(1.25rem, 6vw, 1.75rem) !important;
+        line-height: 1.25 !important;
+      }
+      .header p,
+      .section-description,
+      .game-subtitle,
+      .subtitle,
+      .scenario-text,
+      .situation-question,
+      .step-content,
+      .detail-section li,
+      .teaching-text,
+      .option-button,
+      .info-item,
+      .level-description {
+        font-size: 1rem !important;
+        line-height: 1.55 !important;
+      }
+      .info-boxes,
+      .body-map,
+      .injury-cards,
+      .scene-grid,
+      .options,
+      .phase-buttons,
+      .cards-grid,
+      .options-grid,
+      .cards-container {
+        grid-template-columns: 1fr !important;
+      }
+      .chain-builder,
+      .final-buttons,
+      .buttons-row,
+      .nav-buttons,
+      .button-group,
+      .buttons-group {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+      }
+      .btn,
+      .btn-primary,
+      .btn-secondary,
+      .phase-button,
+      .action-btn,
+      .next-button,
+      .option-btn,
+      .option-button {
+        width: 100% !important;
+      }
+      .score-display {
+        position: static !important;
+        display: block !important;
+        width: fit-content;
+        max-width: 100%;
+        margin: 0 auto 16px auto !important;
+        font-size: 1rem !important;
+        padding: 12px 16px !important;
+      }
+    }
+  </style>
+    <script>
+    window.elementSdk = window.elementSdk || {
+      init: async function () { return { isOk: true, value: null }; },
+      on: function () {},
+      emit: function () { return { isOk: true, value: null }; }
+    };
+    window.dataSdk = window.dataSdk || {
+      init: async function () { return { isOk: true, value: null }; },
+      create: async function () { return { isOk: true, value: null }; },
+      list: async function () { return { isOk: true, value: [] }; },
+      update: async function () { return { isOk: true, value: null }; }
+    };
+  </script>
+</head>
+ <body>
+  <div class="game-container">
+   <header class="header">
+    <h1>Fisica del tenis AC</h1>
+    <p>Juego rapido para leer, responder y aprender mejor.</p>
+   </header>
+   <div class="progress-bar">
+    <div class="progress-fill" id="progressBar"></div>
+   </div><!-- MINIJUEGO 1: ¿QUIÉN SE MUEVE MÁS? -->
+   <section id="minigame1" class="minigame-section">
+    <h2 class="minigame-title">🟢 MINIJUEGO 1 — "¿QUIÉN SE MUEVE MÁS?"</h2>
+    <p class="minigame-subtitle">Adivina el movimiento correcto</p>
+    <div class="situation-card">
+     <h3 class="situation-title">Situación A</h3>
+     <p class="situation-question">¿Quién se mueve más en un partido de tenis: las piernas o los brazos?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(1, 1, 0, true)">Las piernas</button> <button class="option-button" onclick="checkAnswer(1, 1, 0, false)">Los brazos</button>
+     </div>
+     <div class="teaching-box" id="teaching-1-1">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       Tu juego nace de tus piernas. Muévete primero, golpea después.
+      </div>
+     </div>
+    </div>
+    <div class="situation-card">
+     <h3 class="situation-title">Situación B</h3>
+     <p class="situation-question">¿Qué hace que llegues estable al golpe: un paso grande o muchos pasos cortos?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(1, 2, 1, false)">Un paso grande</button> <button class="option-button" onclick="checkAnswer(1, 2, 1, true)">Muchos pasos cortos</button>
+     </div>
+     <div class="teaching-box" id="teaching-1-2">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       Los pasos pequeños te dan control. Es la clave del equilibrio.
+      </div>
+     </div>
+    </div>
+    <div class="situation-card">
+     <h3 class="situation-title">Situación C</h3>
+     <p class="situation-question">¿Qué evita más lesiones: saber frenar o saber acelerar?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(1, 3, 0, true)">Saber frenar</button> <button class="option-button" onclick="checkAnswer(1, 3, 0, false)">Saber acelerar</button>
+     </div>
+     <div class="teaching-box" id="teaching-1-3">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       Si frenas mejor, golpeas mejor.
+      </div>
+     </div>
+    </div><button class="next-button" id="next-1" onclick="goToMinigame(2)">Continuar al Minijuego 2 →</button>
+   </section><!-- MINIJUEGO 2: ADIVINA EL ESFUERZO -->
+   <section id="minigame2" class="minigame-section hidden">
+    <h2 class="minigame-title">🟠 MINIJUEGO 2 — "ADIVINA EL ESFUERZO"</h2>
+    <p class="minigame-subtitle">Descubre qué parte del cuerpo trabaja más</p>
+    <div class="situation-card">
+     <h3 class="situation-title">Golpe 1 — Saque</h3>
+     <p class="situation-question">🤔 ¿Qué parte del cuerpo trabaja más?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(2, 1, 1, false)">Brazos</button> <button class="option-button" onclick="checkAnswer(2, 1, 1, true)">Piernas</button> <button class="option-button" onclick="checkAnswer(2, 1, 1, false)">Torso</button>
+     </div>
+     <div class="teaching-box" id="teaching-2-1">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       El saque empieza abajo, no arriba.
+      </div>
+     </div>
+    </div>
+    <div class="situation-card">
+     <h3 class="situation-title">Golpe 2 — Derecha en carrera</h3>
+     <p class="situation-question">🤔 ¿Qué te da equilibrio?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(2, 2, 1, false)">Hombros</button> <button class="option-button" onclick="checkAnswer(2, 2, 1, true)">Abdomen</button> <button class="option-button" onclick="checkAnswer(2, 2, 1, false)">Muñeca</button>
+     </div>
+     <div class="teaching-box" id="teaching-2-2">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       Si tu abdomen no trabaja, tu derecha se descontrola.
+      </div>
+     </div>
+    </div>
+    <div class="situation-card">
+     <h3 class="situation-title">Golpe 3 — Revés a dos manos</h3>
+     <p class="situation-question">🤔 ¿Quién manda?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(2, 3, 1, false)">Mano dominante</button> <button class="option-button" onclick="checkAnswer(2, 3, 1, true)">Mano no dominante</button> <button class="option-button" onclick="checkAnswer(2, 3, 1, false)">Ninguna de las dos</button>
+     </div>
+     <div class="teaching-box" id="teaching-2-3">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       Tu revés a dos manos mejora si entrenas tu mano izquierda.
+      </div>
+     </div>
+    </div><button class="next-button" id="next-2" onclick="goToMinigame(3)">Continuar al Minijuego 3 →</button>
+   </section><!-- MINIJUEGO 3: TU PUNTO PERFECTO -->
+   <section id="minigame3" class="minigame-section hidden">
+    <h2 class="minigame-title">🔵 MINIJUEGO 3 — "TU PUNTO PERFECTO"</h2>
+    <p class="minigame-subtitle">Toca cada fase para armar tu punto ideal</p>
+    <div class="phase-buttons">
+     <div class="phase-btn" onclick="revealPhase(1)">
+      <div class="phase-number">
+       1
+      </div>
+      <div class="phase-name">
+       Preparación
+      </div>
+      <div class="phase-detail">
+       Rodillas flexionadas = mejor reacción.
+      </div>
+     </div>
+     <div class="phase-btn" onclick="revealPhase(2)">
+      <div class="phase-number">
+       2
+      </div>
+      <div class="phase-name">
+       Arranque
+      </div>
+      <div class="phase-detail">
+       El primer paso es el que manda.
+      </div>
+     </div>
+     <div class="phase-btn" onclick="revealPhase(3)">
+      <div class="phase-number">
+       3
+      </div>
+      <div class="phase-name">
+       Ajuste
+      </div>
+      <div class="phase-detail">
+       Mini pasos = punto estable.
+      </div>
+     </div>
+     <div class="phase-btn" onclick="revealPhase(4)">
+      <div class="phase-number">
+       4
+      </div>
+      <div class="phase-name">
+       Golpe
+      </div>
+      <div class="phase-detail">
+       Rota el torso, no la muñeca.
+      </div>
+     </div>
+     <div class="phase-btn" onclick="revealPhase(5)">
+      <div class="phase-number">
+       5
+      </div>
+      <div class="phase-name">
+       Recuperación
+      </div>
+      <div class="phase-detail">
+       Vuelve al centro, siempre.
+      </div>
+     </div>
+     <div class="phase-btn" onclick="revealPhase(6)">
+      <div class="phase-number">
+       6
+      </div>
+      <div class="phase-name">
+       Transición
+      </div>
+      <div class="phase-detail">
+       Paso pequeño + listo para el siguiente.
+      </div>
+     </div>
+    </div>
+    <div class="final-teaching" id="final-teaching-3">
+     <div class="teaching-icon">
+      🎯
+     </div>
+     <div class="final-teaching-text">
+      El 80% del punto es movimiento, no golpes.
+     </div>
+    </div><button class="next-button" id="next-3" onclick="goToMinigame(4)">Continuar al Minijuego 4 →</button>
+   </section><!-- MINIJUEGO 4: LA ENERGÍA OCULTA -->
+   <section id="minigame4" class="minigame-section hidden">
+    <h2 class="minigame-title">🟣 MINIJUEGO 4 — "LA ENERGÍA OCULTA"</h2>
+    <p class="minigame-subtitle">Decisiones aplicables al tenis real</p>
+    <div class="situation-card">
+     <h3 class="situation-title">Pregunta 1</h3>
+     <p class="situation-question">¿Qué te cansa más: correr mucho o frenar mucho?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(4, 1, 1, false)">Correr mucho</button> <button class="option-button" onclick="checkAnswer(4, 1, 1, true)">Frenar mucho</button>
+     </div>
+     <div class="teaching-box" id="teaching-4-1">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       Aprende a frenar bien y ahorrarás energía.
+      </div>
+     </div>
+    </div>
+    <div class="situation-card">
+     <h3 class="situation-title">Pregunta 2</h3>
+     <p class="situation-question">¿Qué golpe te gasta más energía si lo haces mal?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(4, 2, 0, true)">Saque</button> <button class="option-button" onclick="checkAnswer(4, 2, 0, false)">Volea</button> <button class="option-button" onclick="checkAnswer(4, 2, 0, false)">Slice</button>
+     </div>
+     <div class="teaching-box" id="teaching-4-2">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       Un saque mal hecho te destruye el hombro y te quita energía.
+      </div>
+     </div>
+    </div>
+    <div class="situation-card">
+     <h3 class="situation-title">Pregunta 3</h3>
+     <p class="situation-question">¿Qué te da más potencia: fuerza o técnica?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(4, 3, 1, false)">Fuerza</button> <button class="option-button" onclick="checkAnswer(4, 3, 1, true)">Técnica</button>
+     </div>
+     <div class="teaching-box" id="teaching-4-3">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       Un jugador técnico gasta menos energía y golpea más fuerte.
+      </div>
+     </div>
+    </div><button class="next-button" id="next-4" onclick="goToMinigame(5)">Continuar al Minijuego 5 →</button>
+   </section><!-- MINIJUEGO 5: ADIVINA AL PRO -->
+   <section id="minigame5" class="minigame-section hidden">
+    <h2 class="minigame-title">🟡 MINIJUEGO 5 — "ADIVINA AL PRO"</h2>
+    <p class="minigame-subtitle">Aprende de los mejores jugadores del mundo</p>
+    <div class="situation-card">
+     <h3 class="situation-title">Pregunta 1</h3>
+     <p class="situation-question">¿Quién se mueve como elástico?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(5, 1, 0, true)">Djokovic</button> <button class="option-button" onclick="checkAnswer(5, 1, 0, false)">Nadal</button> <button class="option-button" onclick="checkAnswer(5, 1, 0, false)">Federer</button>
+     </div>
+     <div class="teaching-box" id="teaching-5-1">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       La flexibilidad te hace más rápido.
+      </div>
+     </div>
+    </div>
+    <div class="situation-card">
+     <h3 class="situation-title">Pregunta 2</h3>
+     <p class="situation-question">¿Quién golpea más pesado?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(5, 2, 0, true)">Alcaraz</button> <button class="option-button" onclick="checkAnswer(5, 2, 0, false)">Sinner</button> <button class="option-button" onclick="checkAnswer(5, 2, 0, false)">Medvedev</button>
+     </div>
+     <div class="teaching-box" id="teaching-5-2">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       Potencia nace en las piernas.
+      </div>
+     </div>
+    </div>
+    <div class="situation-card">
+     <h3 class="situation-title">Pregunta 3</h3>
+     <p class="situation-question">¿Quién usa mejor el core?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(5, 3, 0, true)">Sinner</button> <button class="option-button" onclick="checkAnswer(5, 3, 0, false)">Djokovic</button> <button class="option-button" onclick="checkAnswer(5, 3, 0, false)">Alcaraz</button>
+     </div>
+     <div class="teaching-box" id="teaching-5-3">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       El core coordina todo.
+      </div>
+     </div>
+    </div>
+    <div class="situation-card">
+     <h3 class="situation-title">Pregunta 4</h3>
+     <p class="situation-question">¿Quién tiene mejor energía mental + física?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(5, 4, 0, true)">Nadal</button> <button class="option-button" onclick="checkAnswer(5, 4, 0, false)">Djokovic</button> <button class="option-button" onclick="checkAnswer(5, 4, 0, false)">Federer</button>
+     </div>
+     <div class="teaching-box" id="teaching-5-4">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       Tu cuerpo sigue a tu mente.
+      </div>
+     </div>
+    </div>
+    <div class="situation-card">
+     <h3 class="situation-title">Pregunta 5</h3>
+     <p class="situation-question">¿Quién gasta menos energía por punto?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(5, 5, 0, true)">Federer</button> <button class="option-button" onclick="checkAnswer(5, 5, 0, false)">Nadal</button> <button class="option-button" onclick="checkAnswer(5, 5, 0, false)">Medvedev</button>
+     </div>
+     <div class="teaching-box" id="teaching-5-5">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       Moverte bonito = gastar menos.
+      </div>
+     </div>
+    </div>
+    <div class="situation-card">
+     <h3 class="situation-title">Pregunta 6</h3>
+     <p class="situation-question">¿Quién corre más atrás?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(5, 6, 0, true)">Medvedev</button> <button class="option-button" onclick="checkAnswer(5, 6, 0, false)">Alcaraz</button> <button class="option-button" onclick="checkAnswer(5, 6, 0, false)">Zverev</button>
+     </div>
+     <div class="teaching-box" id="teaching-5-6">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       Encuentra tu distancia ideal.
+      </div>
+     </div>
+    </div>
+    <div class="situation-card">
+     <h3 class="situation-title">Pregunta 7</h3>
+     <p class="situation-question">¿Quién tiene el mejor arranque?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(5, 7, 0, true)">Alcaraz</button> <button class="option-button" onclick="checkAnswer(5, 7, 0, false)">Sinner</button> <button class="option-button" onclick="checkAnswer(5, 7, 0, false)">Djokovic</button>
+     </div>
+     <div class="teaching-box" id="teaching-5-7">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       Primer paso explosivo.
+      </div>
+     </div>
+    </div>
+    <div class="situation-card">
+     <h3 class="situation-title">Pregunta 8</h3>
+     <p class="situation-question">¿Quién defiende mejor en piernas?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(5, 8, 0, true)">Djokovic</button> <button class="option-button" onclick="checkAnswer(5, 8, 0, false)">Nadal</button> <button class="option-button" onclick="checkAnswer(5, 8, 0, false)">Alcaraz</button>
+     </div>
+     <div class="teaching-box" id="teaching-5-8">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       Piernas rápidas = defensa sólida.
+      </div>
+     </div>
+    </div>
+    <div class="situation-card">
+     <h3 class="situation-title">Pregunta 9</h3>
+     <p class="situation-question">¿Quién mejoró su cuerpo con movilidad?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(5, 9, 0, true)">Djokovic</button> <button class="option-button" onclick="checkAnswer(5, 9, 0, false)">Nadal</button> <button class="option-button" onclick="checkAnswer(5, 9, 0, false)">Federer</button>
+     </div>
+     <div class="teaching-box" id="teaching-5-9">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       Moverse bien es más importante que estar fuerte.
+      </div>
+     </div>
+    </div>
+    <div class="situation-card">
+     <h3 class="situation-title">Pregunta 10</h3>
+     <p class="situation-question">¿Quién tiene el golpe de revés más explosivo?</p>
+     <div class="options-container"><button class="option-button" onclick="checkAnswer(5, 10, 0, true)">Djokovic</button> <button class="option-button" onclick="checkAnswer(5, 10, 0, false)">Nadal</button> <button class="option-button" onclick="checkAnswer(5, 10, 0, false)">Alcaraz</button>
+     </div>
+     <div class="teaching-box" id="teaching-5-10">
+      <div class="teaching-icon">
+       💡
+      </div>
+      <div class="teaching-text">
+       Revés potente = cuerpo coordinado.
+      </div>
+     </div>
+    </div><button class="next-button" id="next-5" onclick="finishGame()">🏆 Ver Resultado Final</button>
+   </section>
+  </div>
+  <script>
+    const gameState = {
+      minigame1: { completed: 0, total: 3 },
+      minigame2: { completed: 0, total: 3 },
+      minigame3: { phasesRevealed: 0, total: 6 },
+      minigame4: { completed: 0, total: 3 },
+      minigame5: { completed: 0, total: 10 }
+    };
+
+    function updateProgress() {
+      const totalCompleted = 
+        gameState.minigame1.completed + 
+        gameState.minigame2.completed + 
+        (gameState.minigame3.phasesRevealed > 0 ? 1 : 0) +
+        gameState.minigame4.completed + 
+        gameState.minigame5.completed;
+      
+      const totalTasks = 
+        gameState.minigame1.total + 
+        gameState.minigame2.total + 
+        1 + 
+        gameState.minigame4.total + 
+        gameState.minigame5.total;
+      
+      const percentage = (totalCompleted / totalTasks) * 100;
+      document.getElementById('progressBar').style.width = percentage + '%';
+    }
+
+    function checkAnswer(minigame, question, correctIndex, isCorrect) {
+      const teachingId = `teaching-${minigame}-${question}`;
+      const teachingBox = document.getElementById(teachingId);
+      const buttons = teachingBox.previousElementSibling.querySelectorAll('.option-button');
+      
+      buttons.forEach((btn, index) => {
+        btn.disabled = true;
+        if (index === correctIndex) {
+          btn.classList.add('correct');
+        } else if (!isCorrect && btn === event.target) {
+          btn.classList.add('incorrect');
+        }
+      });
+
+      teachingBox.classList.add('show');
+
+      gameState[`minigame${minigame}`].completed++;
+      
+      if (gameState[`minigame${minigame}`].completed === gameState[`minigame${minigame}`].total) {
+        const nextButton = document.getElementById(`next-${minigame}`);
+        if (nextButton) {
+          nextButton.classList.add('show');
+        }
+      }
+
+      updateProgress();
+    }
+
+    function goToMinigame(number) {
+      document.querySelectorAll('.minigame-section').forEach(section => {
+        section.classList.add('hidden');
+      });
+      document.getElementById(`minigame${number}`).classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function revealPhase(phaseNum) {
+      const phases = document.querySelectorAll('.phase-btn');
+      const clickedPhase = phases[phaseNum - 1];
+      
+      if (!clickedPhase.classList.contains('revealed')) {
+        clickedPhase.classList.add('revealed');
+        gameState.minigame3.phasesRevealed++;
+
+        if (gameState.minigame3.phasesRevealed === gameState.minigame3.total) {
+          document.getElementById('final-teaching-3').classList.add('show');
+          document.getElementById('next-3').classList.add('show');
+        }
+
+        updateProgress();
+      }
+    }
+
+    function finishGame() {
+      const totalQuestions = 
+        gameState.minigame1.total + 
+        gameState.minigame2.total + 
+        gameState.minigame4.total + 
+        gameState.minigame5.total;
+      
+      const totalCorrect = 
+        gameState.minigame1.completed + 
+        gameState.minigame2.completed + 
+        gameState.minigame4.completed + 
+        gameState.minigame5.completed;
+      
+      const percentage = (totalCorrect / totalQuestions) * 100;
+      
+      let level, icon, title, message, color;
+      
+      if (percentage >= 80) {
+        level = "NIVEL 3";
+        icon = "🟩";
+        title = "CUERPO DE ATLETA AC";
+        message = "Aprendiste a usar tu cuerpo como un profesional.";
+        color = "#22c55e";
+      } else if (percentage >= 60) {
+        level = "NIVEL 2";
+        icon = "🟨";
+        title = "BUEN ENTENDIMIENTO";
+        message = "Comprendes lo esencial y ya puedes aplicarlo mejor en pista.";
+        color = "#fbbf24";
+      } else {
+        level = "NIVEL 1";
+        icon = "🟥";
+        title = "NECESITAS ENTRENAR TU CUERPO";
+        message = "Repite el juego y mejora tu lectura fisica del tenis.";
+        color = "#ef4444";
+      }
+      
+      const resultScreen = document.createElement('div');
+      resultScreen.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.98);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.5s ease-out;
+        padding: 1rem;
+        overflow-y: auto;
+      `;
+      
+      resultScreen.innerHTML = `
+        <div style="
+          background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.95));
+          border: 3px solid ${color};
+          border-radius: 20px;
+          padding: clamp(1.25rem, 4vw, 2.25rem);
+          max-width: 560px;
+          width: 100%;
+          text-align: center;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        ">
+          <div style="font-size: clamp(3rem, 11vw, 4.5rem); margin-bottom: 0.85rem;">${icon}</div>
+          <h2 style="
+            font-size: clamp(1.1rem, 4.5vw, 1.4rem);
+            color: ${color};
+            margin: 0 0 0.5rem 0;
+            font-weight: bold;
+          ">${level}</h2>
+          <h3 style="
+            font-size: clamp(1.5rem, 6vw, 1.9rem);
+            color: #ffffff;
+            margin: 0 0 1.5rem 0;
+            font-weight: bold;
+          ">${title}</h3>
+          
+          <div style="
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+          ">
+            <p style="
+              font-size: clamp(1rem, 4.1vw, 1.15rem);
+              line-height: 1.7;
+              margin: 0 0 1rem 0;
+              color: #ffffff;
+            ">${message}</p>
+            
+            <div style="
+              font-size: 1rem;
+              color: #fbbf24;
+              font-weight: 600;
+            ">
+              ${totalCorrect} de ${totalQuestions} correctas
+            </div>
+          </div>
+
+          <div style="
+            background: rgba(251, 191, 36, 0.15);
+            border: 2px solid rgba(251, 191, 36, 0.3);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 2rem;
+          ">
+            <p style="
+              font-size: 1rem;
+              line-height: 1.7;
+              margin: 0;
+              color: #fef3c7;
+              font-style: italic;
+            ">"Ahora entiendo mejor como aprovechar mi cuerpo en la cancha."</p>
+          </div>
+
+          <div style="display: grid; gap: 1rem;">
+            <button onclick="window.location.reload()" style="
+              background: linear-gradient(135deg, #fbbf24, #f59e0b);
+              border: none;
+              border-radius: 12px;
+              padding: 0.95rem 1.2rem;
+              color: #0f172a;
+              font-size: 1rem;
+              font-weight: bold;
+              cursor: pointer;
+              transition: all 0.3s ease;
+            ">Volver a jugar</button>
+            
+            <button onclick="saveProgress()" style="
+              background: rgba(96, 165, 250, 0.3);
+              border: 2px solid #60a5fa;
+              border-radius: 12px;
+              padding: 0.95rem 1.2rem;
+              color: #ffffff;
+              font-size: 1rem;
+              font-weight: bold;
+              cursor: pointer;
+              transition: all 0.3s ease;
+            ">Guardar aprendizaje</button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(resultScreen);
+    }
+
+    function saveProgress() {
+      const saveMessage = document.createElement('div');
+      saveMessage.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(34, 197, 94, 0.95);
+        border: 3px solid #22c55e;
+        border-radius: 16px;
+        padding: 1.5rem 2rem;
+        color: #ffffff;
+        font-size: 1.2rem;
+        font-weight: bold;
+        z-index: 1001;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      `;
+      saveMessage.innerHTML = 'Aprendizaje guardado correctamente';
+      document.body.appendChild(saveMessage);
+      
+      setTimeout(() => {
+        saveMessage.remove();
+      }, 2000);
+    }
+  </script>
+ <script>
+(function(){function acGameScrollTop(){try{window.scrollTo(0,0);}catch(e){}['.container','.game-container','.game-area','.game-section','.section','.phase-container','.results-screen','.modal-content'].forEach(function(selector){document.querySelectorAll(selector).forEach(function(element){if(!element){return;}try{if(typeof element.scrollTo==='function'){element.scrollTo(0,0);}else{element.scrollTop=0;}}catch(e){element.scrollTop=0;}});});}window.acGameScrollTop=acGameScrollTop;document.addEventListener('click',function(event){var trigger=event.target.closest('button, .btn, .btn-primary, .btn-secondary, .option-btn, .option-button, .action-btn, .phase-button');if(!trigger){return;}setTimeout(acGameScrollTop,40);setTimeout(acGameScrollTop,220);},true);document.addEventListener('DOMContentLoaded',function(){acGameScrollTop();setTimeout(acGameScrollTop,120);});})();
+</script>
+</body>
+</html>

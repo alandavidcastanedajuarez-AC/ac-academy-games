@@ -1,0 +1,1430 @@
+<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Musculos principales en el tenis</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+      min-height: 100%;
+    }
+
+    .header {
+      text-align: center;
+      color: #ffffff;
+      margin-bottom: 32px;
+      padding: 24px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .header h1 {
+      margin: 0 0 12px 0;
+      font-size: 42px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .header p {
+      margin: 0;
+      font-size: 21px;
+      opacity: 0.95;
+    }
+
+    .phase-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .phase-dot {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 18px;
+      transition: all 0.3s ease;
+    }
+
+    .phase-dot.active {
+      background: #00d9ff;
+      transform: scale(1.2);
+      box-shadow: 0 4px 12px rgba(0, 217, 255, 0.4);
+    }
+
+    .phase-dot.completed {
+      background: #00ff88;
+    }
+
+    .game-area {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 32px;
+      min-height: 500px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .phase-title {
+      font-size: 32px;
+      color: #1e3c72;
+      margin: 0 0 24px 0;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .body-map {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .body-zone {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 24px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #ffffff;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .body-zone:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+    }
+
+    .body-zone h3 {
+      margin: 0 0 12px 0;
+      font-size: 24px;
+    }
+
+    .body-zone p {
+      margin: 0;
+      font-size: 16.5px;
+      opacity: 0.9;
+    }
+
+    .body-zone .icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90%;
+      overflow-y: auto;
+      position: relative;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: #ff4444;
+      color: #ffffff;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+      background: #cc0000;
+      transform: scale(1.1);
+    }
+
+    .modal h2 {
+      color: #1e3c72;
+      margin: 0 0 16px 0;
+      font-size: 28px;
+    }
+
+    .modal h3 {
+      color: #2a5298;
+      margin: 20px 0 12px 0;
+      font-size: 21px;
+    }
+
+    .modal p {
+      color: #333333;
+      line-height: 1.6;
+      margin: 8px 0;
+      font-size: 16.5px;
+    }
+
+    .curiosity-box {
+      background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+      color: #ffffff;
+      padding: 16px;
+      border-radius: 12px;
+      margin-top: 16px;
+      font-style: italic;
+    }
+
+    .drag-drop-area {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .drop-zone {
+      background: #f0f4f8;
+      border: 3px dashed #cbd5e0;
+      border-radius: 16px;
+      padding: 24px;
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .drop-zone.drag-over {
+      background: #e6f7ff;
+      border-color: #00d9ff;
+      transform: scale(1.02);
+    }
+
+    .drop-zone.correct {
+      background: #d4edda;
+      border-color: #00ff88;
+      animation: pulse 0.5s ease;
+    }
+
+    .drop-zone.incorrect {
+      background: #f8d7da;
+      border-color: #ff4444;
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .drop-zone h4 {
+      margin: 0 0 8px 0;
+      color: #1e3c72;
+      font-size: 21px;
+    }
+
+    .drag-cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .drag-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      cursor: grab;
+      text-align: center;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      font-size: 16.5px;
+    }
+
+    .drag-card:active {
+      cursor: grabbing;
+      opacity: 0.7;
+    }
+
+    .drag-card.dragging {
+      opacity: 0.5;
+    }
+
+    .simulator-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .stroke-card {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: #ffffff;
+      padding: 24px;
+      border-radius: 16px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .stroke-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(240, 147, 251, 0.4);
+    }
+
+    .stroke-card h4 {
+      margin: 0 0 12px 0;
+      font-size: 24px;
+    }
+
+    .stroke-card .emoji {
+      font-size: 42px;
+      margin-bottom: 8px;
+    }
+
+    .body-diagram {
+      max-width: 400px;
+      margin: 24px auto;
+      position: relative;
+    }
+
+    .body-part {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.3);
+      border: 3px solid #ffffff;
+      border-radius: 12px;
+      padding: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .body-part.highlighted {
+      background: #00ff88;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+      transform: scale(1.1);
+    }
+
+    .quiz-question {
+      background: #f0f4f8;
+      padding: 24px;
+      border-radius: 16px;
+      margin-top: 24px;
+    }
+
+    .quiz-question h3 {
+      color: #1e3c72;
+      margin: 0 0 16px 0;
+      font-size: 21px;
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 12px;
+    }
+
+    .quiz-option {
+      background: #ffffff;
+      border: 2px solid #cbd5e0;
+      padding: 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 16.5px;
+    }
+
+    .quiz-option:hover {
+      border-color: #667eea;
+      transform: translateX(4px);
+    }
+
+    .quiz-option.correct {
+      background: #d4edda;
+      border-color: #00ff88;
+    }
+
+    .quiz-option.incorrect {
+      background: #f8d7da;
+      border-color: #ff4444;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #ffffff;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-block;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-center {
+      display: flex;
+      justify-content: center;
+      margin-top: 24px;
+    }
+
+    .score-display {
+      text-align: center;
+      padding: 32px;
+    }
+
+    .score-circle {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
+    }
+
+    .score-number {
+      font-size: 64px;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .score-label {
+      font-size: 32px;
+      color: #1e3c72;
+      margin: 16px 0;
+      font-weight: 700;
+    }
+
+    .score-description {
+      font-size: 21px;
+      color: #2a5298;
+      margin: 16px 0;
+    }
+
+    .final-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    .balance-game {
+      display: grid;
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .scenario-card {
+      background: #f0f4f8;
+      padding: 24px;
+      border-radius: 16px;
+    }
+
+    .scenario-card h4 {
+      color: #1e3c72;
+      margin: 0 0 16px 0;
+      font-size: 21px;
+    }
+
+    .scenario-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .progress-bar {
+      background: #e0e0e0;
+      height: 8px;
+      border-radius: 4px;
+      margin: 24px 0;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #00ff88 0%, #00d9ff 100%);
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+
+    .welcome-screen {
+      text-align: center;
+      padding: 32px;
+    }
+
+    .welcome-screen h2 {
+      color: #1e3c72;
+      font-size: 32px;
+      margin-bottom: 24px;
+    }
+
+    .welcome-screen p {
+      color: #333333;
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .feedback-message {
+      padding: 16px;
+      border-radius: 12px;
+      margin-top: 16px;
+      text-align: center;
+      font-weight: 600;
+      display: none;
+      font-size: 16.5px;
+    }
+
+    .feedback-message.success {
+      background: #d4edda;
+      color: #155724;
+      display: block;
+    }
+
+    .feedback-message.error {
+      background: #f8d7da;
+      color: #721c24;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 32px;
+      }
+
+      .header p {
+        font-size: 16.5px;
+      }
+
+      .body-map, .drag-drop-area, .drag-cards, .scenario-options {
+        grid-template-columns: 1fr;
+      }
+
+      .simulator-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .score-circle {
+        width: 150px;
+        height: 150px;
+      }
+
+      .score-number {
+        font-size: 48px;
+      }
+    }
+      /* Standalone cleanup helpers */
+    .hidden { display: none !important; }
+    .text-center, .center { text-align: center !important; }
+    .mt-30 { margin-top: 30px !important; }
+    @media (max-width: 768px) {
+      .container,
+      .game-container,
+      .game-area,
+      .game-section,
+      .section,
+      .phase-container,
+      .minigame-section,
+      .header,
+      .modal-content {
+        padding: 18px !important;
+      }
+      .header h1,
+      .game-title,
+      #gameTitle,
+      #game-title,
+      .intro-title,
+      .cover-title,
+      h1 {
+        font-size: clamp(1.9rem, 8vw, 2.4rem) !important;
+        line-height: 1.15 !important;
+      }
+      .header h2,
+      .section-title,
+      .phase-title,
+      .minigame-title,
+      h2 {
+        font-size: clamp(1.25rem, 6vw, 1.75rem) !important;
+        line-height: 1.25 !important;
+      }
+      .header p,
+      .section-description,
+      .game-subtitle,
+      .subtitle,
+      .scenario-text,
+      .situation-question,
+      .step-content,
+      .detail-section li,
+      .teaching-text,
+      .option-button,
+      .info-item,
+      .level-description {
+        font-size: 1rem !important;
+        line-height: 1.55 !important;
+      }
+      .info-boxes,
+      .body-map,
+      .injury-cards,
+      .scene-grid,
+      .options,
+      .phase-buttons,
+      .cards-grid,
+      .options-grid,
+      .cards-container {
+        grid-template-columns: 1fr !important;
+      }
+      .chain-builder,
+      .final-buttons,
+      .buttons-row,
+      .nav-buttons,
+      .button-group,
+      .buttons-group {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+      }
+      .btn,
+      .btn-primary,
+      .btn-secondary,
+      .phase-button,
+      .action-btn,
+      .next-button,
+      .option-btn,
+      .option-button {
+        width: 100% !important;
+      }
+      .score-display {
+        position: static !important;
+        display: block !important;
+        width: fit-content;
+        max-width: 100%;
+        margin: 0 auto 16px auto !important;
+        font-size: 1rem !important;
+        padding: 12px 16px !important;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }    /* Standalone cleanup helpers */
+    .hidden { display: none !important; }
+    .text-center, .center { text-align: center !important; }
+    .mt-30 { margin-top: 30px !important; }
+    @media (max-width: 768px) {
+      .container,
+      .game-container,
+      .game-area,
+      .game-section,
+      .section,
+      .phase-container,
+      .minigame-section,
+      .header,
+      .modal-content {
+        padding: 18px !important;
+      }
+      .header h1,
+      .game-title,
+      #gameTitle,
+      #game-title,
+      .intro-title,
+      .cover-title,
+      h1 {
+        font-size: clamp(1.9rem, 8vw, 2.4rem) !important;
+        line-height: 1.15 !important;
+      }
+      .header h2,
+      .section-title,
+      .phase-title,
+      .minigame-title,
+      h2 {
+        font-size: clamp(1.25rem, 6vw, 1.75rem) !important;
+        line-height: 1.25 !important;
+      }
+      .header p,
+      .section-description,
+      .game-subtitle,
+      .subtitle,
+      .scenario-text,
+      .situation-question,
+      .step-content,
+      .detail-section li,
+      .teaching-text,
+      .option-button,
+      .info-item,
+      .level-description {
+        font-size: 1rem !important;
+        line-height: 1.55 !important;
+      }
+      .info-boxes,
+      .body-map,
+      .injury-cards,
+      .scene-grid,
+      .options,
+      .phase-buttons,
+      .cards-grid,
+      .options-grid,
+      .cards-container {
+        grid-template-columns: 1fr !important;
+      }
+      .chain-builder,
+      .final-buttons,
+      .buttons-row,
+      .nav-buttons,
+      .button-group,
+      .buttons-group {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+      }
+      .btn,
+      .btn-primary,
+      .btn-secondary,
+      .phase-button,
+      .action-btn,
+      .next-button,
+      .option-btn,
+      .option-button {
+        width: 100% !important;
+      }
+      .score-display {
+        position: static !important;
+        display: block !important;
+        width: fit-content;
+        max-width: 100%;
+        margin: 0 auto 16px auto !important;
+        font-size: 1rem !important;
+        padding: 12px 16px !important;
+      }
+    }
+  </style>
+    <script>
+    window.elementSdk = window.elementSdk || { init: async function () { return { isOk: true, value: null }; }, on: function () {}, emit: function () { return { isOk: true, value: null }; } };
+    window.dataSdk = window.dataSdk || { init: async function () { return { isOk: true, value: null }; }, create: async function () { return { isOk: true, value: null }; }, list: async function () { return { isOk: true, value: [] }; }, update: async function () { return { isOk: true, value: null }; } };
+  </script>
+</head>
+ <body>
+  <div class="container">
+   <header class="header">
+    <h1 id="game-title">MUSCULOS PRINCIPALES EN EL TENIS ⚡🎾</h1>
+    <p id="game-subtitle">Conoce tu cuerpo, domina tu juego</p>
+   </header>
+   <div class="phase-indicator" id="phaseIndicator"></div>
+   <div class="game-area" id="gameArea"></div>
+  </div>
+  <div class="modal" id="infoModal">
+   <div class="modal-content"><button class="modal-close" onclick="closeModal()">×</button>
+    <div id="modalBody"></div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "MUSCULOS PRINCIPALES EN EL TENIS ⚡🎾",
+      game_subtitle: "Conoce tu cuerpo, domina tu juego",
+      welcome_message: "¡Bienvenido al recorrido corporal AC! Descubre cómo tu cuerpo trabaja en cada golpe del tenis. Completa las 5 fases interactivas y obtén tu puntuacion corporal.",
+      start_button: "¡Comenzar Aventura!",
+      next_button: "Siguiente Fase",
+      finish_button: "Ver Resultado Final"
+    };
+
+    let currentPhase = 0;
+    let scores = {
+      phase1: 0,
+      phase2: 0,
+      phase3: 0,
+      phase4: 0
+    };
+    let startTime = Date.now();
+
+    const bodyZones = [
+      {
+        id: 'legs',
+        name: 'Piernas y Glúteos',
+        icon: '🦵',
+        role: ['Base de potencia', 'Estabilidad en golpes y desplazamientos', 'Saltos, frenado, cambio de dirección'],
+        curiosity: 'Más del 50% de la fuerza del drive viene de las piernas.',
+        function: 'Potencia + Estabilidad'
+      },
+      {
+        id: 'core',
+        name: 'Core',
+        icon: '💪',
+        role: ['Transferencia de energía', 'Equilibrio dinámico', 'Control del centro del cuerpo'],
+        curiosity: 'Sin core no hay rotación, y sin rotación no hay potencia.',
+        function: 'Transferencia + Equilibrio'
+      },
+      {
+        id: 'shoulders',
+        name: 'Hombros y Espalda Alta',
+        icon: '💎',
+        role: ['Control y aceleración del brazo', 'Estabilidad en la volea', 'Soporte del saque'],
+        curiosity: 'El hombro soporta fuerzas equivalentes a 1 tonelada en un saque profesional.',
+        function: 'Control + Aceleración'
+      },
+      {
+        id: 'forearm',
+        name: 'Antebrazo + Muñeca',
+        icon: '✋',
+        role: ['Precisión', 'Spin', 'Direccionamiento de la pelota'],
+        curiosity: 'El antebrazo controla el spin y la muñeca libera la velocidad final.',
+        function: 'Precisión + Spin'
+      }
+    ];
+
+    const strokes = [
+      {
+        name: 'Drive',
+        emoji: '➡️',
+        muscles: ['Piernas', 'Core', 'Hombros', 'Muñeca'],
+        question: '¿Qué zona genera la base de potencia en el drive?',
+        correctAnswer: 'Piernas'
+      },
+      {
+        name: 'Revés',
+        emoji: '⬅️',
+        muscles: ['Piernas', 'Core', 'Hombros'],
+        question: '¿Qué zona permite la rotación del cuerpo en el revés?',
+        correctAnswer: 'Core'
+      },
+      {
+        name: 'Saque',
+        emoji: '⬆️',
+        muscles: ['Piernas', 'Core', 'Hombros', 'Muñeca'],
+        question: '¿Qué zona genera más energía en el saque?',
+        correctAnswer: 'Piernas'
+      },
+      {
+        name: 'Volea',
+        emoji: '🎯',
+        muscles: ['Hombros', 'Muñeca'],
+        question: '¿Qué zona controla la estabilidad en la volea?',
+        correctAnswer: 'Hombros'
+      },
+      {
+        name: 'Smash',
+        emoji: '⚡',
+        muscles: ['Core', 'Hombros', 'Muñeca'],
+        question: '¿Qué zona proporciona fuerza en el smash?',
+        correctAnswer: 'Hombros'
+      }
+    ];
+
+    const balanceScenarios = [
+      {
+        description: 'Jugador frenando lateralmente después de un sprint',
+        correctAnswer: 'Piernas + Glúteos',
+        options: ['Piernas + Glúteos', 'Core', 'Hombros', 'Muñeca']
+      },
+      {
+        description: 'Jugador gira en un revés cruzado con máxima rotación',
+        correctAnswer: 'Core',
+        options: ['Piernas + Glúteos', 'Core', 'Hombros', 'Muñeca']
+      },
+      {
+        description: 'Jugador ejecuta una volea firme y controlada',
+        correctAnswer: 'Hombros',
+        options: ['Piernas + Glúteos', 'Core', 'Hombros', 'Muñeca']
+      },
+      {
+        description: 'Jugador hace un slice con efecto cortado',
+        correctAnswer: 'Muñeca',
+        options: ['Piernas + Glúteos', 'Core', 'Hombros', 'Muñeca']
+      }
+    ];
+
+    let currentStrokeIndex = 0;
+    let currentScenarioIndex = 0;
+
+    async function onConfigChange(config) {
+      document.getElementById('game-title').textContent = config.game_title || defaultConfig.game_title;
+      document.getElementById('game-subtitle').textContent = config.game_subtitle || defaultConfig.game_subtitle;
+
+      if (currentPhase === 0) {
+        renderWelcomeScreen();
+      }
+    }
+
+    const dataHandler = {
+      onDataChanged(data) {
+      }
+    };
+
+    async function initApp() {
+      const dataSdkResult = await window.dataSdk.init(dataHandler);
+      if (!dataSdkResult.isOk) {
+        console.error("Error initializing data SDK");
+      }
+
+      await window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["game_title", config.game_title || defaultConfig.game_title],
+          ["game_subtitle", config.game_subtitle || defaultConfig.game_subtitle],
+          ["welcome_message", config.welcome_message || defaultConfig.welcome_message],
+          ["start_button", config.start_button || defaultConfig.start_button],
+          ["next_button", config.next_button || defaultConfig.next_button],
+          ["finish_button", config.finish_button || defaultConfig.finish_button]
+        ])
+      });
+
+      renderPhaseIndicator();
+      renderWelcomeScreen();
+    }
+
+    function renderPhaseIndicator() {
+      const indicator = document.getElementById('phaseIndicator');
+      indicator.innerHTML = '';
+      
+      for (let i = 1; i <= 5; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'phase-dot';
+        if (i === currentPhase) {
+          dot.classList.add('active');
+        } else if (i < currentPhase) {
+          dot.classList.add('completed');
+        }
+        dot.textContent = i;
+        indicator.appendChild(dot);
+      }
+    }
+
+    function renderWelcomeScreen() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const gameArea = document.getElementById('gameArea');
+      gameArea.innerHTML = `
+        <div class="welcome-screen">
+          <h2>¡Bienvenido! 🎾</h2>
+          <p>${config.welcome_message || defaultConfig.welcome_message}</p>
+          <button class="btn" onclick="startGame()">${config.start_button || defaultConfig.start_button}</button>
+        </div>
+      `;
+    }
+
+    function startGame() {
+      currentPhase = 1;
+      renderPhaseIndicator();
+      renderPhase1();
+    }
+
+    function renderPhase1() {
+      const gameArea = document.getElementById('gameArea');
+      gameArea.innerHTML = `
+        <h2 class="phase-title">Fase 1: Mapa Corporal Interactivo</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 24px; font-size: 18px;">Toca cada zona del cuerpo para descubrir su función en el tenis</p>
+        <div class="body-map" id="bodyMap"></div>
+        <div class="btn-center">
+          <button class="btn" onclick="goToPhase2()">Construir mi mapa corporal 👉</button>
+        </div>
+      `;
+
+      const bodyMap = document.getElementById('bodyMap');
+      bodyZones.forEach(zone => {
+        const card = document.createElement('div');
+        card.className = 'body-zone';
+        card.innerHTML = `
+          <div class="icon">${zone.icon}</div>
+          <h3>${zone.name}</h3>
+          <p>Toca para conocer más</p>
+        `;
+        card.onclick = () => showZoneInfo(zone);
+        bodyMap.appendChild(card);
+      });
+
+      scores.phase1 = 25;
+    }
+
+    function showZoneInfo(zone) {
+      const modalBody = document.getElementById('modalBody');
+      modalBody.innerHTML = `
+        <h2>${zone.icon} ${zone.name}</h2>
+        <h3>Rol en el Tenis:</h3>
+        ${zone.role.map(r => `<p>✓ ${r}</p>`).join('')}
+        <div class="curiosity-box">
+          <strong>💡 Curiosidad:</strong><br>
+          "${zone.curiosity}"
+        </div>
+      `;
+      document.getElementById('infoModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('infoModal').classList.remove('active');
+    }
+
+    function goToPhase2() {
+      currentPhase = 2;
+      renderPhaseIndicator();
+      renderPhase2();
+    }
+
+    function renderPhase2() {
+      const gameArea = document.getElementById('gameArea');
+      gameArea.innerHTML = `
+        <h2 class="phase-title">Fase 2: Asignación de Funciones</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 24px; font-size: 18px;">Arrastra cada función a la zona corporal correcta</p>
+        <div class="drag-cards" id="dragCards"></div>
+        <div class="drag-drop-area" id="dropZones"></div>
+        <div class="feedback-message" id="phase2Feedback"></div>
+        <div class="btn-center">
+          <button class="btn" id="phase2NextBtn" onclick="goToPhase3()" disabled>Siguiente Fase</button>
+        </div>
+      `;
+
+      const dragCards = document.getElementById('dragCards');
+      const functions = bodyZones.map(z => z.function);
+      
+      functions.sort(() => Math.random() - 0.5).forEach((func, index) => {
+        const card = document.createElement('div');
+        card.className = 'drag-card';
+        card.draggable = true;
+        card.textContent = func;
+        card.dataset.function = func;
+        card.id = `drag-${index}`;
+        
+        card.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', func);
+          card.classList.add('dragging');
+        });
+        
+        card.addEventListener('dragend', () => {
+          card.classList.remove('dragging');
+        });
+        
+        dragCards.appendChild(card);
+      });
+
+      const dropZones = document.getElementById('dropZones');
+      bodyZones.forEach(zone => {
+        const dropZone = document.createElement('div');
+        dropZone.className = 'drop-zone';
+        dropZone.innerHTML = `
+          <h4>${zone.icon} ${zone.name}</h4>
+          <p style="color: #999; font-size: 15px;">Arrastra aquí la función</p>
+        `;
+        dropZone.dataset.zone = zone.id;
+        dropZone.dataset.correctFunction = zone.function;
+        
+        dropZone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          dropZone.classList.add('drag-over');
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+          dropZone.classList.remove('drag-over');
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          dropZone.classList.remove('drag-over');
+          
+          const droppedFunction = e.dataTransfer.getData('text/plain');
+          const correctFunction = dropZone.dataset.correctFunction;
+          
+          if (droppedFunction === correctFunction) {
+            dropZone.classList.add('correct');
+            dropZone.innerHTML = `
+              <h4>${zone.icon} ${zone.name}</h4>
+              <p style="color: #155724; font-weight: 600;">✓ ${droppedFunction}</p>
+            `;
+            
+            const draggedCard = Array.from(document.querySelectorAll('.drag-card')).find(
+              card => card.dataset.function === droppedFunction
+            );
+            if (draggedCard) {
+              draggedCard.style.display = 'none';
+            }
+            
+            checkPhase2Completion();
+          } else {
+            dropZone.classList.add('incorrect');
+            setTimeout(() => {
+              dropZone.classList.remove('incorrect');
+            }, 500);
+            
+            const feedback = document.getElementById('phase2Feedback');
+            feedback.className = 'feedback-message error';
+            feedback.textContent = 'Piensa en la biomecánica del golpe 🤔';
+            setTimeout(() => {
+              feedback.className = 'feedback-message';
+            }, 2000);
+          }
+        });
+        
+        dropZones.appendChild(dropZone);
+      });
+    }
+
+    function checkPhase2Completion() {
+      const correctZones = document.querySelectorAll('.drop-zone.correct').length;
+      if (correctZones === bodyZones.length) {
+        scores.phase2 = 25;
+        const feedback = document.getElementById('phase2Feedback');
+        feedback.className = 'feedback-message success';
+        feedback.textContent = '¡Perfecto! Has completado el mapa corporal correctamente 🎉';
+        document.getElementById('phase2NextBtn').disabled = false;
+      }
+    }
+
+    function goToPhase3() {
+      currentPhase = 3;
+      currentStrokeIndex = 0;
+      renderPhaseIndicator();
+      renderPhase3();
+    }
+
+    function renderPhase3() {
+      const gameArea = document.getElementById('gameArea');
+      gameArea.innerHTML = `
+        <h2 class="phase-title">Fase 3: Simulador Biomecánico</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 24px; font-size: 18px;">Selecciona un golpe para ver qué músculos se activan</p>
+        <div class="simulator-grid" id="strokeGrid"></div>
+        <div id="strokeQuestion"></div>
+      `;
+
+      const strokeGrid = document.getElementById('strokeGrid');
+      strokes.forEach((stroke, index) => {
+        const card = document.createElement('div');
+        card.className = 'stroke-card';
+        card.innerHTML = `
+          <div class="emoji">${stroke.emoji}</div>
+          <h4>${stroke.name}</h4>
+        `;
+        card.onclick = () => showStrokeQuestion(index);
+        strokeGrid.appendChild(card);
+      });
+    }
+
+    function showStrokeQuestion(index) {
+      currentStrokeIndex = index;
+      const stroke = strokes[index];
+      const questionDiv = document.getElementById('strokeQuestion');
+      
+      questionDiv.innerHTML = `
+        <div class="quiz-question">
+          <h3>${stroke.question}</h3>
+          <div class="quiz-options" id="quizOptions"></div>
+          <div class="feedback-message" id="phase3Feedback"></div>
+        </div>
+      `;
+
+      const options = ['Piernas', 'Core', 'Hombros', 'Muñeca'];
+      const quizOptions = document.getElementById('quizOptions');
+      
+      options.forEach(option => {
+        const optionBtn = document.createElement('div');
+        optionBtn.className = 'quiz-option';
+        optionBtn.textContent = option;
+        optionBtn.onclick = () => checkStrokeAnswer(option, stroke.correctAnswer, optionBtn);
+        quizOptions.appendChild(optionBtn);
+      });
+    }
+
+    function checkStrokeAnswer(selected, correct, optionElement) {
+      const allOptions = document.querySelectorAll('.quiz-option');
+      allOptions.forEach(opt => {
+        opt.style.pointerEvents = 'none';
+      });
+
+      const feedback = document.getElementById('phase3Feedback');
+      
+      if (selected === correct) {
+        optionElement.classList.add('correct');
+        feedback.className = 'feedback-message success';
+        feedback.textContent = '¡Correcto! 🎯';
+        scores.phase3 += 6;
+        
+        setTimeout(() => {
+          const answeredCount = document.querySelectorAll('.quiz-option.correct').length;
+          if (answeredCount >= strokes.length || scores.phase3 >= 30) {
+            goToPhase4();
+          } else {
+            document.getElementById('strokeQuestion').innerHTML = '';
+          }
+        }, 1500);
+      } else {
+        optionElement.classList.add('incorrect');
+        feedback.className = 'feedback-message error';
+        feedback.textContent = 'Intenta de nuevo 💪';
+        
+        setTimeout(() => {
+          allOptions.forEach(opt => {
+            opt.style.pointerEvents = 'auto';
+            opt.classList.remove('incorrect');
+          });
+          feedback.className = 'feedback-message';
+        }, 1500);
+      }
+    }
+
+    function goToPhase4() {
+      currentPhase = 4;
+      currentScenarioIndex = 0;
+      renderPhaseIndicator();
+      renderPhase4();
+    }
+
+    function renderPhase4() {
+      const gameArea = document.getElementById('gameArea');
+      gameArea.innerHTML = `
+        <h2 class="phase-title">Fase 4: Balancea tu Cuerpo</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 24px; font-size: 18px;">Identifica qué zona domina cada movimiento</p>
+        <div class="balance-game" id="balanceGame"></div>
+      `;
+
+      renderCurrentScenario();
+    }
+
+    function renderCurrentScenario() {
+      if (currentScenarioIndex >= balanceScenarios.length) {
+        goToPhase5();
+        return;
+      }
+
+      const scenario = balanceScenarios[currentScenarioIndex];
+      const balanceGame = document.getElementById('balanceGame');
+      
+      balanceGame.innerHTML = `
+        <div class="scenario-card">
+          <h4>Escenario ${currentScenarioIndex + 1} de ${balanceScenarios.length}</h4>
+          <p style="font-size: 18px; color: #333; margin: 16px 0;">${scenario.description}</p>
+          <p style="color: #666; font-weight: 600;">¿Qué zona está trabajando más?</p>
+          <div class="scenario-options" id="scenarioOptions"></div>
+          <div class="feedback-message" id="phase4Feedback"></div>
+        </div>
+      `;
+
+      const optionsDiv = document.getElementById('scenarioOptions');
+      scenario.options.forEach(option => {
+        const btn = document.createElement('div');
+        btn.className = 'quiz-option';
+        btn.textContent = option;
+        btn.onclick = () => checkScenarioAnswer(option, scenario.correctAnswer, btn);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function checkScenarioAnswer(selected, correct, optionElement) {
+      const allOptions = document.querySelectorAll('#scenarioOptions .quiz-option');
+      allOptions.forEach(opt => {
+        opt.style.pointerEvents = 'none';
+      });
+
+      const feedback = document.getElementById('phase4Feedback');
+      
+      if (selected === correct) {
+        optionElement.classList.add('correct');
+        feedback.className = 'feedback-message success';
+        feedback.textContent = '¡Excelente! 🌟';
+        scores.phase4 += 5;
+        
+        setTimeout(() => {
+          currentScenarioIndex++;
+          renderCurrentScenario();
+        }, 1500);
+      } else {
+        optionElement.classList.add('incorrect');
+        feedback.className = 'feedback-message error';
+        feedback.textContent = 'Piensa en el movimiento 🤔';
+        
+        setTimeout(() => {
+          allOptions.forEach(opt => {
+            opt.style.pointerEvents = 'auto';
+            opt.classList.remove('incorrect');
+          });
+          feedback.className = 'feedback-message';
+        }, 1500);
+      }
+    }
+
+    async function goToPhase5() {
+      currentPhase = 5;
+      renderPhaseIndicator();
+      
+      const totalScore = scores.phase1 + scores.phase2 + scores.phase3 + scores.phase4;
+      const totalTime = Math.floor((Date.now() - startTime) / 1000);
+      
+      let rank, emoji;
+      if (totalScore >= 90) {
+        rank = 'Máquina biomecánica AC';
+        emoji = '🏆';
+      } else if (totalScore >= 70) {
+        rank = 'Jugador físicamente inteligente';
+        emoji = '🎯';
+      } else if (totalScore >= 50) {
+        rank = 'Buen entendimiento';
+        emoji = '⚙️';
+      } else {
+        rank = 'Repite el mapa corporal';
+        emoji = '🛠️';
+      }
+
+      const gameArea = document.getElementById('gameArea');
+      const config = window.elementSdk?.config || defaultConfig;
+      
+      gameArea.innerHTML = `
+        <div class="score-display">
+          <h2 class="phase-title">Puntuacion corporal AC</h2>
+          <div class="score-circle">
+            <div class="score-number">${totalScore}%</div>
+          </div>
+          <div class="score-label">${emoji} ${rank}</div>
+          <div class="score-description">
+            <p style="font-size: 18px; margin: 8px 0;">Fase 1: ${scores.phase1}%</p>
+            <p style="font-size: 18px; margin: 8px 0;">Fase 2: ${scores.phase2}%</p>
+            <p style="font-size: 18px; margin: 8px 0;">Fase 3: ${scores.phase3}%</p>
+            <p style="font-size: 18px; margin: 8px 0;">Fase 4: ${scores.phase4}%</p>
+            <p style="color: #999; margin-top: 16px;">Tiempo: ${totalTime} segundos</p>
+          </div>
+          <div class="final-buttons">
+            <button class="btn" onclick="window.location.reload()">🔄 Repetir</button>
+            <button class="btn" onclick="showExercises()">💪 Ver Ejercicios</button>
+            <button class="btn" onclick="nextInfographic()">➡️ Cierre del juego</button>
+          </div>
+        </div>
+      `;
+
+      const result = await window.dataSdk.create({
+        player_name: "Jugador",
+        body_score: totalScore,
+        phase_scores: JSON.stringify(scores),
+        completion_date: new Date().toISOString(),
+        total_time: totalTime
+      });
+
+      if (!result.isOk) {
+        console.error("Error saving score");
+      }
+    }
+
+    function showExercises() {
+      const modalBody = document.getElementById('modalBody');
+      modalBody.innerHTML = `
+        <h2>💪 Ejercicios Recomendados</h2>
+        <h3>🦵 Piernas y Glúteos</h3>
+        <p>• Sentadillas con salto</p>
+        <p>• Zancadas laterales</p>
+        <p>• Saltos en una pierna</p>
+        
+        <h3>💪 Core</h3>
+        <p>• Plancha con rotación</p>
+        <p>• Russian twists</p>
+        <p>• Mountain climbers</p>
+        
+        <h3>💎 Hombros</h3>
+        <p>• Rotaciones con banda elástica</p>
+        <p>• Press de hombros</p>
+        <p>• Face pulls</p>
+        
+        <h3>✋ Antebrazo y Muñeca</h3>
+        <p>• Flexiones de muñeca</p>
+        <p>• Rotaciones con peso</p>
+        <p>• Apretón de pelota</p>
+      `;
+      document.getElementById('infoModal').classList.add('active');
+    }
+
+    function nextInfographic() {
+      const modalBody = document.getElementById('modalBody');
+      modalBody.innerHTML = `
+        <h2>🎉 ¡Felicitaciones!</h2>
+        <p style="font-size: 18px; line-height: 1.6;">Has completado el recorrido corporal AC. Ahora puedes repetir el juego o revisar los ejercicios recomendados para reforzar lo aprendido.</p>
+        <div style="text-align: center; margin-top: 24px;">
+          <button class="btn" onclick="closeModal()">Entendido</button>
+        </div>
+      `;
+      document.getElementById('infoModal').classList.add('active');
+    }
+
+    window.addEventListener('click', (e) => {
+      if (e.target.id === 'infoModal') {
+        closeModal();
+      }
+    });
+
+    initApp();
+  </script>
+ <script>
+(function(){function acGameScrollTop(){try{window.scrollTo(0,0);}catch(e){}['.container','.game-container','.game-area','.game-section','.section','.phase-container','.results-screen','.modal-content'].forEach(function(selector){document.querySelectorAll(selector).forEach(function(element){if(!element){return;}try{if(typeof element.scrollTo==='function'){element.scrollTo(0,0);}else{element.scrollTop=0;}}catch(e){element.scrollTop=0;}});});}window.acGameScrollTop=acGameScrollTop;document.addEventListener('click',function(event){var trigger=event.target.closest('button, .btn, .btn-primary, .btn-secondary, .option-btn, .option-button, .action-btn, .phase-button');if(!trigger){return;}setTimeout(acGameScrollTop,40);setTimeout(acGameScrollTop,220);},true);document.addEventListener('DOMContentLoaded',function(){acGameScrollTop();setTimeout(acGameScrollTop,120);});})();
+</script>
+</body>
+</html>

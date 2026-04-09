@@ -1,0 +1,2187 @@
+<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadena cinetica</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #f1f5f9;
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      border: 2px solid rgba(34, 211, 238, 0.3);
+    }
+
+    .game-title {
+      font-size: 3rem;
+      font-weight: 800;
+      margin: 0;
+      background: linear-gradient(135deg, #22d3ee, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .game-subtitle {
+      font-size: 1.25rem;
+      margin: 0.5rem 0 0 0;
+      color: #94a3b8;
+    }
+
+    .lesson-info {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.5rem 1.5rem;
+      background: rgba(34, 211, 238, 0.2);
+      border-radius: 25px;
+      font-size: 0.95rem;
+      color: #22d3ee;
+    }
+
+    .score-display {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(168, 85, 247, 0.9);
+      padding: 1rem 1.5rem;
+      border-radius: 15px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      z-index: 1000;
+      box-shadow: 0 8px 32px rgba(168, 85, 247, 0.4);
+    }
+
+    .phase-container {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      border: 2px solid rgba(34, 211, 238, 0.2);
+      display: none;
+    }
+
+    .phase-container.active {
+      display: block;
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .phase-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0 0 1.5rem 0;
+      color: #22d3ee;
+      text-align: center;
+    }
+
+    .pyramid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .pyramid-level {
+      width: 100%;
+      max-width: 600px;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .pyramid-level:hover {
+      background: rgba(34, 211, 238, 0.15);
+      transform: translateY(-5px);
+      border-color: #22d3ee;
+    }
+
+    .pyramid-level.active {
+      background: rgba(34, 211, 238, 0.2);
+      border-color: #22d3ee;
+      box-shadow: 0 0 30px rgba(34, 211, 238, 0.4);
+    }
+
+    .level-number {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      background: #a855f7;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 40px;
+      font-weight: 700;
+      margin-right: 1rem;
+    }
+
+    .level-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0.5rem 0;
+      color: #22d3ee;
+    }
+
+    .level-content {
+      display: none;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(34, 211, 238, 0.3);
+    }
+
+    .level-content.visible {
+      display: block;
+    }
+
+    .level-description {
+      margin: 0.5rem 0;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+
+    .level-fact {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: rgba(168, 85, 247, 0.2);
+      border-radius: 10px;
+      border-left: 4px solid #a855f7;
+      font-weight: 600;
+      color: #e9d5ff;
+    }
+
+    .phase-button {
+      display: block;
+      margin: 2rem auto 0;
+      padding: 1rem 3rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #22d3ee, #a855f7);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 32px rgba(168, 85, 247, 0.4);
+    }
+
+    .phase-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(168, 85, 247, 0.6);
+    }
+
+    .phase-button:active {
+      transform: translateY(0);
+    }
+
+    .chain-builder {
+      display: flex;
+      justify-content: space-between;
+      gap: 3rem;
+      margin: 2rem 0;
+    }
+
+    .drop-zones {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .drop-zone {
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 3px dashed rgba(34, 211, 238, 0.3);
+      border-radius: 15px;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .drop-zone::before {
+      content: attr(data-level);
+      position: absolute;
+      top: 10px;
+      left: 15px;
+      font-size: 0.85rem;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .drop-zone.drag-over {
+      background: rgba(34, 211, 238, 0.2);
+      border-color: #22d3ee;
+      border-style: solid;
+    }
+
+    .drop-zone.correct {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: #22c55e;
+      border-style: solid;
+      animation: pulse 0.5s ease;
+    }
+
+    .drop-zone.incorrect {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .draggable-cards {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .card {
+      padding: 1.5rem;
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(168, 85, 247, 0.2));
+      border-radius: 15px;
+      cursor: grab;
+      transition: all 0.3s ease;
+      border: 2px solid rgba(34, 211, 238, 0.3);
+      font-weight: 600;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(34, 211, 238, 0.4);
+    }
+
+    .card.dragging {
+      opacity: 0.5;
+      cursor: grabbing;
+    }
+
+    .card.placed {
+      display: none;
+    }
+
+    .energy-line {
+      width: 6px;
+      height: 0;
+      background: linear-gradient(180deg, #22d3ee, #a855f7);
+      margin: 0 auto;
+      transition: height 1s ease;
+      border-radius: 3px;
+    }
+
+    .energy-line.flowing {
+      height: 100px;
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.6);
+    }
+
+    .simulator-area {
+      display: flex;
+      gap: 3rem;
+      align-items: center;
+      justify-content: center;
+      margin: 2rem 0;
+    }
+
+    .player-silhouette {
+      position: relative;
+      width: 200px;
+      height: 300px;
+    }
+
+    .silhouette-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .body-part {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .body-part:hover {
+      filter: brightness(1.5);
+    }
+
+    .body-part.activated {
+      fill: #22d3ee;
+      filter: drop-shadow(0 0 10px #22d3ee);
+      animation: glow 0.5s ease;
+    }
+
+    @keyframes glow {
+      0%, 100% { filter: drop-shadow(0 0 10px #22d3ee); }
+      50% { filter: drop-shadow(0 0 20px #22d3ee); }
+    }
+
+    .energy-bar {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 0.5rem;
+      height: 400px;
+    }
+
+    .energy-segment {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid rgba(34, 211, 238, 0.3);
+      font-weight: 700;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .energy-segment::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 0;
+      background: linear-gradient(180deg, #22d3ee, #a855f7);
+      transition: height 0.5s ease;
+    }
+
+    .energy-segment span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .energy-segment:hover {
+      border-color: #22d3ee;
+      transform: scale(1.05);
+    }
+
+    .energy-segment.active::before {
+      height: 100%;
+    }
+
+    .energy-segment.active {
+      box-shadow: 0 0 30px rgba(34, 211, 238, 0.6);
+    }
+
+    .ball-animation {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: radial-gradient(circle, #fbbf24, #f59e0b);
+      border-radius: 50%;
+      box-shadow: 0 4px 15px rgba(251, 191, 36, 0.6);
+      display: none;
+    }
+
+    .ball-animation.moving {
+      display: block;
+      animation: ballPath 3s ease-in-out;
+    }
+
+    @keyframes ballPath {
+      0% { transform: translate(-200px, -100px); }
+      25% { transform: translate(-100px, 50px); }
+      50% { transform: translate(0, 0); }
+      75% { transform: translate(100px, -50px); }
+      100% { transform: translate(200px, -150px); }
+    }
+
+    .feedback-message {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      border-radius: 15px;
+      font-weight: 600;
+      text-align: center;
+      display: none;
+    }
+
+    .feedback-message.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .feedback-message.success {
+      background: rgba(34, 197, 94, 0.2);
+      border: 2px solid #22c55e;
+      color: #86efac;
+    }
+
+    .feedback-message.error {
+      background: rgba(239, 68, 68, 0.2);
+      border: 2px solid #ef4444;
+      color: #fca5a5;
+    }
+
+    .stroke-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .stroke-card {
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 15px;
+      border: 2px solid rgba(34, 211, 238, 0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .stroke-card:hover {
+      transform: translateY(-8px);
+      background: rgba(34, 211, 238, 0.15);
+      border-color: #22d3ee;
+      box-shadow: 0 12px 40px rgba(34, 211, 238, 0.4);
+    }
+
+    .stroke-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .stroke-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #22d3ee;
+    }
+
+    .muscle-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .muscle-option {
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid rgba(34, 211, 238, 0.3);
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .muscle-option:hover {
+      background: rgba(34, 211, 238, 0.2);
+      border-color: #22d3ee;
+    }
+
+    .muscle-option.selected {
+      background: rgba(34, 211, 238, 0.3);
+      border-color: #22d3ee;
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+    }
+
+    .muscle-option.correct {
+      background: rgba(34, 197, 94, 0.3);
+      border-color: #22c55e;
+    }
+
+    .muscle-option.incorrect {
+      background: rgba(239, 68, 68, 0.3);
+      border-color: #ef4444;
+    }
+
+    .exam-options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .exam-option {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(34, 211, 238, 0.3);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .exam-option:hover {
+      background: rgba(34, 211, 238, 0.15);
+      border-color: #22d3ee;
+      transform: translateX(10px);
+    }
+
+    .exam-option.selected {
+      background: rgba(34, 211, 238, 0.2);
+      border-color: #22d3ee;
+    }
+
+    .exam-option.correct {
+      background: rgba(34, 197, 94, 0.3);
+      border-color: #22c55e;
+      pointer-events: none;
+    }
+
+    .exam-option.incorrect {
+      background: rgba(239, 68, 68, 0.3);
+      border-color: #ef4444;
+      pointer-events: none;
+    }
+
+    .option-letter {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: rgba(168, 85, 247, 0.3);
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e9d5ff;
+      flex-shrink: 0;
+    }
+
+    .exam-option.correct .option-letter {
+      background: rgba(34, 197, 94, 0.5);
+      color: #86efac;
+    }
+
+    .exam-option.incorrect .option-letter {
+      background: rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+    }
+
+    .question-feedback {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 12px;
+      font-weight: 600;
+      display: none;
+    }
+
+    .question-feedback.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    .question-feedback.correct-fb {
+      background: rgba(34, 197, 94, 0.2);
+      border: 2px solid #22c55e;
+      color: #86efac;
+    }
+
+    .question-feedback.incorrect-fb {
+      background: rgba(239, 68, 68, 0.2);
+      border: 2px solid #ef4444;
+      color: #fca5a5;
+    }
+
+    .final-score-display {
+      text-align: center;
+      padding: 3rem 2rem;
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(168, 85, 247, 0.2));
+      border-radius: 30px;
+      border: 3px solid rgba(34, 211, 238, 0.5);
+      margin: 2rem 0;
+    }
+
+    .score-circle {
+      width: 250px;
+      height: 250px;
+      margin: 0 auto 2rem;
+      position: relative;
+      border-radius: 50%;
+      background: conic-gradient(
+        #22d3ee 0deg,
+        #a855f7 var(--score-deg),
+        rgba(255, 255, 255, 0.1) var(--score-deg)
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: rotateCircle 1.5s ease-out;
+    }
+
+    @keyframes rotateCircle {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .score-circle::before {
+      content: '';
+      position: absolute;
+      width: 210px;
+      height: 210px;
+      background: #0f172a;
+      border-radius: 50%;
+    }
+
+    .score-value {
+      position: relative;
+      z-index: 2;
+      font-size: 4rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #22d3ee, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+
+    .action-btn {
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(135deg, #22d3ee, #a855f7);
+      color: white;
+    }
+
+    .action-btn.secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #22d3ee;
+      border: 2px solid #22d3ee;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(34, 211, 238, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .game-title {
+        font-size: 2rem;
+      }
+
+      .phase-container {
+        padding: 1.5rem;
+      }
+
+      .chain-builder {
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .simulator-area {
+        flex-direction: column;
+      }
+
+      .stroke-selector {
+        grid-template-columns: 1fr;
+      }
+
+      .muscle-options {
+        grid-template-columns: 1fr;
+      }
+    }
+      /* Standalone cleanup helpers */
+    .hidden { display: none !important; }
+    .text-center, .center { text-align: center !important; }
+    .mt-30 { margin-top: 30px !important; }
+    @media (max-width: 768px) {
+      .container,
+      .game-container,
+      .game-area,
+      .game-section,
+      .section,
+      .phase-container,
+      .minigame-section,
+      .header,
+      .modal-content {
+        padding: 18px !important;
+      }
+      .header h1,
+      .game-title,
+      #gameTitle,
+      #game-title,
+      .intro-title,
+      .cover-title,
+      h1 {
+        font-size: clamp(1.9rem, 8vw, 2.4rem) !important;
+        line-height: 1.15 !important;
+      }
+      .header h2,
+      .section-title,
+      .phase-title,
+      .minigame-title,
+      h2 {
+        font-size: clamp(1.25rem, 6vw, 1.75rem) !important;
+        line-height: 1.25 !important;
+      }
+      .header p,
+      .section-description,
+      .game-subtitle,
+      .subtitle,
+      .scenario-text,
+      .situation-question,
+      .step-content,
+      .detail-section li,
+      .teaching-text,
+      .option-button,
+      .info-item,
+      .level-description {
+        font-size: 1rem !important;
+        line-height: 1.55 !important;
+      }
+      .info-boxes,
+      .body-map,
+      .injury-cards,
+      .scene-grid,
+      .options,
+      .phase-buttons,
+      .cards-grid,
+      .options-grid,
+      .cards-container {
+        grid-template-columns: 1fr !important;
+      }
+      .chain-builder,
+      .final-buttons,
+      .buttons-row,
+      .nav-buttons,
+      .button-group,
+      .buttons-group {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+      }
+      .btn,
+      .btn-primary,
+      .btn-secondary,
+      .phase-button,
+      .action-btn,
+      .next-button,
+      .option-btn,
+      .option-button {
+        width: 100% !important;
+      }
+      .score-display {
+        position: static !important;
+        display: block !important;
+        width: fit-content;
+        max-width: 100%;
+        margin: 0 auto 16px auto !important;
+        font-size: 1rem !important;
+        padding: 12px 16px !important;
+      }
+    }
+    @media (max-width: 768px) {
+      .container {
+        padding: 16px 12px 28px !important;
+      }
+
+      .header {
+        margin-bottom: 22px !important;
+        padding: 18px 14px !important;
+        border-radius: 16px !important;
+      }
+
+      .game-title {
+        font-size: clamp(1.8rem, 7vw, 2.2rem) !important;
+        line-height: 1.1 !important;
+      }
+
+      .game-subtitle {
+        font-size: 1rem !important;
+        line-height: 1.55 !important;
+      }
+
+      .lesson-info {
+        font-size: 0.88rem !important;
+        line-height: 1.45 !important;
+        padding: 10px 14px !important;
+      }
+
+      .phase-container {
+        padding: 18px 14px !important;
+        margin-bottom: 16px !important;
+        border-radius: 16px !important;
+      }
+
+      .phase-title {
+        font-size: clamp(1.2rem, 5.2vw, 1.45rem) !important;
+        line-height: 1.28 !important;
+        margin-bottom: 14px !important;
+      }
+
+      .pyramid-level,
+      .drop-zone,
+      .info-panel {
+        padding: 16px 14px !important;
+      }
+
+      .level-title {
+        font-size: 1.1rem !important;
+      }
+
+      .level-description,
+      .feedback-message,
+      .info-panel p,
+      .drop-zone,
+      .phase-button,
+      .action-btn {
+        font-size: 0.98rem !important;
+        line-height: 1.58 !important;
+      }
+
+      .chain-builder,
+      div[style*="display: flex; gap: 3rem;"],
+      div[style*="display: flex; gap: 2rem;"] {
+        flex-direction: column !important;
+        gap: 16px !important;
+      }
+
+      .drop-zone {
+        min-height: 84px !important;
+      }
+
+      .action-buttons {
+        flex-direction: column !important;
+        gap: 10px !important;
+      }
+
+      .phase-button,
+      .action-btn {
+        width: 100% !important;
+        padding: 14px 16px !important;
+      }
+
+      .score-display {
+        margin-bottom: 14px !important;
+        font-size: 0.96rem !important;
+        padding: 10px 14px !important;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }    /* Standalone cleanup helpers */
+    .hidden { display: none !important; }
+    .text-center, .center { text-align: center !important; }
+    .mt-30 { margin-top: 30px !important; }
+    @media (max-width: 768px) {
+      .container,
+      .game-container,
+      .game-area,
+      .game-section,
+      .section,
+      .phase-container,
+      .minigame-section,
+      .header,
+      .modal-content {
+        padding: 18px !important;
+      }
+      .header h1,
+      .game-title,
+      #gameTitle,
+      #game-title,
+      .intro-title,
+      .cover-title,
+      h1 {
+        font-size: clamp(1.9rem, 8vw, 2.4rem) !important;
+        line-height: 1.15 !important;
+      }
+      .header h2,
+      .section-title,
+      .phase-title,
+      .minigame-title,
+      h2 {
+        font-size: clamp(1.25rem, 6vw, 1.75rem) !important;
+        line-height: 1.25 !important;
+      }
+      .header p,
+      .section-description,
+      .game-subtitle,
+      .subtitle,
+      .scenario-text,
+      .situation-question,
+      .step-content,
+      .detail-section li,
+      .teaching-text,
+      .option-button,
+      .info-item,
+      .level-description {
+        font-size: 1rem !important;
+        line-height: 1.55 !important;
+      }
+      .info-boxes,
+      .body-map,
+      .injury-cards,
+      .scene-grid,
+      .options,
+      .phase-buttons,
+      .cards-grid,
+      .options-grid,
+      .cards-container {
+        grid-template-columns: 1fr !important;
+      }
+      .chain-builder,
+      .final-buttons,
+      .buttons-row,
+      .nav-buttons,
+      .button-group,
+      .buttons-group {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+      }
+      .btn,
+      .btn-primary,
+      .btn-secondary,
+      .phase-button,
+      .action-btn,
+      .next-button,
+      .option-btn,
+      .option-button {
+        width: 100% !important;
+      }
+      .score-display {
+        position: static !important;
+        display: block !important;
+        width: fit-content;
+        max-width: 100%;
+        margin: 0 auto 16px auto !important;
+        font-size: 1rem !important;
+        padding: 12px 16px !important;
+      }
+    }
+  </style>
+    <script>
+    window.elementSdk = window.elementSdk || { init: async function () { return { isOk: true, value: null }; }, on: function () {}, emit: function () { return { isOk: true, value: null }; } };
+    window.dataSdk = window.dataSdk || { init: async function () { return { isOk: true, value: null }; }, create: async function () { return { isOk: true, value: null }; }, list: async function () { return { isOk: true, value: [] }; }, update: async function () { return { isOk: true, value: null }; } };
+  </script>
+</head>
+ <body>
+  <div class="score-display">
+   Puntaje cinetico: <span id="score">0</span>%
+  </div>
+  <div class="container">
+   <div class="header">
+    <h1 class="game-title" id="gameTitle">Cadena cinetica AC</h1>
+    <p class="game-subtitle" id="gameSubtitle">Domina la Cadena del Golpe Perfecto</p>
+    <div class="lesson-info" id="lessonInfo">
+     Lección 2 – Cadena Cinética del Golpe
+    </div>
+   </div><!-- FASE 1: LABORATORIO CINÉTICO INTERACTIVO -->
+   <div id="phase1" class="phase-container active">
+    <h2 class="phase-title">Fase 1 - Laboratorio de energia</h2>
+    <p style="text-align: center; font-size: 1.1rem; margin-bottom: 2rem; color: #cbd5e1;">Experimenta con cada parte del cuerpo. Activa y desactiva para ver cómo afecta la potencia del golpe.</p>
+    <div style="display: flex; gap: 3rem; align-items: center; justify-content: center; margin: 2rem 0;">
+     <div style="flex: 1; max-width: 400px;">
+      <svg id="interactivePlayer" viewbox="0 0 200 350" style="width: 100%; height: auto;"><!-- Pies --> <g id="feetGroup" class="body-segment" data-part="pies" style="cursor: pointer;">
+        <ellipse cx="100" cy="320" rx="60" ry="25" fill="#475569" opacity="0.4" />
+        <text x="100" y="328" text-anchor="middle" fill="white" font-size="16" font-weight="bold">
+         PIES
+        </text>
+       </g> <!-- Piernas --> <g id="legsGroup" class="body-segment" data-part="pies" style="cursor: pointer;">
+        <rect x="70" y="230" width="60" height="90" rx="15" fill="#475569" opacity="0.4" />
+       </g> <!-- Cadera --> <g id="hipsGroup" class="body-segment" data-part="cadera" style="cursor: pointer;">
+        <ellipse cx="100" cy="210" rx="50" ry="35" fill="#475569" opacity="0.4" />
+        <text x="100" y="218" text-anchor="middle" fill="white" font-size="14" font-weight="bold">
+         CADERA
+        </text>
+        <path d="M 70 210 Q 100 230 130 210" stroke="#64748b" stroke-width="3" fill="none" opacity="0.6" />
+       </g> <!-- Torso --> <g id="torsoGroup" class="body-segment" data-part="cadera" style="cursor: pointer;">
+        <rect x="65" y="120" width="70" height="90" rx="20" fill="#475569" opacity="0.4" />
+       </g> <!-- Brazo --> <g id="armGroup" class="body-segment" data-part="brazo" style="cursor: pointer;">
+        <rect x="135" y="140" width="18" height="80" rx="9" fill="#475569" opacity="0.4" transform="rotate(25 144 140)" />
+        <text x="165" y="175" text-anchor="middle" fill="white" font-size="12" font-weight="bold" transform="rotate(25 165 175)">
+         BRAZO
+        </text>
+       </g> <!-- Muñeca/Raqueta --> <g id="wristGroup" class="body-segment" data-part="muneca" style="cursor: pointer;">
+        <ellipse cx="195" cy="210" rx="35" ry="50" fill="#a855f7" opacity="0.4" />
+        <text x="195" y="215" text-anchor="middle" fill="white" font-size="11" font-weight="bold">
+         RAQUETA
+        </text>
+       </g> <!-- Cabeza --> <circle cx="100" cy="90" r="30" fill="#475569" opacity="0.6" /> <circle cx="95" cy="85" r="4" fill="white" /> <circle cx="105" cy="85" r="4" fill="white" /> <path d="M 90 100 Q 100 105 110 100" stroke="white" stroke-width="2" fill="none" />
+      </svg>
+      <div style="text-align: center; margin-top: 1.5rem; padding: 1rem; background: rgba(168, 85, 247, 0.2); border-radius: 12px;">
+       <div style="font-size: 0.9rem; color: #cbd5e1; margin-bottom: 0.5rem;">
+        HAZ CLIC EN CADA PARTE
+       </div>
+       <div style="font-size: 2.5rem; font-weight: 800; color: #22d3ee;" id="powerDisplay">
+        0%
+       </div>
+       <div style="font-size: 0.85rem; color: #94a3b8;">
+        Potencia del Golpe
+       </div>
+      </div>
+     </div>
+     <div style="flex: 1; max-width: 500px;">
+      <div class="info-panel" id="infoPies" style="display: none;">
+       <h3 style="color: #22d3ee; margin: 0 0 1rem 0;">🔻 PIES – Base de Poder</h3>
+       <div style="background: rgba(34, 211, 238, 0.1); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;"><strong>Contribución: +40%</strong>
+       </div>
+       <p style="line-height: 1.6; color: #cbd5e1;">• La energía nace en el suelo<br>
+         • Flexión ligera para cargar energía<br>
+         • Empuje explosivo hacia adelante<br>
+         • Estabilidad = Control</p>
+       <div style="background: rgba(251, 191, 36, 0.2); padding: 0.75rem; border-radius: 8px; margin-top: 1rem; border-left: 4px solid #fbbf24;">
+        ⚡ Sin pies activos, pierdes más de la mitad de tu potencia
+       </div>
+      </div>
+      <div class="info-panel" id="infoCadera" style="display: none;">
+       <h3 style="color: #22d3ee; margin: 0 0 1rem 0;">🔸 CADERA – Motor de Rotación</h3>
+       <div style="background: rgba(34, 211, 238, 0.1); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;"><strong>Contribución: +30%</strong>
+       </div>
+       <p style="line-height: 1.6; color: #cbd5e1;">• Genera torque rotacional<br>
+         • Separa hombros de cadera<br>
+         • Transfiere energía hacia arriba<br>
+         • Clave para velocidad angular</p>
+       <div style="background: rgba(251, 191, 36, 0.2); padding: 0.75rem; border-radius: 8px; margin-top: 1rem; border-left: 4px solid #fbbf24;">
+        ⚡ La rotación multiplica la fuerza de las piernas
+       </div>
+      </div>
+      <div class="info-panel" id="infoBrazo" style="display: none;">
+       <h3 style="color: #22d3ee; margin: 0 0 1rem 0;">🔹 BRAZO – Acelerador</h3>
+       <div style="background: rgba(34, 211, 238, 0.1); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;"><strong>Contribución: +15%</strong>
+       </div>
+       <p style="line-height: 1.6; color: #cbd5e1;">• Acelera la energía acumulada<br>
+         • Movimiento fluido y natural<br>
+         • NO genera potencia, la libera<br>
+         • Extensión progresiva</p>
+       <div style="background: rgba(251, 191, 36, 0.2); padding: 0.75rem; border-radius: 8px; margin-top: 1rem; border-left: 4px solid #fbbf24;">
+        ⚡ El brazo solo acelera lo que piernas y cadera crearon
+       </div>
+      </div>
+      <div class="info-panel" id="infoMuneca" style="display: none;">
+       <h3 style="color: #22d3ee; margin: 0 0 1rem 0;">🔺 MUÑECA – Finalizador</h3>
+       <div style="background: rgba(34, 211, 238, 0.1); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;"><strong>Contribución: +15%</strong>
+       </div>
+       <p style="line-height: 1.6; color: #cbd5e1;">• Pronación final<br>
+         • Genera spin y efecto<br>
+         • Dirección precisa<br>
+         • Liberación explosiva</p>
+       <div style="background: rgba(251, 191, 36, 0.2); padding: 0.75rem; border-radius: 8px; margin-top: 1rem; border-left: 4px solid #fbbf24;">
+        ⚡ La muñeca da el toque final de velocidad y control
+       </div>
+      </div>
+      <div class="info-panel" id="infoStart" style="display: block;">
+       <h3 style="color: #a855f7; margin: 0 0 1rem 0; text-align: center;">👆 Comienza Experimentando</h3>
+       <p style="text-align: center; color: #94a3b8; font-size: 1.1rem; line-height: 1.6;">Haz clic en cada parte del cuerpo del jugador para activarla o desactivarla.<br><br>
+         Observa cómo cambia la potencia total del golpe.</p>
+      </div>
+     </div>
+    </div>
+    <div style="text-align: center; margin-top: 2rem;">
+     <div id="phase1Success" style="display: none; padding: 1.5rem; background: rgba(34, 197, 94, 0.2); border-radius: 15px; border: 2px solid #22c55e; margin-bottom: 1.5rem;">
+      <div style="font-size: 1.3rem; color: #86efac; font-weight: 700;">
+       ✅ ¡Has descubierto la cadena completa! Todas las partes trabajan juntas = 100% de potencia máxima
+      </div>
+     </div><button class="phase-button" id="phase1Button" style="display: none;" onclick="goToPhase(2)">🎯 Siguiente: Secuencia Perfecta</button>
+    </div>
+   </div><!-- FASE 2: TIMING GAME - SECUENCIA PERFECTA -->
+   <div id="phase2" class="phase-container">
+    <h2 class="phase-title">🟠 FASE 2 – TIMING PERFECTO</h2>
+    <p style="text-align: center; font-size: 1.1rem; margin-bottom: 2rem; color: #cbd5e1;">Presiona las teclas en el orden correcto cuando aparezcan. ¡El timing es crítico!</p>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 2rem;">
+     <div style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 20px; width: 100%; max-width: 800px;">
+      <div style="display: flex; justify-content: space-around; margin-bottom: 2rem;">
+       <div style="text-align: center;">
+        <div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 0.5rem;">
+         Combo Actual
+        </div>
+        <div style="font-size: 2rem; font-weight: 800; color: #22d3ee;" id="comboCount">
+         0
+        </div>
+       </div>
+       <div style="text-align: center;">
+        <div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 0.5rem;">
+         Mejor Racha
+        </div>
+        <div style="font-size: 2rem; font-weight: 800; color: #a855f7;" id="bestStreak">
+         0
+        </div>
+       </div>
+       <div style="text-align: center;">
+        <div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 0.5rem;">
+         Precisión
+        </div>
+        <div style="font-size: 2rem; font-weight: 800; color: #fbbf24;" id="accuracy">
+         100%
+        </div>
+       </div>
+      </div>
+      <div id="sequenceTrack" style="position: relative; height: 200px; background: rgba(0, 0, 0, 0.3); border-radius: 15px; overflow: hidden; border: 2px solid rgba(34, 211, 238, 0.3);">
+       <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: rgba(34, 211, 238, 0.5); transform: translateX(-50%);"></div>
+       <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 150px; height: 80px; border: 4px solid #22d3ee; border-radius: 15px; background: rgba(34, 211, 238, 0.1); box-shadow: 0 0 30px rgba(34, 211, 238, 0.4);">
+        <div style="text-align: center; line-height: 72px; font-size: 0.85rem; color: #22d3ee; font-weight: 700;">
+         ZONA PERFECTA
+        </div>
+       </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 2rem;">
+       <div class="timing-key" data-key="pies" style="background: rgba(239, 68, 68, 0.2); border: 2px solid #ef4444; border-radius: 12px; padding: 1.5rem; text-align: center; font-weight: 700; color: #fca5a5; cursor: pointer; transition: all 0.2s ease;">
+        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">
+         🦶
+        </div>
+        <div style="font-size: 0.85rem;">
+         PIES
+        </div>
+        <div style="font-size: 0.75rem; margin-top: 0.3rem; opacity: 0.7;">
+         Clic o Tecla: 1
+        </div>
+       </div>
+       <div class="timing-key" data-key="cadera" style="background: rgba(251, 191, 36, 0.2); border: 2px solid #fbbf24; border-radius: 12px; padding: 1.5rem; text-align: center; font-weight: 700; color: #fde68a; cursor: pointer; transition: all 0.2s ease;">
+        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">
+         🔄
+        </div>
+        <div style="font-size: 0.85rem;">
+         CADERA
+        </div>
+        <div style="font-size: 0.75rem; margin-top: 0.3rem; opacity: 0.7;">
+         Clic o Tecla: 2
+        </div>
+       </div>
+       <div class="timing-key" data-key="brazo" style="background: rgba(34, 211, 238, 0.2); border: 2px solid #22d3ee; border-radius: 12px; padding: 1.5rem; text-align: center; font-weight: 700; color: #a5f3fc; cursor: pointer; transition: all 0.2s ease;">
+        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">
+         💪
+        </div>
+        <div style="font-size: 0.85rem;">
+         BRAZO
+        </div>
+        <div style="font-size: 0.75rem; margin-top: 0.3rem; opacity: 0.7;">
+         Clic o Tecla: 3
+        </div>
+       </div>
+       <div class="timing-key" data-key="muneca" style="background: rgba(168, 85, 247, 0.2); border: 2px solid #a855f7; border-radius: 12px; padding: 1.5rem; text-align: center; font-weight: 700; color: #e9d5ff; cursor: pointer; transition: all 0.2s ease;">
+        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">
+         🎾
+        </div>
+        <div style="font-size: 0.85rem;">
+         MUÑECA
+        </div>
+        <div style="font-size: 0.75rem; margin-top: 0.3rem; opacity: 0.7;">
+         Clic o Tecla: 4
+        </div>
+       </div>
+      </div>
+     </div><button class="phase-button" id="startTimingGame" onclick="startTimingGame()">▶️ Comenzar Secuencia</button>
+    </div>
+    <div class="feedback-message" id="phase2Feedback"></div><button class="phase-button" id="phase2Button" style="display: none;" onclick="goToPhase(3)">⚡ Activar Músculos en Tiempo Real</button>
+   </div><!-- FASE 3: REACCIÓN MUSCULAR EN TIEMPO REAL -->
+   <div id="phase3" class="phase-container">
+    <h2 class="phase-title">🔵 FASE 3 – REACCIÓN EN CADENA</h2>
+    <p style="text-align: center; font-size: 1.1rem; margin-bottom: 2rem; color: #cbd5e1;">Haz clic en cada músculo JUSTO cuando se ilumine. Velocidad y precisión son clave.</p>
+    <div style="display: flex; gap: 3rem; align-items: center; justify-content: center; flex-wrap: wrap;">
+     <div style="flex: 1; min-width: 300px; max-width: 400px;">
+      <svg id="reactionPlayer" viewbox="0 0 200 350" style="width: 100%; height: auto;"><g id="react_feet" class="reactive-part" data-muscle="pies" style="cursor: pointer;">
+        <ellipse cx="100" cy="320" rx="60" ry="25" fill="#1e293b" stroke="#475569" stroke-width="3" />
+        <text x="100" y="328" text-anchor="middle" fill="#64748b" font-size="16" font-weight="bold">
+         PIES
+        </text>
+       </g> <g id="react_legs" class="reactive-part" data-muscle="pies" style="cursor: pointer;">
+        <rect x="70" y="230" width="60" height="90" rx="15" fill="#1e293b" stroke="#475569" stroke-width="3" />
+       </g> <g id="react_hips" class="reactive-part" data-muscle="cadera" style="cursor: pointer;">
+        <ellipse cx="100" cy="210" rx="50" ry="35" fill="#1e293b" stroke="#475569" stroke-width="3" />
+        <text x="100" y="218" text-anchor="middle" fill="#64748b" font-size="14" font-weight="bold">
+         CADERA
+        </text>
+       </g> <g id="react_torso" class="reactive-part" data-muscle="cadera" style="cursor: pointer;">
+        <rect x="65" y="120" width="70" height="90" rx="20" fill="#1e293b" stroke="#475569" stroke-width="3" />
+       </g> <g id="react_arm" class="reactive-part" data-muscle="brazo" style="cursor: pointer;">
+        <rect x="135" y="140" width="18" height="80" rx="9" fill="#1e293b" stroke="#475569" stroke-width="3" transform="rotate(25 144 140)" />
+        <text x="165" y="175" text-anchor="middle" fill="#64748b" font-size="12" font-weight="bold" transform="rotate(25 165 175)">
+         BRAZO
+        </text>
+       </g> <g id="react_wrist" class="reactive-part" data-muscle="muneca" style="cursor: pointer;">
+        <ellipse cx="195" cy="210" rx="35" ry="50" fill="#1e293b" stroke="#a855f7" stroke-width="3" />
+        <text x="195" y="215" text-anchor="middle" fill="#a855f7" font-size="11" font-weight="bold">
+         RAQUETA
+        </text>
+       </g> <circle cx="100" cy="90" r="30" fill="#1e293b" stroke="#475569" stroke-width="2" /> <circle cx="95" cy="85" r="4" fill="#64748b" /> <circle cx="105" cy="85" r="4" fill="#64748b" />
+      </svg>
+      <div style="margin-top: 1.5rem; text-align: center;">
+       <div style="background: rgba(255, 255, 255, 0.05); padding: 1.5rem; border-radius: 15px;">
+        <div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 0.5rem;">
+         Tiempo de Reacción Promedio
+        </div>
+        <div style="font-size: 2.5rem; font-weight: 800; color: #22d3ee;" id="reactionTime">
+         0ms
+        </div>
+       </div>
+      </div>
+     </div>
+     <div style="flex: 1; min-width: 300px; max-width: 450px;">
+      <div style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 20px; margin-bottom: 2rem;">
+       <h3 style="color: #22d3ee; margin: 0 0 1.5rem 0; text-align: center;">📊 Estadísticas</h3>
+       <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+        <div style="text-align: center; padding: 1rem; background: rgba(34, 211, 238, 0.1); border-radius: 12px;">
+         <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.3rem;">
+          Activaciones
+         </div>
+         <div style="font-size: 2rem; font-weight: 800; color: #22d3ee;" id="activationCount">
+          0/0
+         </div>
+        </div>
+        <div style="text-align: center; padding: 1rem; background: rgba(168, 85, 247, 0.1); border-radius: 12px;">
+         <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.3rem;">
+          Precisión
+         </div>
+         <div style="font-size: 2rem; font-weight: 800; color: #a855f7;" id="reactionAccuracy">
+          0%
+         </div>
+        </div>
+        <div style="text-align: center; padding: 1rem; background: rgba(34, 197, 94, 0.1); border-radius: 12px;">
+         <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.3rem;">
+          Perfects
+         </div>
+         <div style="font-size: 2rem; font-weight: 800; color: #22c55e;" id="perfectHits">
+          0
+         </div>
+        </div>
+        <div style="text-align: center; padding: 1rem; background: rgba(251, 191, 36, 0.1); border-radius: 12px;">
+         <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.3rem;">
+          Mejor Tiempo
+         </div>
+         <div style="font-size: 2rem; font-weight: 800; color: #fbbf24;" id="bestTime">
+          ---
+         </div>
+        </div>
+       </div>
+      </div>
+      <div id="reactionInstructions" style="padding: 1.5rem; background: rgba(34, 211, 238, 0.1); border-radius: 15px; border: 2px solid rgba(34, 211, 238, 0.3);">
+       <h4 style="color: #22d3ee; margin: 0 0 1rem 0;">🎯 Instrucciones</h4>
+       <p style="margin: 0; line-height: 1.6; color: #cbd5e1;">• Las partes del cuerpo se iluminarán aleatoriamente<br>
+         • Haz clic INMEDIATAMENTE cuando veas el brillo<br>
+         • &lt;200ms = PERFECTO ⚡<br>
+         • &lt;400ms = BUENO ✓<br>
+         • &gt;400ms = LENTO ❌</p>
+      </div>
+     </div>
+    </div>
+    <div style="text-align: center; margin-top: 2rem;"><button class="phase-button" id="startReactionGame" onclick="startReactionGame()">⚡ Comenzar Test de Reacción</button>
+    </div>
+    <div class="feedback-message" id="phase3Feedback"></div><button class="phase-button" id="phase3Button" style="display: none;" onclick="goToPhase(4)">💥 Identifica Golpes Profesionales</button>
+   </div><!-- FASE 4: GOLPEA COMO LOS PRO -->
+   <div id="phase4" class="phase-container">
+    <h2 class="phase-title">🟣 FASE 4 – GOLPEA COMO LOS PRO</h2>
+    <p style="text-align: center; font-size: 1.1rem; margin-bottom: 2rem; color: #cbd5e1;">Identifica qué parte de la cadena domina cada golpe profesional.</p>
+    <div id="strokeSelection" class="stroke-selector">
+     <div class="stroke-card" onclick="selectStroke('drive')">
+      <div class="stroke-icon">
+       💥
+      </div>
+      <div class="stroke-name">
+       DRIVE
+      </div>
+      <p style="color: #94a3b8; margin: 0;">Golpe de fondo</p>
+     </div>
+     <div class="stroke-card" onclick="selectStroke('reves')">
+      <div class="stroke-icon">
+       🎾
+      </div>
+      <div class="stroke-name">
+       REVÉS
+      </div>
+      <p style="color: #94a3b8; margin: 0;">Golpe de revés</p>
+     </div>
+     <div class="stroke-card" onclick="selectStroke('saque')">
+      <div class="stroke-icon">
+       ⚡
+      </div>
+      <div class="stroke-name">
+       SAQUE
+      </div>
+      <p style="color: #94a3b8; margin: 0;">Servicio potente</p>
+     </div>
+     <div class="stroke-card" onclick="selectStroke('volea')">
+      <div class="stroke-icon">
+       🤲
+      </div>
+      <div class="stroke-name">
+       VOLEA
+      </div>
+      <p style="color: #94a3b8; margin: 0;">Golpe de red</p>
+     </div>
+    </div>
+    <div id="muscleSelection" style="display: none;">
+     <h3 style="text-align: center; color: #22d3ee; margin: 2rem 0 1rem;">¿Qué parte domina este golpe?</h3>
+     <div class="muscle-options">
+      <div class="muscle-option" onclick="checkAnswer('Piernas')">
+       🦶 Piernas
+      </div>
+      <div class="muscle-option" onclick="checkAnswer('Cadera')">
+       🔄 Cadera
+      </div>
+      <div class="muscle-option" onclick="checkAnswer('Brazo')">
+       💪 Brazo
+      </div>
+      <div class="muscle-option" onclick="checkAnswer('Muñeca')">
+       🎾 Muñeca
+      </div>
+     </div>
+    </div>
+    <div class="feedback-message" id="phase4Feedback"></div><button class="phase-button" id="phase4Button" style="display: none;" onclick="goToPhase(5)">🧠 Examen Final</button>
+   </div><!-- FASE 5: EXAMEN FINAL -->
+   <div id="phase5" class="phase-container">
+    <h2 class="phase-title">🧠 FASE 5 – EXAMEN FINAL + PUNTUACION CINETICA AC</h2>
+    <p style="text-align: center; font-size: 1.1rem; margin-bottom: 2rem; color: #cbd5e1;">Responde correctamente estas 3 preguntas técnicas para completar tu evaluación.</p>
+    <div style="max-width: 800px; margin: 0 auto;"><!-- Pregunta 1 -->
+     <div class="exam-question" id="question1" style="margin-bottom: 2rem;">
+      <div style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 20px; border: 2px solid rgba(34, 211, 238, 0.3);">
+       <h3 style="color: #22d3ee; margin: 0 0 1.5rem 0; font-size: 1.3rem;">❓ 1. El error más común en la cadena cinética es…</h3>
+       <div class="exam-options">
+        <div class="exam-option" onclick="answerQuestion(1, 'a')"><span class="option-letter">A</span> <span>Activar la muñeca primero</span>
+        </div>
+        <div class="exam-option" onclick="answerQuestion(1, 'b')"><span class="option-letter">B</span> <span>Depender del brazo</span>
+        </div>
+        <div class="exam-option correct-answer" onclick="answerQuestion(1, 'c')"><span class="option-letter">C</span> <span>No usar las piernas</span>
+        </div>
+       </div>
+       <div class="question-feedback" id="feedback1"></div>
+      </div>
+     </div><!-- Pregunta 2 -->
+     <div class="exam-question" id="question2" style="margin-bottom: 2rem; opacity: 0.5; pointer-events: none;">
+      <div style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 20px; border: 2px solid rgba(34, 211, 238, 0.3);">
+       <h3 style="color: #22d3ee; margin: 0 0 1.5rem 0; font-size: 1.3rem;">❓ 2. ¿Qué parte genera torque?</h3>
+       <div class="exam-options">
+        <div class="exam-option" onclick="answerQuestion(2, 'a')"><span class="option-letter">A</span> <span>Muñeca</span>
+        </div>
+        <div class="exam-option" onclick="answerQuestion(2, 'b')"><span class="option-letter">B</span> <span>Brazo</span>
+        </div>
+        <div class="exam-option correct-answer" onclick="answerQuestion(2, 'c')"><span class="option-letter">C</span> <span>Cadera/Torso</span>
+        </div>
+       </div>
+       <div class="question-feedback" id="feedback2"></div>
+      </div>
+     </div><!-- Pregunta 3 -->
+     <div class="exam-question" id="question3" style="margin-bottom: 2rem; opacity: 0.5; pointer-events: none;">
+      <div style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 20px; border: 2px solid rgba(34, 211, 238, 0.3);">
+       <h3 style="color: #22d3ee; margin: 0 0 1.5rem 0; font-size: 1.3rem;">❓ 3. La muñeca aporta principalmente:</h3>
+       <div class="exam-options">
+        <div class="exam-option" onclick="answerQuestion(3, 'a')"><span class="option-letter">A</span> <span>Fuerza bruta</span>
+        </div>
+        <div class="exam-option correct-answer" onclick="answerQuestion(3, 'b')"><span class="option-letter">B</span> <span>Dirección y efecto</span>
+        </div>
+        <div class="exam-option" onclick="answerQuestion(3, 'c')"><span class="option-letter">C</span> <span>Equilibrio</span>
+        </div>
+       </div>
+       <div class="question-feedback" id="feedback3"></div>
+      </div>
+     </div>
+    </div><button class="phase-button" id="phase5Button" style="display: none;" onclick="showFinalScore()">Ver resultado final</button>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "CADENA CINETICA AC ⚡🎾",
+      game_subtitle: "Domina la Cadena del Golpe Perfecto",
+      lesson_info: "Lección 2 – Cadena Cinética del Golpe"
+    };
+
+    let currentPhase = 1;
+    let kineticScore = 0;
+    let currentStroke = '';
+    let strokesCompleted = 0;
+    
+    // FASE 1: Variables
+    let activeParts = {
+      pies: false,
+      cadera: false,
+      brazo: false,
+      muneca: false
+    };
+    let allPartsActivated = false;
+
+    // FASE 2: Variables
+    let timingActive = false;
+    let currentCombo = 0;
+    let bestStreak = 0;
+    let totalAttempts = 0;
+    let successfulAttempts = 0;
+    let timingSequence = ['pies', 'cadera', 'brazo', 'muneca'];
+    let currentTimingStep = 0;
+    let timingNotes = [];
+
+    // FASE 3: Variables
+    let reactionActive = false;
+    let reactionTimes = [];
+    let reactionAttempts = 0;
+    let reactionSuccesses = 0;
+    let perfectHitsCount = 0;
+    let currentHighlight = null;
+    let highlightStartTime = 0;
+    let reactionRound = 0;
+    const maxReactionRounds = 12;
+
+    // FASE 5: Variables
+    let examAnswers = { 1: null, 2: null, 3: null };
+    let examCorrectAnswers = { 1: 'c', 2: 'c', 3: 'b' };
+    let examScore = 0;
+
+    const strokeAnswers = {
+      drive: ['Piernas', 'Cadera'],
+      reves: ['Cadera', 'Brazo'],
+      saque: ['Piernas', 'Cadera', 'Brazo', 'Muñeca'],
+      volea: ['Brazo', 'Muñeca']
+    };
+
+    const strokeExplanations = {
+      drive: "El drive nace en los pies y se impulsa con la cadera. La potencia viene de abajo.",
+      reves: "El revés se apoya en la rotación de cadera y la extensión del brazo para control.",
+      saque: "El saque usa la cadena completa: piernas, cadera, brazo y muñeca trabajan juntas.",
+      volea: "La volea no usa piernas para potencia, sino para equilibrio. Domina el brazo y muñeca."
+    };
+
+    function updateScore(points) {
+      kineticScore += points;
+      if (kineticScore > 100) kineticScore = 100;
+      document.getElementById('score').textContent = kineticScore;
+    }
+
+    function goToPhase(phase) {
+      document.querySelectorAll('.phase-container').forEach(p => p.classList.remove('active'));
+      document.getElementById(`phase${phase}`).classList.add('active');
+      currentPhase = phase;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ===== FASE 1: LABORATORIO DE ENERGÍA =====
+    const powerContributions = {
+      pies: 40,
+      cadera: 30,
+      brazo: 15,
+      muneca: 15
+    };
+
+    document.querySelectorAll('.body-segment').forEach(segment => {
+      segment.addEventListener('click', function() {
+        const part = this.dataset.part;
+        activeParts[part] = !activeParts[part];
+        
+        const allElements = document.querySelectorAll(`[data-part="${part}"]`);
+        allElements.forEach(el => {
+          if (activeParts[part]) {
+            el.querySelectorAll('ellipse, rect, circle').forEach(shape => {
+              shape.setAttribute('fill', getColorForPart(part));
+              shape.setAttribute('opacity', '1');
+              shape.style.filter = `drop-shadow(0 0 15px ${getColorForPart(part)})`;
+            });
+          } else {
+            el.querySelectorAll('ellipse, rect, circle').forEach(shape => {
+              shape.setAttribute('fill', '#475569');
+              shape.setAttribute('opacity', '0.4');
+              shape.style.filter = 'none';
+            });
+          }
+        });
+
+        updatePowerDisplay();
+        showPartInfo(part, activeParts[part]);
+      });
+    });
+
+    function getColorForPart(part) {
+      const colors = {
+        pies: '#ef4444',
+        cadera: '#fbbf24',
+        brazo: '#22d3ee',
+        muneca: '#a855f7'
+      };
+      return colors[part] || '#475569';
+    }
+
+    function updatePowerDisplay() {
+      let totalPower = 0;
+      Object.keys(activeParts).forEach(part => {
+        if (activeParts[part]) {
+          totalPower += powerContributions[part];
+        }
+      });
+
+      document.getElementById('powerDisplay').textContent = totalPower + '%';
+
+      const allActive = Object.values(activeParts).every(val => val === true);
+      if (allActive && !allPartsActivated) {
+        allPartsActivated = true;
+        updateScore(20);
+        document.getElementById('phase1Success').style.display = 'block';
+        document.getElementById('phase1Button').style.display = 'block';
+      }
+    }
+
+    function showPartInfo(part, isActive) {
+      document.querySelectorAll('.info-panel').forEach(panel => panel.style.display = 'none');
+      
+      if (isActive) {
+        const infoMap = {
+          pies: 'infoPies',
+          cadera: 'infoCadera',
+          brazo: 'infoBrazo',
+          muneca: 'infoMuneca'
+        };
+        const panelId = infoMap[part];
+        if (panelId) {
+          document.getElementById(panelId).style.display = 'block';
+        }
+      } else {
+        document.getElementById('infoStart').style.display = 'block';
+      }
+    }
+
+    // ===== FASE 2: TIMING PERFECTO =====
+    function startTimingGame() {
+      timingActive = true;
+      currentCombo = 0;
+      currentTimingStep = 0;
+      timingNotes = [];
+      document.getElementById('startTimingGame').style.display = 'none';
+      
+      spawnTimingNote();
+    }
+
+    function spawnTimingNote() {
+      if (!timingActive || currentTimingStep >= 20) {
+        endTimingGame();
+        return;
+      }
+
+      const track = document.getElementById('sequenceTrack');
+      const sequenceType = timingSequence[currentTimingStep % 4];
+      
+      const note = document.createElement('div');
+      note.className = 'timing-note';
+      note.dataset.type = sequenceType;
+      note.style.cssText = `
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        top: -60px;
+        width: 120px;
+        height: 50px;
+        background: ${getColorForPart(sequenceType)};
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: white;
+        box-shadow: 0 4px 20px ${getColorForPart(sequenceType)}80;
+        transition: top 2s linear;
+      `;
+      
+      const icons = { pies: '🦶', cadera: '🔄', brazo: '💪', muneca: '🎾' };
+      note.textContent = icons[sequenceType];
+      
+      track.appendChild(note);
+      timingNotes.push({ element: note, type: sequenceType, hit: false });
+      
+      setTimeout(() => {
+        note.style.top = '220px';
+      }, 50);
+      
+      setTimeout(() => {
+        if (!note.dataset.hit) {
+          note.remove();
+          timingNotes = timingNotes.filter(n => n.element !== note);
+          handleMiss();
+        }
+      }, 2100);
+      
+      setTimeout(() => spawnTimingNote(), 800);
+    }
+
+    function handleTimingInput(pressedType) {
+      if (!timingActive || currentPhase !== 2) return;
+      if (!pressedType) return;
+      
+      const keyElement = document.querySelector(`[data-key="${pressedType}"]`);
+      if (keyElement) {
+        keyElement.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          keyElement.style.transform = 'scale(1)';
+        }, 100);
+      }
+      
+      const perfectZone = document.getElementById('sequenceTrack').getBoundingClientRect();
+      const perfectCenter = perfectZone.top + perfectZone.height / 2;
+      
+      for (let noteData of timingNotes) {
+        if (noteData.hit) continue;
+        if (noteData.type !== pressedType) continue;
+        
+        const noteRect = noteData.element.getBoundingClientRect();
+        const noteCenter = noteRect.top + noteRect.height / 2;
+        const distance = Math.abs(noteCenter - perfectCenter);
+        
+        if (distance < 80) {
+          noteData.hit = true;
+          noteData.element.dataset.hit = 'true';
+          noteData.element.style.background = '#22c55e';
+          noteData.element.style.transform = 'translateX(-50%) scale(1.3)';
+          
+          setTimeout(() => noteData.element.remove(), 200);
+          
+          handleHit(distance);
+          break;
+        }
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      const keyMap = { '1': 'pies', '2': 'cadera', '3': 'brazo', '4': 'muneca' };
+      const pressedType = keyMap[e.key];
+      handleTimingInput(pressedType);
+    });
+
+    document.querySelectorAll('.timing-key').forEach(key => {
+      key.addEventListener('click', function() {
+        const keyType = this.dataset.key;
+        handleTimingInput(keyType);
+      });
+    });
+
+    function handleHit(distance) {
+      currentCombo++;
+      totalAttempts++;
+      successfulAttempts++;
+      currentTimingStep++;
+      
+      if (currentCombo > bestStreak) {
+        bestStreak = currentCombo;
+        document.getElementById('bestStreak').textContent = bestStreak;
+      }
+      
+      document.getElementById('comboCount').textContent = currentCombo;
+      
+      const accuracy = Math.round((successfulAttempts / totalAttempts) * 100);
+      document.getElementById('accuracy').textContent = accuracy + '%';
+    }
+
+    function handleMiss() {
+      currentCombo = 0;
+      totalAttempts++;
+      currentTimingStep++;
+      document.getElementById('comboCount').textContent = currentCombo;
+      
+      const accuracy = Math.round((successfulAttempts / totalAttempts) * 100);
+      document.getElementById('accuracy').textContent = accuracy + '%';
+    }
+
+    function endTimingGame() {
+      timingActive = false;
+      const score = Math.min(30, Math.round((successfulAttempts / 20) * 30));
+      updateScore(score);
+      
+      const feedback = document.getElementById('phase2Feedback');
+      if (successfulAttempts >= 15) {
+        feedback.textContent = `🎯 ¡Excelente! ${successfulAttempts}/20 perfectos. Tu timing es profesional.`;
+        feedback.className = 'feedback-message success show';
+      } else if (successfulAttempts >= 10) {
+        feedback.textContent = `✓ Buen trabajo! ${successfulAttempts}/20 correctos. Sigue practicando.`;
+        feedback.className = 'feedback-message show';
+        feedback.style.background = 'rgba(251, 191, 36, 0.2)';
+        feedback.style.borderColor = '#fbbf24';
+        feedback.style.color = '#fde68a';
+      } else {
+        feedback.textContent = `💪 ${successfulAttempts}/20 correctos. El timing se mejora con práctica.`;
+        feedback.className = 'feedback-message show';
+        feedback.style.background = 'rgba(34, 211, 238, 0.2)';
+        feedback.style.borderColor = '#22d3ee';
+        feedback.style.color = '#a5f3fc';
+      }
+      
+      document.getElementById('phase2Button').style.display = 'block';
+    }
+
+    // ===== FASE 3: TEST DE REACCIÓN =====
+    function startReactionGame() {
+      reactionActive = true;
+      reactionRound = 0;
+      reactionTimes = [];
+      reactionAttempts = 0;
+      reactionSuccesses = 0;
+      perfectHitsCount = 0;
+      
+      document.getElementById('startReactionGame').style.display = 'none';
+      document.getElementById('reactionInstructions').style.display = 'none';
+      
+      nextReactionRound();
+    }
+
+    function nextReactionRound() {
+      if (reactionRound >= maxReactionRounds) {
+        endReactionGame();
+        return;
+      }
+      
+      reactionRound++;
+      
+      setTimeout(() => {
+        if (!reactionActive) return;
+        
+        const muscles = ['pies', 'cadera', 'brazo', 'muneca'];
+        const randomMuscle = muscles[Math.floor(Math.random() * muscles.length)];
+        
+        highlightMuscle(randomMuscle);
+      }, Math.random() * 1500 + 800);
+    }
+
+    function highlightMuscle(muscle) {
+      currentHighlight = muscle;
+      highlightStartTime = Date.now();
+      
+      const parts = document.querySelectorAll(`.reactive-part[data-muscle="${muscle}"]`);
+      parts.forEach(part => {
+        part.querySelectorAll('ellipse, rect').forEach(shape => {
+          shape.setAttribute('fill', getColorForPart(muscle));
+          shape.setAttribute('stroke', getColorForPart(muscle));
+          shape.setAttribute('stroke-width', '5');
+          shape.style.filter = `drop-shadow(0 0 25px ${getColorForPart(muscle)})`;
+        });
+      });
+    }
+
+    document.querySelectorAll('.reactive-part').forEach(part => {
+      part.addEventListener('click', function() {
+        if (!reactionActive || !currentHighlight) return;
+        
+        const clickedMuscle = this.dataset.muscle;
+        
+        if (clickedMuscle === currentHighlight) {
+          const reactionTime = Date.now() - highlightStartTime;
+          reactionTimes.push(reactionTime);
+          reactionAttempts++;
+          reactionSuccesses++;
+          
+          if (reactionTime < 200) {
+            perfectHitsCount++;
+          }
+          
+          clearHighlight();
+          updateReactionStats();
+          
+          setTimeout(() => nextReactionRound(), 400);
+        }
+      });
+    });
+
+    function clearHighlight() {
+      if (!currentHighlight) return;
+      
+      const parts = document.querySelectorAll(`.reactive-part[data-muscle="${currentHighlight}"]`);
+      parts.forEach(part => {
+        part.querySelectorAll('ellipse, rect').forEach(shape => {
+          shape.setAttribute('fill', '#1e293b');
+          shape.setAttribute('stroke', '#475569');
+          shape.setAttribute('stroke-width', '3');
+          shape.style.filter = 'none';
+        });
+      });
+      
+      currentHighlight = null;
+    }
+
+    function updateReactionStats() {
+      const avgTime = reactionTimes.length > 0 
+        ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length)
+        : 0;
+      
+      const bestTimeVal = reactionTimes.length > 0 
+        ? Math.min(...reactionTimes)
+        : 0;
+      
+      const accuracy = reactionAttempts > 0 
+        ? Math.round((reactionSuccesses / reactionRound) * 100)
+        : 0;
+      
+      document.getElementById('reactionTime').textContent = avgTime + 'ms';
+      document.getElementById('activationCount').textContent = `${reactionSuccesses}/${reactionRound}`;
+      document.getElementById('reactionAccuracy').textContent = accuracy + '%';
+      document.getElementById('perfectHits').textContent = perfectHitsCount;
+      document.getElementById('bestTime').textContent = bestTimeVal > 0 ? bestTimeVal + 'ms' : '---';
+    }
+
+    function endReactionGame() {
+      reactionActive = false;
+      clearHighlight();
+      
+      const avgTime = reactionTimes.length > 0 
+        ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length)
+        : 999;
+      
+      const score = Math.min(30, Math.round((reactionSuccesses / maxReactionRounds) * 30));
+      updateScore(score);
+      
+      const feedback = document.getElementById('phase3Feedback');
+      if (avgTime < 250 && reactionSuccesses >= 10) {
+        feedback.textContent = `⚡ ¡Increíble! Tiempo promedio: ${avgTime}ms. Reacciones de profesional.`;
+        feedback.className = 'feedback-message success show';
+      } else if (avgTime < 350 && reactionSuccesses >= 8) {
+        feedback.textContent = `✓ Muy bien! Tiempo promedio: ${avgTime}ms. Excelente coordinación.`;
+        feedback.className = 'feedback-message show';
+        feedback.style.background = 'rgba(251, 191, 36, 0.2)';
+        feedback.style.borderColor = '#fbbf24';
+        feedback.style.color = '#fde68a';
+      } else {
+        feedback.textContent = `💪 Tiempo promedio: ${avgTime}ms. Sigue entrenando tu velocidad de reacción.`;
+        feedback.className = 'feedback-message show';
+        feedback.style.background = 'rgba(34, 211, 238, 0.2)';
+        feedback.style.borderColor = '#22d3ee';
+        feedback.style.color = '#a5f3fc';
+      }
+      
+      document.getElementById('phase3Button').style.display = 'block';
+    }
+
+    function selectStroke(stroke) {
+      currentStroke = stroke;
+      document.getElementById('strokeSelection').style.display = 'none';
+      document.getElementById('muscleSelection').style.display = 'block';
+      
+      document.querySelectorAll('.muscle-option').forEach(opt => {
+        opt.classList.remove('selected', 'correct', 'incorrect');
+      });
+    }
+
+    function checkAnswer(selectedMuscle) {
+      const correctAnswers = strokeAnswers[currentStroke];
+      const allOptions = document.querySelectorAll('.muscle-option');
+      
+      allOptions.forEach(opt => {
+        const muscleName = opt.textContent.trim().split(' ')[1];
+        if (correctAnswers.includes(muscleName)) {
+          opt.classList.add('correct');
+        } else if (opt.textContent.includes(selectedMuscle)) {
+          opt.classList.add('incorrect');
+        }
+      });
+
+      const feedback = document.getElementById('phase4Feedback');
+      
+      if (correctAnswers.includes(selectedMuscle)) {
+        feedback.textContent = `✅ ¡Correcto! ${strokeExplanations[currentStroke]}`;
+        feedback.className = 'feedback-message success show';
+        updateScore(7.5);
+        strokesCompleted++;
+        
+        setTimeout(() => {
+          if (strokesCompleted >= 4) {
+            document.getElementById('phase4Button').style.display = 'block';
+          } else {
+            document.getElementById('strokeSelection').style.display = 'grid';
+            document.getElementById('muscleSelection').style.display = 'none';
+            feedback.classList.remove('show');
+          }
+        }, 3000);
+      } else {
+        feedback.textContent = `❌ ${strokeExplanations[currentStroke]}`;
+        feedback.className = 'feedback-message error show';
+        
+        setTimeout(() => {
+          document.getElementById('strokeSelection').style.display = 'grid';
+          document.getElementById('muscleSelection').style.display = 'none';
+          feedback.classList.remove('show');
+        }, 4000);
+      }
+    }
+
+    // ===== FASE 5: EXAMEN FINAL =====
+    function answerQuestion(questionNum, answer) {
+      examAnswers[questionNum] = answer;
+      
+      const questionDiv = document.getElementById(`question${questionNum}`);
+      const options = questionDiv.querySelectorAll('.exam-option');
+      const correctAnswer = examCorrectAnswers[questionNum];
+      
+      options.forEach(opt => {
+        opt.classList.remove('selected');
+        const optAnswer = opt.onclick.toString().match(/'([a-c])'/)[1];
+        
+        if (optAnswer === answer) {
+          opt.classList.add('selected');
+        }
+        
+        if (optAnswer === correctAnswer) {
+          opt.classList.add('correct');
+        } else if (optAnswer === answer && answer !== correctAnswer) {
+          opt.classList.add('incorrect');
+        }
+      });
+      
+      const feedback = document.getElementById(`feedback${questionNum}`);
+      if (answer === correctAnswer) {
+        feedback.textContent = '✅ ¡Correcto! Excelente comprensión de la cadena cinética.';
+        feedback.className = 'question-feedback correct-fb show';
+        examScore += 6.67;
+      } else {
+        feedback.textContent = '❌ Incorrecto. Revisa los conceptos de la cadena cinética.';
+        feedback.className = 'question-feedback incorrect-fb show';
+      }
+      
+      updateScore(6.67);
+      
+      setTimeout(() => {
+        if (questionNum < 3) {
+          const nextQuestion = document.getElementById(`question${questionNum + 1}`);
+          nextQuestion.style.opacity = '1';
+          nextQuestion.style.pointerEvents = 'auto';
+          
+          window.scrollTo({
+            top: nextQuestion.offsetTop - 100,
+            behavior: 'smooth'
+          });
+        } else {
+          document.getElementById('phase5Button').style.display = 'block';
+          window.scrollTo({
+            top: document.getElementById('phase5Button').offsetTop - 100,
+            behavior: 'smooth'
+          });
+        }
+      }, 1500);
+    }
+
+    function showFinalScore() {
+      const container = document.querySelector('.container');
+      
+      let rankEmoji = '';
+      let rankTitle = '';
+      let rankMessage = '';
+      
+      if (kineticScore >= 90) {
+        rankEmoji = '🏆';
+        rankTitle = 'Máster de la Energía AC';
+        rankMessage = '¡Impresionante! Dominas completamente la cadena cinética. Tu comprensión del flujo de energía es excepcional.';
+      } else if (kineticScore >= 70) {
+        rankEmoji = '🎯';
+        rankTitle = 'Buena comprensión cinética';
+        rankMessage = 'Muy bien! Entiendes los conceptos clave. Con más práctica alcanzarás el nivel máster.';
+      } else if (kineticScore >= 50) {
+        rankEmoji = '⚙️';
+        rankTitle = 'Falta sincronía';
+        rankMessage = 'Has captado algunos conceptos pero necesitas mejorar la coordinación. Te recomendamos repetir el juego.';
+      } else {
+        rankEmoji = '🛠️';
+        rankTitle = 'Aprende la lógica de abajo hacia arriba';
+        rankMessage = 'Recuerda: la energía fluye desde los pies hacia la raqueta. Repasa las fases y vuelve a intentarlo.';
+      }
+      
+      const scoreDeg = (kineticScore / 100) * 360;
+      
+      const finalScoreHTML = `
+        <div class="final-score-display">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">${rankEmoji}</div>
+          
+          <h2 style="font-size: 2.5rem; font-weight: 900; margin: 0 0 1rem 0; color: #22d3ee;">
+            Resultado final
+          </h2>
+          
+          <div class="score-circle" style="--score-deg: ${scoreDeg}deg;">
+            <div class="score-value">${Math.round(kineticScore)}%</div>
+          </div>
+          
+          <div style="font-size: 1.8rem; font-weight: 700; color: #a855f7; margin-bottom: 1rem;">
+            ${rankTitle}
+          </div>
+          
+          <p style="font-size: 1.15rem; line-height: 1.7; color: #cbd5e1; max-width: 600px; margin: 0 auto 2rem;">
+            ${rankMessage}
+          </p>
+          
+          <div style="margin: 2rem 0; padding: 2rem; background: rgba(0, 0, 0, 0.3); border-radius: 20px;">
+            <div style="font-size: 1rem; color: #94a3b8; margin-bottom: 1.5rem; font-weight: 600;">Desglose por fase</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem;">
+              <div style="padding: 1rem; background: rgba(34, 211, 238, 0.15); border-radius: 12px; border: 2px solid rgba(34, 211, 238, 0.3);">
+                <div style="font-size: 0.85rem; color: #94a3b8;">Fase 1</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: #22d3ee;">20%</div>
+                <div style="font-size: 0.75rem; color: #64748b;">Laboratorio</div>
+              </div>
+              <div style="padding: 1rem; background: rgba(251, 191, 36, 0.15); border-radius: 12px; border: 2px solid rgba(251, 191, 36, 0.3);">
+                <div style="font-size: 0.85rem; color: #94a3b8;">Fase 2</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: #fbbf24;">30%</div>
+                <div style="font-size: 0.75rem; color: #64748b;">Timing</div>
+              </div>
+              <div style="padding: 1rem; background: rgba(168, 85, 247, 0.15); border-radius: 12px; border: 2px solid rgba(168, 85, 247, 0.3);">
+                <div style="font-size: 0.85rem; color: #94a3b8;">Fase 3</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: #a855f7;">30%</div>
+                <div style="font-size: 0.75rem; color: #64748b;">Reacción</div>
+              </div>
+              <div style="padding: 1rem; background: rgba(34, 197, 94, 0.15); border-radius: 12px; border: 2px solid rgba(34, 197, 94, 0.3);">
+                <div style="font-size: 0.85rem; color: #94a3b8;">Fase 4</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: #22c55e;">10%</div>
+                <div style="font-size: 0.75rem; color: #64748b;">Pro Golpes</div>
+              </div>
+              <div style="padding: 1rem; background: rgba(239, 68, 68, 0.15); border-radius: 12px; border: 2px solid rgba(239, 68, 68, 0.3);">
+                <div style="font-size: 0.85rem; color: #94a3b8;">Fase 5</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: #ef4444;">10%</div>
+                <div style="font-size: 0.75rem; color: #64748b;">Examen</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="action-buttons">
+            <button class="action-btn primary" onclick="restartGame()">🔄 Repetir</button>
+            <button class="action-btn secondary" onclick="showExplanation()">Ver explicacion tecnica</button>
+            <button class="action-btn secondary" onclick="nextLesson()">Volver al inicio</button>
+          </div>
+        </div>
+      `;
+      
+      container.innerHTML += finalScoreHTML;
+      
+      window.scrollTo({
+        top: document.querySelector('.final-score-display').offsetTop - 100,
+        behavior: 'smooth'
+      });
+    }
+
+    function restartGame() {
+      window.location.reload();
+    }
+
+    function showExplanation() {
+      const explanationHTML = `
+        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 2rem; overflow-y: auto;" onclick="this.remove()">
+          <div style="background: linear-gradient(135deg, #1e293b, #0f172a); padding: 3rem; border-radius: 30px; max-width: 800px; border: 3px solid #22d3ee;" onclick="event.stopPropagation()">
+            <h2 style="color: #22d3ee; font-size: clamp(1.35rem, 5vw, 2rem); margin: 0 0 1.5rem 0; text-align: center;">Explicacion tecnica de la cadena cinetica</h2>
+            
+            <div style="color: #cbd5e1; line-height: 1.8; font-size: 1.05rem;">
+              <p><strong style="color: #22d3ee;">🔻 PIES (40% de la potencia):</strong><br>
+              Son la base de todo. El contacto con el suelo y el impulso desde las piernas generan la energía inicial. Sin una base sólida, todo el resto falla.</p>
+              
+              <p><strong style="color: #fbbf24;">🔸 CADERA (30% de la potencia):</strong><br>
+              La rotación de cadera convierte el empuje vertical en torque rotacional. Separa los hombros de la cadera creando un efecto de látigo que multiplica la fuerza.</p>
+              
+              <p><strong style="color: #a855f7;">🔹 BRAZO (15% de la potencia):</strong><br>
+              El brazo NO genera potencia por sí solo. Su función es acelerar y liberar la energía acumulada por piernas y cadera. Un movimiento fluido y natural.</p>
+              
+              <p><strong style="color: #22c55e;">🔺 MUÑECA/RAQUETA (15% de la potencia):</strong><br>
+              La pronación final de la muñeca añade velocidad extra, spin y dirección precisa. Es el toque final que define la calidad del golpe.</p>
+              
+              <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(34, 211, 238, 0.2); border-radius: 15px; border-left: 4px solid #22d3ee;">
+                <strong style="color: #22d3ee;">⚡ PRINCIPIO CLAVE:</strong><br>
+                La energía fluye de ABAJO hacia ARRIBA en una secuencia perfecta. Romper esta cadena significa perder potencia y control.
+              </div>
+            </div>
+            
+            <button class="action-btn primary" style="display: block; margin: 2rem auto 0;" onclick="this.parentElement.parentElement.remove()">Cerrar</button>
+          </div>
+        </div>
+      `;
+      document.body.insertAdjacentHTML('beforeend', explanationHTML);
+    }
+
+    function nextLesson() {
+      const messageHTML = `
+        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 2rem;" onclick="this.remove()">
+          <div style="background: linear-gradient(135deg, #1e293b, #0f172a); padding: clamp(1.25rem, 4vw, 3rem); border-radius: 24px; max-width: 600px; text-align: center; border: 3px solid #a855f7;" onclick="event.stopPropagation()">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🎾</div>
+            <h2 style="color: #a855f7; font-size: 2rem; margin: 0 0 1rem 0;">Modulo completado</h2>
+            <p style="color: #cbd5e1; font-size: 1.15rem; line-height: 1.6;">
+              Has completado este recorrido sobre la cadena cinetica. Puedes repetir el juego o volver al inicio para reforzar la base tecnica.
+            </p>
+            <button class="action-btn primary" style="margin-top: 2rem;" onclick="this.parentElement.parentElement.remove()">Entendido</button>
+          </div>
+        </div>
+      `;
+      document.body.insertAdjacentHTML('beforeend', messageHTML);
+    }
+
+    async function onConfigChange(config) {
+      const titleElement = document.getElementById('gameTitle');
+      const subtitleElement = document.getElementById('gameSubtitle');
+      const lessonElement = document.getElementById('lessonInfo');
+
+      titleElement.textContent = config.game_title || defaultConfig.game_title;
+      subtitleElement.textContent = config.game_subtitle || defaultConfig.game_subtitle;
+      lessonElement.textContent = config.lesson_info || defaultConfig.lesson_info;
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["game_title", config.game_title || defaultConfig.game_title],
+        ["game_subtitle", config.game_subtitle || defaultConfig.game_subtitle],
+        ["lesson_info", config.lesson_info || defaultConfig.lesson_info]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+  </script>
+ <script>
+(function(){function acGameScrollTop(){try{window.scrollTo(0,0);}catch(e){}['.container','.game-container','.game-area','.game-section','.section','.phase-container','.results-screen','.modal-content'].forEach(function(selector){document.querySelectorAll(selector).forEach(function(element){if(!element){return;}try{if(typeof element.scrollTo==='function'){element.scrollTo(0,0);}else{element.scrollTop=0;}}catch(e){element.scrollTop=0;}});});}window.acGameScrollTop=acGameScrollTop;document.addEventListener('click',function(event){var trigger=event.target.closest('button, .btn, .btn-primary, .btn-secondary, .option-btn, .option-button, .action-btn, .phase-button');if(!trigger){return;}setTimeout(acGameScrollTop,40);setTimeout(acGameScrollTop,220);},true);document.addEventListener('DOMContentLoaded',function(){acGameScrollTop();setTimeout(acGameScrollTop,120);});})();
+</script>
+</body>
+</html>

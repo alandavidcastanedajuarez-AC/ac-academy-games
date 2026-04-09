@@ -1,0 +1,1526 @@
+<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rutina pre y despues de entrenar</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      min-height: 100%;
+    }
+
+    .game-section {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .section-title {
+      font-size: 28px;
+      color: #667eea;
+      margin: 0 0 20px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .info-boxes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .info-box {
+      padding: 20px;
+      border-radius: 15px;
+      border: 3px solid;
+    }
+
+    .info-box.pre {
+      background: #fff5f0;
+      border-color: #ff6b35;
+    }
+
+    .info-box.post {
+      background: #f0f9ff;
+      border-color: #4a90e2;
+    }
+
+    .info-box h3 {
+      margin: 0 0 15px 0;
+      font-size: 22px;
+    }
+
+    .info-box.pre h3 {
+      color: #ff6b35;
+    }
+
+    .info-box.post h3 {
+      color: #4a90e2;
+    }
+
+    .info-item {
+      margin: 12px 0;
+      padding-left: 25px;
+      position: relative;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .info-item:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+      color: #10b981;
+    }
+
+    .duration {
+      background: rgba(0,0,0,0.05);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      margin: 10px 0;
+      font-weight: 600;
+    }
+
+    .learning-box {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-style: italic;
+    }
+
+    .cards-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin: 20px 0;
+      min-height: 120px;
+      padding: 20px;
+      background: #f9fafb;
+      border-radius: 12px;
+      border: 2px dashed #cbd5e1;
+    }
+
+    .card {
+      background: white;
+      padding: 15px 20px;
+      border-radius: 10px;
+      border: 2px solid #cbd5e1;
+      cursor: move;
+      user-select: none;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .card.dragging {
+      opacity: 0.5;
+      transform: rotate(5deg);
+    }
+
+    .card.correct {
+      background: #d1fae5;
+      border-color: #10b981;
+      animation: correctPulse 0.5s ease;
+    }
+
+    .card.incorrect {
+      background: #fee2e2;
+      border-color: #ef4444;
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes correctPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .drop-zone {
+      min-height: 150px;
+      padding: 20px;
+      background: white;
+      border: 3px dashed #cbd5e1;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+
+    .drop-zone.active {
+      border-color: #667eea;
+      background: #f0f4ff;
+    }
+
+    .drop-zone-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #64748b;
+      margin-bottom: 15px;
+    }
+
+    .scenario {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 15px 0;
+      border-left: 4px solid #667eea;
+    }
+
+    .scenario-text {
+      font-size: 18px;
+      margin-bottom: 15px;
+      font-weight: 500;
+      color: #334155;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .option-btn {
+      background: white;
+      border: 2px solid #cbd5e1;
+      padding: 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .option-btn:hover {
+      background: #f1f5f9;
+      transform: translateY(-2px);
+    }
+
+    .option-btn.selected-correct {
+      background: #d1fae5;
+      border-color: #10b981;
+    }
+
+    .option-btn.selected-incorrect {
+      background: #fee2e2;
+      border-color: #ef4444;
+    }
+
+    .scene-card {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 15px 0;
+    }
+
+    .scene-header {
+      font-size: 18px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 12px;
+    }
+
+    .scene-description {
+      font-size: 16px;
+      color: #64748b;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    .error-box {
+      background: #fee2e2;
+      border-left: 4px solid #ef4444;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      display: none;
+    }
+
+    .error-box.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .question-card {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 15px 0;
+      border: 2px solid #e2e8f0;
+    }
+
+    .question-text {
+      font-size: 20px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 15px;
+    }
+
+    .btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: #10b981;
+    }
+
+    .btn-secondary:hover {
+      background: #059669;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #059669);
+      transition: width 0.5s ease;
+      border-radius: 10px;
+    }
+
+    .score-display {
+      text-align: center;
+      padding: 30px;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      border-radius: 15px;
+      color: white;
+      margin: 20px 0;
+    }
+
+    .score-number {
+      font-size: 72px;
+      font-weight: 700;
+      margin: 10px 0;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .score-label {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .feedback {
+      padding: 15px;
+      border-radius: 10px;
+      margin: 15px 0;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .feedback.success {
+      background: #d1fae5;
+      color: #065f46;
+      border-left: 4px solid #10b981;
+    }
+
+    .feedback.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border-left: 4px solid #ef4444;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .info-boxes {
+        grid-template-columns: 1fr;
+      }
+      
+      .section-title {
+        font-size: 22px;
+      }
+      
+      .options {
+        grid-template-columns: 1fr;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+    }
+      /* Standalone cleanup helpers */
+    .hidden { display: none !important; }
+    .text-center, .center { text-align: center !important; }
+    .mt-30 { margin-top: 30px !important; }
+    @media (max-width: 768px) {
+      .container,
+      .game-container,
+      .game-area,
+      .game-section,
+      .section,
+      .phase-container,
+      .minigame-section,
+      .header,
+      .modal-content {
+        padding: 18px !important;
+      }
+      .header h1,
+      .game-title,
+      #gameTitle,
+      #game-title,
+      .intro-title,
+      .cover-title,
+      h1 {
+        font-size: clamp(1.9rem, 8vw, 2.4rem) !important;
+        line-height: 1.15 !important;
+      }
+      .header h2,
+      .section-title,
+      .phase-title,
+      .minigame-title,
+      h2 {
+        font-size: clamp(1.25rem, 6vw, 1.75rem) !important;
+        line-height: 1.25 !important;
+      }
+      .header p,
+      .section-description,
+      .game-subtitle,
+      .subtitle,
+      .scenario-text,
+      .situation-question,
+      .step-content,
+      .detail-section li,
+      .teaching-text,
+      .option-button,
+      .info-item,
+      .level-description {
+        font-size: 1rem !important;
+        line-height: 1.55 !important;
+      }
+      .info-boxes,
+      .body-map,
+      .injury-cards,
+      .scene-grid,
+      .options,
+      .phase-buttons,
+      .cards-grid,
+      .options-grid,
+      .cards-container {
+        grid-template-columns: 1fr !important;
+      }
+      .chain-builder,
+      .final-buttons,
+      .buttons-row,
+      .nav-buttons,
+      .button-group,
+      .buttons-group {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+      }
+      .btn,
+      .btn-primary,
+      .btn-secondary,
+      .phase-button,
+      .action-btn,
+      .next-button,
+      .option-btn,
+      .option-button {
+        width: 100% !important;
+      }
+      .score-display {
+        position: static !important;
+        display: block !important;
+        width: fit-content;
+        max-width: 100%;
+        margin: 0 auto 16px auto !important;
+        font-size: 1rem !important;
+        padding: 12px 16px !important;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }    /* Standalone cleanup helpers */
+    .hidden { display: none !important; }
+    .text-center, .center { text-align: center !important; }
+    .mt-30 { margin-top: 30px !important; }
+    @media (max-width: 768px) {
+      .container,
+      .game-container,
+      .game-area,
+      .game-section,
+      .section,
+      .phase-container,
+      .minigame-section,
+      .header,
+      .modal-content {
+        padding: 18px !important;
+      }
+      .header h1,
+      .game-title,
+      #gameTitle,
+      #game-title,
+      .intro-title,
+      .cover-title,
+      h1 {
+        font-size: clamp(1.9rem, 8vw, 2.4rem) !important;
+        line-height: 1.15 !important;
+      }
+      .header h2,
+      .section-title,
+      .phase-title,
+      .minigame-title,
+      h2 {
+        font-size: clamp(1.25rem, 6vw, 1.75rem) !important;
+        line-height: 1.25 !important;
+      }
+      .header p,
+      .section-description,
+      .game-subtitle,
+      .subtitle,
+      .scenario-text,
+      .situation-question,
+      .step-content,
+      .detail-section li,
+      .teaching-text,
+      .option-button,
+      .info-item,
+      .level-description {
+        font-size: 1rem !important;
+        line-height: 1.55 !important;
+      }
+      .info-boxes,
+      .body-map,
+      .injury-cards,
+      .scene-grid,
+      .options,
+      .phase-buttons,
+      .cards-grid,
+      .options-grid,
+      .cards-container {
+        grid-template-columns: 1fr !important;
+      }
+      .chain-builder,
+      .final-buttons,
+      .buttons-row,
+      .nav-buttons,
+      .button-group,
+      .buttons-group {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+      }
+      .btn,
+      .btn-primary,
+      .btn-secondary,
+      .phase-button,
+      .action-btn,
+      .next-button,
+      .option-btn,
+      .option-button {
+        width: 100% !important;
+      }
+      .score-display {
+        position: static !important;
+        display: block !important;
+        width: fit-content;
+        max-width: 100%;
+        margin: 0 auto 16px auto !important;
+        font-size: 1rem !important;
+        padding: 12px 16px !important;
+      }
+    }
+  </style>
+    <script>
+    window.elementSdk = window.elementSdk || { init: async function () { return { isOk: true, value: null }; }, on: function () {}, emit: function () { return { isOk: true, value: null }; } };
+    window.dataSdk = window.dataSdk || { init: async function () { return { isOk: true, value: null }; }, create: async function () { return { isOk: true, value: null }; }, list: async function () { return { isOk: true, value: [] }; }, update: async function () { return { isOk: true, value: null }; } };
+  </script>
+</head>
+ <body>
+  <div class="container"><!-- Parte 0: Inicio -->
+   <div id="parte0" class="game-section">
+    <div style="text-align: center; margin-bottom: 30px;">
+     <h1 id="game-title" style="font-size: 42px; color: #667eea; margin: 0 0 10px 0;">🎮 RUTINA TOTAL AC 🔥🎾</h1>
+     <p id="lesson-subtitle" style="font-size: 20px; color: #64748b; margin: 5px 0;">📘 Lección 4 – Rutinas rápidas pre y post entrenamiento</p>
+    </div>
+    <h2 class="section-title">👋 ¡Bienvenido!</h2>
+    <p style="font-size: 18px; line-height: 1.8; margin-bottom: 20px;">En este juego aprenderás a organizar correctamente tus rutinas de entrenamiento. Descubrirás qué hacer ANTES y DESPUÉS de entrenar, y por qué es tan importante para tu rendimiento.</p>
+    <p style="font-size: 18px; color: #667eea; font-weight: 600; margin-bottom: 20px;">🎯 Aprende a organizar tu rutina ANTES y DESPUÉS del entrenamiento</p>
+    <p style="font-size: 16px; color: #64748b; margin-bottom: 25px;">El juego tiene 6 partes que te llevarán paso a paso hacia convertirte en un experto en rutinas AC.</p>
+    <div class="center"><button id="start-button" class="btn">🚀 Comenzar Entrenamiento</button>
+    </div>
+   </div><!-- Parte 1: Exploración Guiada -->
+   <div id="parte1" class="game-section hidden">
+    <h2 class="section-title">🔍 PARTE 1 – Exploración Guiada</h2>
+    <p style="font-size: 18px; margin-bottom: 25px;">Conoce las dos rutinas esenciales: ANTES y DESPUÉS del entrenamiento</p>
+    <div class="info-boxes">
+     <div class="info-box pre">
+      <h3>🔶 ANTES de entrenar – Activar</h3>
+      <div class="duration">
+       ⏱️ Duración total: 10 minutos
+      </div>
+      <div style="margin-top: 15px;"><strong style="font-size: 18px; color: #ff6b35;">🎯 Objetivo:</strong>
+       <p style="margin: 10px 0; line-height: 1.6;">Preparar el cuerpo para el esfuerzo físico, activando músculos, articulaciones y el sistema nervioso. Esto previene lesiones y mejora el rendimiento inmediato.</p><strong style="font-size: 18px; color: #ff6b35; display: block; margin-top: 20px;">📋 Lo que incluye:</strong>
+       <div class="info-item" style="margin-top: 15px;">
+        <strong>1. Movilidad articular (5 min)</strong><br><span style="font-size: 14px; color: #64748b;">Movimientos suaves y controlados de las articulaciones principales</span>
+        <ul style="margin: 8px 0 0 25px; color: #64748b; font-size: 14px;">
+         <li>Círculos de cuello (preparar cervicales)</li>
+         <li>Rotaciones de hombros (soltar tensión)</li>
+         <li>Círculos de cadera (activar core)</li>
+         <li>Rotaciones de tobillos (prevenir esguinces)</li>
+        </ul>
+       </div>
+       <div class="info-item">
+        <strong>2. Activación muscular (5 min)</strong><br><span style="font-size: 14px; color: #64748b;">Ejercicios dinámicos que aumentan la temperatura corporal y activan el sistema nervioso</span>
+        <ul style="margin: 8px 0 0 25px; color: #64748b; font-size: 14px;">
+         <li>Saltos cortos en el lugar (activar piernas)</li>
+         <li>Skipping suave (coordinación)</li>
+         <li>Trote ligero (elevar frecuencia cardíaca)</li>
+         <li>Desplazamientos laterales (activar caderas)</li>
+        </ul>
+       </div>
+      </div>
+      <div class="learning-box"><strong>💡 ¿Por qué es importante?</strong><br>
+        • Aumenta el flujo sanguíneo a los músculos<br>
+        • Mejora la elasticidad muscular y articular<br>
+        • Prepara mentalmente para el entrenamiento<br>
+        • Reduce hasta un 50% el riesgo de lesiones
+      </div>
+      <div style="background: #ffebee; padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 4px solid #ef4444;"><strong style="color: #c62828;">⚠️ NUNCA hacer antes:</strong><br><span style="font-size: 14px;">Estiramientos estáticos largos (relajan el músculo cuando debe estar activo)</span>
+      </div>
+     </div>
+     <div class="info-box post">
+      <h3>🔷 DESPUÉS de entrenar – Recuperar</h3>
+      <div class="duration">
+       ⏱️ Duración total: 10–15 minutos
+      </div>
+      <div style="margin-top: 15px;"><strong style="font-size: 18px; color: #4a90e2;">🎯 Objetivo:</strong>
+       <p style="margin: 10px 0; line-height: 1.6;">Ayudar al cuerpo a recuperarse del esfuerzo, eliminar tensiones musculares, bajar el pulso y prevenir lesiones por acumulación de fatiga.</p><strong style="font-size: 18px; color: #4a90e2; display: block; margin-top: 20px;">📋 Lo que incluye:</strong>
+       <div class="info-item" style="margin-top: 15px;">
+        <strong>1. Estiramientos estáticos (6-8 min)</strong><br><span style="font-size: 14px; color: #64748b;">Mantener cada posición 10-15 segundos sin rebotes</span>
+        <ul style="margin: 8px 0 0 25px; color: #64748b; font-size: 14px;">
+         <li>Cuádriceps (parte frontal del muslo)</li>
+         <li>Isquiotibiales (parte posterior del muslo)</li>
+         <li>Glúteos (evitar dolor lumbar)</li>
+         <li>Espalda baja (liberar tensión)</li>
+         <li>Hombros y brazos (relajar tren superior)</li>
+        </ul>
+       </div>
+       <div class="info-item">
+        <strong>2. Respiración profunda (3-5 min)</strong><br><span style="font-size: 14px; color: #64748b;">Respiración diafragmática lenta y controlada</span>
+        <ul style="margin: 8px 0 0 25px; color: #64748b; font-size: 14px;">
+         <li>Inhalar por nariz (4 segundos)</li>
+         <li>Exhalar por boca (6 segundos)</li>
+         <li>Calma el sistema nervioso</li>
+         <li>Reduce el pulso cardíaco</li>
+        </ul>
+       </div>
+       <div class="info-item">
+        <strong>3. Hidratación (2 min)</strong><br><span style="font-size: 14px; color: #64748b;">Reponer líquidos perdidos durante el entrenamiento</span>
+        <ul style="margin: 8px 0 0 25px; color: #64748b; font-size: 14px;">
+         <li>Agua fresca (no helada)</li>
+         <li>Bebidas con electrolitos si fue intenso</li>
+         <li>Beber lentamente, no de golpe</li>
+        </ul>
+       </div>
+      </div>
+      <div class="learning-box"><strong>💡 ¿Por qué es importante?</strong><br>
+        • Acelera la recuperación muscular<br>
+        • Previene dolores y contracturas<br>
+        • Mejora la flexibilidad a largo plazo<br>
+        • Reduce el riesgo de lesiones crónicas
+      </div>
+      <div style="background: #ffebee; padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 4px solid #ef4444;"><strong style="color: #c62828;">⚠️ NUNCA hacer después:</strong><br><span style="font-size: 14px;">Activación muscular intensa (el cuerpo necesita relajarse, no activarse más)</span>
+      </div>
+     </div>
+    </div>
+    <div class="center"><button id="btn-parte1" class="btn">👉 Construir mis rutinas</button>
+    </div>
+   </div><!-- Parte 2: Rutina Previa -->
+   <div id="parte2" class="game-section hidden">
+    <h2 class="section-title">🟠 PARTE 2 – Arma la Rutina PREVIA</h2>
+    <p style="font-size: 18px; margin-bottom: 20px;">Arrastra las tarjetas correctas y ordénalas para crear la rutina perfecta ANTES de entrenar</p>
+    <div class="cards-container" id="cards-parte2">
+     <div class="card" draggable="true" data-id="activacion">
+      Activación muscular
+     </div>
+     <div class="card" draggable="true" data-id="estiramientos">
+      Estiramientos estáticos
+     </div>
+     <div class="card" draggable="true" data-id="movilidad">
+      Movilidad articular
+     </div>
+     <div class="card" draggable="true" data-id="respiracion">
+      Respiración profunda
+     </div>
+     <div class="card" draggable="true" data-id="hidratacion">
+      Hidratación
+     </div>
+     <div class="card" draggable="true" data-id="peloteo">
+      Peloteo suave
+     </div>
+    </div>
+    <div class="drop-zone" id="dropzone-parte2">
+     <div class="drop-zone-title">
+      ⬇️ Suelta aquí las tarjetas en el orden correcto
+     </div>
+     <div id="dropped-cards-parte2"></div>
+    </div>
+    <div id="feedback-parte2" class="feedback hidden"></div>
+    <div class="center"><button id="check-parte2" class="btn" disabled>✓ Verificar Orden</button>
+    </div>
+    <div class="progress-bar">
+     <div class="progress-fill" style="width: 20%;"></div>
+    </div>
+   </div><!-- Parte 3: Rutina Posterior -->
+   <div id="parte3" class="game-section hidden">
+    <h2 class="section-title">🔵 PARTE 3 – Arma la Rutina POSTERIOR</h2>
+    <p style="font-size: 18px; margin-bottom: 20px;">Ahora organiza lo que debes hacer DESPUÉS del entrenamiento</p>
+    <div class="cards-container" id="cards-parte3">
+     <div class="card" draggable="true" data-id="estiramientos">
+      Estiramientos estáticos
+     </div>
+     <div class="card" draggable="true" data-id="hidratacion">
+      Hidratación
+     </div>
+     <div class="card" draggable="true" data-id="respiracion">
+      Respiración profunda
+     </div>
+     <div class="card" draggable="true" data-id="movilidad">
+      Movilidad
+     </div>
+     <div class="card" draggable="true" data-id="activacion">
+      Activación
+     </div>
+     <div class="card" draggable="true" data-id="peloteo">
+      Peloteo suave
+     </div>
+    </div>
+    <div class="drop-zone" id="dropzone-parte3">
+     <div class="drop-zone-title">
+      ⬇️ Suelta aquí las tarjetas en el orden correcto
+     </div>
+     <div id="dropped-cards-parte3"></div>
+    </div>
+    <div id="feedback-parte3" class="feedback hidden"></div>
+    <div class="center"><button id="check-parte3" class="btn" disabled>✓ Verificar Orden</button>
+    </div>
+    <div class="progress-bar">
+     <div class="progress-fill" style="width: 40%;"></div>
+    </div>
+   </div><!-- Parte 4: Simulador Físico -->
+   <div id="parte4" class="game-section hidden">
+    <h2 class="section-title">🟣 PARTE 4 – Simulador Físico</h2>
+    <p style="font-size: 18px; margin-bottom: 20px;">Lee cada sensación y elige la acción correcta</p>
+    <div id="scenarios-container"></div>
+    <div id="feedback-parte4" class="feedback hidden"></div>
+    <div class="center"><button id="btn-parte4" class="btn hidden">Continuar</button>
+    </div>
+    <div class="progress-bar">
+     <div class="progress-fill" style="width: 60%;"></div>
+    </div>
+   </div><!-- Parte 5: ¿Qué está mal? -->
+   <div id="parte5" class="game-section hidden">
+    <h2 class="section-title">🟣 PARTE 5 – ¿Qué está mal en esta escena?</h2>
+    <p style="font-size: 18px; margin-bottom: 20px;">Identifica el error en cada situación</p>
+    <div id="scenes-container"></div>
+    <div id="feedback-parte5" class="feedback hidden"></div>
+    <div class="center"><button id="btn-parte5" class="btn hidden">Continuar a la Prueba Final</button>
+    </div>
+    <div class="progress-bar">
+     <div class="progress-fill" style="width: 80%;"></div>
+    </div>
+   </div><!-- Parte 6: Prueba Final -->
+   <div id="parte6" class="game-section hidden">
+    <h2 class="section-title">🧠 PARTE 6 – Prueba Final AC</h2>
+    <p style="font-size: 18px; margin-bottom: 20px;">Responde estas preguntas clave para completar tu entrenamiento</p>
+    <div id="questions-container"></div>
+    <div id="feedback-parte6" class="feedback hidden"></div>
+    <div class="center"><button id="submit-parte6" class="btn" disabled>🏆 Ver mi Rutina AC Score</button>
+    </div>
+    <div class="progress-bar">
+     <div class="progress-fill" style="width: 100%;"></div>
+    </div>
+   </div><!-- Resultado Final -->
+   <div id="resultado" class="game-section hidden">
+    <h2 class="section-title center">🎉 ¡Entrenamiento Completado!</h2>
+    <div class="score-display">
+     <div class="score-label">
+      Tu Rutina AC Score
+     </div>
+     <div class="score-number" id="final-score">
+      0
+     </div>
+     <div style="font-size: 18px;" id="score-message"></div>
+    </div>
+    <div style="background: #f8fafc; padding: 20px; border-radius: 12px; margin: 20px 0;">
+     <h3 style="color: #334155; margin-top: 0;">📊 Resumen de tu desempeño:</h3>
+     <div id="score-breakdown"></div>
+    </div>
+    <div class="center button-group"><button id="restart-btn" class="btn">🔄 Repetir Juego</button>
+    </div><!-- Rutina Recomendada AC -->
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 20px; margin-top: 30px; color: white;">
+     <h2 style="text-align: center; margin: 0 0 25px 0; font-size: 32px;">📋 Tu Rutina Recomendada AC</h2>
+     <div style="background: white; border-radius: 15px; padding: 25px; margin-bottom: 20px;">
+      <h3 style="color: #ff6b35; margin-top: 0; font-size: 24px;">🔶 ANTES de entrenar (10 min)</h3>
+      <ol style="line-height: 2; font-size: 16px; color: #334155;">
+       <li><strong>Movilidad articular</strong> – 5 minutos 
+        <ul style="margin-top: 8px; color: #64748b; list-style: none; padding-left: 20px;">
+         <li>→ Círculos de cuello (10 cada lado)</li>
+         <li>→ Rotaciones de hombros (15 repeticiones)</li>
+         <li>→ Círculos de cadera (10 cada lado)</li>
+         <li>→ Rotaciones de tobillos (10 cada pie)</li>
+        </ul></li>
+       <li style="margin-top: 15px;"><strong>Activación muscular</strong> – 5 minutos 
+        <ul style="margin-top: 8px; color: #64748b; list-style: none; padding-left: 20px;">
+         <li>→ Saltos cortos en el lugar (30 segundos)</li>
+         <li>→ Skipping suave (30 segundos)</li>
+         <li>→ Trote ligero (2 minutos)</li>
+         <li>→ Desplazamientos laterales (1 minuto)</li>
+        </ul></li>
+      </ol>
+     </div>
+     <div style="background: white; border-radius: 15px; padding: 25px;">
+      <h3 style="color: #4a90e2; margin-top: 0; font-size: 24px;">🔷 DESPUÉS de entrenar (10-15 min)</h3>
+      <ol style="line-height: 2; font-size: 16px; color: #334155;">
+       <li><strong>Estiramientos estáticos</strong> – 10-15 seg cada músculo 
+        <ul style="margin-top: 8px; color: #64748b; list-style: none; padding-left: 20px;">
+         <li>→ Cuádriceps (pierna al glúteo)</li>
+         <li>→ Isquiotibiales (tocar los pies)</li>
+         <li>→ Glúteos (rodilla al pecho)</li>
+         <li>→ Espalda baja (gato-camello)</li>
+         <li>→ Hombros (brazo cruzado al pecho)</li>
+        </ul></li>
+       <li style="margin-top: 15px;"><strong>Respiración profunda</strong> – 3-5 minutos 
+        <ul style="margin-top: 8px; color: #64748b; list-style: none; padding-left: 20px;">
+         <li>→ Respiración diafragmática</li>
+         <li>→ Inhala 4 segundos, exhala 6 segundos</li>
+        </ul></li>
+       <li style="margin-top: 15px;"><strong>Hidratación</strong>
+        <ul style="margin-top: 8px; color: #64748b; list-style: none; padding-left: 20px;">
+         <li>→ Agua o bebida con electrolitos</li>
+         <li>→ Beber lentamente, no todo de golpe</li>
+        </ul></li>
+      </ol>
+     </div>
+     <div style="background: rgba(255, 255, 255, 0.2); padding: 20px; border-radius: 10px; margin-top: 20px; border: 2px solid rgba(255, 255, 255, 0.3);"><strong style="font-size: 18px;">💡 Recuerda:</strong>
+      <p style="margin: 10px 0 0 0; line-height: 1.6;">Estas rutinas son fundamentales para prevenir lesiones y maximizar tu rendimiento. ¡Hazlas parte de tu entrenamiento diario!</p>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "🎮 RUTINA TOTAL AC 🔥🎾",
+      lesson_subtitle: "📘 Lección 4 – Rutinas rápidas pre y post entrenamiento",
+      start_button: "🚀 Comenzar Entrenamiento",
+      next_button: "Continuar"
+    };
+
+    let currentScore = {
+      parte2: 0,
+      parte3: 0,
+      parte4: 0,
+      parte5: 0,
+      parte6: 0
+    };
+
+    let parte4Answers = [];
+    let parte5Answers = [];
+    let parte6Answers = [];
+
+    // Inicializar Element SDK
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange: async (config) => {
+        document.getElementById('game-title').textContent = config.game_title || defaultConfig.game_title;
+        document.getElementById('lesson-subtitle').textContent = config.lesson_subtitle || defaultConfig.lesson_subtitle;
+        document.getElementById('start-button').textContent = config.start_button || defaultConfig.start_button;
+      },
+      mapToCapabilities: (config) => ({
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ["game_title", config.game_title || defaultConfig.game_title],
+        ["lesson_subtitle", config.lesson_subtitle || defaultConfig.lesson_subtitle],
+        ["start_button", config.start_button || defaultConfig.start_button],
+        ["next_button", config.next_button || defaultConfig.next_button]
+      ])
+    });
+
+    // Inicializar Data SDK
+    const dataHandler = {
+      onDataChanged(data) {
+        // No necesitamos mostrar datos en este juego
+      }
+    };
+
+    window.dataSdk.init(dataHandler);
+
+    // Navegación entre partes
+    document.getElementById('start-button').addEventListener('click', () => {
+      document.getElementById('parte0').classList.add('hidden');
+      document.getElementById('parte1').classList.remove('hidden');
+    });
+
+    document.getElementById('btn-parte1').addEventListener('click', () => {
+      document.getElementById('parte1').classList.add('hidden');
+      document.getElementById('parte2').classList.remove('hidden');
+    });
+
+    // PARTE 2: Drag and Drop
+    setupDragAndDrop('parte2', ['movilidad', 'activacion']);
+
+    document.getElementById('check-parte2').addEventListener('click', () => {
+      checkParte2();
+    });
+
+    function setupDragAndDrop(parte, correctOrder) {
+      const cards = document.querySelectorAll(`#cards-${parte} .card`);
+      const dropzone = document.getElementById(`dropzone-${parte}`);
+      const droppedContainer = document.getElementById(`dropped-cards-${parte}`);
+
+      cards.forEach(card => {
+        card.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', e.target.dataset.id);
+          e.target.classList.add('dragging');
+        });
+
+        card.addEventListener('dragend', (e) => {
+          e.target.classList.remove('dragging');
+        });
+      });
+
+      dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('active');
+      });
+
+      dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('active');
+      });
+
+      dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('active');
+
+        const cardId = e.dataTransfer.getData('text/plain');
+        const card = document.querySelector(`#cards-${parte} .card[data-id="${cardId}"]`);
+
+        if (card) {
+          const newCard = card.cloneNode(true);
+          newCard.draggable = false;
+          newCard.style.cursor = 'default';
+          
+          const removeBtn = document.createElement('span');
+          removeBtn.textContent = ' ✕';
+          removeBtn.style.cursor = 'pointer';
+          removeBtn.style.marginLeft = '10px';
+          removeBtn.style.color = '#ef4444';
+          removeBtn.addEventListener('click', () => {
+            newCard.remove();
+            card.style.display = 'block';
+            updateCheckButton(parte);
+          });
+          
+          newCard.appendChild(removeBtn);
+          droppedContainer.appendChild(newCard);
+          card.style.display = 'none';
+
+          updateCheckButton(parte);
+        }
+      });
+    }
+
+    function updateCheckButton(parte) {
+      const droppedCards = document.querySelectorAll(`#dropped-cards-${parte} .card`);
+      const checkBtn = document.getElementById(`check-${parte}`);
+      checkBtn.disabled = droppedCards.length === 0;
+    }
+
+    function checkParte2() {
+      const droppedCards = document.querySelectorAll('#dropped-cards-parte2 .card');
+      const order = Array.from(droppedCards).map(card => card.dataset.id);
+      const correctOrder = ['movilidad', 'activacion'];
+      const feedback = document.getElementById('feedback-parte2');
+
+      if (order.length === 0) {
+        feedback.textContent = '❌ Debes arrastrar al menos una tarjeta para verificar.';
+        feedback.className = 'feedback error';
+        feedback.classList.remove('hidden');
+        return;
+      }
+
+      if (order.length < correctOrder.length) {
+        feedback.textContent = '❌ Faltan elementos. La rutina previa debe tener exactamente 2 pasos: Movilidad articular y Activación muscular.';
+        feedback.className = 'feedback error';
+        feedback.classList.remove('hidden');
+        return;
+      }
+
+      if (order.length > correctOrder.length) {
+        feedback.textContent = '❌ Demasiados elementos. La rutina previa solo necesita 2 pasos. Elimina las tarjetas incorrectas.';
+        feedback.className = 'feedback error';
+        feedback.classList.remove('hidden');
+        return;
+      }
+
+      // Verificar si tienen los elementos correctos pero en orden incorrecto
+      const hasCorrectElements = order.every(id => correctOrder.includes(id));
+      const isCorrectOrder = order.every((id, index) => id === correctOrder[index]);
+
+      droppedCards.forEach((card, index) => {
+        if (card.dataset.id !== correctOrder[index]) {
+          card.classList.add('incorrect');
+        } else {
+          card.classList.add('correct');
+        }
+      });
+
+      if (!hasCorrectElements) {
+        // Elementos incorrectos incluidos
+        const wrongElements = order.filter(id => !correctOrder.includes(id));
+        if (wrongElements.includes('estiramientos')) {
+          feedback.textContent = '❌ ERROR: Los estiramientos estáticos NUNCA van antes de entrenar. Relajan el músculo cuando debe estar activado.';
+        } else if (wrongElements.includes('hidratacion')) {
+          feedback.textContent = '❌ ERROR: La hidratación es importante pero NO sustituye la movilidad ni la activación muscular.';
+        } else if (wrongElements.includes('respiracion')) {
+          feedback.textContent = '❌ ERROR: La respiración profunda es para DESPUÉS del entrenamiento, no antes.';
+        } else if (wrongElements.includes('peloteo')) {
+          feedback.textContent = '❌ ERROR: El peloteo suave puede ser útil pero NO reemplaza la rutina previa de movilidad y activación.';
+        } else {
+          feedback.textContent = '❌ Los elementos seleccionados no son correctos para la rutina previa.';
+        }
+        feedback.className = 'feedback error';
+        feedback.classList.remove('hidden');
+      } else if (!isCorrectOrder) {
+        // Elementos correctos pero en orden incorrecto
+        feedback.textContent = '❌ Los elementos son correctos, pero el ORDEN está incorrecto. Recuerda: primero MOVILIDAD (preparar articulaciones) y luego ACTIVACIÓN (preparar músculos).';
+        feedback.className = 'feedback error';
+        feedback.classList.remove('hidden');
+      } else {
+        // Todo correcto
+        currentScore.parte2 = 20;
+        feedback.textContent = '✓ ¡Perfecto! Has armado correctamente la rutina previa: Movilidad → Activación. +20 puntos';
+        feedback.className = 'feedback success';
+        feedback.classList.remove('hidden');
+        
+        setTimeout(() => {
+          document.getElementById('parte2').classList.add('hidden');
+          document.getElementById('parte3').classList.remove('hidden');
+        }, 2000);
+      }
+    }
+
+    // PARTE 3
+    setupDragAndDrop('parte3', ['estiramientos', 'respiracion', 'hidratacion']);
+
+    document.getElementById('check-parte3').addEventListener('click', () => {
+      checkParte3();
+    });
+
+    function checkParte3() {
+      const droppedCards = document.querySelectorAll('#dropped-cards-parte3 .card');
+      const order = Array.from(droppedCards).map(card => card.dataset.id);
+      const correctOrder = ['estiramientos', 'respiracion', 'hidratacion'];
+      const feedback = document.getElementById('feedback-parte3');
+
+      if (order.length === 0) {
+        feedback.textContent = '❌ Debes arrastrar al menos una tarjeta para verificar.';
+        feedback.className = 'feedback error';
+        feedback.classList.remove('hidden');
+        return;
+      }
+
+      if (order.length < correctOrder.length) {
+        feedback.textContent = '❌ Faltan elementos. La rutina posterior debe tener exactamente 3 pasos: Estiramientos estáticos, Respiración profunda e Hidratación.';
+        feedback.className = 'feedback error';
+        feedback.classList.remove('hidden');
+        return;
+      }
+
+      if (order.length > correctOrder.length) {
+        feedback.textContent = '❌ Demasiados elementos. La rutina posterior solo necesita 3 pasos. Elimina las tarjetas incorrectas.';
+        feedback.className = 'feedback error';
+        feedback.classList.remove('hidden');
+        return;
+      }
+
+      // Verificar si tienen los elementos correctos pero en orden incorrecto
+      const hasCorrectElements = order.every(id => correctOrder.includes(id));
+      const isCorrectOrder = order.every((id, index) => id === correctOrder[index]);
+
+      droppedCards.forEach((card, index) => {
+        if (card.dataset.id !== correctOrder[index]) {
+          card.classList.add('incorrect');
+        } else {
+          card.classList.add('correct');
+        }
+      });
+
+      if (!hasCorrectElements) {
+        // Elementos incorrectos incluidos
+        const wrongElements = order.filter(id => !correctOrder.includes(id));
+        if (wrongElements.includes('activacion')) {
+          feedback.textContent = '❌ ERROR: La activación muscular es para ANTES del entrenamiento, no después. El cuerpo necesita RELAJARSE, no activarse más.';
+        } else if (wrongElements.includes('movilidad')) {
+          feedback.textContent = '❌ ERROR: La movilidad dinámica es para ANTES del entrenamiento. Después necesitas estiramientos ESTÁTICOS para relajar.';
+        } else if (wrongElements.includes('peloteo')) {
+          feedback.textContent = '❌ ERROR: El peloteo es actividad física. DESPUÉS del entrenamiento debes recuperar, no seguir activándote.';
+        } else {
+          feedback.textContent = '❌ Los elementos seleccionados no son correctos para la rutina posterior.';
+        }
+        feedback.className = 'feedback error';
+        feedback.classList.remove('hidden');
+      } else if (!isCorrectOrder) {
+        // Elementos correctos pero en orden incorrecto
+        feedback.textContent = '❌ Los elementos son correctos, pero el ORDEN está incorrecto. Recuerda: primero ESTIRAMIENTOS (relajar músculos), luego RESPIRACIÓN (bajar el pulso) y finalmente HIDRATACIÓN (reponer líquidos).';
+        feedback.className = 'feedback error';
+        feedback.classList.remove('hidden');
+      } else {
+        // Todo correcto
+        currentScore.parte3 = 20;
+        feedback.textContent = '✓ ¡Excelente! Has armado correctamente la rutina posterior: Estiramientos → Respiración → Hidratación. +20 puntos';
+        feedback.className = 'feedback success';
+        feedback.classList.remove('hidden');
+        
+        setTimeout(() => {
+          document.getElementById('parte3').classList.add('hidden');
+          document.getElementById('parte4').classList.remove('hidden');
+          initParte4();
+        }, 2000);
+      }
+    }
+
+    // PARTE 4: Simulador
+    const scenarios = [
+      {
+        text: "Estoy rígido de la espalda baja antes de entrenar.",
+        correct: "movilidad",
+        options: [
+          { id: "movilidad", text: "Movilidad articular" },
+          { id: "estiramiento", text: "Estiramientos estáticos" },
+          { id: "hidratacion", text: "Hidratación" }
+        ]
+      },
+      {
+        text: "Siento el cuerpo sin energía y lento.",
+        correct: "activacion",
+        options: [
+          { id: "respiracion", text: "Respiración profunda" },
+          { id: "activacion", text: "Activación muscular" },
+          { id: "estiramiento", text: "Estiramientos" }
+        ]
+      },
+      {
+        text: "Después del entrenamiento mis piernas están tensas.",
+        correct: "estiramiento",
+        options: [
+          { id: "estiramiento", text: "Estiramientos estáticos" },
+          { id: "movilidad", text: "Movilidad articular" },
+          { id: "activacion", text: "Activación muscular" }
+        ]
+      },
+      {
+        text: "Terminé agotado y con el pulso alto.",
+        correct: "respiracion",
+        options: [
+          { id: "hidratacion", text: "Hidratación" },
+          { id: "respiracion", text: "Respiración profunda" },
+          { id: "estiramiento", text: "Estiramientos" }
+        ]
+      },
+      {
+        text: "Terminé con sed y boqueando.",
+        correct: "hidratacion",
+        options: [
+          { id: "respiracion", text: "Respiración" },
+          { id: "estiramiento", text: "Estiramientos" },
+          { id: "hidratacion", text: "Hidratación" }
+        ]
+      }
+    ];
+
+    function initParte4() {
+      const container = document.getElementById('scenarios-container');
+      container.innerHTML = '';
+      parte4Answers = [];
+
+      scenarios.forEach((scenario, index) => {
+        const scenarioDiv = document.createElement('div');
+        scenarioDiv.className = 'scenario';
+        scenarioDiv.innerHTML = `
+          <div class="scenario-text">💭 Escena ${index + 1}: "${scenario.text}"</div>
+          <div class="options" data-scenario="${index}">
+            ${scenario.options.map(opt => `
+              <button class="option-btn" data-answer="${opt.id}">${opt.text}</button>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(scenarioDiv);
+
+        const buttons = scenarioDiv.querySelectorAll('.option-btn');
+        buttons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            buttons.forEach(b => {
+              b.classList.remove('selected-correct', 'selected-incorrect');
+              b.style.pointerEvents = 'auto';
+            });
+
+            const answer = btn.dataset.answer;
+            const isCorrect = answer === scenario.correct;
+            
+            btn.classList.add(isCorrect ? 'selected-correct' : 'selected-incorrect');
+            buttons.forEach(b => b.style.pointerEvents = 'none');
+
+            parte4Answers[index] = isCorrect ? 6 : 0;
+
+            if (parte4Answers.filter(a => a !== undefined).length === scenarios.length) {
+              setTimeout(showParte4Results, 500);
+            }
+          });
+        });
+      });
+    }
+
+    function showParte4Results() {
+      currentScore.parte4 = parte4Answers.reduce((sum, val) => sum + val, 0);
+      const feedback = document.getElementById('feedback-parte4');
+      feedback.textContent = `✓ Has completado el simulador. Puntuación: ${currentScore.parte4}/30 puntos`;
+      feedback.className = 'feedback success';
+      feedback.classList.remove('hidden');
+
+      document.getElementById('btn-parte4').classList.remove('hidden');
+    }
+
+    document.getElementById('btn-parte4').addEventListener('click', () => {
+      document.getElementById('parte4').classList.add('hidden');
+      document.getElementById('parte5').classList.remove('hidden');
+      initParte5();
+    });
+
+    // PARTE 5: ¿Qué está mal?
+    const scenes = [
+      {
+        title: "Escena A",
+        description: "Un jugador inicia su entrenamiento haciendo estiramientos estáticos largos.",
+        error: "El estiramiento estático NO va antes de entrenar.",
+        explanation: "Los estiramientos estáticos RELAJAN el músculo y reducen su capacidad de respuesta inmediata. Antes de entrenar el músculo debe estar ACTIVO y listo para reaccionar. Hacer estiramientos estáticos antes aumenta el riesgo de lesiones y disminuye el rendimiento. Lo correcto es hacer MOVILIDAD DINÁMICA y luego ACTIVACIÓN MUSCULAR."
+      },
+      {
+        title: "Escena B",
+        description: "Un jugador termina el partido y se va directamente sin estirar ni respirar.",
+        error: "No recupera ni limpia la tensión del músculo.",
+        explanation: "Al terminar el entrenamiento, los músculos quedan tensos y acortados, con microdesgarros y acumulación de ácido láctico. Si no haces la rutina posterior (estiramientos, respiración, hidratación), los músculos se quedan contraídos, lo que causa: dolores al día siguiente, mayor riesgo de lesiones crónicas, recuperación más lenta y pérdida de flexibilidad. Es fundamental dedicar 10-15 minutos a recuperar correctamente."
+      },
+      {
+        title: "Escena C",
+        description: "Un jugador hace activación muscular después de terminar de entrenar.",
+        error: "La activación es previa, no posterior.",
+        explanation: "La ACTIVACIÓN MUSCULAR (saltos, skipping, trote) sirve para PREPARAR el cuerpo para el esfuerzo, aumentando la temperatura corporal y activando el sistema nervioso. Hacerla DESPUÉS del entrenamiento es contraproducente porque el cuerpo necesita RELAJARSE y RECUPERARSE, no seguir activándose. Lo correcto después es: estiramientos estáticos (relajar), respiración profunda (bajar pulso) e hidratación."
+      },
+      {
+        title: "Escena D",
+        description: "Un jugador solo toma agua antes del entrenamiento pero no calienta.",
+        error: "La hidratación sola NO sustituye la rutina previa.",
+        explanation: "Aunque hidratarse es importante, NO reemplaza la preparación física del cuerpo. Sin movilidad articular y activación muscular, el jugador entra al entrenamiento con: articulaciones 'frías' y rígidas (mayor riesgo de esguinces), músculos no preparados (mayor riesgo de desgarros), sistema nervioso no activado (peor coordinación y reflejos). El agua solo hidrata, no prepara músculos ni articulaciones para el movimiento."
+      }
+    ];
+
+    function initParte5() {
+      const container = document.getElementById('scenes-container');
+      container.innerHTML = '';
+      parte5Answers = [];
+
+      scenes.forEach((scene, index) => {
+        const sceneDiv = document.createElement('div');
+        sceneDiv.className = 'scene-card';
+        sceneDiv.innerHTML = `
+          <div class="scene-header">🎬 ${scene.title}</div>
+          <div class="scene-description">${scene.description}</div>
+          <button class="btn btn-secondary" data-scene="${index}">🔍 Identificar el error</button>
+          <div class="error-box" id="error-${index}" style="display: none;">
+            <div style="font-size: 18px; font-weight: 700; margin-bottom: 10px;">❌ Error identificado:</div>
+            <div style="font-size: 16px; font-weight: 600; color: #991b1b; margin-bottom: 12px;">${scene.error}</div>
+            <div style="font-size: 15px; line-height: 1.6; color: #1f2937; background: white; padding: 12px; border-radius: 8px; margin-top: 10px;">
+              <strong>📖 Explicación detallada:</strong><br>
+              ${scene.explanation}
+            </div>
+          </div>
+        `;
+        container.appendChild(sceneDiv);
+
+        const btn = sceneDiv.querySelector('button');
+        btn.addEventListener('click', () => {
+          document.getElementById(`error-${index}`).style.display = 'block';
+          document.getElementById(`error-${index}`).classList.add('show');
+          btn.disabled = true;
+          btn.textContent = '✓ Error identificado';
+          btn.style.background = '#059669';
+          parte5Answers[index] = 5;
+
+          if (parte5Answers.filter(a => a !== undefined).length === scenes.length) {
+            setTimeout(showParte5Results, 500);
+          }
+        });
+      });
+    }
+
+    function showParte5Results() {
+      currentScore.parte5 = parte5Answers.reduce((sum, val) => sum + val, 0);
+      const feedback = document.getElementById('feedback-parte5');
+      feedback.textContent = `✓ Has identificado todos los errores. +${currentScore.parte5} puntos`;
+      feedback.className = 'feedback success';
+      feedback.classList.remove('hidden');
+
+      document.getElementById('btn-parte5').classList.remove('hidden');
+    }
+
+    document.getElementById('btn-parte5').addEventListener('click', () => {
+      document.getElementById('parte5').classList.add('hidden');
+      document.getElementById('parte6').classList.remove('hidden');
+      initParte6();
+    });
+
+    // PARTE 6: Prueba Final
+    const questions = [
+      {
+        question: "¿Cuál es el primer paso antes de entrenar?",
+        options: ["Estiramientos estáticos", "Movilidad articular", "Hidratación"],
+        correct: 1
+      },
+      {
+        question: "¿Qué sí debe hacerse después del entrenamiento?",
+        options: ["Activación muscular", "Estiramientos estáticos", "Saltos intensos"],
+        correct: 1
+      },
+      {
+        question: "¿Por qué respiración profunda después del entrenamiento?",
+        options: [
+          "Para relajar el sistema nervioso y bajar el pulso",
+          "Para hacer tiempo mientras descansas",
+          "Porque es obligatorio en todos los deportes"
+        ],
+        correct: 0
+      },
+      {
+        question: "¿Por qué NO hacer estiramientos estáticos antes de entrenar?",
+        options: [
+          "Porque relajan el músculo cuando debe estar activado",
+          "Porque no tienen ningún beneficio",
+          "Porque solo sirven para después de dormir"
+        ],
+        correct: 0
+      },
+      {
+        question: "¿Cuánto tiempo debe durar la rutina previa completa?",
+        options: ["5 minutos", "10 minutos", "20 minutos"],
+        correct: 1
+      },
+      {
+        question: "¿Qué incluye la activación muscular?",
+        options: [
+          "Dormir y descansar",
+          "Saltos, skipping y trote suave",
+          "Estiramientos largos y relajación"
+        ],
+        correct: 1
+      },
+      {
+        question: "¿Cuál es el objetivo principal de la rutina posterior?",
+        options: [
+          "Seguir quemando calorías",
+          "Preparar el cuerpo para el próximo entrenamiento",
+          "Ayudar al cuerpo a recuperarse y prevenir lesiones"
+        ],
+        correct: 2
+      }
+    ];
+
+    function initParte6() {
+      const container = document.getElementById('questions-container');
+      container.innerHTML = '';
+      parte6Answers = [];
+
+      questions.forEach((q, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question-card';
+        questionDiv.innerHTML = `
+          <div class="question-text">❓ Pregunta ${index + 1}: ${q.question}</div>
+          <div class="options" data-question="${index}">
+            ${q.options.map((opt, i) => `
+              <button class="option-btn" data-answer="${i}">${opt}</button>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(questionDiv);
+
+        const buttons = questionDiv.querySelectorAll('.option-btn');
+        buttons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            buttons.forEach(b => {
+              b.classList.remove('selected-correct', 'selected-incorrect');
+              b.style.pointerEvents = 'auto';
+            });
+
+            const answer = parseInt(btn.dataset.answer);
+            const isCorrect = answer === q.correct;
+            
+            btn.classList.add(isCorrect ? 'selected-correct' : 'selected-incorrect');
+            buttons.forEach(b => b.style.pointerEvents = 'none');
+
+            parte6Answers[index] = isCorrect ? 4 : 0;
+
+            if (parte6Answers.filter(a => a !== undefined).length === questions.length) {
+              document.getElementById('submit-parte6').disabled = false;
+            }
+          });
+        });
+      });
+    }
+
+    document.getElementById('submit-parte6').addEventListener('click', async () => {
+      currentScore.parte6 = parte6Answers.reduce((sum, val) => sum + val, 0);
+      
+      const totalScore = Object.values(currentScore).reduce((sum, val) => sum + val, 0);
+      
+      const result = await window.dataSdk.create({
+        player_name: "Jugador",
+        parte1_completed: true,
+        parte2_score: currentScore.parte2,
+        parte3_score: currentScore.parte3,
+        parte4_score: currentScore.parte4,
+        parte5_score: currentScore.parte5,
+        parte6_score: currentScore.parte6,
+        total_score: totalScore,
+        completed_at: new Date().toISOString()
+      });
+
+      if (result.isOk) {
+        showResults(totalScore);
+      }
+    });
+
+    function showResults(totalScore) {
+      document.getElementById('parte6').classList.add('hidden');
+      document.getElementById('resultado').classList.remove('hidden');
+      
+      document.getElementById('final-score').textContent = totalScore;
+      
+      let message = '';
+      let level = '';
+      const percentage = Math.round((totalScore / 118) * 100);
+      
+      if (percentage >= 90) {
+        level = '🏆 Atleta estructurado AC';
+        message = '¡Excelente! Dominas completamente las rutinas pre y post entrenamiento';
+      } else if (percentage >= 70) {
+        level = '🎯 Buena rutina física';
+        message = '¡Muy bien! Tienes una base sólida, sigue así';
+      } else if (percentage >= 50) {
+        level = '⚙️ Le falta orden';
+        message = 'Buen inicio, pero necesitas mejorar la estructura de tus rutinas';
+      } else {
+        level = '🛠️ Repetir para evitar lesiones';
+        message = 'Es importante que repases el contenido para prevenir lesiones';
+      }
+      
+      document.getElementById('score-message').innerHTML = `
+        <div style="font-size: 28px; font-weight: 700; margin: 15px 0;">${level}</div>
+        <div style="font-size: 18px;">${message}</div>
+        <div style="font-size: 16px; margin-top: 10px; opacity: 0.9;">${percentage}% de aciertos</div>
+      `;
+
+      const breakdown = document.getElementById('score-breakdown');
+      breakdown.innerHTML = `
+        <p style="margin: 10px 0;"><strong>Parte 2 (Rutina Previa):</strong> ${currentScore.parte2}/20 puntos</p>
+        <p style="margin: 10px 0;"><strong>Parte 3 (Rutina Posterior):</strong> ${currentScore.parte3}/20 puntos</p>
+        <p style="margin: 10px 0;"><strong>Parte 4 (Simulador):</strong> ${currentScore.parte4}/30 puntos</p>
+        <p style="margin: 10px 0;"><strong>Parte 5 (Errores):</strong> ${currentScore.parte5}/20 puntos</p>
+        <p style="margin: 10px 0;"><strong>Parte 6 (Prueba Final):</strong> ${currentScore.parte6}/28 puntos</p>
+        <hr style="margin: 15px 0; border: none; border-top: 2px solid #e2e8f0;">
+        <p style="margin: 10px 0; font-size: 18px;"><strong>TOTAL:</strong> ${totalScore}/118 puntos</p>
+      `;
+    }
+
+    document.getElementById('restart-btn').addEventListener('click', () => {
+      window.location.reload();
+    });
+  </script>
+ <script>
+(function(){function acGameScrollTop(){try{window.scrollTo(0,0);}catch(e){}['.container','.game-container','.game-area','.game-section','.section','.phase-container','.results-screen','.modal-content'].forEach(function(selector){document.querySelectorAll(selector).forEach(function(element){if(!element){return;}try{if(typeof element.scrollTo==='function'){element.scrollTo(0,0);}else{element.scrollTop=0;}}catch(e){element.scrollTop=0;}});});}window.acGameScrollTop=acGameScrollTop;document.addEventListener('click',function(event){var trigger=event.target.closest('button, .btn, .btn-primary, .btn-secondary, .option-btn, .option-button, .action-btn, .phase-button');if(!trigger){return;}setTimeout(acGameScrollTop,40);setTimeout(acGameScrollTop,220);},true);document.addEventListener('DOMContentLoaded',function(){acGameScrollTop();setTimeout(acGameScrollTop,120);});})();
+</script>
+</body>
+</html>
