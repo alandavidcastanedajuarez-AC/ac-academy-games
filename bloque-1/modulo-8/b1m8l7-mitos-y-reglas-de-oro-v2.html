@@ -136,25 +136,34 @@
     }
     
     .card-flip {
-      transform-style: preserve-3d;
-      transition: transform 0.6s;
+      position: relative;
     }
-    
-    .card-flip.flipped {
-      transform: rotateY(180deg);
-    }
-    
-    .card-front, .card-back {
-      backface-visibility: hidden;
-    }
-    
+
+    .card-front,
     .card-back {
-      transform: rotateY(180deg);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .card-back {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      height: 100%;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+    }
+
+    .card-flip.flipped .card-front {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-10px);
+    }
+
+    .card-flip.flipped .card-back {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
     }
     
     .pulse-animation {
@@ -328,11 +337,11 @@
       secondary_action_color: "#3b82f6",
       font_family: "Inter",
       font_size: 16,
-      game_title: "Mitos, Verdades y Reglas de Oro del Tenista",
-      game_subtitle: "Claridad total sobre hábitos de rendimiento",
+      game_title: "Rompe Mitos del Rendimiento",
+      game_subtitle: "Descubre qué hábitos de nutrición, hidratación y recuperación sostienen de verdad tu nivel en cancha",
       block1_title: "ROMPE EL MITO",
-      block2_title: "APLICA LA VERDAD EN ESCENARIOS REALES",
-      block3_title: "LAS 7 REGLAS DE ORO DEL RENDIMIENTO AC",
+      block2_title: "LLEVA LA VERDAD A LA CANCHA",
+      block3_title: "LAS 7 REGLAS DE ORO DEL TENISTA",
       start_button: "Comenzar el Juego",
       continue_button: "Continuar"
     };
@@ -524,41 +533,60 @@
       setTimeout(() => toast.remove(), 3000);
     }
 
+    function safeCopy(value, fallback) {
+      if (typeof value !== 'string') {
+        return fallback;
+      }
+
+      const normalized = value.trim();
+      if (!normalized || normalized.toLowerCase() === 'undefined' || normalized.toLowerCase() === 'null') {
+        return fallback;
+      }
+
+      return normalized;
+    }
+
     function renderWelcomeScreen() {
       const config = window.elementSdk?.config || defaultConfig;
       const baseFont = config.font_size || defaultConfig.font_size;
       const customFont = config.font_family || defaultConfig.font_family;
       const baseFontStack = 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+      const gameTitle = safeCopy(config.game_title, defaultConfig.game_title);
+      const gameSubtitle = safeCopy(config.game_subtitle, defaultConfig.game_subtitle);
+      const block1Title = safeCopy(config.block1_title, defaultConfig.block1_title);
+      const block2Title = safeCopy(config.block2_title, defaultConfig.block2_title);
+      const block3Title = safeCopy(config.block3_title, defaultConfig.block3_title);
+      const startButton = safeCopy(config.start_button, defaultConfig.start_button);
       
       return `
         <div class="min-h-full flex items-center justify-center screen-shell" style="background-color: ${config.background_color};">
           <div class="max-w-2xl w-full text-center fade-in screen-card">
             <div class="text-6xl mb-6">🎾🔥</div>
             <h1 class="text-4xl font-bold mb-4" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 2}px;">
-              ${config.game_title}
+              ${gameTitle}
             </h1>
             <p class="text-lg mb-8 opacity-90" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.1}px;">
-              ${config.game_subtitle}
+              ${gameSubtitle}
             </p>
             <div class="space-y-4 mb-8" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont}px;">
               <div class="p-4 rounded-lg" style="background-color: ${config.surface_color};">
                 <div class="text-2xl mb-2">🟦</div>
-                <div class="font-semibold mb-1">BLOQUE 1 - Rompe el Mito</div>
-                <div class="text-sm opacity-80">Identifica creencias falsas</div>
+                <div class="font-semibold mb-1">${block1Title}</div>
+                <div class="text-sm opacity-80">Detecta ideas que parecen lógicas, pero debilitan tu rendimiento.</div>
               </div>
               <div class="p-4 rounded-lg" style="background-color: ${config.surface_color};">
                 <div class="text-2xl mb-2">🟩</div>
-                <div class="font-semibold mb-1">BLOQUE 2 - Aplica la Verdad</div>
-                <div class="text-sm opacity-80">Escenarios reales de tenistas</div>
+                <div class="font-semibold mb-1">${block2Title}</div>
+                <div class="text-sm opacity-80">Toma decisiones de partido usando criterios que sí funcionan.</div>
               </div>
               <div class="p-4 rounded-lg" style="background-color: ${config.surface_color};">
                 <div class="text-2xl mb-2">🟨</div>
-                <div class="font-semibold mb-1">BLOQUE 3 - Reglas de Oro</div>
-                <div class="text-sm opacity-80">7 reglas del rendimiento</div>
+                <div class="font-semibold mb-1">${block3Title}</div>
+                <div class="text-sm opacity-80">Quédate con reglas simples para sostener energía, enfoque y recuperación.</div>
               </div>
             </div>
             <button onclick="startGame()" class="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105" style="background-color: ${config.primary_action_color}; color: ${config.background_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.1}px;">
-              ${config.start_button}
+              ${startButton}
             </button>
           </div>
         </div>
@@ -572,6 +600,7 @@
       const baseFontStack = 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
       const currentMyth = myths[gameState.currentMyth];
       const isRevealed = gameState.revealedMyths.includes(gameState.currentMyth);
+      const block1Title = safeCopy(config.block1_title, defaultConfig.block1_title);
       
       return `
         <div class="min-h-full screen-shell" style="background-color: ${config.background_color};">
@@ -579,7 +608,7 @@
             <div class="mb-8 text-center fade-in">
               <div class="text-4xl mb-3">🟦</div>
               <h2 class="text-3xl font-bold mb-2" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.8}px;">
-                ${config.block1_title}
+                ${block1Title}
               </h2>
               <p class="opacity-80" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont}px;">
                 Identifica creencias falsas
@@ -652,6 +681,7 @@
       const baseFontStack = 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
       const currentScenario = scenarios[gameState.currentScenario];
       const isCompleted = gameState.completedScenarios.includes(gameState.currentScenario);
+      const block2Title = safeCopy(config.block2_title, defaultConfig.block2_title);
       
       return `
         <div class="min-h-full screen-shell" style="background-color: ${config.background_color};">
@@ -659,7 +689,7 @@
             <div class="mb-8 text-center fade-in">
               <div class="text-4xl mb-3">🟩</div>
               <h2 class="text-3xl font-bold mb-2" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.8}px;">
-                ${config.block2_title}
+                ${block2Title}
               </h2>
               <p class="opacity-80" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont}px;">
                 Demuestra tu comprensión
@@ -727,6 +757,7 @@
       const baseFont = config.font_size || defaultConfig.font_size;
       const customFont = config.font_family || defaultConfig.font_family;
       const baseFontStack = 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+      const block3Title = safeCopy(config.block3_title, defaultConfig.block3_title);
       
       return `
         <div class="min-h-full screen-shell" style="background-color: ${config.background_color};">
@@ -734,7 +765,7 @@
             <div class="mb-8 text-center fade-in">
               <div class="text-4xl mb-3">🟨</div>
               <h2 class="text-3xl font-bold mb-6" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.8}px;">
-                ${config.block3_title}
+                ${block3Title}
               </h2>
             </div>
 
