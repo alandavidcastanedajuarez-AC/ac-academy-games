@@ -1,0 +1,1466 @@
+﻿<!doctype html>
+<html lang="es" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tu Semana de Energía AC</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      background: #0f172a;
+      color: #f1f5f9;
+    }
+
+    *, *::before, *::after {
+      box-sizing: inherit;
+    }
+
+    #app {
+      min-height: 100vh;
+    }
+
+    .w-full { width: 100%; }
+    .text-center { text-align: center; }
+    .text-left { text-align: left; }
+    .font-bold { font-weight: 700; }
+    .font-semibold { font-weight: 600; }
+    .italic { font-style: italic; }
+    .opacity-80 { opacity: 0.8; }
+    .opacity-90 { opacity: 0.9; }
+    .leading-relaxed { line-height: 1.6; }
+    .flex { display: flex; }
+    .items-start { align-items: flex-start; }
+    .space-y-4 > * + * { margin-top: 1rem; }
+    .space-y-3 > * + * { margin-top: 0.75rem; }
+    .space-y-6 > * + * { margin-top: 1.5rem; }
+    .mb-1 { margin-bottom: 0.25rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mb-3 { margin-bottom: 0.75rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .mb-8 { margin-bottom: 2rem; }
+    .mt-3 { margin-top: 0.75rem; }
+    .mt-6 { margin-top: 1.5rem; }
+    .mt-8 { margin-top: 2rem; }
+    .mr-3 { margin-right: 0.75rem; }
+    .pl-3 { padding-left: 0.75rem; }
+    .pl-4 { padding-left: 1rem; }
+    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .p-3 { padding: 0.75rem; }
+    .p-4 { padding: 1rem; }
+    .px-8 { padding-left: 2rem; padding-right: 2rem; }
+    .px-12 { padding-left: 3rem; padding-right: 3rem; }
+    .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+    .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+    .rounded { border-radius: 12px; }
+    .rounded-lg { border-radius: 16px; }
+    .rounded-full { border-radius: 999px; }
+    .border-none { border: none; }
+    .cursor-pointer { cursor: pointer; }
+    .text-lg { font-size: 1.125rem; }
+    .text-xl { font-size: 1.25rem; }
+    .text-2xl { font-size: 1.5rem; }
+    .text-3xl { font-size: 1.875rem; }
+    .transition-all { transition: all 0.25s ease; }
+    .transition-opacity { transition: opacity 0.25s ease; }
+    .hover\:opacity-90:hover { opacity: 0.9; }
+    .disabled\:opacity-50:disabled { opacity: 0.5; }
+
+    .game-shell {
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    .game-inner,
+    .phase-transition {
+      width: min(100%, 1120px);
+      margin: 0 auto;
+    }
+
+    .game-header {
+      padding: 1.5rem 1.25rem;
+      text-align: center;
+      border-radius: 0 0 28px 28px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.28);
+    }
+
+    .game-body {
+      padding: 1rem;
+    }
+
+    .game-panel {
+      border-radius: 24px;
+      padding: 1.25rem;
+      box-shadow: 0 20px 45px rgba(2, 6, 23, 0.22);
+    }
+
+    .game-card {
+      border-radius: 18px;
+      padding: 1rem;
+    }
+
+    .game-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .game-grid.two-cols {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .phase-pill {
+      width: 3rem;
+      height: 3rem;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.24);
+    }
+
+    .split-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.875rem;
+    }
+
+    .split-row .emoji {
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .energy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .energy-table th,
+    .energy-table td {
+      padding: 0.75rem;
+      vertical-align: middle;
+    }
+
+    .energy-table th {
+      text-align: left;
+    }
+
+    .energy-table select {
+      width: 100%;
+      padding: 0.7rem 0.85rem;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      border-radius: 12px;
+      outline: none;
+      appearance: none;
+      min-height: 46px;
+    }
+
+    .energy-table tbody tr:first-child td:first-child {
+      border-top-left-radius: 16px;
+    }
+
+    .energy-table tbody tr:first-child td:last-child {
+      border-top-right-radius: 16px;
+    }
+
+    .energy-table tbody tr:last-child td:first-child {
+      border-bottom-left-radius: 16px;
+    }
+
+    .energy-table tbody tr:last-child td:last-child {
+      border-bottom-right-radius: 16px;
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      min-height: 48px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.2);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+      box-shadow: none;
+    }
+    
+    .energy-cell {
+      transition: all 0.3s ease;
+    }
+    
+    .energy-cell:hover {
+      transform: scale(1.05);
+    }
+    
+    .phase-transition {
+      animation: fadeIn 0.5s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .pulse-animation {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    @media (max-width: 768px) {
+      .game-header {
+        padding: 1.25rem 1rem;
+        border-radius: 0 0 22px 22px;
+      }
+
+      .game-body,
+      .phase-transition {
+        padding: 0.875rem;
+      }
+
+      .game-panel {
+        padding: 1rem;
+        border-radius: 20px;
+      }
+
+      .game-grid.two-cols {
+        grid-template-columns: 1fr;
+      }
+
+      .pill-row {
+        gap: 0.5rem;
+      }
+
+      .phase-pill {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 0.95rem;
+      }
+
+      .split-row {
+        gap: 0.75rem;
+      }
+
+      .energy-table,
+      .energy-table thead,
+      .energy-table tbody,
+      .energy-table tr,
+      .energy-table th,
+      .energy-table td {
+        display: block;
+        width: 100%;
+      }
+
+      .energy-table thead {
+        display: none;
+      }
+
+      .energy-table tbody {
+        display: grid;
+        gap: 0.9rem;
+      }
+
+      .energy-table tbody tr {
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.18);
+      }
+
+      .energy-table td {
+        padding: 0.55rem 0.8rem;
+      }
+
+      .energy-table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 0.35rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        opacity: 0.75;
+      }
+
+      .energy-table td[data-label="Dia"]::before,
+      .energy-table td[data-label="Día"]::before {
+        margin-bottom: 0.2rem;
+      }
+
+      .energy-table td[data-label="Día"] {
+        padding-top: 0.85rem;
+        font-size: 1rem;
+      }
+
+      .energy-table select {
+        min-height: 50px;
+        font-size: 0.95rem;
+      }
+
+      .action-row {
+        flex-direction: column;
+      }
+
+      .action-row button {
+        width: 100%;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+
+    .container,
+    .game-container,
+    .game-wrapper,
+    .app-wrapper,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .phase-container,
+    .phase-card,
+    .content,
+    .content-area,
+    .modal-content,
+    .results-card {
+      padding: 16px !important;
+    }
+
+    h1, .main-title, .game-title, .title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+
+    h2, .phase-title, .stage-title, .final-title {
+      font-size: clamp(1.3rem, 6vw, 1.7rem) !important;
+      line-height: 1.25 !important;
+    }
+
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label {
+      font-size: clamp(1rem, 4.5vw, 1.15rem) !important;
+      line-height: 1.4 !important;
+    }
+
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+
+    .button-group,
+    .action-buttons,
+    .final-buttons,
+    .controls-row {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+
+    button,
+    .btn,
+    .btn-primary,
+    .btn-secondary,
+    .action-button,
+    .option-btn {
+      width: 100% !important;
+    }
+
+    .scenario-grid,
+    .macronutrient-grid,
+    .options-grid,
+    .snack-grid,
+    .results-stats,
+    .pyramid-preview,
+    .week-grid,
+    .myths-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    setConfig: function () {},
+    config: {}
+  };
+
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body class="h-full overflow-auto">
+  <div id="app" class="w-full min-h-full"></div>
+  <script>
+    const defaultConfig = {
+      background_color: "#0f172a",
+      surface_color: "#1e293b",
+      text_color: "#f1f5f9",
+      primary_action_color: "#3b82f6",
+      secondary_action_color: "#64748b",
+      font_family: "Inter",
+      font_size: 16,
+      main_title: "🎮🔥 Tu Semana de Energía AC",
+      phase_1_title: "Dibuja tu semana: ¿Cómo vives realmente?",
+      phase_2_title: "Análisis AC de la Semana",
+      phase_3_title: "Arma tu Semana Ideal de Energía AC",
+      phase_4_title: "Tu Plan Semanal AC"
+    };
+
+    const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    
+    const ENERGY_LEVELS = [
+      { emoji: '🔥', label: 'Alta', value: 'alta' },
+      { emoji: '🙂', label: 'Media', value: 'media' },
+      { emoji: '😴', label: 'Baja', value: 'baja' },
+      { emoji: '😵', label: 'Muy baja', value: 'muy_baja' }
+    ];
+    
+    const SLEEP_HOURS = ['<6', '6-7', '7-8', '8-9', '9+'];
+    const HYDRATION = ['💧 Baja', '💧💧 Media', '💧💧💧 Alta'];
+    const TRAINING = ['Descanso', 'Ligero', 'Medio', 'Duro'];
+    const OBJECTIVES = ['Energía', 'Técnica', 'Fuerza', 'Recuperación', 'Competencia'];
+    const INVISIBLE_GOALS = ['Dormir bien', 'Comer mejor', 'Hidratarse más', 'Manejar emociones', 'Estirar en la noche'];
+
+    let currentPhase = 0;
+    let weekData = {};
+    let idealWeekData = {};
+    let analysisResult = null;
+    let loadingState = false;
+    let personalizedTips = [];
+
+    function initializeWeekData() {
+      weekData = {};
+      DAYS.forEach(day => {
+        weekData[day] = {
+          energy: null,
+          sleep: null,
+          hydration: null,
+          training: null
+        };
+      });
+    }
+
+    function initializeIdealWeekData() {
+      idealWeekData = {};
+      DAYS.forEach(day => {
+        idealWeekData[day] = {
+          training: null,
+          objective: null,
+          invisibleGoal: null
+        };
+      });
+    }
+
+    function getDayColor(day) {
+      const data = weekData[day];
+      if (!data.energy || !data.sleep || !data.hydration || !data.training) {
+        return '#334155';
+      }
+      
+      const energyScore = { alta: 3, media: 2, baja: 1, muy_baja: 0 }[data.energy] || 0;
+      const sleepScore = ['<6', '6-7', '7-8', '8-9', '9+'].indexOf(data.sleep);
+      const hydrationScore = ['💧 Baja', '💧💧 Media', '💧💧💧 Alta'].indexOf(data.hydration);
+      
+      const totalScore = energyScore + (sleepScore > 1 ? 1 : 0) + (hydrationScore > 0 ? 1 : 0);
+      
+      if (totalScore >= 4) return '#10b981';
+      if (totalScore >= 2) return '#f59e0b';
+      return '#ef4444';
+    }
+
+    function generatePersonalizedTips() {
+      const tips = [];
+      let lowSleepDays = [];
+      let hardTrainingDays = [];
+      let lowHydrationDays = [];
+      let lowEnergyDays = [];
+      
+      DAYS.forEach(day => {
+        const data = weekData[day];
+        const sleepScore = ['<6', '6-7', '7-8', '8-9', '9+'].indexOf(data.sleep);
+        
+        if (sleepScore < 2) lowSleepDays.push(day);
+        if (data.training === 'Duro') hardTrainingDays.push(day);
+        if (data.hydration === '💧 Baja') lowHydrationDays.push(day);
+        if (data.energy === 'baja' || data.energy === 'muy_baja') lowEnergyDays.push(day);
+      });
+      
+      // Consejos sobre sueño
+      if (lowSleepDays.length >= 3) {
+        tips.push({
+          icon: '😴',
+          title: 'Crítico: Déficit de Sueño',
+          message: `Dormiste menos de 7 horas en ${lowSleepDays.length} días (${lowSleepDays.join(', ')}). El sueño es cuando tu cuerpo se repara y construye músculo.`,
+          advice: 'Objetivo: 8 horas mínimo antes de entrenamientos duros. Establece una hora fija para dormir.'
+        });
+      } else if (lowSleepDays.length > 0) {
+        tips.push({
+          icon: '💤',
+          title: 'Atención: Sueño Irregular',
+          message: `Tuviste ${lowSleepDays.length} día(s) con poco sueño. Esto reduce tu capacidad de recuperación.`,
+          advice: 'Intenta ser más consistente. La regularidad es tan importante como la cantidad.'
+        });
+      }
+      
+      // Consejos sobre entrenamiento
+      let consecutiveHardDays = [];
+      let currentStreak = [];
+      
+      DAYS.forEach((day, index) => {
+        if (weekData[day].training === 'Duro') {
+          currentStreak.push(day);
+        } else {
+          if (currentStreak.length >= 2) {
+            consecutiveHardDays.push([...currentStreak]);
+          }
+          currentStreak = [];
+        }
+      });
+      if (currentStreak.length >= 2) consecutiveHardDays.push(currentStreak);
+      
+      if (consecutiveHardDays.length > 0) {
+        const streaks = consecutiveHardDays.map(s => s.join(' → ')).join(' y ');
+        tips.push({
+          icon: '⚠️',
+          title: 'Riesgo: Sobreentrenamiento',
+          message: `Entrenamientos duros consecutivos: ${streaks}. Tu cuerpo no tuvo tiempo de recuperarse.`,
+          advice: 'Alterna días duros con días ligeros o de recuperación. Patrón ideal: Duro → Medio → Ligero.'
+        });
+      }
+      
+      // Consejos sobre combinaciones peligrosas
+      DAYS.forEach((day, index) => {
+        if (index > 0) {
+          const prevDay = DAYS[index - 1];
+          const prevSleep = ['<6', '6-7', '7-8', '8-9', '9+'].indexOf(weekData[prevDay].sleep);
+          
+          if (prevSleep < 2 && weekData[day].training === 'Duro') {
+            tips.push({
+              icon: '🚨',
+              title: `Combinación Peligrosa: ${day}`,
+              message: `Entrenaste duro después de dormir mal el ${prevDay}. Esta es la receta perfecta para lesiones.`,
+              advice: 'Cuando duermes mal, cambia tu entrenamiento duro a medio o ligero. Tu seguridad es primero.'
+            });
+          }
+        }
+      });
+      
+      // Consejos sobre hidratación
+      if (lowHydrationDays.length >= 4) {
+        tips.push({
+          icon: '💧',
+          title: 'Crítico: Deshidratación Crónica',
+          message: `Hidratación baja en ${lowHydrationDays.length} días. Esto reduce tu rendimiento hasta 30%.`,
+          advice: 'Lleva una botella contigo siempre. Bebe 2L diarios mínimo, más si entrenas duro.'
+        });
+      }
+      
+      // Consejos sobre patrones de energía
+      if (lowEnergyDays.length >= 4) {
+        tips.push({
+          icon: '🔋',
+          title: 'Patrón: Energía Baja Frecuente',
+          message: `Te sentiste con poca energía ${lowEnergyDays.length} días. Esto no es normal.`,
+          advice: 'Revisa: 1) Carbohidratos suficientes antes de entrenar, 2) Desayuno completo, 3) Nivel de estrés.'
+        });
+      }
+      
+      // Consejos positivos
+      if (tips.length === 0) {
+        tips.push({
+          icon: '🌟',
+          title: '¡Excelente Semana!',
+          message: 'Tu semana muestra buenos hábitos: sueño suficiente, hidratación, y cargas bien distribuidas.',
+          advice: 'Mantén estos patrones. La consistencia a largo plazo es lo que crea campeones.'
+        });
+      }
+      
+      // Consejo siempre presente sobre recuperación
+      const restDays = DAYS.filter(d => weekData[d].training === 'Descanso').length;
+      if (restDays === 0) {
+        tips.push({
+          icon: '🛑',
+          title: 'Falta: Día de Descanso Total',
+          message: 'No tuviste ningún día de descanso completo. El cuerpo necesita parar para crecer.',
+          advice: 'Incluye AL MENOS 1 día de descanso total por semana. Es cuando realmente mejoras.'
+        });
+      }
+      
+      return tips;
+    }
+
+    function analyzeWeek() {
+      const analysis = {
+        energyAccumulated: 'media',
+        bestDay: null,
+        worstDay: null,
+        mainError: '',
+        energyProfile: ''
+      };
+      
+      let bestScore = -1;
+      let worstScore = 999;
+      let totalEnergy = 0;
+      let lowSleepCount = 0;
+      let hardTrainingCount = 0;
+      let consecutiveHard = 0;
+      let maxConsecutiveHard = 0;
+      
+      DAYS.forEach((day, index) => {
+        const data = weekData[day];
+        const energyScore = { alta: 3, media: 2, baja: 1, muy_baja: 0 }[data.energy] || 0;
+        const sleepScore = ['<6', '6-7', '7-8', '8-9', '9+'].indexOf(data.sleep);
+        const hydrationScore = ['💧 Baja', '💧💧 Media', '💧💧💧 Alta'].indexOf(data.hydration);
+        
+        const dayScore = energyScore + sleepScore + hydrationScore;
+        totalEnergy += energyScore;
+        
+        if (sleepScore < 2) lowSleepCount++;
+        if (data.training === 'Duro') {
+          hardTrainingCount++;
+          consecutiveHard++;
+          maxConsecutiveHard = Math.max(maxConsecutiveHard, consecutiveHard);
+        } else {
+          consecutiveHard = 0;
+        }
+        
+        if (dayScore > bestScore) {
+          bestScore = dayScore;
+          analysis.bestDay = day;
+        }
+        
+        if (dayScore < worstScore) {
+          worstScore = dayScore;
+          analysis.worstDay = day;
+        }
+      });
+      
+      const avgEnergy = totalEnergy / 7;
+      if (avgEnergy >= 2.5) analysis.energyAccumulated = '🔥 Alta';
+      else if (avgEnergy >= 1.5) analysis.energyAccumulated = '🙂 Media';
+      else if (avgEnergy >= 0.8) analysis.energyAccumulated = '😴 Baja';
+      else analysis.energyAccumulated = '😵 Muy baja';
+      
+      if (lowSleepCount >= 4) {
+        analysis.mainError = 'Sueño insuficiente - estás acumulando fatiga';
+      } else if (maxConsecutiveHard >= 3) {
+        analysis.mainError = 'Cargas duras seguidas - riesgo de lesión alto';
+      } else if (hardTrainingCount >= 5) {
+        analysis.mainError = 'Exceso de cargas duras - falta recuperación';
+      } else {
+        analysis.mainError = 'Hidratación inconsistente - afecta tu rendimiento';
+      }
+      
+      const variance = totalEnergy / 7;
+      if (variance >= 2.3 && lowSleepCount <= 2) analysis.energyProfile = 'Energía Estable';
+      else if (variance >= 2 && maxConsecutiveHard <= 2) analysis.energyProfile = 'Energía Inteligente';
+      else if (variance < 1.5) analysis.energyProfile = 'Energía Caótica';
+      else if (hardTrainingCount >= 4 && lowSleepCount >= 3) analysis.energyProfile = 'Energía Inestable';
+      else analysis.energyProfile = 'Energía Fuerte';
+      
+      return analysis;
+    }
+
+    function validateIdealWeek() {
+      const errors = [];
+      let consecutiveHard = 0;
+      
+      DAYS.forEach((day, index) => {
+        const data = idealWeekData[day];
+        
+        if (data.training === 'Duro') {
+          consecutiveHard++;
+          if (consecutiveHard >= 3) {
+            errors.push(`${day}: Demasiadas cargas duras seguidas. Tu cuerpo necesita recuperación.`);
+          }
+        } else {
+          consecutiveHard = 0;
+        }
+        
+        if (index > 0) {
+          const prevDay = DAYS[index - 1];
+          const prevData = weekData[prevDay];
+          
+          if (prevData && prevData.sleep === '<6' && data.training === 'Duro') {
+            errors.push(`${day}: Riesgo de lesión. Dormiste mal ayer, elige día medio o ligero.`);
+          }
+        }
+      });
+      
+      return errors;
+    }
+
+    async function saveWeekPlan() {
+      if (loadingState) return;
+      
+      loadingState = true;
+      renderApp();
+      
+      const result = await window.dataSdk.create({
+        week_id: `week_${Date.now()}`,
+        created_at: new Date().toISOString(),
+        week_data: JSON.stringify(weekData),
+        analysis_result: JSON.stringify(analysisResult),
+        energy_profile: analysisResult.energyProfile
+      });
+      
+      loadingState = false;
+      
+      if (result.isOk) {
+        const successMessage = document.getElementById('save-success');
+        if (successMessage) {
+          successMessage.style.display = 'block';
+          setTimeout(() => {
+            successMessage.style.display = 'none';
+          }, 3000);
+        }
+      } else {
+        const errorMessage = document.getElementById('save-error');
+        if (errorMessage) {
+          errorMessage.textContent = 'Error al guardar: ' + result.error.message;
+          errorMessage.style.display = 'block';
+          setTimeout(() => {
+            errorMessage.style.display = 'none';
+          }, 3000);
+        }
+      }
+      
+      renderApp();
+    }
+
+    function renderPhase0() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const baseFont = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const fontStack = `${customFont}, Inter, system-ui, -apple-system, sans-serif`;
+      
+      return `
+        <div class="phase-transition">
+          <div style="background-color: ${config.surface_color || defaultConfig.surface_color};" class="game-panel mb-6">
+            <h2 style="font-size: ${baseFont * 1.75}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-6 text-center">Bienvenido al Método AC de Energía</h2>
+            
+            <div class="space-y-6">
+              <div style="border-left: 4px solid ${config.primary_action_color || defaultConfig.primary_action_color};" class="pl-4">
+                <p style="font-size: ${baseFont * 1.1}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="leading-relaxed mb-3">
+                  <strong>¿Sabías que el 70% de las lesiones y bajones de rendimiento no vienen del entrenamiento... sino de cómo gestionas tu energía fuera del campo?</strong>
+                </p>
+                <p style="font-size: ${baseFont}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="opacity-90 leading-relaxed">
+                  La diferencia entre un atleta promedio y uno de élite no está solo en las horas de entrenamiento. Está en cómo recupera, cómo duerme, cómo se hidrata, y cómo organiza su semana.
+                </p>
+              </div>
+              
+              <div style="background-color: ${config.background_color || defaultConfig.background_color};" class="game-card">
+                <h3 style="font-size: ${baseFont * 1.2}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-4">📚 En este juego vas a:</h3>
+                <ul class="space-y-3">
+                  <li style="font-size: ${baseFont * 0.95}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="flex items-start">
+                    <span class="mr-3">1️⃣</span>
+                    <span><strong>Escanear tu semana real</strong> — Verás patrones que nunca habías notado sobre tu energía, sueño y entrenamientos.</span>
+                  </li>
+                  <li style="font-size: ${baseFont * 0.95}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="flex items-start">
+                    <span class="mr-3">2️⃣</span>
+                    <span><strong>Recibir análisis AC personalizado</strong> — Identificaremos tu día más fuerte, tu día más débil, y tu mayor sabotaje.</span>
+                  </li>
+                  <li style="font-size: ${baseFont * 0.95}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="flex items-start">
+                    <span class="mr-3">3️⃣</span>
+                    <span><strong>Construir tu semana ideal</strong> — Con retroalimentación en tiempo real que te advierte sobre errores peligrosos.</span>
+                  </li>
+                  <li style="font-size: ${baseFont * 0.95}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="flex items-start">
+                    <span class="mr-3">4️⃣</span>
+                    <span><strong>Obtener consejos específicos</strong> — Basados exactamente en las elecciones que tomaste, no consejos genéricos.</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div style="background-color: rgba(59, 130, 246, 0.1); border: 2px solid ${config.primary_action_color || defaultConfig.primary_action_color};" class="game-card">
+                <h3 style="font-size: ${baseFont * 1.1}px; font-family: ${fontStack}; color: ${config.primary_action_color || defaultConfig.primary_action_color};" class="font-bold mb-3">💡 Principio AC Fundamental:</h3>
+                <p style="font-size: ${baseFont}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="italic leading-relaxed">
+                  "Tu energía no es infinita. Es un recurso que se administra. Los atletas profesionales no entrenan más duro... entrenan más inteligentemente. Conocen sus límites, respetan su recuperación, y maximizan cada día."
+                </p>
+              </div>
+              
+              <div style="background-color: ${config.background_color || defaultConfig.background_color};" class="game-card">
+                <h3 style="font-size: ${baseFont * 1.1}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-3">🎯 Lo que aprenderás:</h3>
+                <div class="game-grid two-cols">
+                  <div style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};">
+                    ✅ Por qué 3 días duros seguidos = lesión
+                  </div>
+                  <div style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};">
+                    ✅ La conexión sueño + entrenamiento
+                  </div>
+                  <div style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};">
+                    ✅ Cómo la hidratación afecta tu técnica
+                  </div>
+                  <div style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};">
+                    ✅ El poder de los "hábitos invisibles"
+                  </div>
+                  <div style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};">
+                    ✅ Cuándo entrenar duro vs. ligero
+                  </div>
+                  <div style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};">
+                    ✅ Tu perfil personal de energía
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="text-center">
+            <p style="font-size: ${baseFont * 0.95}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="mb-4 opacity-80">
+              ⏱️ Tiempo estimado: 5-7 minutos<br>
+              💪 Impacto en tu rendimiento: Permanente
+            </p>
+            <button 
+              onclick="startGame()"
+              style="background-color: ${config.primary_action_color || defaultConfig.primary_action_color}; font-size: ${baseFont * 1.1}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};"
+              class="px-12 py-4 rounded-lg font-bold hover:opacity-90 transition-opacity text-lg"
+            >
+              🚀 Comenzar Análisis
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPhase1() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const baseFont = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const fontStack = `${customFont}, Inter, system-ui, -apple-system, sans-serif`;
+      
+      return `
+        <div class="phase-transition">
+          <h2 style="font-size: ${baseFont * 1.75}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-2">${config.phase_1_title || defaultConfig.phase_1_title}</h2>
+          <p style="font-size: ${baseFont}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="mb-6 opacity-80">Escaneo real y honesto de tu semana actual</p>
+          
+          <div class="overflow-x-auto">
+            <table class="energy-table">
+              <thead>
+                <tr style="background-color: ${config.surface_color || defaultConfig.surface_color};">
+                  <th style="font-size: ${baseFont * 0.85}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="p-3 text-left font-semibold">Día</th>
+                  <th style="font-size: ${baseFont * 0.85}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="p-3 text-left font-semibold">Energía</th>
+                  <th style="font-size: ${baseFont * 0.85}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="p-3 text-left font-semibold">Sueño</th>
+                  <th style="font-size: ${baseFont * 0.85}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="p-3 text-left font-semibold">Hidratación</th>
+                  <th style="font-size: ${baseFont * 0.85}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="p-3 text-left font-semibold">Entrenamiento</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${DAYS.map(day => `
+                  <tr style="background-color: ${getDayColor(day)}; border-bottom: 2px solid ${config.background_color || defaultConfig.background_color};" class="energy-cell">
+                    <td data-label="Día" style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="p-3 font-medium">${day}</td>
+                    <td data-label="Energía" class="p-2">
+                      <select 
+                        id="energy-${day}" 
+                        style="background-color: ${config.surface_color || defaultConfig.surface_color}; color: ${config.text_color || defaultConfig.text_color}; font-size: ${baseFont * 0.85}px; font-family: ${fontStack};"
+                        class="w-full p-2 rounded border-none cursor-pointer"
+                        onchange="handleEnergyChange('${day}', this.value)"
+                      >
+                        <option value="">Seleccionar</option>
+                        ${ENERGY_LEVELS.map(e => `
+                          <option value="${e.value}" ${weekData[day].energy === e.value ? 'selected' : ''}>
+                            ${e.emoji} ${e.label}
+                          </option>
+                        `).join('')}
+                      </select>
+                    </td>
+                    <td data-label="Sueño" class="p-2">
+                      <select 
+                        id="sleep-${day}" 
+                        style="background-color: ${config.surface_color || defaultConfig.surface_color}; color: ${config.text_color || defaultConfig.text_color}; font-size: ${baseFont * 0.85}px; font-family: ${fontStack};"
+                        class="w-full p-2 rounded border-none cursor-pointer"
+                        onchange="handleSleepChange('${day}', this.value)"
+                      >
+                        <option value="">Seleccionar</option>
+                        ${SLEEP_HOURS.map(h => `
+                          <option value="${h}" ${weekData[day].sleep === h ? 'selected' : ''}>${h}</option>
+                        `).join('')}
+                      </select>
+                    </td>
+                    <td data-label="Hidratación" class="p-2">
+                      <select 
+                        id="hydration-${day}" 
+                        style="background-color: ${config.surface_color || defaultConfig.surface_color}; color: ${config.text_color || defaultConfig.text_color}; font-size: ${baseFont * 0.85}px; font-family: ${fontStack};"
+                        class="w-full p-2 rounded border-none cursor-pointer"
+                        onchange="handleHydrationChange('${day}', this.value)"
+                      >
+                        <option value="">Seleccionar</option>
+                        ${HYDRATION.map(h => `
+                          <option value="${h}" ${weekData[day].hydration === h ? 'selected' : ''}>${h}</option>
+                        `).join('')}
+                      </select>
+                    </td>
+                    <td data-label="Entrenamiento" class="p-2">
+                      <select 
+                        id="training-${day}" 
+                        style="background-color: ${config.surface_color || defaultConfig.surface_color}; color: ${config.text_color || defaultConfig.text_color}; font-size: ${baseFont * 0.85}px; font-family: ${fontStack};"
+                        class="w-full p-2 rounded border-none cursor-pointer"
+                        onchange="handleTrainingChange('${day}', this.value)"
+                      >
+                        <option value="">Seleccionar</option>
+                        ${TRAINING.map(t => `
+                          <option value="${t}" ${weekData[day].training === t ? 'selected' : ''}>${t}</option>
+                        `).join('')}
+                      </select>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="mt-6 text-center">
+            <p style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="mb-4 italic">💡 Tu semana tiene patrones. Cada patrón tiene consecuencias.</p>
+            <button 
+              onclick="analyzeAndNextPhase()"
+              style="background-color: ${config.primary_action_color || defaultConfig.primary_action_color}; font-size: ${baseFont}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};"
+              class="px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+              ${!isPhase1Complete() ? 'disabled' : ''}
+            >
+              Analizar tu semana →
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPhase2() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const baseFont = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const fontStack = `${customFont}, Inter, system-ui, -apple-system, sans-serif`;
+      
+      return `
+        <div class="phase-transition">
+          <h2 style="font-size: ${baseFont * 1.75}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-6">${config.phase_2_title || defaultConfig.phase_2_title}</h2>
+          
+          <div class="game-grid two-cols mb-8">
+            <div style="background-color: ${config.surface_color || defaultConfig.surface_color};" class="game-card">
+              <h3 style="font-size: ${baseFont * 1.25}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-3">⭐ Energía Acumulada</h3>
+              <p style="font-size: ${baseFont * 1.5}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="text-2xl mb-2">${analysisResult.energyAccumulated}</p>
+              <p style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="opacity-80">Basado en tus elecciones de la semana</p>
+            </div>
+            
+            <div style="background-color: ${config.surface_color || defaultConfig.surface_color};" class="game-card">
+              <h3 style="font-size: ${baseFont * 1.25}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-3">⭐ Día más fuerte</h3>
+              <p style="font-size: ${baseFont * 1.5}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="text-2xl mb-2">${analysisResult.bestDay}</p>
+              <p style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="opacity-80">Tu día de campeón. Repite esta fórmula.</p>
+            </div>
+            
+            <div style="background-color: ${config.surface_color || defaultConfig.surface_color};" class="game-card">
+              <h3 style="font-size: ${baseFont * 1.25}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-3">⭐ Día más débil</h3>
+              <p style="font-size: ${baseFont * 1.5}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="text-2xl mb-2">${analysisResult.worstDay}</p>
+              <p style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="opacity-80">Día rojo. Aquí perdiste energía valiosa.</p>
+            </div>
+            
+            <div style="background-color: ${config.surface_color || defaultConfig.surface_color};" class="game-card">
+              <h3 style="font-size: ${baseFont * 1.25}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-3">⭐ Error principal</h3>
+              <p style="font-size: ${baseFont}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="leading-relaxed">${analysisResult.mainError}</p>
+            </div>
+          </div>
+          
+          <div style="background-color: ${config.surface_color || defaultConfig.surface_color};" class="game-panel mb-8">
+            <h3 style="font-size: ${baseFont * 1.5}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-6 text-center">📋 Consejos Personalizados para TI</h3>
+            <p style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="text-center mb-6 opacity-80">Basados en las decisiones específicas que tomaste esta semana</p>
+            
+            <div class="space-y-4">
+              ${personalizedTips.map(tip => `
+                <div style="background-color: ${config.background_color || defaultConfig.background_color}; border-left: 4px solid ${tip.icon.includes('🚨') || tip.icon.includes('⚠️') ? '#ef4444' : tip.icon.includes('🌟') ? '#10b981' : config.primary_action_color || defaultConfig.primary_action_color};" class="game-card">
+                  <div class="split-row">
+                    <span style="font-size: ${baseFont * 1.5}px;" class="emoji">${tip.icon}</span>
+                    <div>
+                      <h4 style="font-size: ${baseFont * 1.1}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-2">${tip.title}</h4>
+                      <p style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="mb-3 leading-relaxed">${tip.message}</p>
+                      <div style="background-color: rgba(59, 130, 246, 0.1); border-left: 3px solid ${config.primary_action_color || defaultConfig.primary_action_color};" class="pl-3 py-2">
+                        <p style="font-size: ${baseFont * 0.85}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="italic"><strong>💡 Acción:</strong> ${tip.advice}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          
+          <div class="mt-8 text-center">
+            <button 
+              onclick="nextPhase()"
+              style="background-color: ${config.primary_action_color || defaultConfig.primary_action_color}; font-size: ${baseFont}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};"
+              class="px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
+            >
+              Construir tu semana ideal →
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPhase3() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const baseFont = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const fontStack = `${customFont}, Inter, system-ui, -apple-system, sans-serif`;
+      const validationErrors = validateIdealWeek();
+      
+      return `
+        <div class="phase-transition">
+          <h2 style="font-size: ${baseFont * 1.75}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-2">${config.phase_3_title || defaultConfig.phase_3_title}</h2>
+          <p style="font-size: ${baseFont}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="mb-6 opacity-80">Planificación inteligente con retroalimentación</p>
+          
+          ${validationErrors.length > 0 ? `
+            <div style="background-color: #7f1d1d; border-left: 4px solid #ef4444; font-family: ${fontStack};" class="game-card mb-6">
+              <p style="font-size: ${baseFont * 0.9}px; color: ${config.text_color || defaultConfig.text_color};" class="font-semibold mb-2">⚠️ Advertencias:</p>
+              ${validationErrors.map(err => `
+                <p style="font-size: ${baseFont * 0.85}px; color: ${config.text_color || defaultConfig.text_color};" class="mb-1">• ${err}</p>
+              `).join('')}
+            </div>
+          ` : ''}
+          
+          <div class="overflow-x-auto">
+            <table class="energy-table">
+              <thead>
+                <tr style="background-color: ${config.surface_color || defaultConfig.surface_color};">
+                  <th style="font-size: ${baseFont * 0.85}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="p-3 text-left font-semibold">Día</th>
+                  <th style="font-size: ${baseFont * 0.85}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="p-3 text-left font-semibold">Entrenamiento</th>
+                  <th style="font-size: ${baseFont * 0.85}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="p-3 text-left font-semibold">Objetivo</th>
+                  <th style="font-size: ${baseFont * 0.85}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="p-3 text-left font-semibold">Hábito Invisible</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${DAYS.map(day => `
+                  <tr style="background-color: ${config.surface_color || defaultConfig.surface_color}; border-bottom: 2px solid ${config.background_color || defaultConfig.background_color};">
+                    <td data-label="Día" style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="p-3 font-medium">${day}</td>
+                    <td data-label="Entrenamiento" class="p-2">
+                      <select 
+                        id="ideal-training-${day}" 
+                        style="background-color: ${config.background_color || defaultConfig.background_color}; color: ${config.text_color || defaultConfig.text_color}; font-size: ${baseFont * 0.85}px; font-family: ${fontStack};"
+                        class="w-full p-2 rounded border-none cursor-pointer"
+                        onchange="handleIdealTrainingChange('${day}', this.value)"
+                      >
+                        <option value="">Seleccionar</option>
+                        ${TRAINING.map(t => `
+                          <option value="${t}" ${idealWeekData[day].training === t ? 'selected' : ''}>${t}</option>
+                        `).join('')}
+                      </select>
+                    </td>
+                    <td data-label="Objetivo" class="p-2">
+                      <select 
+                        id="ideal-objective-${day}" 
+                        style="background-color: ${config.background_color || defaultConfig.background_color}; color: ${config.text_color || defaultConfig.text_color}; font-size: ${baseFont * 0.85}px; font-family: ${fontStack};"
+                        class="w-full p-2 rounded border-none cursor-pointer"
+                        onchange="handleIdealObjectiveChange('${day}', this.value)"
+                      >
+                        <option value="">Seleccionar</option>
+                        ${OBJECTIVES.map(o => `
+                          <option value="${o}" ${idealWeekData[day].objective === o ? 'selected' : ''}>${o}</option>
+                        `).join('')}
+                      </select>
+                    </td>
+                    <td data-label="Hábito Invisible" class="p-2">
+                      <select 
+                        id="ideal-goal-${day}" 
+                        style="background-color: ${config.background_color || defaultConfig.background_color}; color: ${config.text_color || defaultConfig.text_color}; font-size: ${baseFont * 0.85}px; font-family: ${fontStack};"
+                        class="w-full p-2 rounded border-none cursor-pointer"
+                        onchange="handleIdealGoalChange('${day}', this.value)"
+                      >
+                        <option value="">Seleccionar</option>
+                        ${INVISIBLE_GOALS.map(g => `
+                          <option value="${g}" ${idealWeekData[day].invisibleGoal === g ? 'selected' : ''}>${g}</option>
+                        `).join('')}
+                      </select>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="mt-6 text-center">
+            ${validationErrors.length === 0 ? `
+              <p style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: #10b981;" class="mb-4 italic">✔ Esta es una semana inteligente: cargas distribuidas + descanso estratégico</p>
+            ` : ''}
+            <button 
+              onclick="nextPhase()"
+              style="background-color: ${config.primary_action_color || defaultConfig.primary_action_color}; font-size: ${baseFont}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};"
+              class="px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+              ${!isPhase3Complete() ? 'disabled' : ''}
+            >
+              Confirmar semana AC →
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPhase4() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const baseFont = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const fontStack = `${customFont}, Inter, system-ui, -apple-system, sans-serif`;
+      
+      const recommendations = {
+        'Energía Estable': 'Tu semana tiene buen equilibrio. Mantén estos patrones para competir consistentemente.',
+        'Energía Inteligente': 'Excelente distribución de cargas. Tu semana ideal te prepara para competir al máximo.',
+        'Energía Caótica': 'Tu energía es irregular. Necesitas más consistencia en sueño e hidratación.',
+        'Energía Fuerte': 'Buena intensidad, pero cuidado con el exceso. Necesitas más días de recuperación.',
+        'Energía Inestable': 'Tu semana tiene riesgo de lesión. Necesitas dormir más antes de días duros.'
+      };
+      
+      return `
+        <div class="phase-transition">
+          <h2 style="font-size: ${baseFont * 1.75}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-6">${config.phase_4_title || defaultConfig.phase_4_title}</h2>
+          
+          <div style="background-color: ${config.surface_color || defaultConfig.surface_color};" class="game-card mb-6">
+            <h3 style="font-size: ${baseFont * 1.5}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-3">🟢 Tu Perfil de Energía AC</h3>
+            <p style="font-size: ${baseFont * 1.75}px; font-family: ${fontStack}; color: ${config.primary_action_color || defaultConfig.primary_action_color};" class="text-3xl font-bold mb-4">${analysisResult.energyProfile}</p>
+          </div>
+          
+          <div style="background-color: ${config.surface_color || defaultConfig.surface_color};" class="game-panel mb-6">
+            <h3 style="font-size: ${baseFont * 1.25}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-4">🟡 Tu Rutina Semanal Ideal</h3>
+            <div class="space-y-3">
+              ${DAYS.map(day => `
+                <div style="background-color: ${config.background_color || defaultConfig.background_color};" class="game-card">
+                  <p style="font-size: ${baseFont * 1.1}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-2">${day}</p>
+                  <p style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="opacity-80">Entrenamiento: <span class="font-semibold">${idealWeekData[day].training || 'No definido'}</span></p>
+                  <p style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="opacity-80">Objetivo: <span class="font-semibold">${idealWeekData[day].objective || 'No definido'}</span></p>
+                  <p style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="opacity-80">Hábito: <span class="font-semibold">${idealWeekData[day].invisibleGoal || 'No definido'}</span></p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          
+          <div style="background-color: ${config.surface_color || defaultConfig.surface_color};" class="game-card mb-6">
+            <h3 style="font-size: ${baseFont * 1.25}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="font-bold mb-3">🔵 Recomendación AC Final</h3>
+            <p style="font-size: ${baseFont}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="leading-relaxed">${recommendations[analysisResult.energyProfile]}</p>
+            <p style="font-size: ${baseFont}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};" class="mt-3 italic">Tu energía es tu arma más importante.</p>
+          </div>
+          
+          <div id="save-success" style="display: none; background-color: #065f46; font-family: ${fontStack};" class="p-4 mb-4 rounded-lg">
+            <p style="font-size: ${baseFont * 0.9}px; color: ${config.text_color || defaultConfig.text_color};">✓ Plan guardado exitosamente</p>
+          </div>
+          
+          <div id="save-error" style="display: none; background-color: #7f1d1d; font-family: ${fontStack};" class="p-4 mb-4 rounded-lg">
+            <p style="font-size: ${baseFont * 0.9}px; color: ${config.text_color || defaultConfig.text_color};"></p>
+          </div>
+          
+          <div class="action-row">
+            <button 
+              onclick="saveWeekPlan()"
+              style="background-color: ${config.primary_action_color || defaultConfig.primary_action_color}; font-size: ${baseFont}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};"
+              class="px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+              ${loadingState ? 'disabled' : ''}
+            >
+              ${loadingState ? 'Guardando...' : '   Guardar Plan'}
+            </button>
+            <button 
+              onclick="resetGame()"
+              style="background-color: ${config.secondary_action_color || defaultConfig.secondary_action_color}; font-size: ${baseFont}px; font-family: ${fontStack}; color: ${config.text_color || defaultConfig.text_color};"
+              class="px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
+            >
+              ↻ Repetir
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderApp() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const baseFont = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const fontStack = `${customFont}, Inter, system-ui, -apple-system, sans-serif`;
+      
+      const app = document.getElementById('app');
+      
+      let phaseContent = '';
+      if (currentPhase === 0) phaseContent = renderPhase0();
+      else if (currentPhase === 1) phaseContent = renderPhase1();
+      else if (currentPhase === 2) phaseContent = renderPhase2();
+      else if (currentPhase === 3) phaseContent = renderPhase3();
+      else if (currentPhase === 4) phaseContent = renderPhase4();
+      
+      app.innerHTML = `
+        <div style="background-color: ${config.background_color || defaultConfig.background_color}; color: ${config.text_color || defaultConfig.text_color}; min-height: 100%;" class="game-shell">
+          <div class="game-inner">
+            <header style="background: linear-gradient(135deg, ${config.primary_action_color || defaultConfig.primary_action_color}, ${config.secondary_action_color || defaultConfig.secondary_action_color});" class="game-header">
+              <h1 style="font-size: ${baseFont * 2}px; font-family: ${fontStack};" class="font-bold mb-2">${config.main_title || defaultConfig.main_title}</h1>
+              <p style="font-size: ${baseFont * 0.9}px; font-family: ${fontStack};" class="opacity-90">Organiza tu semana para maximizar rendimiento</p>
+            </header>
+            
+            <div class="game-body">
+              ${currentPhase > 0 ? `
+                <div class="pill-row">
+                  ${[1, 2, 3, 4].map(phase => `
+                    <div 
+                      style="background-color: ${currentPhase >= phase ? config.primary_action_color || defaultConfig.primary_action_color : config.secondary_action_color || defaultConfig.secondary_action_color}; font-family: ${fontStack};"
+                      class="phase-pill ${currentPhase === phase ? 'pulse-animation' : ''}"
+                    >
+                      ${phase}
+                    </div>
+                  `).join('')}
+                </div>
+              ` : ''}
+              
+              ${phaseContent}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function isPhase1Complete() {
+      return DAYS.every(day => {
+        const data = weekData[day];
+        return data.energy && data.sleep && data.hydration && data.training;
+      });
+    }
+
+    function isPhase3Complete() {
+      return DAYS.every(day => {
+        const data = idealWeekData[day];
+        return data.training && data.objective && data.invisibleGoal;
+      });
+    }
+
+    window.handleEnergyChange = (day, value) => {
+      weekData[day].energy = value;
+      renderApp();
+    };
+
+    window.handleSleepChange = (day, value) => {
+      weekData[day].sleep = value;
+      renderApp();
+    };
+
+    window.handleHydrationChange = (day, value) => {
+      weekData[day].hydration = value;
+      renderApp();
+    };
+
+    window.handleTrainingChange = (day, value) => {
+      weekData[day].training = value;
+      renderApp();
+    };
+
+    window.handleIdealTrainingChange = (day, value) => {
+      idealWeekData[day].training = value;
+      renderApp();
+    };
+
+    window.handleIdealObjectiveChange = (day, value) => {
+      idealWeekData[day].objective = value;
+      renderApp();
+    };
+
+    window.handleIdealGoalChange = (day, value) => {
+      idealWeekData[day].invisibleGoal = value;
+      renderApp();
+    };
+
+    function renderWithContextScroll(mode) {
+      renderApp();
+      if (mode === 'top' && typeof window.acScrollToTop === 'function') {
+        requestAnimationFrame(() => window.acScrollToTop());
+      }
+    }
+
+    window.startGame = () => {
+      currentPhase = 1;
+      renderWithContextScroll('top');
+    };
+
+    window.analyzeAndNextPhase = () => {
+      if (isPhase1Complete()) {
+        analysisResult = analyzeWeek();
+        personalizedTips = generatePersonalizedTips();
+        currentPhase = 2;
+        renderWithContextScroll('top');
+      }
+    };
+
+    window.nextPhase = () => {
+      if (currentPhase === 2) {
+        initializeIdealWeekData();
+        currentPhase = 3;
+      } else if (currentPhase === 3 && isPhase3Complete()) {
+        currentPhase = 4;
+      }
+      renderWithContextScroll('top');
+    };
+
+    window.resetGame = () => {
+      currentPhase = 0;
+      initializeWeekData();
+      initializeIdealWeekData();
+      analysisResult = null;
+      personalizedTips = [];
+      renderWithContextScroll('top');
+    };
+
+    const dataHandler = {
+      onDataChanged(data) {
+        // UI is already updated through local state management
+      }
+    };
+
+    async function onConfigChange(config) {
+      const baseFont = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const fontStack = `${customFont}, Inter, system-ui, -apple-system, sans-serif`;
+      
+      document.body.style.fontFamily = fontStack;
+      
+      const app = document.getElementById('app');
+      if (app) {
+        app.style.backgroundColor = config.background_color || defaultConfig.background_color;
+        app.style.color = config.text_color || defaultConfig.text_color;
+      }
+      
+      renderApp();
+    }
+
+    async function init() {
+      initializeWeekData();
+      initializeIdealWeekData();
+      
+      if (window.dataSdk) {
+        await window.dataSdk.init(dataHandler);
+      }
+      
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities: (config) => ({
+            recolorables: [
+              {
+                get: () => config.background_color || defaultConfig.background_color,
+                set: (value) => {
+                  config.background_color = value;
+                  window.elementSdk.setConfig({ background_color: value });
+                }
+              },
+              {
+                get: () => config.surface_color || defaultConfig.surface_color,
+                set: (value) => {
+                  config.surface_color = value;
+                  window.elementSdk.setConfig({ surface_color: value });
+                }
+              },
+              {
+                get: () => config.text_color || defaultConfig.text_color,
+                set: (value) => {
+                  config.text_color = value;
+                  window.elementSdk.setConfig({ text_color: value });
+                }
+              },
+              {
+                get: () => config.primary_action_color || defaultConfig.primary_action_color,
+                set: (value) => {
+                  config.primary_action_color = value;
+                  window.elementSdk.setConfig({ primary_action_color: value });
+                }
+              },
+              {
+                get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+                set: (value) => {
+                  config.secondary_action_color = value;
+                  window.elementSdk.setConfig({ secondary_action_color: value });
+                }
+              }
+            ],
+            borderables: [],
+            fontEditable: {
+              get: () => config.font_family || defaultConfig.font_family,
+              set: (value) => {
+                config.font_family = value;
+                window.elementSdk.setConfig({ font_family: value });
+              }
+            },
+            fontSizeable: {
+              get: () => config.font_size || defaultConfig.font_size,
+              set: (value) => {
+                config.font_size = value;
+                window.elementSdk.setConfig({ font_size: value });
+              }
+            }
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ['main_title', config.main_title || defaultConfig.main_title],
+            ['phase_1_title', config.phase_1_title || defaultConfig.phase_1_title],
+            ['phase_2_title', config.phase_2_title || defaultConfig.phase_2_title],
+            ['phase_3_title', config.phase_3_title || defaultConfig.phase_3_title],
+            ['phase_4_title', config.phase_4_title || defaultConfig.phase_4_title]
+          ])
+        });
+      }
+      
+      renderApp();
+    }
+
+    init();
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) {
+      acScrollToTop();
+      return;
+    }
+
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+
+    try {
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, Math.max(0, top));
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    window.scrollTo(0, 0);
+  });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>

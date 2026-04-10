@@ -1,0 +1,1548 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pirámide de Poder del Tenista</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100%;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    .game-container {
+      width: 100%;
+      min-height: 100%;
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 2rem;
+      width: 100%;
+    }
+
+    .title {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      font-weight: 400;
+      opacity: 0.95;
+    }
+
+    .phase-container {
+      background: white;
+      border-radius: 24px;
+      padding: 2rem;
+      max-width: 900px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      margin-bottom: 2rem;
+    }
+
+    .phase-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .phase-number {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .phase-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 0.5rem;
+    }
+
+    .phase-description {
+      font-size: 1rem;
+      color: #4a5568;
+      line-height: 1.6;
+    }
+
+    .pyramid-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 2rem 0;
+    }
+
+    .pyramid-level {
+      background: #f7fafc;
+      border: 3px dashed #cbd5e0;
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .pyramid-level.level-base {
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .pyramid-level.level-2 {
+      width: 80%;
+      max-width: 400px;
+    }
+
+    .pyramid-level.level-3 {
+      width: 60%;
+      max-width: 300px;
+    }
+
+    .pyramid-level.level-top {
+      width: 40%;
+      max-width: 200px;
+    }
+
+    .pyramid-level.filled {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: 3px solid #5568d3;
+    }
+
+    .pyramid-level.active {
+      border-color: #667eea;
+      background: #edf2f7;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4);
+      }
+      50% {
+        transform: scale(1.02);
+        box-shadow: 0 0 20px 10px rgba(102, 126, 234, 0.2);
+      }
+    }
+
+    .pyramid-label {
+      font-size: 0.8rem;
+      color: #718096;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .pyramid-level.filled .pyramid-label {
+      color: white;
+    }
+
+    .habits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .habit-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      font-size: 1rem;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      user-select: none;
+    }
+
+    .habit-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+    }
+
+    .habit-card.selected {
+      background: #48bb78;
+      transform: scale(0.95);
+    }
+
+    .habit-card.disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .placed-habit {
+      background: white;
+      color: #667eea;
+      padding: 0.75rem 1.25rem;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .feedback {
+      background: #fff5f5;
+      border-left: 4px solid #fc8181;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      display: none;
+    }
+
+    .feedback.success {
+      background: #f0fff4;
+      border-left-color: #48bb78;
+    }
+
+    .feedback.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .feedback-icon {
+      font-size: 1.5rem;
+      margin-right: 0.5rem;
+    }
+
+    .feedback-text {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1a202c;
+    }
+
+    .principle-box {
+      background: linear-gradient(135deg, #fef5e7 0%, #fdebd0 100%);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      border: 2px solid #f39c12;
+    }
+
+    .principle-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .principle-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 0.75rem;
+    }
+
+    .principle-text {
+      font-size: 1rem;
+      color: #2d3748;
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    .action-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 1rem 2.5rem;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      display: none;
+      margin: 1.5rem auto 0;
+    }
+
+    .action-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .action-button.show {
+      display: block;
+    }
+
+    .final-pyramid {
+      margin: 3rem 0;
+    }
+
+    .final-message {
+      text-align: center;
+      color: #1a202c;
+      margin: 2rem 0;
+    }
+
+    .final-message h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      color: #667eea;
+    }
+
+    .final-message p {
+      font-size: 1.2rem;
+      line-height: 1.8;
+      color: #2d3748;
+      margin-bottom: 0.5rem;
+    }
+
+    .final-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+
+    .final-actions button {
+      padding: 0.875rem 2rem;
+      font-size: 1rem;
+    }
+
+    .instruction-text {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    /* TRIVIA STYLES */
+    .trivia-container {
+      width: 100%;
+    }
+
+    .trivia-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .trivia-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #1a202c;
+      margin-bottom: 1rem;
+    }
+
+    .trivia-intro {
+      font-size: 1.1rem;
+      color: #4a5568;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .timer-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #fef5e7 0%, #fdebd0 100%);
+      border-radius: 16px;
+      border: 3px solid #f39c12;
+    }
+
+    .timer-label {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1a202c;
+    }
+
+    .timer-display {
+      font-size: 3rem;
+      font-weight: 800;
+      color: #667eea;
+      min-width: 120px;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-display.warning {
+      color: #f39c12;
+      animation: timerPulse 1s infinite;
+    }
+
+    .timer-display.danger {
+      color: #e53e3e;
+      animation: timerShake 0.5s infinite;
+    }
+
+    @keyframes timerPulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+    }
+
+    @keyframes timerShake {
+      0%, 100% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(-5px);
+      }
+      75% {
+        transform: translateX(5px);
+      }
+    }
+
+    .question-container {
+      margin-bottom: 2rem;
+    }
+
+    .question-number {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .question-text {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1a202c;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .answers-grid {
+      display: grid;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .answer-option {
+      background: #f7fafc;
+      border: 3px solid #e2e8f0;
+      padding: 1.25rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #2d3748;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .answer-option:hover {
+      border-color: #667eea;
+      background: #edf2f7;
+      transform: translateX(5px);
+    }
+
+    .answer-option.selected {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .answer-option.correct {
+      border-color: #48bb78;
+      background: #48bb78;
+      color: white;
+    }
+
+    .answer-option.incorrect {
+      border-color: #fc8181;
+      background: #fc8181;
+      color: white;
+    }
+
+    .answer-option.disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .answer-letter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: white;
+      color: #667eea;
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .answer-option.selected .answer-letter,
+    .answer-option.correct .answer-letter,
+    .answer-option.incorrect .answer-letter {
+      background: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+
+    .question-feedback {
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      margin-top: 1rem;
+      display: none;
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+
+    .question-feedback.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    .question-feedback.correct-feedback {
+      background: #c6f6d5;
+      color: #22543d;
+      border-left: 4px solid #48bb78;
+    }
+
+    .question-feedback.incorrect-feedback {
+      background: #fed7d7;
+      color: #742a2a;
+      border-left: 4px solid #fc8181;
+    }
+
+    .trivia-progress {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 2rem 0;
+    }
+
+    .progress-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      transition: all 0.3s ease;
+    }
+
+    .progress-dot.active {
+      background: #667eea;
+      transform: scale(1.3);
+    }
+
+    .progress-dot.completed {
+      background: #48bb78;
+    }
+
+    .trivia-results {
+      text-align: center;
+    }
+
+    .results-score {
+      font-size: 4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 2rem 0;
+    }
+
+    .results-message {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 1rem;
+    }
+
+    .results-subtitle {
+      font-size: 1.1rem;
+      color: #4a5568;
+      margin-bottom: 2rem;
+    }
+
+    .results-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .stat-card {
+      background: #f7fafc;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #667eea;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: #718096;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 640px) {
+      .title {
+        font-size: 1.5rem;
+      }
+
+      .subtitle {
+        font-size: 1rem;
+      }
+
+      .phase-container {
+        padding: 1.5rem;
+      }
+
+      .habits-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .timer-display {
+        font-size: 2rem;
+      }
+
+      .question-text {
+        font-size: 1.1rem;
+      }
+
+      .results-score {
+        font-size: 3rem;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+
+    .container,
+    .game-container,
+    .game-wrapper,
+    .app-wrapper,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .phase-container,
+    .phase-card,
+    .content,
+    .content-area,
+    .modal-content,
+    .results-card {
+      padding: 16px !important;
+    }
+
+    h1, .main-title, .game-title, .title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+
+    h2, .phase-title, .stage-title, .final-title {
+      font-size: clamp(1.3rem, 6vw, 1.7rem) !important;
+      line-height: 1.25 !important;
+    }
+
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label {
+      font-size: clamp(1rem, 4.5vw, 1.15rem) !important;
+      line-height: 1.4 !important;
+    }
+
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+
+    .button-group,
+    .action-buttons,
+    .final-buttons,
+    .controls-row {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+
+    button,
+    .btn,
+    .btn-primary,
+    .btn-secondary,
+    .action-button,
+    .option-btn {
+      width: 100% !important;
+    }
+
+    .scenario-grid,
+    .macronutrient-grid,
+    .options-grid,
+    .snack-grid,
+    .results-stats,
+    .pyramid-preview,
+    .week-grid,
+    .myths-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    setConfig: function () {},
+    config: {}
+  };
+
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body>
+  <div class="game-container">
+   <header class="header">
+    <h1 class="title" id="game-title">🎮🔥 Construye tu Pirámide de Poder del Tenista</h1>
+    <p class="subtitle" id="game-subtitle">Comprende el ORDEN REAL de los hábitos que sostienen el rendimiento</p>
+   </header>
+   <main class="phase-container" id="phase-container"><!-- Content will be dynamically generated -->
+   </main>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "🎮🔥 Construye tu Pirámide de Poder del Tenista",
+      game_subtitle: "Comprende el ORDEN REAL de los hábitos que sostienen el rendimiento",
+      trivia_title: "⚡ TRIVIA RÁPIDA: Pon a prueba tu conocimiento",
+      trivia_time_label: "Tiempo restante",
+      final_message_title: "Tu Pirámide de Poder AC",
+      final_message_body: "Un tenista fuerte no se construye en el gimnasio… se construye en lo básico. Domina la base. La cima llega sola."
+    };
+
+    const gameData = {
+      currentPhase: 1,
+      selectedHabits: [],
+      pyramidState: {
+        base: [],
+        level2: [],
+        level3: [],
+        top: []
+      },
+      triviaState: {
+        currentQuestion: 0,
+        score: 0,
+        answers: [],
+        timeRemaining: 0,
+        timerInterval: null
+      }
+    };
+
+    const phases = [
+      {
+        number: 1,
+        title: "Las Bases Ocultas: Lo que NADIE ve, pero TODOS necesitan",
+        description: "Entiende la importancia de la base antes de construir",
+        instruction: "¿Qué va en la base de un tenista real? Selecciona DOS hábitos",
+        habits: [
+          { id: 'hidratacion', name: '💧 Hidratación', correct: true, level: 'base' },
+          { id: 'descanso', name: '😴 Descanso', correct: true, level: 'base' },
+          { id: 'alimentacion', name: '🥗 Alimentación diaria', correct: false },
+          { id: 'snacks', name: '🍌 Snacks pre/durante/post', correct: false },
+          { id: 'suplementacion', name: '💊 Suplementación', correct: false },
+          { id: 'mental', name: '🧠 Preparación mental', correct: false }
+        ],
+        correctCount: 2,
+        targetLevel: 'base',
+        principle: {
+          icon: '💡',
+          title: 'Principio AC',
+          text: 'La base del éxito no es glamour. Es repetir lo básico hasta dominarlo.'
+        },
+        errorMessage: 'Demasiado arriba. La base se construye con lo esencial.',
+        successMessage: '🌟 Perfecto. Sin agua ni sueño no existe rendimiento.'
+      },
+      {
+        number: 2,
+        title: "El Nivel Intermedio: El combustible de cada día",
+        description: "Comprende qué mantiene tu energía constante",
+        instruction: "Selecciona lo que sostiene tu energía día tras día (1 hábito)",
+        habits: [
+          { id: 'alimentacion', name: '🥗 Alimentación diaria', correct: true, level: 'level2' },
+          { id: 'snacks', name: '🍌 Snacks pre/durante/post', correct: false },
+          { id: 'suplementacion', name: '💊 Suplementación', correct: false },
+          { id: 'mental', name: '🧠 Preparación mental', correct: false }
+        ],
+        correctCount: 1,
+        targetLevel: 'level2',
+        principle: {
+          icon: '💡',
+          title: 'Principio AC',
+          text: 'El 80% del rendimiento se construye con lo que comes todos los días, no con lo que comes solo en partido.'
+        },
+        errorMessage: 'Este hábito va más arriba o no corresponde a energía básica.',
+        successMessage: '✅ Correcto. La alimentación diaria es tu combustible constante.'
+      },
+      {
+        number: 3,
+        title: "Nivel Superior: Lo que te da energía estratégica",
+        description: "Aprende sobre los snacks pre/post y su importancia real",
+        instruction: "Elige lo que te ayuda ANTES y DESPUÉS del esfuerzo (1 hábito)",
+        habits: [
+          { id: 'snacks', name: '🍌 Snacks pre/durante/post', correct: true, level: 'level3' },
+          { id: 'suplementacion', name: '💊 Suplementación', correct: false },
+          { id: 'mental', name: '🧠 Preparación mental', correct: false }
+        ],
+        correctCount: 1,
+        targetLevel: 'level3',
+        principle: {
+          icon: '💡',
+          title: 'Principio AC',
+          text: 'Lo que comes 30–60 min antes cambia tu energía. Lo que comes después cambia tu recuperación.'
+        },
+        errorMessage: 'Primero lo natural. Lo avanzado va en la cima.',
+        successMessage: '⚡ ¡Excelente! Los snacks estratégicos optimizan tu rendimiento.'
+      },
+      {
+        number: 4,
+        title: "La Cima: Solo para niveles avanzados",
+        description: "Entiende que la suplementación NO es lo primero",
+        instruction: "¿Qué va realmente hasta arriba? (1 hábito)",
+        habits: [
+          { id: 'suplementacion', name: '💊 Suplementación', correct: true, level: 'top' },
+          { id: 'mental', name: '🧠 Preparación mental', correct: false }
+        ],
+        correctCount: 1,
+        targetLevel: 'top',
+        principle: {
+          icon: '💡',
+          title: 'Principio AC',
+          text: 'La suplementación es la última pieza, nunca la primera.'
+        },
+        errorMessage: 'La mentalidad está en todo el cuerpo, no en una sola parte. La cima es solo para lo avanzado.',
+        successMessage: '🎉 ¡Perfecto! Has completado tu pirámide de poder.'
+      }
+    ];
+
+    const triviaQuestions = [
+      {
+        question: "¿Cada cuánto tiempo debe hidratarse un tenista durante un partido?",
+        options: [
+          "Solo al final del partido",
+          "Cada cambio de lado (cada 2 juegos)",
+          "Una vez por set",
+          "Solo cuando tenga mucha sed"
+        ],
+        correct: 1,
+        explanation: "¡Correcto! Los tenistas deben hidratarse cada cambio de lado (aproximadamente cada 10-15 minutos) tomando pequeños sorbos de 150-200ml para mantener una hidratación óptima sin sentirse pesados.",
+        timeLimit: 15
+      },
+      {
+        question: "¿Cuál es el mejor momento para consumir proteínas después del entrenamiento?",
+        options: [
+          "Inmediatamente después (0-30 minutos)",
+          "2-3 horas después",
+          "Antes de dormir",
+          "No importa el momento"
+        ],
+        correct: 0,
+        explanation: "¡Exacto! La ventana anabólica de 0-30 minutos post-entrenamiento es ideal para maximizar la recuperación muscular.",
+        timeLimit: 15
+      },
+      {
+        question: "¿Cuántas horas de sueño necesita un tenista profesional para una óptima recuperación?",
+        options: [
+          "5-6 horas",
+          "6-7 horas",
+          "8-10 horas",
+          "Más de 10 horas"
+        ],
+        correct: 2,
+        explanation: "Perfecto. Los atletas de alto rendimiento necesitan 8-10 horas de sueño para la recuperación muscular, consolidación de habilidades y rendimiento óptimo.",
+        timeLimit: 15
+      },
+      {
+        question: "¿Qué tipo de carbohidratos son mejores 30-60 minutos ANTES de un partido?",
+        options: [
+          "Carbohidratos complejos (pasta integral, arroz)",
+          "Carbohidratos simples (plátano, miel, bebida deportiva)",
+          "No consumir carbohidratos antes",
+          "Solo proteínas"
+        ],
+        correct: 1,
+        explanation: "¡Correcto! Los carbohidratos simples se digieren rápido y proporcionan energía inmediata sin causar molestias estomacales.",
+        timeLimit: 15
+      },
+      {
+        question: "¿En qué nivel de la pirámide nutricional debe estar la suplementación?",
+        options: [
+          "En la base - es lo más importante",
+          "En el nivel intermedio",
+          "En la cima - solo después de dominar lo básico",
+          "No es necesaria la suplementación"
+        ],
+        correct: 2,
+        explanation: "¡Exactamente! La suplementación es la ÚLTIMA pieza. Primero debes dominar hidratación, descanso, alimentación diaria y snacks estratégicos.",
+        timeLimit: 15
+      },
+      {
+        question: "¿Qué porcentaje del rendimiento deportivo se construye con la alimentación DIARIA?",
+        options: [
+          "30-40%",
+          "50-60%",
+          "80%",
+          "100%"
+        ],
+        correct: 2,
+        explanation: "¡Perfecto! El 80% del rendimiento se construye con lo que comes todos los días, no solo con lo que comes en días de partido.",
+        timeLimit: 15
+      },
+      {
+        question: "¿Cuál es el mejor snack para consumir DURANTE un partido largo (más de 2 horas)?",
+        options: [
+          "Hamburguesa y papas fritas",
+          "Plátano, gel energético o bebida deportiva",
+          "Pizza y refresco",
+          "Barrita de chocolate"
+        ],
+        correct: 1,
+        explanation: "¡Correcto! Plátanos, geles energéticos y bebidas deportivas proporcionan carbohidratos de rápida absorción y electrolitos sin causar malestar.",
+        timeLimit: 15
+      },
+      {
+        question: "¿Por qué el descanso está en la BASE de la pirámide de poder?",
+        options: [
+          "Porque es menos importante",
+          "Porque sin recuperación no hay adaptación ni rendimiento",
+          "Por costumbre",
+          "Solo para rellenar la pirámide"
+        ],
+        correct: 1,
+        explanation: "¡Exacto! Sin descanso adecuado, tu cuerpo no puede adaptarse al entrenamiento, recuperar músculos ni rendir al máximo. Es ESENCIAL.",
+        timeLimit: 15
+      }
+    ];
+
+    function renderPyramid(activeLevel = null) {
+      const levels = ['base', 'level2', 'level3', 'top'];
+      const labels = {
+        base: 'BASE',
+        level2: 'NIVEL 2',
+        level3: 'NIVEL 3',
+        top: 'CIMA'
+      };
+
+      let html = '<div class="pyramid-preview">';
+      
+      levels.reverse().forEach(level => {
+        const habits = gameData.pyramidState[level];
+        const isActive = level === activeLevel;
+        const isFilled = habits.length > 0;
+        const className = `pyramid-level level-${level === 'level2' ? '2' : level === 'level3' ? '3' : level} ${isFilled ? 'filled' : ''} ${isActive ? 'active' : ''}`;
+        
+        html += `<div class="${className}">`;
+        
+        if (isFilled) {
+          habits.forEach(habit => {
+            html += `<span class="placed-habit">${habit}</span>`;
+          });
+        } else {
+          html += `<span class="pyramid-label">${labels[level]}</span>`;
+        }
+        
+        html += '</div>';
+      });
+      
+      html += '</div>';
+      
+      return html;
+    }
+
+    function renderPhase(phaseNum) {
+      const phase = phases[phaseNum - 1];
+      const container = document.getElementById('phase-container');
+      
+      let html = `
+        <div class="phase-header">
+          <div class="phase-number">FASE ${phase.number} de 4</div>
+          <h2 class="phase-title">${phase.title}</h2>
+          <p class="phase-description">${phase.description}</p>
+        </div>
+      `;
+      
+      html += renderPyramid(phase.targetLevel);
+      
+      html += `
+        <div class="instruction-text">${phase.instruction}</div>
+        
+        <div class="habits-grid" id="habits-grid">
+          ${phase.habits.map(habit => `
+            <div class="habit-card" data-habit-id="${habit.id}" data-correct="${habit.correct}" data-level="${habit.level || ''}">
+              ${habit.name}
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="feedback" id="feedback">
+          <span class="feedback-icon" id="feedback-icon"></span>
+          <span class="feedback-text" id="feedback-text"></span>
+        </div>
+        
+        <div class="principle-box" id="principle-box" style="display: none;">
+          <div class="principle-icon">${phase.principle.icon}</div>
+          <div class="principle-title">${phase.principle.title}</div>
+          <div class="principle-text">${phase.principle.text}</div>
+        </div>
+        
+        <button class="action-button" id="next-button">
+          ${phaseNum < 4 ? 'Construir siguiente nivel' : 'Completar Pirámide'}
+        </button>
+      `;
+      
+      container.innerHTML = html;
+      
+      attachHabitListeners(phase);
+    }
+
+    function attachHabitListeners(phase) {
+      const habitCards = document.querySelectorAll('.habit-card');
+      
+      habitCards.forEach(card => {
+        card.addEventListener('click', () => {
+          if (card.classList.contains('disabled')) return;
+          
+          const habitId = card.dataset.habitId;
+          const isCorrect = card.dataset.correct === 'true';
+          const habitLevel = card.dataset.level;
+          const habitName = card.textContent.trim();
+          
+          if (gameData.selectedHabits.includes(habitId)) {
+            gameData.selectedHabits = gameData.selectedHabits.filter(id => id !== habitId);
+            gameData.pyramidState[phase.targetLevel] = gameData.pyramidState[phase.targetLevel].filter(h => h !== habitName);
+            card.classList.remove('selected');
+          } else {
+            if (gameData.selectedHabits.length >= phase.correctCount) {
+              return;
+            }
+            
+            gameData.selectedHabits.push(habitId);
+            card.classList.add('selected');
+            
+            if (isCorrect) {
+              gameData.pyramidState[phase.targetLevel].push(habitName);
+              showFeedback(true, phase.successMessage);
+              
+              if (gameData.selectedHabits.length === phase.correctCount) {
+                habitCards.forEach(c => c.classList.add('disabled'));
+                document.getElementById('principle-box').style.display = 'block';
+                document.getElementById('next-button').classList.add('show');
+              }
+            } else {
+              showFeedback(false, phase.errorMessage);
+              setTimeout(() => {
+                gameData.selectedHabits = gameData.selectedHabits.filter(id => id !== habitId);
+                card.classList.remove('selected');
+                hideFeedback();
+              }, 2000);
+            }
+          }
+          
+          const container = document.getElementById('phase-container');
+          const pyramidHtml = renderPyramid(phase.targetLevel);
+          const pyramidContainer = container.querySelector('.pyramid-preview');
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = pyramidHtml;
+          pyramidContainer.replaceWith(tempDiv.firstElementChild);
+        });
+      });
+      
+      document.getElementById('next-button').addEventListener('click', () => {
+        gameData.selectedHabits = [];
+        
+        if (gameData.currentPhase < 4) {
+          gameData.currentPhase++;
+          renderPhase(gameData.currentPhase);
+        } else {
+          renderTransitionScreen();
+        }
+      });
+    }
+
+    function showFeedback(success, message) {
+      const feedback = document.getElementById('feedback');
+      const icon = document.getElementById('feedback-icon');
+      const text = document.getElementById('feedback-text');
+      
+      feedback.className = 'feedback show';
+      if (success) {
+        feedback.classList.add('success');
+        icon.textContent = '✅';
+      } else {
+        icon.textContent = '❌';
+      }
+      
+      text.textContent = message;
+    }
+
+    function hideFeedback() {
+      const feedback = document.getElementById('feedback');
+      feedback.classList.remove('show');
+    }
+
+    function renderTransitionScreen() {
+      const container = document.getElementById('phase-container');
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      
+      let html = `
+        <div class="final-message">
+          <h2 id="final-message-title">${config.final_message_title || defaultConfig.final_message_title}</h2>
+          <p id="final-message-body">${config.final_message_body || defaultConfig.final_message_body}</p>
+        </div>
+        
+        <div class="final-pyramid">
+          ${renderPyramid()}
+        </div>
+        
+        <div style="text-align: center; margin-top: 3rem;">
+          <div class="principle-box">
+            <div class="principle-icon">⚡</div>
+            <div class="principle-title">¿Listo para el desafío final?</div>
+            <div class="principle-text">
+              Ahora pon a prueba todo lo que has aprendido con nuestra TRIVIA RÁPIDA.<br>
+              Tienes tiempo limitado para cada pregunta. ¡Demuestra tu conocimiento!
+            </div>
+          </div>
+          <button class="action-button show" id="start-trivia-button" style="display: block; margin: 2rem auto;">
+            🔥 Comenzar Trivia
+          </button>
+        </div>
+      `;
+      
+      container.innerHTML = html;
+      if (typeof acScrollToTop === 'function') {
+        requestAnimationFrame(() => acScrollToTop());
+      }
+      
+      document.getElementById('start-trivia-button').addEventListener('click', () => {
+        startTrivia();
+      });
+    }
+
+    function startTrivia() {
+      gameData.triviaState = {
+        currentQuestion: 0,
+        score: 0,
+        answers: [],
+        timeRemaining: 0,
+        timerInterval: null
+      };
+      
+      renderTriviaQuestion();
+      if (typeof acScrollToTop === 'function') {
+        requestAnimationFrame(() => acScrollToTop());
+      }
+    }
+
+    function renderTriviaQuestion() {
+      const container = document.getElementById('phase-container');
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const questionData = triviaQuestions[gameData.triviaState.currentQuestion];
+      const totalQuestions = triviaQuestions.length;
+      
+      gameData.triviaState.timeRemaining = questionData.timeLimit;
+      
+      let html = `
+        <div class="trivia-container">
+          <div class="trivia-header">
+            <h2 class="trivia-title" id="trivia-title">${config.trivia_title || defaultConfig.trivia_title}</h2>
+          </div>
+          
+          <div class="trivia-progress">
+            ${Array.from({length: totalQuestions}, (_, i) => {
+              let className = 'progress-dot';
+              if (i < gameData.triviaState.currentQuestion) className += ' completed';
+              if (i === gameData.triviaState.currentQuestion) className += ' active';
+              return `<div class="${className}"></div>`;
+            }).join('')}
+          </div>
+          
+          <div class="timer-container">
+            <span class="timer-label" id="timer-label">${config.trivia_time_label || defaultConfig.trivia_time_label}:</span>
+            <span class="timer-display" id="timer-display">${questionData.timeLimit}s</span>
+          </div>
+          
+          <div class="question-container">
+            <div class="question-number">Pregunta ${gameData.triviaState.currentQuestion + 1} de ${totalQuestions}</div>
+            <div class="question-text">${questionData.question}</div>
+            
+            <div class="answers-grid">
+              ${questionData.options.map((option, index) => `
+                <div class="answer-option" data-answer-index="${index}">
+                  <span class="answer-letter">${String.fromCharCode(65 + index)}</span>
+                  <span>${option}</span>
+                </div>
+              `).join('')}
+            </div>
+            
+            <div class="question-feedback" id="question-feedback"></div>
+          </div>
+        </div>
+      `;
+      
+      container.innerHTML = html;
+      
+      attachTriviaListeners(questionData);
+      startTimer();
+    }
+
+    function attachTriviaListeners(questionData) {
+      const answerOptions = document.querySelectorAll('.answer-option');
+      
+      answerOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          if (option.classList.contains('disabled')) return;
+          
+          const answerIndex = parseInt(option.dataset.answerIndex);
+          handleAnswer(answerIndex, questionData);
+        });
+      });
+    }
+
+    function startTimer() {
+      const timerDisplay = document.getElementById('timer-display');
+      
+      if (gameData.triviaState.timerInterval) {
+        clearInterval(gameData.triviaState.timerInterval);
+      }
+      
+      gameData.triviaState.timerInterval = setInterval(() => {
+        gameData.triviaState.timeRemaining--;
+        timerDisplay.textContent = `${gameData.triviaState.timeRemaining}s`;
+        
+        if (gameData.triviaState.timeRemaining <= 5) {
+          timerDisplay.classList.remove('warning');
+          timerDisplay.classList.add('danger');
+        } else if (gameData.triviaState.timeRemaining <= 10) {
+          timerDisplay.classList.add('warning');
+        }
+        
+        if (gameData.triviaState.timeRemaining <= 0) {
+          clearInterval(gameData.triviaState.timerInterval);
+          handleTimeout();
+        }
+      }, 1000);
+    }
+
+    function handleAnswer(answerIndex, questionData) {
+      clearInterval(gameData.triviaState.timerInterval);
+      
+      const answerOptions = document.querySelectorAll('.answer-option');
+      answerOptions.forEach(opt => opt.classList.add('disabled'));
+      
+      const isCorrect = answerIndex === questionData.correct;
+      
+      answerOptions.forEach((opt, idx) => {
+        if (idx === questionData.correct) {
+          opt.classList.add('correct');
+        } else if (idx === answerIndex && !isCorrect) {
+          opt.classList.add('incorrect');
+        }
+      });
+      
+      const feedback = document.getElementById('question-feedback');
+      feedback.classList.add('show');
+      
+      if (isCorrect) {
+        gameData.triviaState.score++;
+        feedback.classList.add('correct-feedback');
+        feedback.innerHTML = `<strong>✅ ¡Correcto!</strong><br>${questionData.explanation}`;
+      } else {
+        feedback.classList.add('incorrect-feedback');
+        feedback.innerHTML = `<strong>❌ Incorrecto.</strong><br>${questionData.explanation}`;
+      }
+      
+      gameData.triviaState.answers.push({
+        questionIndex: gameData.triviaState.currentQuestion,
+        selectedAnswer: answerIndex,
+        isCorrect: isCorrect,
+        timeUsed: triviaQuestions[gameData.triviaState.currentQuestion].timeLimit - gameData.triviaState.timeRemaining
+      });
+      
+      setTimeout(() => {
+        gameData.triviaState.currentQuestion++;
+        
+        if (gameData.triviaState.currentQuestion < triviaQuestions.length) {
+          renderTriviaQuestion();
+        } else {
+          renderTriviaResults();
+        }
+      }, 3000);
+    }
+
+    function handleTimeout() {
+      const answerOptions = document.querySelectorAll('.answer-option');
+      answerOptions.forEach(opt => opt.classList.add('disabled'));
+      
+      const questionData = triviaQuestions[gameData.triviaState.currentQuestion];
+      
+      answerOptions.forEach((opt, idx) => {
+        if (idx === questionData.correct) {
+          opt.classList.add('correct');
+        }
+      });
+      
+      const feedback = document.getElementById('question-feedback');
+      feedback.classList.add('show', 'incorrect-feedback');
+      feedback.innerHTML = `<strong>⏰ Tiempo agotado.</strong><br>${questionData.explanation}`;
+      
+      gameData.triviaState.answers.push({
+        questionIndex: gameData.triviaState.currentQuestion,
+        selectedAnswer: null,
+        isCorrect: false,
+        timeUsed: questionData.timeLimit
+      });
+      
+      setTimeout(() => {
+        gameData.triviaState.currentQuestion++;
+        
+        if (gameData.triviaState.currentQuestion < triviaQuestions.length) {
+          renderTriviaQuestion();
+        } else {
+          renderTriviaResults();
+        }
+      }, 3000);
+    }
+
+    function renderTriviaResults() {
+      const container = document.getElementById('phase-container');
+      const score = gameData.triviaState.score;
+      const total = triviaQuestions.length;
+      const percentage = Math.round((score / total) * 100);
+      
+      let message, subtitle;
+      if (percentage === 100) {
+        message = "🏆 ¡PERFECTO! Eres un MAESTRO";
+        subtitle = "Dominas completamente los fundamentos nutricionales del tenis";
+      } else if (percentage >= 75) {
+        message = "🌟 ¡EXCELENTE! Conocimiento Sólido";
+        subtitle = "Tienes una muy buena comprensión de la nutrición deportiva";
+      } else if (percentage >= 50) {
+        message = "👍 ¡BIEN! Vas por buen camino";
+        subtitle = "Tienes bases sólidas, sigue aprendiendo";
+      } else {
+        message = "💪 Sigue practicando";
+        subtitle = "Revisa los conceptos y vuelve a intentarlo";
+      }
+      
+      const totalTime = gameData.triviaState.answers.reduce((sum, a) => sum + a.timeUsed, 0);
+      const avgTime = Math.round(totalTime / total);
+      
+      let html = `
+        <div class="trivia-results">
+          <h2 class="trivia-title">📊 Resultados de tu Trivia</h2>
+          
+          <div class="results-score">${score}/${total}</div>
+          <div class="results-message">${message}</div>
+          <div class="results-subtitle">${subtitle}</div>
+          
+          <div class="results-stats">
+            <div class="stat-card">
+              <div class="stat-value">${percentage}%</div>
+              <div class="stat-label">Precisión</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">${score}</div>
+              <div class="stat-label">Correctas</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">${total - score}</div>
+              <div class="stat-label">Incorrectas</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">${avgTime}s</div>
+              <div class="stat-label">Tiempo Promedio</div>
+            </div>
+          </div>
+          
+          <div class="principle-box" style="margin-top: 2rem;">
+            <div class="principle-icon">🎓</div>
+            <div class="principle-title">Recuerda</div>
+            <div class="principle-text">
+              El conocimiento sin acción no sirve. Aplica estos principios en tu día a día.<br>
+              La pirámide de poder se construye con hábitos diarios, no con intención.
+            </div>
+          </div>
+          
+          <div class="final-actions">
+            <button class="action-button show" id="restart-game-button">🔄 Reiniciar Juego Completo</button>
+            <button class="action-button show" id="retry-trivia-button">⚡ Repetir Solo Trivia</button>
+          </div>
+        </div>
+      `;
+      
+      container.innerHTML = html;
+      
+      document.getElementById('restart-game-button').addEventListener('click', () => {
+        restartGame();
+      });
+      
+      document.getElementById('retry-trivia-button').addEventListener('click', () => {
+        startTrivia();
+      });
+    }
+
+    function restartGame() {
+      gameData.currentPhase = 1;
+      gameData.selectedHabits = [];
+      gameData.pyramidState = {
+        base: [],
+        level2: [],
+        level3: [],
+        top: []
+      };
+      gameData.triviaState = {
+        currentQuestion: 0,
+        score: 0,
+        answers: [],
+        timeRemaining: 0,
+        timerInterval: null
+      };
+      renderPhase(1);
+    }
+
+    async function onConfigChange(config) {
+      const titleElement = document.getElementById('game-title');
+      const subtitleElement = document.getElementById('game-subtitle');
+      const triviaTitleElement = document.getElementById('trivia-title');
+      const timerLabelElement = document.getElementById('timer-label');
+      const finalTitleElement = document.getElementById('final-message-title');
+      const finalBodyElement = document.getElementById('final-message-body');
+      
+      if (titleElement) {
+        titleElement.textContent = config.game_title || defaultConfig.game_title;
+      }
+      if (subtitleElement) {
+        subtitleElement.textContent = config.game_subtitle || defaultConfig.game_subtitle;
+      }
+      if (triviaTitleElement) {
+        triviaTitleElement.textContent = config.trivia_title || defaultConfig.trivia_title;
+      }
+      if (timerLabelElement) {
+        timerLabelElement.textContent = config.trivia_time_label || defaultConfig.trivia_time_label;
+      }
+      if (finalTitleElement) {
+        finalTitleElement.textContent = config.final_message_title || defaultConfig.final_message_title;
+      }
+      if (finalBodyElement) {
+        finalBodyElement.textContent = config.final_message_body || defaultConfig.final_message_body;
+      }
+    }
+
+    const element = {
+      defaultConfig,
+      onConfigChange,
+      mapToCapabilities: (config) => ({
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ["game_title", config.game_title || defaultConfig.game_title],
+        ["game_subtitle", config.game_subtitle || defaultConfig.game_subtitle],
+        ["trivia_title", config.trivia_title || defaultConfig.trivia_title],
+        ["trivia_time_label", config.trivia_time_label || defaultConfig.trivia_time_label],
+        ["final_message_title", config.final_message_title || defaultConfig.final_message_title],
+        ["final_message_body", config.final_message_body || defaultConfig.final_message_body]
+      ])
+    };
+
+    if (window.elementSdk) {
+      window.elementSdk.init(element);
+    }
+
+    renderPhase(1);
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) {
+      acScrollToTop();
+      return;
+    }
+
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+
+    try {
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, Math.max(0, top));
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    window.scrollTo(0, 0);
+  });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>

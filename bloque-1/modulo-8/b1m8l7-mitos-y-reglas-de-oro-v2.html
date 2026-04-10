@@ -1,0 +1,1014 @@
+﻿<!doctype html>
+<html lang="es" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mitos y Verdades del Tenista</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      margin: 0;
+      background: #0f172a;
+      color: #f1f5f9;
+    }
+
+    *, *::before, *::after {
+      box-sizing: inherit;
+    }
+
+    #app {
+      min-height: 100vh;
+    }
+
+    .min-h-full { min-height: 100vh; }
+    .w-full { width: 100%; }
+    .max-w-2xl { max-width: 42rem; }
+    .max-w-3xl { max-width: 52rem; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .text-center { text-align: center; }
+    .text-left { text-align: left; }
+    .font-bold { font-weight: 700; }
+    .font-semibold { font-weight: 600; }
+    .font-medium { font-weight: 500; }
+    .uppercase { text-transform: uppercase; }
+    .tracking-wide { letter-spacing: 0.06em; }
+    .opacity-60 { opacity: 0.6; }
+    .opacity-80 { opacity: 0.8; }
+    .opacity-90 { opacity: 0.9; }
+    .leading-relaxed { line-height: 1.65; }
+    .rounded-lg { border-radius: 16px; }
+    .rounded-xl { border-radius: 24px; }
+    .shadow-lg { box-shadow: 0 16px 34px rgba(15, 23, 42, 0.18); }
+    .shadow-2xl { box-shadow: 0 26px 55px rgba(2, 6, 23, 0.28); }
+    .transition-all { transition: all 0.25s ease; }
+    .space-y-3 > * + * { margin-top: 0.75rem; }
+    .space-y-4 > * + * { margin-top: 1rem; }
+    .mb-1 { margin-bottom: 0.25rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mb-3 { margin-bottom: 0.75rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .mb-8 { margin-bottom: 2rem; }
+    .mt-4 { margin-top: 1rem; }
+    .mt-6 { margin-top: 1.5rem; }
+    .p-3 { padding: 0.75rem; }
+    .p-4 { padding: 1rem; }
+    .p-5 { padding: 1.25rem; }
+    .p-6 { padding: 1.5rem; }
+    .p-8 { padding: 2rem; }
+    .px-8 { padding-left: 2rem; padding-right: 2rem; }
+    .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+    .grid { display: grid; }
+    .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .gap-4 { gap: 1rem; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .items-start { align-items: flex-start; }
+    .justify-center { justify-content: center; }
+    .flex-1 { flex: 1 1 auto; }
+    .flex-shrink-0 { flex-shrink: 0; }
+    .cursor-not-allowed { cursor: not-allowed; }
+    .text-xs { font-size: 0.75rem; }
+    .text-sm { font-size: 0.875rem; }
+    .text-base { font-size: 1rem; }
+    .text-lg { font-size: 1.125rem; }
+    .text-xl { font-size: 1.25rem; }
+    .text-2xl { font-size: 1.5rem; }
+    .text-3xl { font-size: 1.875rem; }
+    .text-4xl { font-size: 2.25rem; }
+    .text-5xl { font-size: 3rem; }
+    .text-6xl { font-size: 3.75rem; }
+    .hover\:scale-105:hover { transform: scale(1.02); }
+    .hover\:scale-102:hover { transform: scale(1.01); }
+
+    button {
+      border: none;
+      cursor: pointer;
+      min-height: 48px;
+    }
+
+    .screen-shell {
+      padding: 1rem;
+    }
+
+    .screen-card {
+      width: min(100%, 860px);
+      margin: 0 auto;
+    }
+
+    .hero-card,
+    .block-card,
+    .summary-card,
+    .rule-card {
+      border-radius: 24px;
+      box-shadow: 0 24px 55px rgba(2, 6, 23, 0.24);
+    }
+
+    .cta-button {
+      width: 100%;
+      font-weight: 700;
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.22);
+    }
+
+    .duo-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .slide-in {
+      animation: slideIn 0.6s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(-100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .card-flip {
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+    }
+    
+    .card-flip.flipped {
+      transform: rotateY(180deg);
+    }
+    
+    .card-front, .card-back {
+      backface-visibility: hidden;
+    }
+    
+    .card-back {
+      transform: rotateY(180deg);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .pulse-animation {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @media (max-width: 768px) {
+      .screen-shell {
+        padding: 0.9rem;
+      }
+
+      .p-8 { padding: 1.2rem; }
+      .p-6 { padding: 1rem; }
+      .px-8 { padding-left: 1rem; padding-right: 1rem; }
+      .py-4 { padding-top: 0.9rem; padding-bottom: 0.9rem; }
+      .mb-8 { margin-bottom: 1.5rem; }
+
+      .grid-cols-2,
+      .duo-grid {
+        grid-template-columns: 1fr;
+      }
+
+      button,
+      .cta-button {
+        width: 100%;
+      }
+
+      .hero-card,
+      .block-card,
+      .summary-card,
+      .rule-card,
+      .rounded-xl {
+        border-radius: 20px;
+      }
+
+      .card-flip {
+        min-height: auto !important;
+      }
+
+      .card-front,
+      .card-back {
+        position: relative;
+        width: 100%;
+        height: auto;
+        transform: none;
+        backface-visibility: visible;
+      }
+
+      .card-back {
+        top: auto;
+        left: auto;
+      }
+
+      .card-flip.flipped .card-front {
+        display: none;
+      }
+
+      .card-flip:not(.flipped) .card-back {
+        display: none;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+
+    .container,
+    .game-container,
+    .game-wrapper,
+    .app-wrapper,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .phase-container,
+    .phase-card,
+    .content,
+    .content-area,
+    .modal-content,
+    .results-card {
+      padding: 16px !important;
+    }
+
+    h1, .main-title, .game-title, .title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+
+    h2, .phase-title, .stage-title, .final-title {
+      font-size: clamp(1.3rem, 6vw, 1.7rem) !important;
+      line-height: 1.25 !important;
+    }
+
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label {
+      font-size: clamp(1rem, 4.5vw, 1.15rem) !important;
+      line-height: 1.4 !important;
+    }
+
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+
+    .button-group,
+    .action-buttons,
+    .final-buttons,
+    .controls-row {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+
+    button,
+    .btn,
+    .btn-primary,
+    .btn-secondary,
+    .action-button,
+    .option-btn {
+      width: 100% !important;
+    }
+
+    .scenario-grid,
+    .macronutrient-grid,
+    .options-grid,
+    .snack-grid,
+    .results-stats,
+    .pyramid-preview,
+    .week-grid,
+    .myths-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    setConfig: function () {},
+    config: {}
+  };
+
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body class="h-full">
+  <div id="app" class="h-full w-full overflow-auto"></div>
+  <script>
+    const defaultConfig = {
+      background_color: "#0f172a",
+      surface_color: "#1e293b",
+      text_color: "#f1f5f9",
+      primary_action_color: "#10b981",
+      secondary_action_color: "#3b82f6",
+      font_family: "Inter",
+      font_size: 16,
+      game_title: "Mitos, Verdades y Reglas de Oro del Tenista",
+      game_subtitle: "Claridad total sobre hábitos de rendimiento",
+      block1_title: "ROMPE EL MITO",
+      block2_title: "APLICA LA VERDAD EN ESCENARIOS REALES",
+      block3_title: "LAS 7 REGLAS DE ORO DEL RENDIMIENTO AC",
+      start_button: "Comenzar el Juego",
+      continue_button: "Continuar"
+    };
+
+    let currentRecords = [];
+    let gameState = {
+      currentScreen: 'welcome',
+      currentMyth: 0,
+      currentScenario: 0,
+      currentRule: 0,
+      mythsScore: 0,
+      scenariosScore: 0,
+      revealedMyths: [],
+      completedScenarios: []
+    };
+
+    const myths = [
+      {
+        id: 1,
+        statement: "Solo necesito hidratarme cuando tengo sed",
+        isMito: true,
+        explanation: "Cuando tienes sed, ya estás deshidratado. La hidratación se planifica, no se improvisa.",
+        detailedInfo: "Tu cerebro y músculos pierden un 2% de rendimiento con solo 1% de deshidratación. La sed aparece cuando ya has perdido el 2-3% de tu peso en líquidos. En un partido de 2 horas bajo el sol, puedes perder hasta 2 litros de sudor. Por eso los profesionales beben cada cambio de lado: no esperan a tener sed, siguen un protocolo. La hidratación inteligente empieza 2 horas antes del partido y continúa durante y después.",
+        connection: "Juego 2 (hidratación en partido)"
+      },
+      {
+        id: 2,
+        statement: "Si entreno mucho, no importa dormir poco",
+        isMito: true,
+        explanation: "El progreso ocurre mientras duermes, no mientras entrenas.",
+        detailedInfo: "El entrenamiento rompe fibras musculares y agota tu sistema nervioso. La reparación, el crecimiento y la consolidación de aprendizajes técnicos ocurren mientras duermes profundamente. Con menos de 7 horas de sueño: tu tiempo de reacción baja un 20%, tu precisión en golpes cae un 15%, y tu riesgo de lesión aumenta un 60%. Los tenistas de élite duermen 8-10 horas por noche. Djokovic, Federer y Nadal han declarado públicamente que el sueño es su herramienta de recuperación número uno.",
+        connection: "Juego 5 (sueño y recuperación)"
+      },
+      {
+        id: 3,
+        statement: "Comer menos me hace más ligero y rápido",
+        isMito: true,
+        explanation: "Comer mal te hace lento, débil y mentalmente inestable.",
+        detailedInfo: "Comer muy poco genera déficit calórico crónico que destruye masa muscular, baja tu metabolismo y afecta tu concentración. Tu cerebro consume el 20% de tu energía diaria: sin glucosa adecuada, tu toma de decisiones en punto crítico se vuelve lenta y errática. Además, la restricción calórica extrema eleva el cortisol (hormona del estrés), aumenta lesiones y deprime tu sistema inmune. No se trata de comer menos, sino de comer inteligente: carbohidratos antes y durante, proteínas después, grasas saludables siempre.",
+        connection: "Juego 3 (plato del rendimiento)"
+      },
+      {
+        id: 4,
+        statement: "Los suplementos son la base del rendimiento",
+        isMito: true,
+        explanation: "Primero agua, sueño y comida. Los suplementos solo afinan.",
+        detailedInfo: "Los suplementos representan el 5% del rendimiento, los fundamentos el 95%. Sin hidratación constante, sin 8 horas de sueño de calidad y sin alimentación balanceada, ningún suplemento hará milagros. La industria de suplementos mueve miles de millones vendiendo promesas, pero la ciencia es clara: primero optimiza agua, sueño, comida real y entrenamiento inteligente. Solo después, y bajo supervisión profesional, considera suplementos específicos como creatina, cafeína estratégica o electrolitos. La base no se compra en polvo, se construye con hábitos diarios.",
+        connection: "Juego 1 (pirámide del tenista)"
+      }
+    ];
+
+    const scenarios = [
+      {
+        id: 1,
+        title: "Partido largo + calor",
+        question: "¿Qué haces para sostener tu rendimiento?",
+        options: [
+          { text: "Esperar a tener sed", correct: false },
+          { text: "Beber solo agua al final", correct: false },
+          { text: "Beber cada cambio de lado + snack adecuado", correct: true },
+          { text: "No beber para no sentirte pesado", correct: false }
+        ],
+        learning: "La constancia gana partidos largos.",
+        detailedLearning: "Los partidos largos no se ganan con golpes espectaculares, sino con micro-hábitos constantes. Beber 150-200ml cada cambio de lado mantiene tu hidratación estable. Combinar agua con un snack ligero (plátano, barrita, dátiles) cada 60-90 minutos evita bajones de glucosa. Los profesionales siguen protocolos estrictos porque saben que en el tercer set, el que mantuvo la constancia tiene ventaja física y mental. La disciplina en lo pequeño se convierte en dominancia en lo grande."
+      },
+      {
+        id: 2,
+        title: "Dormiste mal, pero toca entrenar",
+        question: "¿Qué haces?",
+        options: [
+          { text: "Entrenar duro igual", correct: false },
+          { text: "Cancelar todo", correct: false },
+          { text: "Entrenar ligero + priorizar recuperación", correct: true },
+          { text: "Forzarte para 'hacerte fuerte'", correct: false }
+        ],
+        learning: "La inteligencia entrena mejor que el ego.",
+        detailedLearning: "Entrenar duro con poco sueño multiplica el riesgo de lesión y genera fatiga acumulada sin progreso real. La respuesta inteligente es adaptar: entrena técnica a menor intensidad, trabaja movilidad, o haz una sesión táctica sin desgaste físico extremo. Prioriza dormir bien esa noche siguiente. Los campeones no entrenan duro todos los días, entrenan inteligente todos los días. Saber cuándo reducir intensidad es una habilidad estratégica que separa a los que progresan de los que se estancan o lesionan."
+      },
+      {
+        id: 3,
+        title: "Te sientes sin energía en partido",
+        question: "¿Qué haces?",
+        options: [
+          { text: "Culpar tu físico", correct: false },
+          { text: "Ignorarlo", correct: false },
+          { text: "Revisar alimentación e hidratación", correct: true },
+          { text: "Pensar que es mental", correct: false }
+        ],
+        learning: "La energía no es motivación, es combustible.",
+        detailedLearning: "Sentirse 'mentalmente débil' en partido suele ser déficit de glucosa o deshidratación. Tu cerebro no puede fabricar energía de la nada: necesita glucosa constante y correcta hidratación para mantener concentración, velocidad de decisión y estado de ánimo. Antes de culpar tu 'mentalidad', revisa: ¿comiste 2-3 horas antes? ¿Bebiste suficiente? ¿Tomaste un snack a mitad de partido? El 80% de las 'crisis mentales' en cancha tienen causa metabólica. Soluciona la química, y la mente funciona."
+      },
+      {
+        id: 4,
+        title: "Semana con muchos entrenamientos",
+        question: "¿Cómo lo manejas?",
+        options: [
+          { text: "Entrenar duro todos los días", correct: false },
+          { text: "Improvisar", correct: false },
+          { text: "Planificar cargas y descanso", correct: true },
+          { text: "Dormir cuando se pueda", correct: false }
+        ],
+        learning: "La planificación es una habilidad de alto rendimiento.",
+        detailedLearning: "Los tenistas de élite no improvisan sus semanas: siguen periodización con días de alta intensidad, días de carga media, y días de recuperación activa o completa. Una semana intensa mal planificada genera sobreentrenamiento, caída de rendimiento y lesiones. La clave es alternar: si hoy entrenas potencia, mañana trabajas técnica suave. Si hoy juegas partido exigente, mañana movilidad o descanso total. Planificar también incluye horarios fijos de sueño y comidas. La planificación no es rigidez, es inteligencia estratégica aplicada al cuerpo."
+      }
+    ];
+
+    const goldenRules = [
+      { 
+        emoji: "🥇", 
+        text: "El rendimiento se sostiene con hábitos invisibles.",
+        detail: "Lo que haces fuera de la cancha determina tu nivel dentro de ella. Hidratación, sueño, alimentación y recuperación son invisibles en el marcador, pero definen tu consistencia."
+      },
+      { 
+        emoji: "🥈", 
+        text: "Sin agua y sueño, no hay precisión.",
+        detail: "Tu cerebro necesita hidratación para procesar información rápidamente y sueño profundo para consolidar técnica. Sin estos dos pilares, tu coordinación y toma de decisiones colapsan."
+      },
+      { 
+        emoji: "🥉", 
+        text: "Comer bien te hace más rápido y más claro.",
+        detail: "La comida es combustible y señal química. Carbohidratos dan velocidad, proteínas reparan, grasas saludables sostienen energía. Comer estratégicamente te da ventaja física y mental."
+      },
+      { 
+        emoji: "🟢", 
+        text: "No todos los días se entrena duro.",
+        detail: "La progresión ocurre con ondulación inteligente: días duros, días medios, días suaves. Entrenar duro todos los días genera estancamiento y lesiones, no mejora."
+      },
+      { 
+        emoji: "🔵", 
+        text: "La energía se planifica, no se improvisa.",
+        detail: "Los tenistas de élite saben exactamente qué comer antes, durante y después. Planifican hidratación, timing de comidas y descanso. La improvisación genera inconsistencia."
+      },
+      { 
+        emoji: "🟣", 
+        text: "La recuperación es parte del entrenamiento.",
+        detail: "No progresas mientras entrenas, progresas mientras te recuperas. Sueño, estiramientos, nutrición post-entrenamiento y días de descanso activo son tan importantes como el entrenamiento mismo."
+      },
+      { 
+        emoji: "🟠", 
+        text: "Constancia vence intensidad desordenada.",
+        detail: "Entrenar bien 5 días por semana durante 6 meses supera a entrenar caóticamente 7 días durante 2 meses. La constancia inteligente construye bases sólidas, la intensidad desordenada quema recursos."
+      }
+    ];
+
+    const dataHandler = {
+      onDataChanged(data) {
+        currentRecords = data;
+      }
+    };
+
+    async function saveProgress() {
+      if (currentRecords.length >= 999) {
+        showToast("Límite de 999 registros alcanzado", false);
+        return;
+      }
+
+      const result = await window.dataSdk.create({
+        player_name: "Jugador",
+        myths_score: gameState.mythsScore,
+        scenarios_score: gameState.scenariosScore,
+        completed_at: new Date().toISOString()
+      });
+
+      if (result.isOk) {
+        showToast("Progreso guardado", true);
+      } else {
+        showToast("Error al guardar progreso", false);
+      }
+    }
+
+    function showToast(message, success) {
+      const toast = document.createElement('div');
+      toast.className = 'fade-in';
+      toast.style.cssText = `
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 9999;
+        max-width: min(320px, calc(100vw - 32px));
+        padding: 14px 18px;
+        border-radius: 16px;
+        color: #fff;
+        font-weight: 600;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.28);
+        background: ${success ? '#16a34a' : '#dc2626'};
+      `;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    function renderWelcomeScreen() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const baseFont = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseFontStack = 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+      
+      return `
+        <div class="min-h-full flex items-center justify-center screen-shell" style="background-color: ${config.background_color};">
+          <div class="max-w-2xl w-full text-center fade-in screen-card">
+            <div class="text-6xl mb-6">🎾🔥</div>
+            <h1 class="text-4xl font-bold mb-4" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 2}px;">
+              ${config.game_title}
+            </h1>
+            <p class="text-lg mb-8 opacity-90" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.1}px;">
+              ${config.game_subtitle}
+            </p>
+            <div class="space-y-4 mb-8" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont}px;">
+              <div class="p-4 rounded-lg" style="background-color: ${config.surface_color};">
+                <div class="text-2xl mb-2">🟦</div>
+                <div class="font-semibold mb-1">BLOQUE 1 - Rompe el Mito</div>
+                <div class="text-sm opacity-80">Identifica creencias falsas</div>
+              </div>
+              <div class="p-4 rounded-lg" style="background-color: ${config.surface_color};">
+                <div class="text-2xl mb-2">🟩</div>
+                <div class="font-semibold mb-1">BLOQUE 2 - Aplica la Verdad</div>
+                <div class="text-sm opacity-80">Escenarios reales de tenistas</div>
+              </div>
+              <div class="p-4 rounded-lg" style="background-color: ${config.surface_color};">
+                <div class="text-2xl mb-2">🟨</div>
+                <div class="font-semibold mb-1">BLOQUE 3 - Reglas de Oro</div>
+                <div class="text-sm opacity-80">7 reglas del rendimiento</div>
+              </div>
+            </div>
+            <button onclick="startGame()" class="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105" style="background-color: ${config.primary_action_color}; color: ${config.background_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.1}px;">
+              ${config.start_button}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMythsScreen() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const baseFont = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseFontStack = 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+      const currentMyth = myths[gameState.currentMyth];
+      const isRevealed = gameState.revealedMyths.includes(gameState.currentMyth);
+      
+      return `
+        <div class="min-h-full screen-shell" style="background-color: ${config.background_color};">
+          <div class="max-w-3xl mx-auto">
+            <div class="mb-8 text-center fade-in">
+              <div class="text-4xl mb-3">🟦</div>
+              <h2 class="text-3xl font-bold mb-2" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.8}px;">
+                ${config.block1_title}
+              </h2>
+              <p class="opacity-80" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont}px;">
+                Identifica creencias falsas
+              </p>
+              <div class="mt-4" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 0.9}px;">
+                Mito ${gameState.currentMyth + 1} de ${myths.length} | Puntuación: ${gameState.mythsScore}/${gameState.revealedMyths.length}
+              </div>
+            </div>
+
+            <div class="card-flip ${isRevealed ? 'flipped' : ''}" style="position: relative; min-height: 400px;">
+              <div class="card-front p-8 rounded-xl shadow-2xl block-card" style="background-color: ${config.surface_color};">
+                <div class="text-center mb-8">
+                  <div class="text-5xl mb-4">🧠</div>
+                  <h3 class="text-2xl font-bold mb-6" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.5}px;">
+                    "${currentMyth.statement}"
+                  </h3>
+                </div>
+                <div class="duo-grid">
+                  <button onclick="answerMyth(true)" class="p-6 rounded-lg font-bold text-xl transition-all hover:scale-105 cta-button" style="background-color: ${config.primary_action_color}; color: ${config.background_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.2}px;">
+                    ❌ MITO
+                  </button>
+                  <button onclick="answerMyth(false)" class="p-6 rounded-lg font-bold text-xl transition-all hover:scale-105 cta-button" style="background-color: ${config.secondary_action_color}; color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.2}px;">
+                    ✔ REALIDAD
+                  </button>
+                </div>
+              </div>
+
+              <div class="card-back p-8 rounded-xl shadow-2xl block-card" style="background-color: ${config.surface_color};">
+                <div class="text-center mb-6">
+                  <div class="text-5xl mb-4">💡</div>
+                  <div class="text-2xl font-bold mb-4" style="color: ${config.primary_action_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.5}px;">
+                    Verdad Aplicada
+                  </div>
+                  <p class="text-xl leading-relaxed mb-4 font-semibold" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.2}px;">
+                    ${currentMyth.explanation}
+                  </p>
+                  <div class="p-5 rounded-lg mb-6 text-left" style="background-color: ${config.background_color};">
+                    <div class="text-base leading-relaxed opacity-90" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont}px;">
+                      ${currentMyth.detailedInfo}
+                    </div>
+                  </div>
+                  <div class="p-3 rounded-lg" style="background-color: ${config.secondary_action_color}30; border-left: 4px solid ${config.secondary_action_color};">
+                    <div class="text-xs font-semibold mb-1 uppercase tracking-wide" style="color: ${config.secondary_action_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 0.75}px;">
+                      📚 Conexión al módulo
+                    </div>
+                    <div class="text-sm font-medium" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 0.85}px;">
+                      ${currentMyth.connection}
+                    </div>
+                  </div>
+                </div>
+                ${gameState.currentMyth < myths.length - 1 ? 
+                  `<button onclick="nextMyth()" class="w-full p-4 rounded-lg font-bold text-lg transition-all hover:scale-105 cta-button" style="background-color: ${config.primary_action_color}; color: ${config.background_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.1}px;">
+                    Siguiente Mito →
+                  </button>` :
+                  `<button onclick="goToScenarios()" class="w-full p-4 rounded-lg font-bold text-lg transition-all hover:scale-105 cta-button" style="background-color: ${config.primary_action_color}; color: ${config.background_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.1}px;">
+                    Aplicar la Verdad →
+                  </button>`
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderScenariosScreen() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const baseFont = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseFontStack = 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+      const currentScenario = scenarios[gameState.currentScenario];
+      const isCompleted = gameState.completedScenarios.includes(gameState.currentScenario);
+      
+      return `
+        <div class="min-h-full screen-shell" style="background-color: ${config.background_color};">
+          <div class="max-w-3xl mx-auto">
+            <div class="mb-8 text-center fade-in">
+              <div class="text-4xl mb-3">🟩</div>
+              <h2 class="text-3xl font-bold mb-2" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.8}px;">
+                ${config.block2_title}
+              </h2>
+              <p class="opacity-80" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont}px;">
+                Demuestra tu comprensión
+              </p>
+              <div class="mt-4" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 0.9}px;">
+                Escenario ${gameState.currentScenario + 1} de ${scenarios.length} | Puntuación: ${gameState.scenariosScore}/${gameState.completedScenarios.length}
+              </div>
+            </div>
+
+            <div class="slide-in">
+              <div class="p-8 rounded-xl shadow-2xl mb-6 block-card" style="background-color: ${config.surface_color};">
+                <div class="text-center mb-6">
+                  <div class="text-5xl mb-4">🎾</div>
+                  <h3 class="text-2xl font-bold mb-2" style="color: ${config.primary_action_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.5}px;">
+                    ${currentScenario.title}
+                  </h3>
+                  <p class="text-lg" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.1}px;">
+                    ${currentScenario.question}
+                  </p>
+                </div>
+
+                <div class="space-y-3" id="scenario-options">
+                  ${currentScenario.options.map((option, index) => `
+                    <button onclick="answerScenario(${index})" 
+                      class="w-full p-4 rounded-lg text-left transition-all hover:scale-102 ${isCompleted ? 'cursor-not-allowed opacity-60' : ''}"
+                      style="background-color: ${config.background_color}; color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont}px; ${isCompleted ? 'pointer-events: none;' : ''}"
+                      ${isCompleted ? 'disabled' : ''}>
+                      ${option.text}
+                    </button>
+                  `).join('')}
+                </div>
+
+                ${isCompleted ? `
+                  <div class="mt-6 space-y-4">
+                    <div class="p-4 rounded-lg" style="background-color: ${config.primary_action_color}30; border-left: 4px solid ${config.primary_action_color};">
+                      <div class="text-lg font-bold mb-2" style="color: ${config.primary_action_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.2}px;">
+                        💡 Aprendizaje Clave
+                      </div>
+                      <p class="font-semibold text-lg mb-3" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.1}px;">
+                        ${currentScenario.learning}
+                      </p>
+                      <div class="text-base leading-relaxed opacity-90" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 0.95}px;">
+                        ${currentScenario.detailedLearning}
+                      </div>
+                    </div>
+                  </div>
+                  ${gameState.currentScenario < scenarios.length - 1 ?
+                    `<button onclick="nextScenario()" class="w-full mt-4 p-4 rounded-lg font-bold text-lg transition-all hover:scale-105 cta-button" style="background-color: ${config.primary_action_color}; color: ${config.background_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.1}px;">
+                      Siguiente Escenario →
+                    </button>` :
+                    `<button onclick="goToRules()" class="w-full mt-4 p-4 rounded-lg font-bold text-lg transition-all hover:scale-105 cta-button" style="background-color: ${config.primary_action_color}; color: ${config.background_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.1}px;">
+                      Ver Reglas de Oro →
+                    </button>`
+                  }
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRulesScreen() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const baseFont = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseFontStack = 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+      
+      return `
+        <div class="min-h-full screen-shell" style="background-color: ${config.background_color};">
+          <div class="max-w-3xl mx-auto">
+            <div class="mb-8 text-center fade-in">
+              <div class="text-4xl mb-3">🟨</div>
+              <h2 class="text-3xl font-bold mb-6" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.8}px;">
+                ${config.block3_title}
+              </h2>
+            </div>
+
+            <div class="space-y-4 mb-8" id="rules-container">
+              ${goldenRules.slice(0, gameState.currentRule + 1).map((rule, index) => `
+                <div class="p-6 rounded-xl shadow-lg slide-in rule-card" style="background-color: ${config.surface_color}; animation-delay: ${index * 0.1}s;">
+                  <div class="flex items-start gap-4 mb-3">
+                    <div class="text-4xl flex-shrink-0">${rule.emoji}</div>
+                    <div class="flex-1">
+                      <p class="text-xl font-bold mb-2" style="color: ${config.primary_action_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.3}px;">
+                        ${rule.text}
+                      </p>
+                      <p class="text-base leading-relaxed opacity-90" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 0.95}px;">
+                        ${rule.detail}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            ${gameState.currentRule < goldenRules.length - 1 ?
+              `<div class="text-center">
+                <button onclick="showNextRule()" class="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105 pulse-animation" style="background-color: ${config.primary_action_color}; color: ${config.background_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.1}px;">
+                  Siguiente Regla →
+                </button>
+              </div>` :
+              `<div class="p-8 rounded-xl shadow-2xl text-center fade-in summary-card" style="background-color: ${config.surface_color};">
+                <div class="text-5xl mb-4">🏁</div>
+                <h3 class="text-2xl font-bold mb-4" style="color: ${config.primary_action_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.5}px;">
+                  Los campeones no hacen cosas extraordinarias…
+                </h3>
+                <p class="text-xl mb-6" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.2}px;">
+                  hacen lo básico extraordinariamente bien.
+                </p>
+                <p class="text-lg mb-8 opacity-90" style="color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont * 1.1}px;">
+                  Ahora sabes cómo sostener tu rendimiento.
+                </p>
+                <div class="space-y-3">
+                  <button onclick="restartGame()" class="w-full p-4 rounded-lg font-bold transition-all hover:scale-105 cta-button" style="background-color: ${config.primary_action_color}; color: ${config.background_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont}px;">
+                    ✔ Repetir Juego
+                  </button>
+                  <button onclick="saveProgressAndNotify()" class="w-full p-4 rounded-lg font-bold transition-all hover:scale-105 cta-button" style="background-color: ${config.secondary_action_color}; color: ${config.text_color}; font-family: ${customFont}, ${baseFontStack}; font-size: ${baseFont}px;">
+                    ✔ Guardar Progreso
+                  </button>
+                </div>
+              </div>`
+            }
+          </div>
+        </div>
+      `;
+    }
+
+    function render(scrollMode) {
+      const app = document.getElementById('app');
+      
+      switch(gameState.currentScreen) {
+        case 'welcome':
+          app.innerHTML = renderWelcomeScreen();
+          break;
+        case 'myths':
+          app.innerHTML = renderMythsScreen();
+          break;
+        case 'scenarios':
+          app.innerHTML = renderScenariosScreen();
+          break;
+        case 'rules':
+          app.innerHTML = renderRulesScreen();
+          break;
+      }
+
+      if (scrollMode === 'top' && typeof window.acScrollToTop === 'function') {
+        requestAnimationFrame(() => window.acScrollToTop());
+      }
+    }
+
+    window.startGame = function() {
+      gameState.currentScreen = 'myths';
+      gameState.currentMyth = 0;
+      gameState.mythsScore = 0;
+      gameState.revealedMyths = [];
+      render('top');
+    };
+
+    window.answerMyth = function(isMito) {
+      const currentMyth = myths[gameState.currentMyth];
+      if (isMito === currentMyth.isMito) {
+        gameState.mythsScore++;
+      }
+      gameState.revealedMyths.push(gameState.currentMyth);
+      render();
+    };
+
+    window.nextMyth = function() {
+      gameState.currentMyth++;
+      render('top');
+    };
+
+    window.goToScenarios = function() {
+      gameState.currentScreen = 'scenarios';
+      gameState.currentScenario = 0;
+      gameState.scenariosScore = 0;
+      gameState.completedScenarios = [];
+      render('top');
+    };
+
+    window.answerScenario = function(optionIndex) {
+      const currentScenario = scenarios[gameState.currentScenario];
+      if (currentScenario.options[optionIndex].correct) {
+        gameState.scenariosScore++;
+      }
+      gameState.completedScenarios.push(gameState.currentScenario);
+      render();
+    };
+
+    window.nextScenario = function() {
+      gameState.currentScenario++;
+      render('top');
+    };
+
+    window.goToRules = function() {
+      gameState.currentScreen = 'rules';
+      gameState.currentRule = 0;
+      render('top');
+    };
+
+    window.showNextRule = function() {
+      gameState.currentRule++;
+      render();
+    };
+
+    window.restartGame = function() {
+      gameState = {
+        currentScreen: 'welcome',
+        currentMyth: 0,
+        currentScenario: 0,
+        currentRule: 0,
+        mythsScore: 0,
+        scenariosScore: 0,
+        revealedMyths: [],
+        completedScenarios: []
+      };
+      render('top');
+    };
+
+    window.saveProgressAndNotify = async function() {
+      await saveProgress();
+    };
+
+    async function onConfigChange(config) {
+      render();
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              config.surface_color = value;
+              window.elementSdk.setConfig({ surface_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.primary_action_color || defaultConfig.primary_action_color,
+            set: (value) => {
+              config.primary_action_color = value;
+              window.elementSdk.setConfig({ primary_action_color: value });
+            }
+          },
+          {
+            get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+            set: (value) => {
+              config.secondary_action_color = value;
+              window.elementSdk.setConfig({ secondary_action_color: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            window.elementSdk.setConfig({ font_size: value });
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["game_title", config.game_title || defaultConfig.game_title],
+        ["game_subtitle", config.game_subtitle || defaultConfig.game_subtitle],
+        ["block1_title", config.block1_title || defaultConfig.block1_title],
+        ["block2_title", config.block2_title || defaultConfig.block2_title],
+        ["block3_title", config.block3_title || defaultConfig.block3_title],
+        ["start_button", config.start_button || defaultConfig.start_button],
+        ["continue_button", config.continue_button || defaultConfig.continue_button]
+      ]);
+    }
+
+    async function init() {
+      if (window.dataSdk) {
+        const initResult = await window.dataSdk.init(dataHandler);
+        if (!initResult.isOk) {
+          console.error("Error al inicializar Data SDK");
+        }
+      }
+
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities,
+          mapToEditPanelValues
+        });
+      }
+
+      render();
+    }
+
+    init();
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) {
+      acScrollToTop();
+      return;
+    }
+
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+
+    try {
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, Math.max(0, top));
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    window.scrollTo(0, 0);
+  });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>

@@ -1,0 +1,1326 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Hidratación AC</title>
+  <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            width: 100%;
+            min-height: 100%;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .game-wrapper {
+            width: 100%;
+            min-height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 32px 24px;
+        }
+
+        .game-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 32px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            margin: 0 0 8px 0;
+            font-size: 36px;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 0;
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 40px 32px;
+        }
+
+        .phase-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 24px 0;
+            text-align: center;
+            color: #2d3748;
+        }
+
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .scenario-card {
+            background: #f7fafc;
+            padding: 24px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .scenario-card h3 {
+            margin: 0 0 16px 0;
+            font-size: 20px;
+            color: #2d3748;
+        }
+
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            padding: 14px 20px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
+        .option-btn.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .risk-indicator {
+            margin-top: 24px;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .risk-low {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .risk-medium {
+            background: #feebc8;
+            color: #744210;
+        }
+
+        .risk-high {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .primary-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 24px;
+            transition: transform 0.2s;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .primary-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .timeline-container {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 31px;
+            top: 70px;
+            width: 3px;
+            height: calc(100% - 40px);
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .timeline-icon {
+            min-width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            z-index: 1;
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: #f7fafc;
+            padding: 24px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .timeline-content h3 {
+            margin: 0 0 8px 0;
+            font-size: 22px;
+            color: #2d3748;
+        }
+
+        .timeline-time {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .timeline-content p {
+            margin: 8px 0;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .hydration-tip {
+            background: #e6fffa;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            border-left: 4px solid #319795;
+        }
+
+        .hydration-tip strong {
+            color: #234e52;
+        }
+
+        .question-box {
+            background: #f7fafc;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border-left: 4px solid #667eea;
+        }
+
+        .question-box h3 {
+            margin: 0 0 20px 0;
+            font-size: 22px;
+            color: #2d3748;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .stat-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+
+        .feedback-box {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-weight: 600;
+        }
+
+        .feedback-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .feedback-warning {
+            background: #feebc8;
+            color: #744210;
+        }
+
+        .feedback-error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .side-change-indicator {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .teaching-box {
+            background: #edf2f7;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .teaching-box strong {
+            color: #2d3748;
+            font-size: 18px;
+        }
+
+        .teaching-box p {
+            margin: 8px 0 0 0;
+            color: #4a5568;
+            font-size: 16px;
+        }
+
+        .results-container {
+            text-align: center;
+        }
+
+        .result-badge {
+            display: inline-block;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .result-champion {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .result-regular {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+        }
+
+        .result-poor {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: white;
+        }
+
+        .result-message {
+            font-size: 20px;
+            color: #4a5568;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .final-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .final-stat-card {
+            background: #f7fafc;
+            padding: 24px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .final-stat-card h4 {
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            color: #718096;
+        }
+
+        .final-stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .secondary-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 16px;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .secondary-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .game-wrapper {
+                padding: 16px;
+            }
+
+            .content {
+                padding: 24px 16px;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .phase-title {
+                font-size: 24px;
+            }
+
+            .scenario-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline-item {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .timeline-item:not(:last-child)::after {
+                display: none;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+
+    .container,
+    .game-container,
+    .game-wrapper,
+    .app-wrapper,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .phase-container,
+    .phase-card,
+    .content,
+    .content-area,
+    .modal-content,
+    .results-card {
+      padding: 16px !important;
+    }
+
+    h1, .main-title, .game-title, .title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+
+    h2, .phase-title, .stage-title, .final-title {
+      font-size: clamp(1.3rem, 6vw, 1.7rem) !important;
+      line-height: 1.25 !important;
+    }
+
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label {
+      font-size: clamp(1rem, 4.5vw, 1.15rem) !important;
+      line-height: 1.4 !important;
+    }
+
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+
+    .button-group,
+    .action-buttons,
+    .final-buttons,
+    .controls-row {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+
+    button,
+    .btn,
+    .btn-primary,
+    .btn-secondary,
+    .action-button,
+    .option-btn {
+      width: 100% !important;
+    }
+
+    .scenario-grid,
+    .macronutrient-grid,
+    .options-grid,
+    .snack-grid,
+    .results-stats,
+    .pyramid-preview,
+    .week-grid,
+    .myths-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    setConfig: function () {},
+    config: {}
+  };
+
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body>
+  <div class="game-wrapper">
+   <div class="game-container">
+    <header class="header">
+     <h1 id="main-title">Simulador de Hidratación AC</h1>
+     <p id="subtitle">Cada decisión cuenta</p>
+    </header>
+    <div class="content"><!-- FASE 1: Escenario -->
+     <div id="phase1" class="phase">
+      <h2 class="phase-title" id="scenario-title">Escenario de Partido</h2>
+      <div class="scenario-grid">
+       <div class="scenario-card">
+        <h3>☀️ Clima</h3>
+        <div class="option-group" id="climate-options"><button class="option-btn" data-value="sunny">☀️ Soleado fuerte</button> <button class="option-btn" data-value="cloudy">🌥️ Nublado</button> <button class="option-btn" data-value="indoor">🏟️ Interior</button>
+        </div>
+       </div>
+       <div class="scenario-card">
+        <h3>⏱️ Duración</h3>
+        <div class="option-group" id="duration-options"><button class="option-btn" data-value="short">Corto (45 min)</button> <button class="option-btn" data-value="medium">Medio (1-1.5 h)</button> <button class="option-btn" data-value="long">Largo (2 h+)</button>
+        </div>
+       </div>
+       <div class="scenario-card">
+        <h3>💪 Intensidad</h3>
+        <div class="option-group" id="intensity-options"><button class="option-btn" data-value="low">Baja</button> <button class="option-btn" data-value="medium">Media</button> <button class="option-btn" data-value="high">Alta</button>
+        </div>
+       </div>
+      </div>
+      <div id="risk-indicator" class="risk-indicator hidden"></div><button class="primary-btn" id="start-match-btn" disabled>Ver Plan de Hidratación</button>
+     </div><!-- FASE 2: Plan de Hidratación Diaria -->
+     <div id="phase2" class="phase hidden">
+      <h2 class="phase-title" id="daily-hydration-title">Tu Guía de Hidratación Diaria</h2>
+      <p style="text-align: center; font-size: 18px; color: #4a5568; margin-bottom: 24px; max-width: 700px; margin-left: auto; margin-right: auto;"><strong>💡 Esto es una guía flexible, no una regla estricta.</strong> Adapta estas cantidades a tu peso, clima y nivel de actividad. Lo importante es crear el hábito de hidratarte de forma constante.</p>
+      <div class="timeline-container">
+       <div class="timeline-item">
+        <div class="timeline-icon">
+         🌅
+        </div>
+        <div class="timeline-content">
+         <div class="timeline-time">
+          7:00 AM - Al despertar
+         </div>
+         <h3>Primera hidratación del día</h3>
+         <p><strong>Qué beber:</strong> 400-500ml de agua en ayunas</p>
+         <p><strong>Por qué:</strong> Tu cuerpo perdió agua durante la noche. Activa tu metabolismo y mejora tu concentración.</p>
+         <div class="hydration-tip"><strong>💡 Tip AC:</strong> Mantén un vaso de agua en tu mesa de noche para beberlo al despertar.
+         </div>
+        </div>
+       </div>
+       <div class="timeline-item">
+        <div class="timeline-icon">
+         🍳
+        </div>
+        <div class="timeline-content">
+         <div class="timeline-time">
+          8:00-9:00 AM - Desayuno
+         </div>
+         <h3>Hidratación con comida</h3>
+         <p><strong>Qué beber:</strong> 250ml de agua con tu desayuno</p>
+         <p><strong>Por qué:</strong> Ayuda a la digestión y absorción de nutrientes.</p>
+         <div class="hydration-tip"><strong>💡 Tip AC:</strong> Incluye frutas con alto contenido de agua (sandía, naranja, piña).
+         </div>
+        </div>
+       </div>
+       <div class="timeline-item">
+        <div class="timeline-icon">
+         💼
+        </div>
+        <div class="timeline-content">
+         <div class="timeline-time">
+          10:00 AM - 12:00 PM - Media mañana
+         </div>
+         <h3>Hidratación continua</h3>
+         <p><strong>Qué beber:</strong> 300-400ml cada 2 horas</p>
+         <p><strong>Por qué:</strong> Mantiene tu nivel de energía y concentración estables.</p>
+         <div class="hydration-tip"><strong>💡 Tip AC:</strong> Ten siempre una botella de 500ml visible en tu escritorio.
+         </div>
+        </div>
+       </div>
+       <div class="timeline-item">
+        <div class="timeline-icon">
+         🥗
+        </div>
+        <div class="timeline-content">
+         <div class="timeline-time">
+          1:00-2:00 PM - Almuerzo
+         </div>
+         <h3>Hidratación con comida principal</h3>
+         <p><strong>Qué beber:</strong> 300ml de agua con el almuerzo</p>
+         <p><strong>Por qué:</strong> Facilita la digestión y evita la fatiga post-almuerzo.</p>
+         <div class="hydration-tip"><strong>💡 Tip AC:</strong> Bebe agua antes y durante la comida, no después en exceso.
+         </div>
+        </div>
+       </div>
+       <div class="timeline-item">
+        <div class="timeline-icon">
+         ⚠️
+        </div>
+        <div class="timeline-content">
+         <div class="timeline-time">
+          3:00-5:00 PM - Tarde
+         </div>
+         <h3>Pre-hidratación para entrenamiento</h3>
+         <p><strong>Qué beber:</strong> 400-500ml (2 horas antes del partido)</p>
+         <p><strong>Por qué:</strong> <strong>CRÍTICO:</strong> Llegar bien hidratado al partido marca la diferencia en tu rendimiento.</p>
+         <div class="hydration-tip"><strong>💡 Tip AC:</strong> Esta es la hidratación más importante del día. No la saltes nunca.
+         </div>
+        </div>
+       </div>
+       <div class="timeline-item">
+        <div class="timeline-icon">
+         🎾
+        </div>
+        <div class="timeline-content">
+         <div class="timeline-time">
+          6:00-8:00 PM - Durante el partido
+         </div>
+         <h3>Hidratación en competición</h3>
+         <p><strong>Qué beber:</strong> 150-200ml cada cambio de lado</p>
+         <p><strong>Por qué:</strong> Repones las pérdidas por sudor y mantienes tu nivel competitivo.</p>
+         <div class="hydration-tip"><strong>💡 Tip AC:</strong> Sorbos pequeños y constantes. Nunca bebas grandes cantidades de golpe.
+         </div>
+        </div>
+       </div>
+       <div class="timeline-item">
+        <div class="timeline-icon">
+         🏆
+        </div>
+        <div class="timeline-content">
+         <div class="timeline-time">
+          8:00-9:00 PM - Post-partido
+         </div>
+         <h3>Recuperación inmediata</h3>
+         <p><strong>Qué beber:</strong> 1.5× el peso perdido (ej: perdiste 1kg = bebe 1.5L)</p>
+         <p><strong>Por qué:</strong> Recuperación muscular óptima y prevención de calambres nocturnos.</p>
+         <div class="hydration-tip"><strong>💡 Tip AC:</strong> Las primeras 2 horas post-partido son clave para tu recuperación.
+         </div>
+        </div>
+       </div>
+       <div class="timeline-item">
+        <div class="timeline-icon">
+         🌙
+        </div>
+        <div class="timeline-content">
+         <div class="timeline-time">
+          10:00 PM - Antes de dormir
+         </div>
+         <h3>Hidratación nocturna</h3>
+         <p><strong>Qué beber:</strong> 150-200ml</p>
+         <p><strong>Por qué:</strong> Evita despertarte deshidratado sin interrumpir tu sueño.</p>
+         <div class="hydration-tip"><strong>💡 Tip AC:</strong> No bebas demasiado para no levantarte al baño y perder sueño.
+         </div>
+        </div>
+       </div>
+      </div>
+      <div class="teaching-box" style="background: #fff5f5; border-left: 4px solid #e53e3e;"><strong>⚡ Minerales y Sales: La Clave de la Hidratación Real</strong>
+       <p><strong>El agua sola NO es suficiente.</strong> Para que tu cuerpo absorba y utilice el agua correctamente, necesita minerales esenciales:</p>
+       <p style="margin-top: 12px;"><strong>🧂 Sodio (Sal):</strong> Retiene el agua en tu cuerpo y evita calambres. Especialmente crítico cuando sudas mucho.</p>
+       <p><strong>🥥 Potasio:</strong> Regula la presión arterial y la función muscular. Encuéntralo en plátanos, agua de coco.</p>
+       <p><strong>💪 Magnesio:</strong> Previene calambres y fatiga muscular. Presente en nueces, semillas.</p>
+       <p><strong>⚡ Electrolitos:</strong> Combinación de minerales que maximizan la absorción del agua.</p>
+       <p style="margin-top: 12px; background: white; padding: 12px; border-radius: 6px;"><strong>💡 Recomendación AC:</strong> Durante entrenamientos largos o en calor intenso, agrega una pizca de sal marina o suplementos de electrolitos a tu agua. No bebas solo agua pura en grandes cantidades durante el ejercicio intenso.</p>
+      </div>
+      <div class="teaching-box"><strong>📊 Resumen de tu día:</strong>
+       <p>Total recomendado: <strong>2.5-3 litros</strong> en días de entrenamiento</p>
+       <p>Total recomendado: <strong>2-2.5 litros</strong> en días de descanso</p>
+       <p><strong>Recuerda:</strong> La hidratación es acumulativa. Lo que bebes hoy afecta tu rendimiento de mañana.</p>
+      </div><button class="primary-btn" id="continue-simulation-btn">Continuar con la Simulación del Partido</button>
+     </div><!-- FASE 3: Antes del partido -->
+     <div id="phase3" class="phase hidden">
+      <h2 class="phase-title" id="before-match-title">ANTES del partido (1-2h antes)</h2>
+      <div class="question-box">
+       <h3>💧 ¿Cuánto bebiste en las últimas 2 horas?</h3>
+       <div class="option-group" id="before-options"><button class="option-btn" data-value="0">0 ml (nada)</button> <button class="option-btn" data-value="200">200 ml</button> <button class="option-btn" data-value="500">400-500 ml</button> <button class="option-btn" data-value="1000">1 L</button>
+       </div>
+      </div>
+      <div id="before-feedback" class="feedback-box hidden"></div>
+      <div class="teaching-box"><strong>💡 Recuerda:</strong>
+       <p>La hidratación pre-partido es tu escudo contra la fatiga temprana.</p>
+      </div><button class="primary-btn" id="start-playing-btn" disabled>Iniciar Partido</button>
+     </div><!-- FASE 4: Durante el partido -->
+     <div id="phase4" class="phase hidden">
+      <div class="side-change-indicator" id="side-change-indicator"></div>
+      <h2 class="phase-title" id="during-match-title">DURANTE el Partido</h2>
+      <div class="stats-grid" id="player-stats">
+       <div class="stat-card">
+        <div class="stat-label">
+         ⚡ Energía
+        </div>
+        <div class="stat-value" id="energy-value">
+         100%
+        </div>
+        <div class="stat-bar">
+         <div class="stat-bar-fill" id="energy-bar" style="width: 100%"></div>
+        </div>
+       </div>
+       <div class="stat-card">
+        <div class="stat-label">
+         🧠 Claridad
+        </div>
+        <div class="stat-value" id="clarity-value">
+         100%
+        </div>
+        <div class="stat-bar">
+         <div class="stat-bar-fill" id="clarity-bar" style="width: 100%"></div>
+        </div>
+       </div>
+       <div class="stat-card">
+        <div class="stat-label">
+             Precisión
+        </div>
+        <div class="stat-value" id="precision-value">
+         100%
+        </div>
+        <div class="stat-bar">
+         <div class="stat-bar-fill" id="precision-bar" style="width: 100%"></div>
+        </div>
+       </div>
+       <div class="stat-card">
+        <div class="stat-label">
+         ⚠️ Riesgo Calambres
+        </div>
+        <div class="stat-value" id="cramp-value">
+         0%
+        </div>
+        <div class="stat-bar">
+         <div class="stat-bar-fill" id="cramp-bar" style="width: 0%; background: linear-gradient(90deg, #f56565 0%, #e53e3e 100%)"></div>
+        </div>
+       </div>
+      </div>
+      <div class="question-box">
+       <h3>💧 ¿Cuánto bebes en este cambio?</h3>
+       <div class="option-group" id="during-options"><button class="option-btn" data-value="0">0 ml</button> <button class="option-btn" data-value="100">100 ml</button> <button class="option-btn" data-value="175">150-200 ml</button> <button class="option-btn" data-value="300">300+ ml</button>
+       </div>
+      </div>
+      <div id="during-feedback" class="feedback-box hidden"></div><button class="primary-btn" id="next-change-btn" disabled>Siguiente Cambio</button>
+     </div><!-- FASE 5: Después del partido -->
+     <div id="phase5" class="phase hidden">
+      <h2 class="phase-title" id="after-match-title">DESPUÉS DEL Partido</h2>
+      <div class="question-box">
+       <p style="font-size: 18px; margin-bottom: 20px; text-align: center;"><strong>Perdiste aproximadamente <span id="weight-lost">1.0</span> kg durante el partido.</strong></p>
+       <h3>💧 ¿Cuánto deberías beber en las próximas 2 horas?</h3>
+       <div class="option-group" id="after-options"><button class="option-btn" data-value="same">Lo mismo que perdí</button> <button class="option-btn" data-value="1.5x">1.5× lo que perdí</button> <button class="option-btn" data-value="3L">3 litros de golpe</button> <button class="option-btn" data-value="glass">Un vaso nada más</button>
+       </div>
+      </div>
+      <div id="after-feedback" class="feedback-box hidden"></div>
+      <div class="teaching-box"><strong>💡 Dato clave:</strong>
+       <p>Reponer 1.5× protege tus músculos para el partido de mañana.</p>
+      </div><button class="primary-btn" id="see-results-btn" disabled>Ver Resultados</button>
+     </div><!-- FASE 6: Resultados -->
+     <div id="phase6" class="phase hidden">
+      <h2 class="phase-title" id="results-title">Informe de Hidratación AC</h2>
+      <div class="results-container">
+       <div id="result-badge" class="result-badge"></div>
+       <div id="result-message" class="result-message"></div>
+       <div class="final-stats">
+        <div class="final-stat-card">
+         <h4>Energía Final</h4>
+         <div class="value" id="final-energy">
+          0%
+         </div>
+        </div>
+        <div class="final-stat-card">
+         <h4>Precisión Final</h4>
+         <div class="value" id="final-precision">
+          0%
+         </div>
+        </div>
+        <div class="final-stat-card">
+         <h4>Riesgo Calambres</h4>
+         <div class="value" id="final-cramp">
+          0%
+         </div>
+        </div>
+        <div class="final-stat-card">
+         <h4>Score de Hidratación</h4>
+         <div class="value" id="final-hydration">
+          0%
+         </div>
+        </div>
+       </div>
+       <div class="button-group"><button class="secondary-btn" id="restart-btn">🔄 Repetir Simulación</button> <button class="secondary-btn" id="review-plan-btn">📋 Revisar Plan Diario</button>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+        const defaultConfig = {
+            main_title: "Simulador de Hidratación AC",
+            subtitle: "Cada decisión cuenta",
+            scenario_title: "Escenario de Partido",
+            daily_hydration_title: "Tu Guía de Hidratación Diaria",
+            before_match_title: "ANTES del partido (1-2h antes)",
+            during_match_title: "DURANTE el Partido",
+            after_match_title: "DESPUÉS DEL Partido",
+            results_title: "Informe de Hidratación AC"
+        };
+
+        const gameState = {
+            climate: null,
+            duration: null,
+            intensity: null,
+            riskLevel: null,
+            beforeChoice: null,
+            duringChoices: [],
+            afterChoice: null,
+            currentChange: 0,
+            totalChanges: 4,
+            energy: 100,
+            clarity: 100,
+            precision: 100,
+            crampRisk: 0,
+            weightLost: 0,
+            correctChoices: 0,
+            totalChoices: 0
+        };
+
+        // Fase 1: Selección de escenario
+        function setupPhase1() {
+            const climateOptions = document.querySelectorAll('#climate-options .option-btn');
+            const durationOptions = document.querySelectorAll('#duration-options .option-btn');
+            const intensityOptions = document.querySelectorAll('#intensity-options .option-btn');
+
+            climateOptions.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    climateOptions.forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    gameState.climate = btn.dataset.value;
+                    updateRiskLevel();
+                });
+            });
+
+            durationOptions.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    durationOptions.forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    gameState.duration = btn.dataset.value;
+                    if (btn.dataset.value === 'long') {
+                        gameState.totalChanges = 6;
+                    } else {
+                        gameState.totalChanges = 4;
+                    }
+                    updateRiskLevel();
+                });
+            });
+
+            intensityOptions.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    intensityOptions.forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    gameState.intensity = btn.dataset.value;
+                    updateRiskLevel();
+                });
+            });
+
+            document.getElementById('start-match-btn').addEventListener('click', () => {
+                showPhase(2);
+            });
+        }
+
+        function updateRiskLevel() {
+            if (!gameState.climate || !gameState.duration || !gameState.intensity) {
+                document.getElementById('start-match-btn').disabled = true;
+                return;
+            }
+
+            document.getElementById('start-match-btn').disabled = false;
+
+            let riskScore = 0;
+            if (gameState.climate === 'sunny') riskScore += 2;
+            if (gameState.climate === 'cloudy') riskScore += 1;
+            if (gameState.duration === 'long') riskScore += 2;
+            if (gameState.duration === 'medium') riskScore += 1;
+            if (gameState.intensity === 'high') riskScore += 2;
+            if (gameState.intensity === 'medium') riskScore += 1;
+
+            const riskIndicator = document.getElementById('risk-indicator');
+            riskIndicator.classList.remove('hidden');
+
+            if (riskScore >= 5) {
+                gameState.riskLevel = 'high';
+                riskIndicator.className = 'risk-indicator risk-high';
+                riskIndicator.textContent = '⚠️ Riesgo ALTO de deshidratación';
+            } else if (riskScore >= 3) {
+                gameState.riskLevel = 'medium';
+                riskIndicator.className = 'risk-indicator risk-medium';
+                riskIndicator.textContent = '⚠️ Riesgo MEDIO de deshidratación';
+            } else {
+                gameState.riskLevel = 'low';
+                riskIndicator.className = 'risk-indicator risk-low';
+                riskIndicator.textContent = '✓ Riesgo BAJO de deshidratación';
+            }
+        }
+
+        // Fase 2: Plan de Hidratación Diaria
+        function setupPhase2() {
+            document.getElementById('continue-simulation-btn').addEventListener('click', () => {
+                showPhase(3);
+            });
+        }
+
+        // Fase 3: Antes del partido
+        function setupPhase3() {
+            const beforeOptions = document.querySelectorAll('#before-options .option-btn');
+
+            beforeOptions.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    beforeOptions.forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    gameState.beforeChoice = btn.dataset.value;
+                    gameState.totalChoices++;
+                    
+                    const feedback = document.getElementById('before-feedback');
+                    feedback.classList.remove('hidden');
+
+                    if (btn.dataset.value === '500') {
+                        gameState.energy += 10;
+                        gameState.correctChoices++;
+                        feedback.className = 'feedback-box feedback-success';
+                        feedback.textContent = '🌟 ¡Perfecto! Empezarás con energía óptima.';
+                    } else if (btn.dataset.value === '0') {
+                        feedback.className = 'feedback-box feedback-error';
+                        feedback.textContent = '❌ Empezarás con baja energía y concentración.';
+                        gameState.energy -= 15;
+                        gameState.clarity -= 15;
+                    } else if (btn.dataset.value === '200') {
+                        feedback.className = 'feedback-box feedback-warning';
+                        feedback.textContent = '⚠️ Insuficiente. Tendrás menos energía al inicio.';
+                        gameState.energy -= 8;
+                    } else {
+                        feedback.className = 'feedback-box feedback-warning';
+                        feedback.textContent = '⚠️ Demasiado. Sentirás pesadez estomacal.';
+                        gameState.energy -= 5;
+                    }
+
+                    document.getElementById('start-playing-btn').disabled = false;
+                });
+            });
+
+            document.getElementById('start-playing-btn').addEventListener('click', () => {
+                gameState.currentChange = 1;
+                showPhase(4);
+            });
+        }
+
+        // Fase 4: Durante el partido
+        function setupPhase4() {
+            updateSideChangeIndicator();
+            updatePlayerStats();
+
+            const duringOptions = document.querySelectorAll('#during-options .option-btn');
+
+            duringOptions.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    duringOptions.forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    
+                    const drinkAmount = parseInt(btn.dataset.value);
+                    gameState.duringChoices.push(drinkAmount);
+                    gameState.totalChoices++;
+
+                    const feedback = document.getElementById('during-feedback');
+                    feedback.classList.remove('hidden');
+
+                    let intensityFactor = 1;
+                    if (gameState.intensity === 'high') intensityFactor = 1.5;
+                    else if (gameState.intensity === 'medium') intensityFactor = 1.2;
+
+                    let climateFactor = 1;
+                    if (gameState.climate === 'sunny') climateFactor = 1.3;
+                    else if (gameState.climate === 'cloudy') climateFactor = 1.1;
+
+                    if (drinkAmount === 175) {
+                        gameState.energy += Math.round(5 * intensityFactor);
+                        gameState.clarity += 5;
+                        gameState.precision += Math.round(5 * climateFactor);
+                        gameState.correctChoices++;
+                        feedback.className = 'feedback-box feedback-success';
+                        feedback.textContent = '🌟 Cantidad perfecta. Mantén este ritmo.';
+                    } else if (drinkAmount === 0) {
+                        gameState.energy -= Math.round(15 * intensityFactor);
+                        gameState.precision -= Math.round(12 * climateFactor);
+                        gameState.clarity -= 10;
+                        gameState.crampRisk += Math.round(20 * intensityFactor);
+                        feedback.className = 'feedback-box feedback-error';
+                        feedback.textContent = '❌ Sin hidratación pierdes precisión rápidamente.';
+                    } else if (drinkAmount === 100) {
+                        gameState.energy -= Math.round(8 * intensityFactor);
+                        gameState.precision -= Math.round(6 * climateFactor);
+                        gameState.crampRisk += Math.round(12 * intensityFactor);
+                        feedback.className = 'feedback-box feedback-warning';
+                        feedback.textContent = '⚠️ Insuficiente. Tu rendimiento bajará.';
+                    } else {
+                        gameState.energy -= Math.round(10 * intensityFactor);
+                        feedback.className = 'feedback-box feedback-warning';
+                        feedback.textContent = '⚠️ Exceso. Tendrás molestias estomacales.';
+                    }
+
+                    updatePlayerStats();
+                    document.getElementById('next-change-btn').disabled = false;
+                });
+            });
+
+            document.getElementById('next-change-btn').addEventListener('click', () => {
+                gameState.currentChange++;
+                
+                if (gameState.currentChange <= gameState.totalChanges) {
+                    duringOptions.forEach(b => b.classList.remove('selected'));
+                    document.getElementById('during-feedback').classList.add('hidden');
+                    document.getElementById('next-change-btn').disabled = true;
+                    updateSideChangeIndicator();
+                } else {
+                    calculateWeightLost();
+                    showPhase(5);
+                }
+            });
+        }
+
+        function updateSideChangeIndicator() {
+            const indicator = document.getElementById('side-change-indicator');
+            indicator.textContent = `Cambio de lado ${gameState.currentChange} de ${gameState.totalChanges}`;
+        }
+
+        function updatePlayerStats() {
+            gameState.energy = Math.max(0, Math.min(120, gameState.energy));
+            gameState.clarity = Math.max(0, Math.min(120, gameState.clarity));
+            gameState.precision = Math.max(0, Math.min(120, gameState.precision));
+            gameState.crampRisk = Math.max(0, Math.min(100, gameState.crampRisk));
+
+            document.getElementById('energy-value').textContent = Math.round(gameState.energy) + '%';
+            document.getElementById('clarity-value').textContent = Math.round(gameState.clarity) + '%';
+            document.getElementById('precision-value').textContent = Math.round(gameState.precision) + '%';
+            document.getElementById('cramp-value').textContent = Math.round(gameState.crampRisk) + '%';
+
+            document.getElementById('energy-bar').style.width = gameState.energy + '%';
+            document.getElementById('clarity-bar').style.width = gameState.clarity + '%';
+            document.getElementById('precision-bar').style.width = gameState.precision + '%';
+            document.getElementById('cramp-bar').style.width = gameState.crampRisk + '%';
+        }
+
+        function calculateWeightLost() {
+            let baseWeight = 0.8;
+            
+            if (gameState.climate === 'sunny') baseWeight += 0.4;
+            else if (gameState.climate === 'cloudy') baseWeight += 0.2;
+            
+            if (gameState.intensity === 'high') baseWeight += 0.3;
+            else if (gameState.intensity === 'medium') baseWeight += 0.15;
+            
+            if (gameState.duration === 'long') baseWeight += 0.4;
+            else if (gameState.duration === 'medium') baseWeight += 0.2;
+            
+            const totalDrink = gameState.duringChoices.reduce((sum, val) => sum + val, 0) / 1000;
+            baseWeight -= totalDrink * 0.3;
+            
+            gameState.weightLost = Math.max(0.3, Math.min(2.5, baseWeight)).toFixed(1);
+        }
+
+        // Fase 5: Después del partido
+        function setupPhase5() {
+            document.getElementById('weight-lost').textContent = gameState.weightLost;
+
+            const afterOptions = document.querySelectorAll('#after-options .option-btn');
+
+            afterOptions.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    afterOptions.forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    gameState.afterChoice = btn.dataset.value;
+                    gameState.totalChoices++;
+
+                    const feedback = document.getElementById('after-feedback');
+                    feedback.classList.remove('hidden');
+
+                    if (btn.dataset.value === '1.5x') {
+                        gameState.correctChoices++;
+                        feedback.className = 'feedback-box feedback-success';
+                        feedback.textContent = '🌟 ¡Excelente! Recuperación óptima asegurada.';
+                    } else {
+                        feedback.className = 'feedback-box feedback-warning';
+                        feedback.textContent = '⚠️ Recuperación incompleta. Afectará tu próximo partido.';
+                    }
+
+                    document.getElementById('see-results-btn').disabled = false;
+                });
+            });
+
+            document.getElementById('see-results-btn').addEventListener('click', () => {
+                showPhase(6);
+            });
+        }
+
+        // Fase 6: Resultados
+        function setupPhase6() {
+            const successRate = (gameState.correctChoices / gameState.totalChoices) * 100;
+            const resultBadge = document.getElementById('result-badge');
+            const resultMessage = document.getElementById('result-message');
+
+            if (successRate >= 80) {
+                resultBadge.className = 'result-badge result-champion';
+                resultBadge.textContent = '🏆 Hidratación de Campeón';
+                resultMessage.textContent = 'Dominas completamente los principios de hidratación. Tu cuerpo rinde al máximo.';
+            } else if (successRate >= 50) {
+                resultBadge.className = 'result-badge result-regular';
+                resultBadge.textContent = '⚠️ Hidratación Regular';
+                resultMessage.textContent = 'Vas por buen camino, pero pequeños ajustes pueden mejorar tu rendimiento.';
+            } else {
+                resultBadge.className = 'result-badge result-poor';
+                resultBadge.textContent = '❌ Hidratación Deficiente';
+                resultMessage.textContent = 'Necesitas mejorar tus hábitos. Revisa el plan diario y vuelve a intentarlo.';
+            }
+
+            document.getElementById('final-energy').textContent = Math.round(gameState.energy) + '%';
+            document.getElementById('final-precision').textContent = Math.round(gameState.precision) + '%';
+            document.getElementById('final-cramp').textContent = Math.round(gameState.crampRisk) + '%';
+            document.getElementById('final-hydration').textContent = Math.round(successRate) + '%';
+
+            document.getElementById('restart-btn').addEventListener('click', () => {
+                resetGame();
+            });
+
+            document.getElementById('review-plan-btn').addEventListener('click', () => {
+                showPhase(2);
+            });
+        }
+
+        function showPhase(phaseNumber) {
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById('phase' + i).classList.add('hidden');
+            }
+            document.getElementById('phase' + phaseNumber).classList.remove('hidden');
+
+            if (phaseNumber === 4) {
+                setupPhase4();
+            } else if (phaseNumber === 5) {
+                setupPhase5();
+            } else if (phaseNumber === 6) {
+                setupPhase6();
+            }
+
+            if (typeof acScrollToTop === 'function') {
+                requestAnimationFrame(() => acScrollToTop());
+            }
+        }
+
+        function resetGame() {
+            gameState.climate = null;
+            gameState.duration = null;
+            gameState.intensity = null;
+            gameState.riskLevel = null;
+            gameState.beforeChoice = null;
+            gameState.duringChoices = [];
+            gameState.afterChoice = null;
+            gameState.currentChange = 0;
+            gameState.totalChanges = 4;
+            gameState.energy = 100;
+            gameState.clarity = 100;
+            gameState.precision = 100;
+            gameState.crampRisk = 0;
+            gameState.weightLost = 0;
+            gameState.correctChoices = 0;
+            gameState.totalChoices = 0;
+
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            document.querySelectorAll('.primary-btn').forEach(btn => {
+                btn.disabled = true;
+            });
+
+            document.querySelectorAll('.feedback-box').forEach(box => {
+                box.classList.add('hidden');
+            });
+
+            document.getElementById('risk-indicator').classList.add('hidden');
+            document.getElementById('start-match-btn').disabled = true;
+
+            showPhase(1);
+        }
+
+        async function onConfigChange(config) {
+            const mainTitle = document.getElementById('main-title');
+            const subtitle = document.getElementById('subtitle');
+            const scenarioTitle = document.getElementById('scenario-title');
+            const dailyHydrationTitle = document.getElementById('daily-hydration-title');
+            const beforeMatchTitle = document.getElementById('before-match-title');
+            const duringMatchTitle = document.getElementById('during-match-title');
+            const afterMatchTitle = document.getElementById('after-match-title');
+            const resultsTitle = document.getElementById('results-title');
+
+            if (mainTitle) mainTitle.textContent = config.main_title || defaultConfig.main_title;
+            if (subtitle) subtitle.textContent = config.subtitle || defaultConfig.subtitle;
+            if (scenarioTitle) scenarioTitle.textContent = config.scenario_title || defaultConfig.scenario_title;
+            if (dailyHydrationTitle) dailyHydrationTitle.textContent = config.daily_hydration_title || defaultConfig.daily_hydration_title;
+            if (beforeMatchTitle) beforeMatchTitle.textContent = config.before_match_title || defaultConfig.before_match_title;
+            if (duringMatchTitle) duringMatchTitle.textContent = config.during_match_title || defaultConfig.during_match_title;
+            if (afterMatchTitle) afterMatchTitle.textContent = config.after_match_title || defaultConfig.after_match_title;
+            if (resultsTitle) resultsTitle.textContent = config.results_title || defaultConfig.results_title;
+        }
+
+        if (window.elementSdk) {
+            window.elementSdk.init({
+                defaultConfig,
+                onConfigChange,
+                mapToCapabilities: () => ({
+                    recolorables: [],
+                    borderables: [],
+                    fontEditable: undefined,
+                    fontSizeable: undefined
+                }),
+                mapToEditPanelValues: (config) => new Map([
+                    ["main_title", config.main_title || defaultConfig.main_title],
+                    ["subtitle", config.subtitle || defaultConfig.subtitle],
+                    ["scenario_title", config.scenario_title || defaultConfig.scenario_title],
+                    ["daily_hydration_title", config.daily_hydration_title || defaultConfig.daily_hydration_title],
+                    ["before_match_title", config.before_match_title || defaultConfig.before_match_title],
+                    ["during_match_title", config.during_match_title || defaultConfig.during_match_title],
+                    ["after_match_title", config.after_match_title || defaultConfig.after_match_title],
+                    ["results_title", config.results_title || defaultConfig.results_title]
+                ])
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupPhase1();
+            setupPhase2();
+            setupPhase3();
+        });
+    </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) {
+      acScrollToTop();
+      return;
+    }
+
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+
+    try {
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, Math.max(0, top));
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    window.scrollTo(0, 0);
+  });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>

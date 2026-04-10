@@ -1,0 +1,2248 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio de Energía</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .game-container {
+      width: 100%;
+      min-height: 100%;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: white;
+    }
+
+    .game-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin: 0 0 0.5rem 0;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .game-subtitle {
+      font-size: 1.25rem;
+      margin: 0;
+      opacity: 0.95;
+    }
+
+    .energy-bar-container {
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 2rem;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 1rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .energy-label {
+      color: white;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .energy-bar {
+      width: 100%;
+      height: 24px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .energy-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #34d399);
+      border-radius: 12px;
+      transition: width 0.5s ease;
+      box-shadow: 0 0 10px rgba(16,185,129,0.5);
+    }
+
+    .phase-card {
+      width: 100%;
+      max-width: 800px;
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      margin-bottom: 2rem;
+    }
+
+    .phase-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .phase-number {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 0.5rem 1.5rem;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .phase-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .phase-description {
+      color: #6b7280;
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    .snack-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .snack-card {
+      background: #f9fafb;
+      border: 3px solid transparent;
+      border-radius: 12px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      position: relative;
+    }
+
+    .snack-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      border-color: #667eea;
+    }
+
+    .snack-card.selected {
+      border-color: #10b981;
+      background: #ecfdf5;
+    }
+
+    .snack-card.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .snack-emoji {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .snack-name {
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 0.25rem;
+      font-size: 1rem;
+    }
+
+    .consequence-card {
+      background: #f0f9ff;
+      border-left: 4px solid #3b82f6;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      display: none;
+    }
+
+    .consequence-card.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    .consequence-card.success {
+      background: #ecfdf5;
+      border-left-color: #10b981;
+    }
+
+    .consequence-card.warning {
+      background: #fef3c7;
+      border-left-color: #f59e0b;
+    }
+
+    .consequence-card.error {
+      background: #fee2e2;
+      border-left-color: #ef4444;
+    }
+
+    .consequence-icon {
+      font-size: 1.25rem;
+      margin-right: 0.5rem;
+    }
+
+    .consequence-text {
+      color: #1f2937;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .learning-box {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin: 1.5rem 0;
+      border: 2px solid #f59e0b;
+    }
+
+    .learning-icon {
+      font-size: 1.5rem;
+      margin-right: 0.5rem;
+    }
+
+    .learning-text {
+      color: #92400e;
+      font-weight: 600;
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .action-button {
+      width: 100%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1.5rem;
+    }
+
+    .action-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(102,126,234,0.4);
+    }
+
+    .action-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .moment-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .moment-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #d1d5db;
+      transition: all 0.3s ease;
+    }
+
+    .moment-dot.active {
+      background: #10b981;
+      width: 32px;
+      border-radius: 6px;
+    }
+
+    .avatar-section {
+      text-align: center;
+      margin: 1.5rem 0;
+    }
+
+    .avatar {
+      font-size: 4rem;
+      margin-bottom: 0.5rem;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .stat-bar {
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .stat-bar-track {
+      width: 100%;
+      height: 20px;
+      background: #e5e7eb;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .stat-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 10px;
+      transition: width 1s ease;
+    }
+
+    .final-message {
+      background: linear-gradient(135deg, #e0e7ff, #ddd6fe);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      border: 2px solid #6366f1;
+    }
+
+    .secondary-button {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .secondary-button:hover {
+      background: #667eea;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(102,126,234,0.3);
+    }
+
+    @media (max-width: 640px) {
+      .game-container {
+        padding: 1rem;
+      }
+
+      .game-title {
+        font-size: 1.75rem;
+      }
+
+      .game-subtitle {
+        font-size: 1rem;
+      }
+
+      .phase-card {
+        padding: 1.5rem;
+      }
+
+      .snack-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+
+    .container,
+    .game-container,
+    .game-wrapper,
+    .app-wrapper,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .phase-container,
+    .phase-card,
+    .content,
+    .content-area,
+    .modal-content,
+    .results-card {
+      padding: 16px !important;
+    }
+
+    h1, .main-title, .game-title, .title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+
+    h2, .phase-title, .stage-title, .final-title {
+      font-size: clamp(1.3rem, 6vw, 1.7rem) !important;
+      line-height: 1.25 !important;
+    }
+
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label {
+      font-size: clamp(1rem, 4.5vw, 1.15rem) !important;
+      line-height: 1.4 !important;
+    }
+
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+
+    .button-group,
+    .action-buttons,
+    .final-buttons,
+    .controls-row {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+
+    button,
+    .btn,
+    .btn-primary,
+    .btn-secondary,
+    .action-button,
+    .option-btn {
+      width: 100% !important;
+    }
+
+    .scenario-grid,
+    .macronutrient-grid,
+    .options-grid,
+    .snack-grid,
+    .results-stats,
+    .pyramid-preview,
+    .week-grid,
+    .myths-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    setConfig: function () {},
+    config: {}
+  };
+
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body>
+  <div class="game-container">
+   <div class="header">
+    <h1 class="game-title" id="gameTitle">Laboratorio de Energía</h1>
+    <p class="game-subtitle" id="gameSubtitle">🎮🔥 Snacks que Cambian tu Partido</p>
+   </div>
+   <div class="energy-bar-container">
+    <div class="energy-label"><span>⚡ Energía del Jugador</span> <span id="energyPercent">100%</span>
+    </div>
+    <div class="energy-bar">
+     <div class="energy-fill" id="energyFill" style="width: 100%"></div>
+    </div>
+   </div><!-- PANTALLA INICIAL -->
+   <div class="phase-card" id="welcomeScreen">
+    <div class="avatar-section">
+     <div class="avatar">
+      🎓
+     </div>
+    </div>
+    <div class="phase-header">
+     <h2 class="phase-title">Bienvenido al Laboratorio de Energía</h2>
+     <p class="phase-description">Antes de jugar, necesitas entender cómo funciona la energía en tu cuerpo</p>
+    </div>
+    <div style="background: linear-gradient(135deg, #e0e7ff, #ddd6fe); border-radius: 12px; padding: 1.5rem; margin: 2rem 0;">
+     <h3 style="color: #1f2937; font-weight: 700; margin: 0 0 1rem 0;">📚 ¿Qué vas a aprender?</h3>
+     <div style="display: grid; gap: 1rem;">
+      <div style="display: flex; align-items: start; gap: 0.75rem;"><span style="font-size: 1.5rem;">🍎</span>
+       <div><strong style="color: #1f2937;">Módulo 1:</strong> <span style="color: #6b7280;"> ¿Qué es un snack deportivo?</span>
+       </div>
+      </div>
+      <div style="display: flex; align-items: start; gap: 0.75rem;"><span style="font-size: 1.5rem;">⚡</span>
+       <div><strong style="color: #1f2937;">Módulo 2:</strong> <span style="color: #6b7280;"> Cómo actúa en tu cuerpo</span>
+       </div>
+      </div>
+      <div style="display: flex; align-items: start; gap: 0.75rem;"><span style="font-size: 1.5rem;">⏰</span>
+       <div><strong style="color: #1f2937;">Módulo 3:</strong> <span style="color: #6b7280;"> Las 3 ventanas de energía</span>
+       </div>
+      </div>
+      <div style="display: flex; align-items: start; gap: 0.75rem;"><span style="font-size: 1.5rem;">💪</span>
+       <div><strong style="color: #1f2937;">Módulo 4:</strong> <span style="color: #6b7280;"> Herramientas de recuperación</span>
+       </div>
+      </div>
+     </div>
+    </div><button class="action-button" onclick="startTutorial()">Comenzar Aprendizaje</button>
+   </div><!-- MÓDULO 1: QUÉ ES UN SNACK -->
+   <div class="phase-card hidden" id="module1">
+    <div class="phase-header">
+     <div class="phase-number">
+      MÓDULO 1
+     </div>
+     <h2 class="phase-title">¿Qué es un Snack Deportivo?</h2>
+     <p class="phase-description">No todos los snacks son iguales</p>
+    </div>
+    <div class="avatar-section">
+     <div class="avatar">
+      🍎
+     </div>
+    </div>
+    <div style="background: white; border: 3px solid #10b981; border-radius: 12px; padding: 1.5rem; margin: 2rem 0;">
+     <h3 style="color: #1f2937; font-weight: 700; margin: 0 0 1rem 0;">✅ Definición</h3>
+     <p style="color: #6b7280; line-height: 1.6; margin: 0;">Un <strong>snack deportivo</strong> es una pequeña porción de alimento diseñada para darte energía rápida, mantener tu rendimiento o ayudar a tu cuerpo a recuperarse después del esfuerzo.</p>
+    </div>
+    <h3 style="color: #1f2937; font-weight: 700; margin: 2rem 0 1rem 0;">🔍 Tipos de Snacks</h3>
+    <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
+     <div style="background: #ecfdf5; border-left: 4px solid #10b981; border-radius: 8px; padding: 1rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;"><span style="font-size: 1.5rem;">⚡</span> <strong style="color: #1f2937;">Snacks de Energía Rápida</strong>
+      </div>
+      <p style="color: #6b7280; margin: 0; font-size: 0.95rem;"><strong>Ejemplos:</strong> Plátano, dátiles, miel, bebidas isotónicas<br><strong>Actúan en:</strong> 10-20 minutos<br><strong>Función:</strong> Subir tu glucosa en sangre inmediatamente</p>
+     </div>
+     <div style="background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 1rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;"><span style="font-size: 1.5rem;">🔋</span> <strong style="color: #1f2937;">Snacks de Energía Sostenida</strong>
+      </div>
+      <p style="color: #6b7280; margin: 0; font-size: 0.95rem;"><strong>Ejemplos:</strong> Barras de cereal, pan integral, avena<br><strong>Actúan en:</strong> 30-60 minutos<br><strong>Función:</strong> Mantener energía constante por más tiempo</p>
+     </div>
+     <div style="background: #e0f2fe; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 1rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;"><span style="font-size: 1.5rem;">💪</span> <strong style="color: #1f2937;">Snacks de Recuperación</strong>
+      </div>
+      <p style="color: #6b7280; margin: 0; font-size: 0.95rem;"><strong>Ejemplos:</strong> Batido de proteínas, yogurt griego, sándwich con pollo<br><strong>Actúan en:</strong> 1-2 horas<br><strong>Función:</strong> Reparar músculos y reponer energía gastada</p>
+     </div>
+    </div>
+    <div class="learning-box">
+     <p class="learning-text"><span class="learning-icon">💡</span> La clave está en elegir el snack correcto para el momento correcto.</p>
+    </div><button class="action-button" onclick="nextModule(2)">Continuar → Módulo 2</button>
+   </div><!-- MÓDULO 2: CÓMO ACTÚA EN EL CUERPO -->
+   <div class="phase-card hidden" id="module2">
+    <div class="phase-header">
+     <div class="phase-number">
+      MÓDULO 2
+     </div>
+     <h2 class="phase-title">Cómo Actúa en tu Cuerpo</h2>
+     <p class="phase-description">El viaje de la comida a la energía</p>
+    </div>
+    <div class="avatar-section">
+     <div class="avatar">
+      ⚡
+     </div>
+    </div>
+    <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 12px; padding: 1.5rem; margin: 2rem 0;">
+     <h3 style="color: #92400e; font-weight: 700; margin: 0 0 1rem 0;">🔄 El Proceso (Simplificado)</h3>
+     <div style="display: grid; gap: 1rem;">
+      <div style="display: flex; gap: 1rem; align-items: start;">
+       <div style="background: #92400e; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">
+        1
+       </div>
+       <div><strong style="color: #1f2937;">Comes el snack</strong>
+        <p style="color: #6b7280; margin: 0.25rem 0 0 0; font-size: 0.9rem;">Entra a tu estómago</p>
+       </div>
+      </div>
+      <div style="display: flex; gap: 1rem; align-items: start;">
+       <div style="background: #92400e; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">
+        2
+       </div>
+       <div><strong style="color: #1f2937;">Digestión</strong>
+        <p style="color: #6b7280; margin: 0.25rem 0 0 0; font-size: 0.9rem;">Se descompone en nutrientes más pequeños</p>
+       </div>
+      </div>
+      <div style="display: flex; gap: 1rem; align-items: start;">
+       <div style="background: #92400e; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">
+        3
+       </div>
+       <div><strong style="color: #1f2937;">Absorción</strong>
+        <p style="color: #6b7280; margin: 0.25rem 0 0 0; font-size: 0.9rem;">Los nutrientes pasan a tu sangre</p>
+       </div>
+      </div>
+      <div style="display: flex; gap: 1rem; align-items: start;">
+       <div style="background: #92400e; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">
+        4
+       </div>
+       <div><strong style="color: #1f2937;">¡Energía!</strong>
+        <p style="color: #6b7280; margin: 0.25rem 0 0 0; font-size: 0.9rem;">Tu cuerpo la usa para correr, golpear, pensar</p>
+       </div>
+      </div>
+     </div>
+    </div>
+    <h3 style="color: #1f2937; font-weight: 700; margin: 2rem 0 1rem 0;">⏱️ Tiempos de Digestión</h3>
+    <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
+     <div style="background: #ecfdf5; border-radius: 8px; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+      <div><strong style="color: #1f2937;">🍌 Frutas simples</strong>
+       <p style="color: #6b7280; margin: 0.25rem 0 0 0; font-size: 0.9rem;">Plátano, manzana</p>
+      </div>
+      <div style="background: #10b981; color: white; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700;">
+       15-20 min
+      </div>
+     </div>
+     <div style="background: #fef3c7; border-radius: 8px; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+      <div><strong style="color: #1f2937;">🍫 Barras / Pan</strong>
+       <p style="color: #6b7280; margin: 0.25rem 0 0 0; font-size: 0.9rem;">Cereales, tostadas</p>
+      </div>
+      <div style="background: #f59e0b; color: white; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700;">
+       30-45 min
+      </div>
+     </div>
+     <div style="background: #fee2e2; border-radius: 8px; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+      <div><strong style="color: #1f2937;">🥪 Comidas completas</strong>
+       <p style="color: #6b7280; margin: 0.25rem 0 0 0; font-size: 0.9rem;">Sándwich, pasta</p>
+      </div>
+      <div style="background: #ef4444; color: white; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700;">
+       60-90 min
+      </div>
+     </div>
+    </div>
+    <div class="learning-box">
+     <p class="learning-text"><span class="learning-icon">💡</span> Si comes algo muy pesado justo antes de jugar, tu cuerpo está ocupado digiriendo en lugar de darte energía para el partido.</p>
+    </div><button class="action-button" onclick="nextModule(3)">Continuar → Módulo 3</button>
+   </div><!-- MÓDULO 3: LAS 3 VENTANAS -->
+   <div class="phase-card hidden" id="module3">
+    <div class="phase-header">
+     <div class="phase-number">
+      MÓDULO 3
+     </div>
+     <h2 class="phase-title">Las 3 Ventanas de Energía</h2>
+     <p class="phase-description">Timing perfecto para cada momento</p>
+    </div>
+    <div class="avatar-section">
+     <div class="avatar">
+      ⏰
+     </div>
+    </div>
+    <div style="display: grid; gap: 1.5rem; margin: 2rem 0;">
+     <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-radius: 12px; padding: 1.5rem; border: 3px solid #3b82f6;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;"><span style="font-size: 2rem;">🏁</span>
+       <h3 style="color: #1f2937; margin: 0; font-size: 1.25rem;">VENTANA 1: Antes del Partido</h3>
+      </div>
+      <p style="color: #1f2937; font-weight: 600; margin: 0 0 0.5rem 0;">⏱️ Momento: 30-60 minutos antes</p>
+      <p style="color: #6b7280; margin: 0 0 1rem 0; line-height: 1.5;"><strong>Objetivo:</strong> Llenar tus "tanques" de energía sin sentirte pesado.<br><strong>Mejor opción:</strong> Carbohidratos de digestión rápida (frutas, barras ligeras)<br><strong>Evitar:</strong> Comidas pesadas, grasas, mucha fibra</p>
+      <div style="background: rgba(59, 130, 246, 0.1); border-radius: 8px; padding: 0.75rem;"><strong style="color: #1f2937;">✅ Ejemplo perfecto:</strong> <span style="color: #6b7280;"> 1 plátano + un poco de agua</span>
+      </div>
+     </div>
+     <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 12px; padding: 1.5rem; border: 3px solid #f59e0b;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;"><span style="font-size: 2rem;">🎾</span>
+       <h3 style="color: #1f2937; margin: 0; font-size: 1.25rem;">VENTANA 2: Durante el Partido</h3>
+      </div>
+      <p style="color: #1f2937; font-weight: 600; margin: 0 0 0.5rem 0;">⏱️ Momento: Cada 30-45 minutos de juego</p>
+      <p style="color: #6b7280; margin: 0 0 1rem 0; line-height: 1.5;"><strong>Objetivo:</strong> Mantener tu glucosa estable, evitar bajones, reponer sales.<br><strong>Mejor opción:</strong> Snacks ultra rápidos (frutas, bebidas isotónicas)<br><strong>Evitar:</strong> Cualquier cosa que requiera masticación larga o sea difícil de digerir</p>
+      <div style="background: rgba(245, 158, 11, 0.1); border-radius: 8px; padding: 0.75rem;"><strong style="color: #1f2937;">✅ Ejemplo perfecto:</strong> <span style="color: #6b7280;"> Media banana + bebida isotónica entre games</span>
+      </div>
+     </div>
+     <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); border-radius: 12px; padding: 1.5rem; border: 3px solid #10b981;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;"><span style="font-size: 2rem;">💪</span>
+       <h3 style="color: #1f2937; margin: 0; font-size: 1.25rem;">VENTANA 3: Después del Partido</h3>
+      </div>
+      <p style="color: #1f2937; font-weight: 600; margin: 0 0 0.5rem 0;">⏱️ Momento: Primeros 30 minutos después de terminar</p>
+      <p style="color: #6b7280; margin: 0 0 1rem 0; line-height: 1.5;"><strong>Objetivo:</strong> Reparar músculos, reponer energía, acelerar recuperación.<br><strong>Mejor opción:</strong> Proteína + Carbohidratos juntos<br><strong>Evitar:</strong> No comer nada (ventana crítica de recuperación)</p>
+      <div style="background: rgba(16, 185, 129, 0.1); border-radius: 8px; padding: 0.75rem;"><strong style="color: #1f2937;">✅ Ejemplo perfecto:</strong> <span style="color: #6b7280;"> Batido de proteínas + plátano, o sándwich de pollo</span>
+      </div>
+     </div>
+    </div>
+    <div class="learning-box">
+     <p class="learning-text"><span class="learning-icon">💡</span> La "Ventana Anabólica" (primeros 30-45 min después del partido) es cuando tu cuerpo absorbe nutrientes como esponja. ¡No la desperdicies!</p>
+    </div><button class="action-button" onclick="nextModule(4)">Continuar → Módulo 4</button>
+   </div><!-- MÓDULO 4: HERRAMIENTAS DE RECUPERACIÓN -->
+   <div class="phase-card hidden" id="module4">
+    <div class="phase-header">
+     <div class="phase-number">
+      MÓDULO 4
+     </div>
+     <h2 class="phase-title">Herramientas de Recuperación</h2>
+     <p class="phase-description">Más allá de la comida</p>
+    </div>
+    <div class="avatar-section">
+     <div class="avatar">
+      🧰
+     </div>
+    </div>
+    <h3 style="color: #1f2937; font-weight: 700; margin: 2rem 0 1rem 0;">🔧 Tus 4 Herramientas Principales</h3>
+    <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
+     <div style="background: #dbeafe; border-radius: 12px; padding: 1.25rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;"><span style="font-size: 2rem;">💧</span>
+       <h4 style="color: #1f2937; margin: 0; font-size: 1.1rem;">1. HIDRATACIÓN</h4>
+      </div>
+      <p style="color: #6b7280; margin: 0 0 0.75rem 0; line-height: 1.5;">El 60% de tu cuerpo es agua. Perder solo 2% de hidratación = -20% rendimiento.</p>
+      <div style="background: white; border-radius: 8px; padding: 0.75rem;"><strong style="color: #1f2937;">Qué hacer:</strong>
+       <ul style="color: #6b7280; margin: 0.5rem 0 0 0; padding-left: 1.25rem;">
+        <li>Beber 500ml 2 horas antes</li>
+        <li>150-200ml cada 15 min durante el partido</li>
+        <li>Bebidas isotónicas si juegas +60 min</li>
+       </ul>
+      </div>
+     </div>
+     <div style="background: #fce7f3; border-radius: 12px; padding: 1.25rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;"><span style="font-size: 2rem;">🍞</span>
+       <h4 style="color: #1f2937; margin: 0; font-size: 1.1rem;">2. CARBOHIDRATOS</h4>
+      </div>
+      <p style="color: #6b7280; margin: 0 0 0.75rem 0; line-height: 1.5;">Son tu combustible principal. Sin carbohidratos = sin explosividad.</p>
+      <div style="background: white; border-radius: 8px; padding: 0.75rem;"><strong style="color: #1f2937;">Fuentes inteligentes:</strong>
+       <ul style="color: #6b7280; margin: 0.5rem 0 0 0; padding-left: 1.25rem;">
+        <li>Frutas (plátano, dátiles, manzana)</li>
+        <li>Pan integral, avena</li>
+        <li>Barras energéticas naturales</li>
+       </ul>
+      </div>
+     </div>
+     <div style="background: #fef3c7; border-radius: 12px; padding: 1.25rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;"><span style="font-size: 2rem;">🥩</span>
+       <h4 style="color: #1f2937; margin: 0; font-size: 1.1rem;">3. PROTEÍNAS</h4>
+      </div>
+      <p style="color: #6b7280; margin: 0 0 0.75rem 0; line-height: 1.5;">Reparan tus músculos después del partido. Sin proteína = recuperación lenta.</p>
+      <div style="background: white; border-radius: 8px; padding: 0.75rem;"><strong style="color: #1f2937;">Fuentes efectivas:</strong>
+       <ul style="color: #6b7280; margin: 0.5rem 0 0 0; padding-left: 1.25rem;">
+        <li>Batido de proteínas (rápido)</li>
+        <li>Pollo, atún, huevos</li>
+        <li>Yogurt griego, queso fresco</li>
+       </ul>
+      </div>
+     </div>
+     <div style="background: #dcfce7; border-radius: 12px; padding: 1.25rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;"><span style="font-size: 2rem;">⚡</span>
+       <h4 style="color: #1f2937; margin: 0; font-size: 1.1rem;">4. ELECTROLITOS</h4>
+      </div>
+      <p style="color: #6b7280; margin: 0 0 0.75rem 0; line-height: 1.5;">Sales minerales que pierdes al sudar. Sin ellos = calambres y fatiga.</p>
+      <div style="background: white; border-radius: 8px; padding: 0.75rem;"><strong style="color: #1f2937;">Dónde encontrarlos:</strong>
+       <ul style="color: #6b7280; margin: 0.5rem 0 0 0; padding-left: 1.25rem;">
+        <li>Bebidas isotónicas</li>
+        <li>Plátano (potasio natural)</li>
+        <li>Agua de coco</li>
+       </ul>
+      </div>
+     </div>
+    </div>
+    <div style="background: linear-gradient(135deg, #e0e7ff, #ddd6fe); border-radius: 12px; padding: 1.5rem; margin: 2rem 0; border: 2px solid #6366f1;">
+     <h3 style="color: #1f2937; font-weight: 700; margin: 0 0 1rem 0;">🎯 Estrategia de Recuperación Completa</h3>
+     <div style="display: grid; gap: 0.75rem;">
+      <div style="display: flex; gap: 0.5rem;"><span style="color: #6366f1; font-weight: 700;">1.</span> <span style="color: #1f2937;"><strong>Inmediato (0-15 min):</strong> Bebe agua + bebida isotónica</span>
+      </div>
+      <div style="display: flex; gap: 0.5rem;"><span style="color: #6366f1; font-weight: 700;">2.</span> <span style="color: #1f2937;"><strong>Ventana (15-30 min):</strong> Proteína + carbohidratos</span>
+      </div>
+      <div style="display: flex; gap: 0.5rem;"><span style="color: #6366f1; font-weight: 700;">3.</span> <span style="color: #1f2937;"><strong>Post-ducha (1-2 hrs):</strong> Comida completa balanceada</span>
+      </div>
+     </div>
+    </div>
+    <div class="learning-box">
+     <p class="learning-text"><span class="learning-icon">💡</span> La recuperación NO empieza cuando terminas. Empieza mientras juegas.</p>
+    </div><button class="action-button" onclick="startGame()">¡Listo! Comenzar el Juego 🎮</button>
+   </div><!-- FASE DE JUEGO: EL PARTIDO DEFINITIVO -->
+   <div class="phase-card hidden" id="gamePhase" style="max-width: 1000px;">
+    <div class="phase-header">
+     <div class="phase-number">
+      🎮 JUEGO COMPLETO
+     </div>
+     <h2 class="phase-title">El Partido Definitivo</h2>
+     <p class="phase-description">Partido intenso de 3 sets. Tus decisiones definen el resultado.</p>
+    </div><!-- Marcador del partido -->
+    <div style="background: linear-gradient(135deg, #1e293b, #334155); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; color: white;">
+     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <div style="text-align: center; flex: 1;">
+       <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 0.25rem;">
+        TÚ
+       </div>
+       <div style="font-size: 2rem; font-weight: 800;" id="playerScore">
+        0
+       </div>
+      </div>
+      <div style="text-align: center; padding: 0 2rem;">
+       <div style="font-size: 0.8rem; opacity: 0.6;">
+        SET
+       </div>
+       <div style="font-size: 1.5rem; font-weight: 700;" id="currentSet">
+        1
+       </div>
+      </div>
+      <div style="text-align: center; flex: 1;">
+       <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 0.25rem;">
+        RIVAL
+       </div>
+       <div style="font-size: 2rem; font-weight: 800;" id="opponentScore">
+        0
+       </div>
+      </div>
+     </div>
+     <div style="display: flex; gap: 1rem; justify-content: center; font-size: 0.9rem;">
+      <div>
+       Sets: <span id="playerSets" style="font-weight: 700;">0</span>
+      </div>
+      <div style="opacity: 0.5;">
+       |
+      </div>
+      <div>
+       Sets: <span id="opponentSets" style="font-weight: 700;">0</span>
+      </div>
+     </div>
+    </div><!-- Barras de estado del jugador -->
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem;">
+     <div style="background: #f9fafb; border-radius: 8px; padding: 1rem;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;"><span style="font-weight: 600; color: #1f2937;">⚡ Energía</span> <span id="gameEnergy" style="font-weight: 700; color: #10b981;">100%</span>
+      </div>
+      <div style="height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden;">
+       <div id="gameEnergyBar" style="height: 100%; width: 100%; background: linear-gradient(90deg, #10b981, #34d399); transition: width 0.5s;"></div>
+      </div>
+     </div>
+     <div style="background: #f9fafb; border-radius: 8px; padding: 1rem;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;"><span style="font-weight: 600; color: #1f2937;">🧠 Concentración</span> <span id="gameFocus" style="font-weight: 700; color: #3b82f6;">100%</span>
+      </div>
+      <div style="height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden;">
+       <div id="gameFocusBar" style="height: 100%; width: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); transition: width 0.5s;"></div>
+      </div>
+     </div>
+     <div style="background: #f9fafb; border-radius: 8px; padding: 1rem;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;"><span style="font-weight: 600; color: #1f2937;">💧 Hidratación</span> <span id="gameHydration" style="font-weight: 700; color: #06b6d4;">100%</span>
+      </div>
+      <div style="height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden;">
+       <div id="gameHydrationBar" style="height: 100%; width: 100%; background: linear-gradient(90deg, #06b6d4, #22d3ee); transition: width 0.5s;"></div>
+      </div>
+     </div>
+     <div style="background: #f9fafb; border-radius: 8px; padding: 1rem;">
+      <div style="display: flex; justify-content; space-between; margin-bottom: 0.5rem;"><span style="font-weight: 600; color: #1f2937;">💪 Músculos</span> <span id="gameMuscle" style="font-weight: 700; color: #8b5cf6;">100%</span>
+      </div>
+      <div style="height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden;">
+       <div id="gameMuscleBar" style="height: 100%; width: 100%; background: linear-gradient(90deg, #8b5cf6, #a78bfa); transition: width 0.5s;"></div>
+      </div>
+     </div>
+    </div><!-- Situación del juego -->
+    <div id="gameSituation" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; border: 2px solid #f59e0b;">
+     <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;"><span style="font-size: 2.5rem;" id="situationEmoji">🎾</span>
+      <div>
+       <h3 style="color: #1f2937; margin: 0; font-size: 1.25rem; font-weight: 700;" id="situationTitle">Inicio del Set</h3>
+       <p style="color: #6b7280; margin: 0.25rem 0 0 0; font-size: 0.95rem;" id="situationDescription">El partido comienza. Tu energía está al máximo.</p>
+      </div>
+     </div><!-- Timer de decisión -->
+     <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 1rem;"><span style="font-weight: 600; color: #92400e;">⏱️ Decide en:</span>
+      <div style="flex: 1; height: 6px; background: rgba(0,0,0,0.1); border-radius: 3px; overflow: hidden;">
+       <div id="decisionTimer" style="height: 100%; width: 100%; background: #ef4444; transition: width 10s linear;"></div>
+      </div><span id="timerSeconds" style="font-weight: 700; color: #92400e; min-width: 35px;">10s</span>
+     </div>
+    </div><!-- Opciones de decisión -->
+    <div id="gameChoices" style="display: grid; gap: 1rem; margin-bottom: 2rem;"></div><!-- Resultado de la jugada -->
+    <div id="gameResult" class="consequence-card" style="display: none;">
+     <p class="consequence-text"><span class="consequence-icon"></span> <span id="gameResultText"></span></p>
+    </div><!-- Inventario de snacks -->
+    <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; margin-top: 2rem;">
+     <h4 style="color: #1f2937; margin: 0 0 1rem 0; font-size: 1rem; font-weight: 700;">🎒 Tu Inventario</h4>
+     <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+      <div style="background: #f9fafb; border-radius: 8px; padding: 0.75rem; display: flex; align-items: center; gap: 0.5rem;"><span style="font-size: 1.5rem;">🍌</span>
+       <div>
+        <div style="font-size: 0.8rem; color: #6b7280;">
+         Plátanos
+        </div>
+        <div style="font-weight: 700; color: #1f2937;" id="inventoryBananas">
+         3
+        </div>
+       </div>
+      </div>
+      <div style="background: #f9fafb; border-radius: 8px; padding: 0.75rem; display: flex; align-items: center; gap: 0.5rem;"><span style="font-size: 1.5rem;">🥤</span>
+       <div>
+        <div style="font-size: 0.8rem; color: #6b7280;">
+         Isotónicas
+        </div>
+        <div style="font-weight: 700; color: #1f2937;" id="inventoryDrinks">
+         4
+        </div>
+       </div>
+      </div>
+      <div style="background: #f9fafb; border-radius: 8px; padding: 0.75rem; display: flex; align-items: center; gap: 0.5rem;"><span style="font-size: 1.5rem;">🍫</span>
+       <div>
+        <div style="font-size: 0.8rem; color: #6b7280;">
+         Barras
+        </div>
+        <div style="font-weight: 700; color: #1f2937;" id="inventoryBars">
+         2
+        </div>
+       </div>
+      </div>
+      <div style="background: #f9fafb; border-radius: 8px; padding: 0.75rem; display: flex; align-items: center; gap: 0.5rem;"><span style="font-size: 1.5rem;">💧</span>
+       <div>
+        <div style="font-size: 0.8rem; color: #6b7280;">
+         Agua
+        </div>
+        <div style="font-weight: 700; color: #1f2937;" id="inventoryWater">
+         ∞
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div><!-- FASE 1: ANTES DEL PARTIDO -->
+   <div class="phase-card hidden" id="phase1">
+    <div class="phase-header">
+     <div class="phase-number">
+      FASE 1
+     </div>
+     <h2 class="phase-title" id="phase1Title">ANTES DEL PARTIDO: Activa tu Motor</h2>
+     <p class="phase-description">Elige el snack correcto 30-60 minutos antes del partido</p>
+    </div>
+    <div class="avatar-section">
+     <div class="avatar">
+      🎾
+     </div>
+     <p style="color: #6b7280; font-weight: 500;">El jugador en el vestidor</p>
+    </div>
+    <div class="snack-grid">
+     <div class="snack-card" data-snack="banana" data-phase="1">
+      <div class="snack-emoji">
+       🍌
+      </div>
+      <div class="snack-name">
+       Plátano
+      </div>
+     </div>
+     <div class="snack-card" data-snack="cereal-bar" data-phase="1">
+      <div class="snack-emoji">
+       🍫
+      </div>
+      <div class="snack-name">
+       Barra de cereal
+      </div>
+     </div>
+     <div class="snack-card" data-snack="yogurt" data-phase="1">
+      <div class="snack-emoji">
+       🥣
+      </div>
+      <div class="snack-name">
+       Yogurt natural
+      </div>
+     </div>
+     <div class="snack-card" data-snack="sandwich" data-phase="1">
+      <div class="snack-emoji">
+       🥪
+      </div>
+      <div class="snack-name">
+       Sándwich completo
+      </div>
+     </div>
+    </div>
+    <div id="consequence1" class="consequence-card">
+     <p class="consequence-text"><span class="consequence-icon"></span> <span id="consequenceText1"></span></p>
+    </div>
+    <div class="learning-box hidden" id="learning1">
+     <p class="learning-text"><span class="learning-icon">💡</span> Lo que comes antes del partido determina cómo empiezas.</p>
+    </div><button class="action-button" id="startMatchBtn" disabled> <span id="startButtonText">Iniciar Partido</span> </button>
+   </div><!-- FASE 2: DURANTE EL PARTIDO -->
+   <div class="phase-card hidden" id="phase2">
+    <div class="phase-header">
+     <div class="phase-number">
+      FASE 2
+     </div>
+     <h2 class="phase-title" id="phase2Title">DURANTE EL PARTIDO: Mantén la Llama Encendida</h2>
+     <p class="phase-description">Gestiona tu energía en momentos clave</p>
+    </div>
+    <div class="moment-indicator">
+     <div class="moment-dot active" id="moment1Dot"></div>
+     <div class="moment-dot" id="moment2Dot"></div>
+     <div class="moment-dot" id="moment3Dot"></div>
+    </div>
+    <div class="avatar-section">
+     <div class="avatar">
+      🏃
+     </div>
+     <p style="color: #6b7280; font-weight: 500;" id="momentDescription">Primeros Games</p>
+    </div>
+    <div id="moment1" class="moment-section">
+     <h3 style="color: #1f2937; font-weight: 600; margin-bottom: 1rem;">🔥 MOMENTO 1 — Primeros Games</h3>
+     <div class="snack-grid">
+      <div class="snack-card" data-snack="nothing" data-phase="2" data-moment="1">
+       <div class="snack-emoji">
+        🚫
+       </div>
+       <div class="snack-name">
+        Nada
+       </div>
+      </div>
+      <div class="snack-card" data-snack="half-banana" data-phase="2" data-moment="1">
+       <div class="snack-emoji">
+        🍌
+       </div>
+       <div class="snack-name">
+        Mitad de plátano
+       </div>
+      </div>
+      <div class="snack-card" data-snack="isotonic" data-phase="2" data-moment="1">
+       <div class="snack-emoji">
+        🥤
+       </div>
+       <div class="snack-name">
+        Bebida isotónica
+       </div>
+      </div>
+      <div class="snack-card" data-snack="nuts" data-phase="2" data-moment="1">
+       <div class="snack-emoji">
+        🥜
+       </div>
+       <div class="snack-name">
+        Frutos secos
+       </div>
+      </div>
+     </div>
+     <div id="consequence2-1" class="consequence-card">
+      <p class="consequence-text"><span class="consequence-icon"></span> <span id="consequenceText2-1"></span></p>
+     </div>
+    </div>
+    <div id="moment2" class="moment-section hidden">
+     <h3 style="color: #1f2937; font-weight: 600; margin-bottom: 1rem;">🔥 MOMENTO 2 — Medio del partido</h3>
+     <div class="snack-grid">
+      <div class="snack-card" data-snack="isotonic" data-phase="2" data-moment="2">
+       <div class="snack-emoji">
+        🥤
+       </div>
+       <div class="snack-name">
+        Bebida isotónica
+       </div>
+      </div>
+      <div class="snack-card" data-snack="fruit" data-phase="2" data-moment="2">
+       <div class="snack-emoji">
+        🍎
+       </div>
+       <div class="snack-name">
+        Fruta
+       </div>
+      </div>
+      <div class="snack-card" data-snack="energy-bar" data-phase="2" data-moment="2">
+       <div class="snack-emoji">
+        🍫
+       </div>
+       <div class="snack-name">
+        Barra energética
+       </div>
+      </div>
+      <div class="snack-card" data-snack="cookies" data-phase="2" data-moment="2">
+       <div class="snack-emoji">
+        🍪
+       </div>
+       <div class="snack-name">
+        Galletas industriales
+       </div>
+      </div>
+     </div>
+     <div id="consequence2-2" class="consequence-card">
+      <p class="consequence-text"><span class="consequence-icon"></span> <span id="consequenceText2-2"></span></p>
+     </div>
+    </div>
+    <div id="moment3" class="moment-section hidden">
+     <h3 style="color: #1f2937; font-weight: 600; margin-bottom: 1rem;">🔥 MOMENTO 3 — Partido largo</h3>
+     <div class="snack-grid">
+      <div class="snack-card" data-snack="banana" data-phase="2" data-moment="3">
+       <div class="snack-emoji">
+        🍌
+       </div>
+       <div class="snack-name">
+        Plátano
+       </div>
+      </div>
+      <div class="snack-card" data-snack="isotonic" data-phase="2" data-moment="3">
+       <div class="snack-emoji">
+        🥤
+       </div>
+       <div class="snack-name">
+        Bebida isotónica
+       </div>
+      </div>
+      <div class="snack-card" data-snack="nothing" data-phase="2" data-moment="3">
+       <div class="snack-emoji">
+        🚫
+       </div>
+       <div class="snack-name">
+        Nada
+       </div>
+      </div>
+      <div class="snack-card" data-snack="candy" data-phase="2" data-moment="3">
+       <div class="snack-emoji">
+        🍬
+       </div>
+       <div class="snack-name">
+        Dulce rápido
+       </div>
+      </div>
+     </div>
+     <div id="consequence2-3" class="consequence-card">
+      <p class="consequence-text"><span class="consequence-icon"></span> <span id="consequenceText2-3"></span></p>
+     </div>
+    </div>
+    <div class="learning-box hidden" id="learning2">
+     <p class="learning-text"><span class="learning-icon">💡</span> Los snacks durante el partido te mantienen vivo en los puntos largos.</p>
+    </div><button class="action-button" id="continueBtn" disabled> <span id="continueButtonText">Continuar</span> </button>
+   </div><!-- FASE 3: DESPUÉS DEL PARTIDO -->
+   <div class="phase-card hidden" id="phase3">
+    <div class="phase-header">
+     <div class="phase-number">
+      FASE 3
+     </div>
+     <h2 class="phase-title" id="phase3Title">DESPUÉS DEL PARTIDO: Reconstruye tu Cuerpo</h2>
+     <p class="phase-description">Elige el snack correcto para recuperación</p>
+    </div>
+    <div class="avatar-section">
+     <div class="avatar">
+        
+     </div>
+     <p style="color: #6b7280; font-weight: 500;">El jugador termina sudado y cansado</p>
+    </div>
+    <div class="snack-grid">
+     <div class="snack-card" data-snack="protein-shake" data-phase="3">
+      <div class="snack-emoji">
+       🥤
+      </div>
+      <div class="snack-name">
+       Batido de proteínas
+      </div>
+     </div>
+     <div class="snack-card" data-snack="whole-sandwich" data-phase="3">
+      <div class="snack-emoji">
+       🥪
+      </div>
+      <div class="snack-name">
+       Sándwich integral
+      </div>
+     </div>
+     <div class="snack-card" data-snack="nuts" data-phase="3">
+      <div class="snack-emoji">
+       🥜
+      </div>
+      <div class="snack-name">
+       Frutos secos
+      </div>
+     </div>
+     <div class="snack-card" data-snack="nothing" data-phase="3">
+      <div class="snack-emoji">
+       🚫
+      </div>
+      <div class="snack-name">
+       Nada
+      </div>
+     </div>
+    </div>
+    <div id="consequence3" class="consequence-card">
+     <p class="consequence-text"><span class="consequence-icon"></span> <span id="consequenceText3"></span></p>
+    </div>
+    <div class="learning-box hidden" id="learning3">
+     <p class="learning-text"><span class="learning-icon">💡</span> Lo que comes después decide cómo entrenas ma  ana.</p>
+    </div><button class="action-button" id="finishBtn" disabled>Ver Informe Final</button>
+   </div><!-- FASE 4: INFORME FINAL -->
+   <div class="phase-card hidden" id="finalReport">
+    <div class="phase-header">
+     <div class="phase-number">
+      INFORME FINAL
+     </div>
+     <h2 class="phase-title">Tu Energía en Partido</h2>
+     <p class="phase-description">Análisis completo de tu rendimiento</p>
+    </div>
+    <div class="avatar-section">
+     <div class="avatar" id="finalAvatar">
+      🏆
+     </div>
+     <div id="energyProfile" style="margin-top: 1rem;">
+      <h3 id="profileTitle" style="color: #1f2937; font-weight: 700; font-size: 1.5rem; margin: 0.5rem 0;">Tenista Energía Estable</h3>
+      <p id="profileDescription" style="color: #6b7280; font-size: 1rem; margin: 0;">Eres un jugador constante. Lo que comes te acompaña.</p>
+     </div>
+    </div>
+    <div style="margin: 2rem 0;">
+     <div class="stat-bar">
+      <div class="stat-label"><span>⚡ Energía General</span> <span id="energyScore">0%</span>
+      </div>
+      <div class="stat-bar-track">
+       <div class="stat-bar-fill" id="energyBar" style="width: 0%"></div>
+      </div>
+     </div>
+     <div class="stat-bar">
+      <div class="stat-label"><span>🎯 Precisión</span> <span id="precisionScore">0%</span>
+      </div>
+      <div class="stat-bar-track">
+       <div class="stat-bar-fill" id="precisionBar" style="width: 0%"></div>
+      </div>
+     </div>
+     <div class="stat-bar">
+      <div class="stat-label"><span>💪 Recuperación</span> <span id="recoveryScore">0%</span>
+      </div>
+      <div class="stat-bar-track">
+       <div class="stat-bar-fill" id="recoveryBar" style="width: 0%"></div>
+      </div>
+     </div>
+     <div class="stat-bar">
+      <div class="stat-label"><span>🔋 Resistencia</span> <span id="resistanceScore">0%</span>
+      </div>
+      <div class="stat-bar-track">
+       <div class="stat-bar-fill" id="resistanceBar" style="width: 0%"></div>
+      </div>
+     </div>
+    </div>
+    <div class="final-message">
+     <p style="font-size: 1.1rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">💡 Energía estable = mente clara + piernas rápidas + cero calambres.</p>
+     <p style="font-size: 1rem; color: #6b7280; margin: 0;">Tus decisiones invisibles ganan partidos que otros pierden.</p>
+    </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-top: 2rem;"><button class="secondary-button" id="repeatBtn">🔄 Repetir</button> <button class="secondary-button" id="saveBtn">💾 Guardar</button> <button class="action-button" id="nextGameBtn" style="margin: 0;">🏁 Cerrar laboratorio</button>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "Laboratorio de Energía",
+      game_subtitle: "🎮🔥 Snacks que Cambian tu Partido",
+      phase1_title: "ANTES DEL PARTIDO: Activa tu Motor",
+      phase2_title: "DURANTE EL PARTIDO: Mantén la Llama Encendida",
+      phase3_title: "DESPUÉS DEL PARTIDO: Reconstruye tu Cuerpo",
+      start_button: "Iniciar Partido",
+      continue_button: "Continuar"
+    };
+
+    let currentEnergy = 100;
+    let currentPhase = 1;
+    let currentMoment = 1;
+    let phase1Choice = null;
+    let phase2Choices = [];
+    let phase3Choice = null;
+
+    const consequences = {
+      phase1: {
+        banana: { type: 'success', icon: '🌟', text: 'Energía rápida + digestión fácil. Preparación óptima para puntos intensos.', energy: 5 },
+        'cereal-bar': { type: 'warning', icon: '🟡', text: 'Energía moderada. Bien, pero revisa el azúcar si quieres energía estable.', energy: 0 },
+        yogurt: { type: 'warning', icon: '🟡', text: 'Bueno, pero digestión media. Funciona, pero mejor si hay tiempo suficiente.', energy: -5 },
+        sandwich: { type: 'error', icon: '⚠️', text: 'Muy pesado. Digestión lenta → riesgo de pesadez en los primeros juegos.', energy: -10 }
+      },
+      phase2: {
+        moment1: {
+          nothing: { type: 'error', icon: '❌', text: 'Energía firme al inicio, pero te quedarás sin reserva.', energy: -10 },
+          'half-banana': { type: 'success', icon: '✔', text: 'Aporte rápido → energía +15%', energy: 15 },
+          isotonic: { type: 'success', icon: '✔', text: 'Hidratación + glucosa → estabilidad', energy: 10 },
+          nuts: { type: 'warning', icon: '⚠️', text: 'Buena energía, pero digestión más lenta.', energy: 5 }
+        },
+        moment2: {
+          isotonic: { type: 'success', icon: '✔', text: 'Recuperas sales y energía constante.', energy: 10 },
+          fruit: { type: 'success', icon: '✔', text: 'Perfecta si necesitas energía inmediata.', energy: 12 },
+          'energy-bar': { type: 'warning', icon: '✔', text: 'Bien, pero depende de la marca. Energía + moderada.', energy: 8 },
+          cookies: { type: 'error', icon: '❌', text: 'Azúcar mala → altibajos de energía.', energy: -5 }
+        },
+        moment3: {
+          banana: { type: 'success', icon: '✔', text: 'Mejor snack natural → previene calambres.', energy: 15 },
+          isotonic: { type: 'success', icon: '✔', text: 'Equilibrio → perfecto para sets largos.', energy: 12 },
+          candy: { type: 'warning', icon: '⚠️', text: 'Te da un mini boost, pero te desploma rápido.', energy: 5 },
+          nothing: { type: 'error', icon: '❌', text: 'Pierdes precisión por baja glucosa.', energy: -15 }
+        }
+      },
+      phase3: {
+        'protein-shake': { type: 'success', icon: '✔', text: 'Recuperación muscular óptima.', energy: 20 },
+        'whole-sandwich': { type: 'success', icon: '✔', text: 'Repones energía + proteína → recuperación total.', energy: 20 },
+        nuts: { type: 'warning', icon: '🟡', text: 'Buen complemento, pero falta proteína.', energy: 10 },
+        nothing: { type: 'error', icon: '❌', text: 'Recuperación deficiente. Riesgo de fatiga mañana.', energy: -10 }
+      }
+    };
+
+    const dataHandler = {
+      onDataChanged(data) {
+        // UI updates could be added here if needed
+      }
+    };
+
+    async function initializeApp() {
+      if (window.dataSdk) {
+        const initResult = await window.dataSdk.init(dataHandler);
+        if (!initResult.isOk) {
+          console.error("Error initializing Data SDK");
+        }
+      }
+
+      if (window.elementSdk) {
+        await window.elementSdk.init({
+          defaultConfig,
+          onConfigChange: async (config) => {
+            const titleEl = document.getElementById('gameTitle');
+            const subtitleEl = document.getElementById('gameSubtitle');
+            const phase1TitleEl = document.getElementById('phase1Title');
+            const phase2TitleEl = document.getElementById('phase2Title');
+            const phase3TitleEl = document.getElementById('phase3Title');
+            const startBtnEl = document.getElementById('startButtonText');
+            const continueBtnEl = document.getElementById('continueButtonText');
+
+            if (titleEl) titleEl.textContent = config.game_title || defaultConfig.game_title;
+            if (subtitleEl) subtitleEl.textContent = config.game_subtitle || defaultConfig.game_subtitle;
+            if (phase1TitleEl) phase1TitleEl.textContent = config.phase1_title || defaultConfig.phase1_title;
+            if (phase2TitleEl) phase2TitleEl.textContent = config.phase2_title || defaultConfig.phase2_title;
+            if (phase3TitleEl) phase3TitleEl.textContent = config.phase3_title || defaultConfig.phase3_title;
+            if (startBtnEl) startBtnEl.textContent = config.start_button || defaultConfig.start_button;
+            if (continueBtnEl) continueBtnEl.textContent = config.continue_button || defaultConfig.continue_button;
+          },
+          mapToCapabilities: (config) => ({
+            recolorables: [],
+            borderables: [],
+            fontEditable: undefined,
+            fontSizeable: undefined
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ["game_title", config.game_title || defaultConfig.game_title],
+            ["game_subtitle", config.game_subtitle || defaultConfig.game_subtitle],
+            ["phase1_title", config.phase1_title || defaultConfig.phase1_title],
+            ["phase2_title", config.phase2_title || defaultConfig.phase2_title],
+            ["phase3_title", config.phase3_title || defaultConfig.phase3_title],
+            ["start_button", config.start_button || defaultConfig.start_button],
+            ["continue_button", config.continue_button || defaultConfig.continue_button]
+          ])
+        });
+      }
+
+      setupEventListeners();
+    }
+
+    function updateEnergyBar(newEnergy) {
+      currentEnergy = Math.max(0, Math.min(100, newEnergy));
+      const energyFill = document.getElementById('energyFill');
+      const energyPercent = document.getElementById('energyPercent');
+      
+      if (energyFill) energyFill.style.width = `${currentEnergy}%`;
+      if (energyPercent) energyPercent.textContent = `${currentEnergy}%`;
+    }
+
+    function showConsequence(phase, moment, snack) {
+      let consequenceData;
+      let consequenceId;
+      
+      if (phase === 1) {
+        consequenceData = consequences.phase1[snack];
+        consequenceId = 'consequence1';
+      } else if (phase === 2) {
+        consequenceData = consequences.phase2[`moment${moment}`][snack];
+        consequenceId = `consequence2-${moment}`;
+      } else if (phase === 3) {
+        consequenceData = consequences.phase3[snack];
+        consequenceId = 'consequence3';
+      }
+
+      const consequenceCard = document.getElementById(consequenceId);
+      const consequenceText = document.getElementById(`consequenceText${phase === 2 ? '2-' + moment : phase}`);
+      const consequenceIcon = consequenceCard.querySelector('.consequence-icon');
+
+      consequenceCard.className = `consequence-card show ${consequenceData.type}`;
+      consequenceIcon.textContent = consequenceData.icon;
+      consequenceText.textContent = consequenceData.text;
+
+      updateEnergyBar(currentEnergy + consequenceData.energy);
+
+      const learningBox = document.getElementById(`learning${phase}`);
+      if (learningBox) learningBox.classList.remove('hidden');
+
+      if (phase === 1) {
+        document.getElementById('startMatchBtn').disabled = false;
+      } else if (phase === 2) {
+        if (moment < 3) {
+          document.getElementById('continueBtn').disabled = false;
+        } else {
+          document.getElementById('continueBtn').textContent = 'Finalizar Partido';
+          document.getElementById('continueBtn').disabled = false;
+        }
+      } else if (phase === 3) {
+        document.getElementById('finishBtn').disabled = false;
+      }
+    }
+
+    async function saveChoice(phase, snack, moment = null) {
+      if (!window.dataSdk) return;
+
+      const record = {
+        id: `choice_${Date.now()}`,
+        phase: `phase${phase}${moment ? `_moment${moment}` : ''}`,
+        snack_choice: snack,
+        energy_level: currentEnergy,
+        timestamp: new Date().toISOString()
+      };
+
+      const createResult = await window.dataSdk.create(record);
+      if (!createResult.isOk) {
+        console.error("Error saving choice");
+      }
+    }
+
+    function calculateStats() {
+      // Base energy score
+      let energyScore = currentEnergy;
+      
+      // Precision score (based on quality of choices)
+      let precisionScore = 50;
+      const goodChoicesPhase1 = ['banana'];
+      const goodChoicesPhase2M1 = ['half-banana', 'isotonic'];
+      const goodChoicesPhase2M2 = ['isotonic', 'fruit'];
+      const goodChoicesPhase2M3 = ['banana', 'isotonic'];
+      const goodChoicesPhase3 = ['protein-shake', 'whole-sandwich'];
+      
+      if (goodChoicesPhase1.includes(phase1Choice)) precisionScore += 10;
+      if (phase2Choices[0] && goodChoicesPhase2M1.includes(phase2Choices[0])) precisionScore += 10;
+      if (phase2Choices[1] && goodChoicesPhase2M2.includes(phase2Choices[1])) precisionScore += 10;
+      if (phase2Choices[2] && goodChoicesPhase2M3.includes(phase2Choices[2])) precisionScore += 10;
+      if (goodChoicesPhase3.includes(phase3Choice)) precisionScore += 10;
+      
+      // Recovery score (heavily depends on phase 3)
+      let recoveryScore = 40;
+      if (phase3Choice === 'protein-shake' || phase3Choice === 'whole-sandwich') {
+        recoveryScore = 95;
+      } else if (phase3Choice === 'nuts') {
+        recoveryScore = 70;
+      } else if (phase3Choice === 'nothing') {
+        recoveryScore = 30;
+      }
+      
+      // Resistance score (based on phase 2 choices)
+      let resistanceScore = 50;
+      const phase2GoodChoices = phase2Choices.filter(choice => 
+        ['half-banana', 'isotonic', 'fruit', 'banana'].includes(choice)
+      ).length;
+      resistanceScore += phase2GoodChoices * 15;
+      
+      return {
+        energy: Math.min(100, energyScore),
+        precision: Math.min(100, precisionScore),
+        recovery: Math.min(100, recoveryScore),
+        resistance: Math.min(100, resistanceScore)
+      };
+    }
+
+    function showFinalReport() {
+      const stats = calculateStats();
+      const avgScore = (stats.energy + stats.precision + stats.recovery + stats.resistance) / 4;
+      
+      // Determine profile
+      let profile = {
+        emoji: '🟢',
+        title: 'Tenista Energía Estable',
+        description: 'Eres un jugador constante. Lo que comes te acompaña.',
+        color: '#10b981'
+      };
+      
+      if (avgScore < 60) {
+        profile = {
+          emoji: '🔴',
+          title: 'Tenista Energía Caótica',
+          description: 'La comida te está jugando en contra. Organízala.',
+          color: '#ef4444'
+        };
+      } else if (avgScore < 80) {
+        profile = {
+          emoji: '🟡',
+          title: 'Tenista Energía Variable',
+          description: 'Pequeñas mejoras en snacks te harán imparable.',
+          color: '#f59e0b'
+        };
+      }
+      
+      // Show report
+      document.getElementById('finalReport').classList.remove('hidden');
+      document.getElementById('finalAvatar').textContent = profile.emoji;
+      document.getElementById('profileTitle').textContent = profile.title;
+      document.getElementById('profileTitle').style.color = profile.color;
+      document.getElementById('profileDescription').textContent = profile.description;
+      
+      // Animate bars
+      setTimeout(() => {
+        updateStatBar('energy', stats.energy);
+        setTimeout(() => updateStatBar('precision', stats.precision), 200);
+        setTimeout(() => updateStatBar('recovery', stats.recovery), 400);
+        setTimeout(() => updateStatBar('resistance', stats.resistance), 600);
+      }, 300);
+
+      if (typeof acScrollToTop === 'function') {
+        requestAnimationFrame(() => acScrollToTop());
+      }
+    }
+
+    function updateStatBar(statName, value) {
+      const bar = document.getElementById(`${statName}Bar`);
+      const score = document.getElementById(`${statName}Score`);
+      
+      if (bar) bar.style.width = `${value}%`;
+      if (score) score.textContent = `${Math.round(value)}%`;
+    }
+
+    function resetGame() {
+      currentEnergy = 100;
+      currentPhase = 1;
+      currentMoment = 1;
+      phase1Choice = null;
+      phase2Choices = [];
+      phase3Choice = null;
+      
+      updateEnergyBar(100);
+      
+      // Hide all screens
+      document.getElementById('welcomeScreen').classList.remove('hidden');
+      document.getElementById('module1').classList.add('hidden');
+      document.getElementById('module2').classList.add('hidden');
+      document.getElementById('module3').classList.add('hidden');
+      document.getElementById('module4').classList.add('hidden');
+      document.getElementById('phase1').classList.add('hidden');
+      document.getElementById('phase2').classList.add('hidden');
+      document.getElementById('phase3').classList.add('hidden');
+      document.getElementById('finalReport').classList.add('hidden');
+      
+      // Reset phase 2 moments
+      document.getElementById('moment1').classList.remove('hidden');
+      document.getElementById('moment2').classList.add('hidden');
+      document.getElementById('moment3').classList.add('hidden');
+      document.getElementById('moment1Dot').classList.add('active');
+      document.getElementById('moment2Dot').classList.remove('active');
+      document.getElementById('moment3Dot').classList.remove('active');
+      document.getElementById('momentDescription').textContent = 'Primeros Games';
+      
+      // Reset all cards
+      document.querySelectorAll('.snack-card').forEach(card => {
+        card.classList.remove('selected', 'disabled');
+      });
+      
+      // Hide all consequences and learnings
+      document.querySelectorAll('.consequence-card').forEach(card => {
+        card.classList.remove('show');
+      });
+      document.querySelectorAll('.learning-box').forEach(box => {
+        box.classList.add('hidden');
+      });
+      
+      // Reset buttons
+      document.getElementById('startMatchBtn').disabled = true;
+      document.getElementById('continueBtn').disabled = true;
+      document.getElementById('finishBtn').disabled = true;
+    }
+
+    function startTutorial() {
+      document.getElementById('welcomeScreen').classList.add('hidden');
+      document.getElementById('module1').classList.remove('hidden');
+      if (typeof acScrollToTop === 'function') {
+        requestAnimationFrame(() => acScrollToTop());
+      }
+    }
+
+    function nextModule(moduleNumber) {
+      // Hide all modules
+      document.getElementById('module1').classList.add('hidden');
+      document.getElementById('module2').classList.add('hidden');
+      document.getElementById('module3').classList.add('hidden');
+      document.getElementById('module4').classList.add('hidden');
+      
+      // Show requested module
+      document.getElementById(`module${moduleNumber}`).classList.remove('hidden');
+      
+      // Scroll to top
+      window.scrollTo(0, 0);
+    }
+
+    function startGame() {
+      document.getElementById('module4').classList.add('hidden');
+      document.getElementById('gamePhase').classList.remove('hidden');
+      window.scrollTo(0, 0);
+      initMatchGame();
+    }
+
+    // ===== LÓGICA DEL JUEGO DE PARTIDO =====
+    let matchState = {
+      playerScore: 0,
+      opponentScore: 0,
+      playerSets: 0,
+      opponentSets: 0,
+      currentSet: 1,
+      gameNumber: 0,
+      energy: 100,
+      focus: 100,
+      hydration: 100,
+      muscle: 100,
+      inventory: {
+        bananas: 3,
+        drinks: 4,
+        bars: 2,
+        water: Infinity
+      },
+      decisionTimerInterval: null,
+      currentSituation: null
+    };
+
+    const gameSituations = [
+      {
+        id: 'start',
+        emoji: '🎾',
+        title: 'Inicio del Set',
+        description: 'El partido comienza. Tu energía está al máximo.',
+        choices: [
+          { text: 'Calentar intensamente', effect: { energy: -5, focus: +10 }, result: '¡Empiezas concentrado!' },
+          { text: 'Calentar moderadamente', effect: { energy: 0, focus: +5 }, result: 'Comienzo equilibrado' },
+          { text: 'Beber agua', effect: { hydration: +5 }, result: 'Bien hidratado', requiresItem: 'water' },
+          { text: 'Comer plátano', effect: { energy: +10 }, result: '+10 energía rápida', requiresItem: 'bananas' }
+        ]
+      },
+      {
+        id: 'intense_rally',
+        emoji: '🔥',
+        title: 'Peloteo Intenso (3 min seguidos)',
+        description: 'Un intercambio agotador. Sientes el cansancio.',
+        choices: [
+          { text: 'Tomar bebida isotónica', effect: { energy: +15, hydration: +20 }, result: '¡Sales recuperado!', requiresItem: 'drinks' },
+          { text: 'Solo agua', effect: { hydration: +10, energy: -5 }, result: 'Hidratado pero sin energía', requiresItem: 'water' },
+          { text: 'Seguir sin beber', effect: { hydration: -15, focus: -10 }, result: 'Empiezas a sentir sed' },
+          { text: 'Comer mitad de plátano', effect: { energy: +12 }, result: 'Energía rápida', requiresItem: 'bananas' }
+        ]
+      },
+      {
+        id: 'tie_break',
+        emoji: '⚡',
+        title: 'Tie-Break Decisivo',
+        description: '¡Momento crítico! Necesitas máxima concentración.',
+        choices: [
+          { text: 'Respirar profundo 30 seg', effect: { focus: +15, energy: -3 }, result: 'Mente clara' },
+          { text: 'Beber isotónica rápido', effect: { hydration: +10, focus: +5 }, result: 'Listo para el punto', requiresItem: 'drinks' },
+          { text: 'Atacar sin pensar', effect: { focus: -10, energy: -5 }, result: 'Decisión precipitada' },
+          { text: 'Comer barra energética', effect: { energy: +20 }, result: 'Boost de energía', requiresItem: 'bars' }
+        ]
+      },
+      {
+        id: 'injury_risk',
+        emoji: '💢',
+        title: 'Sensación de Calambre',
+        description: 'Tu pierna derecha empieza a tensarse...',
+        choices: [
+          { text: 'Beber isotónica + estirar', effect: { muscle: +20, hydration: +10 }, result: '¡Calambre evitado!', requiresItem: 'drinks' },
+          { text: 'Solo estirar', effect: { muscle: +5, energy: -5 }, result: 'Ayuda parcial' },
+          { text: 'Ignorar y seguir', effect: { muscle: -20, energy: -10 }, result: '¡Riesgo alto de lesión!' },
+          { text: 'Comer plátano (potasio)', effect: { muscle: +15 }, result: 'Potasio natural ayuda', requiresItem: 'bananas' }
+        ]
+      },
+      {
+        id: 'heat',
+        emoji: '🌡️',
+        title: 'Calor Extremo',
+        description: 'El sol está intenso. Sudas mucho.',
+        choices: [
+          { text: 'Beber agua constantemente', effect: { hydration: +15, energy: -3 }, result: 'Bien hidratado', requiresItem: 'water' },
+          { text: 'Isotónica + agua', effect: { hydration: +25, energy: +5 }, result: '¡Perfecto!', requiresItem: 'drinks' },
+          { text: 'Aguantar sin beber', effect: { hydration: -25, focus: -15 }, result: 'Deshidratación leve' },
+          { text: 'Buscar sombra + agua', effect: { hydration: +10, energy: +5 }, result: 'Recuperación inteligente', requiresItem: 'water' }
+        ]
+      },
+      {
+        id: 'mental_fatigue',
+        emoji: '🧠',
+        title: 'Fatiga Mental',
+        description: 'Pierdes varios puntos tontos seguidos.',
+        choices: [
+          { text: 'Comer algo dulce', effect: { focus: +15, energy: +10 }, result: 'Glucosa para el cerebro', requiresItem: 'bars' },
+          { text: 'Toalla + respiración', effect: { focus: +10 }, result: 'Reset mental' },
+          { text: 'Forzar más intensidad', effect: { focus: -10, energy: -15 }, result: 'Empeora la situación' },
+          { text: 'Beber isotónica', effect: { focus: +8, hydration: +10 }, result: 'Ayuda moderada', requiresItem: 'drinks' }
+        ]
+      },
+      {
+        id: 'long_match',
+        emoji: '⏰',
+        title: 'Partido Largo (90 min)',
+        description: 'Ya llevas mucho tiempo jugando.',
+        choices: [
+          { text: 'Barra energética', effect: { energy: +25, muscle: +10 }, result: '¡Energía sostenida!', requiresItem: 'bars' },
+          { text: 'Plátano + agua', effect: { energy: +15, hydration: +10 }, result: 'Combo efectivo', requiresItem: 'bananas' },
+          { text: 'Solo isotónica', effect: { hydration: +15, energy: +5 }, result: 'Insuficiente', requiresItem: 'drinks' },
+          { text: 'No comer nada', effect: { energy: -20, focus: -15 }, result: 'Desgaste severo' }
+        ]
+      }
+    ];
+
+    function initMatchGame() {
+      // Reset match state
+      matchState = {
+        playerScore: 0,
+        opponentScore: 0,
+        playerSets: 0,
+        opponentSets: 0,
+        currentSet: 1,
+        gameNumber: 0,
+        energy: 100,
+        focus: 100,
+        hydration: 100,
+        muscle: 100,
+        inventory: {
+          bananas: 3,
+          drinks: 4,
+          bars: 2,
+          water: Infinity
+        },
+        decisionTimerInterval: null,
+        currentSituation: null
+      };
+      
+      updateMatchUI();
+      presentSituation();
+    }
+
+    function updateMatchUI() {
+      // Update score
+      document.getElementById('playerScore').textContent = matchState.playerScore;
+      document.getElementById('opponentScore').textContent = matchState.opponentScore;
+      document.getElementById('playerSets').textContent = matchState.playerSets;
+      document.getElementById('opponentSets').textContent = matchState.opponentSets;
+      document.getElementById('currentSet').textContent = matchState.currentSet;
+      
+      // Update stats bars
+      updateStatBar2('gameEnergy', matchState.energy);
+      updateStatBar2('gameFocus', matchState.focus);
+      updateStatBar2('gameHydration', matchState.hydration);
+      updateStatBar2('gameMuscle', matchState.muscle);
+      
+      // Update inventory
+      document.getElementById('inventoryBananas').textContent = matchState.inventory.bananas;
+      document.getElementById('inventoryDrinks').textContent = matchState.inventory.drinks;
+      document.getElementById('inventoryBars').textContent = matchState.inventory.bars;
+    }
+
+    function updateStatBar2(statId, value) {
+      const clampedValue = Math.max(0, Math.min(100, value));
+      const bar = document.getElementById(`${statId}Bar`);
+      const text = document.getElementById(statId);
+      
+      if (bar) bar.style.width = `${clampedValue}%`;
+      if (text) text.textContent = `${Math.round(clampedValue)}%`;
+      
+      // Color coding
+      if (clampedValue < 30) {
+        if (bar) bar.style.background = 'linear-gradient(90deg, #ef4444, #f87171)';
+        if (text) text.style.color = '#ef4444';
+      } else if (clampedValue < 60) {
+        if (bar) bar.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+        if (text) text.style.color = '#f59e0b';
+      }
+    }
+
+    function presentSituation() {
+      // Stop any existing timer
+      if (matchState.decisionTimerInterval) {
+        clearInterval(matchState.decisionTimerInterval);
+      }
+      
+      // Select random situation
+      const situation = gameSituations[Math.floor(Math.random() * gameSituations.length)];
+      matchState.currentSituation = situation;
+      
+      // Update situation UI
+      document.getElementById('situationEmoji').textContent = situation.emoji;
+      document.getElementById('situationTitle').textContent = situation.title;
+      document.getElementById('situationDescription').textContent = situation.description;
+      
+      // Hide result from previous turn
+      document.getElementById('gameResult').style.display = 'none';
+      
+      // Generate choices
+      const choicesContainer = document.getElementById('gameChoices');
+      choicesContainer.innerHTML = '';
+      
+      situation.choices.forEach((choice, index) => {
+        // Check if item is available
+        let disabled = false;
+        let disabledClass = '';
+        let disabledText = '';
+        
+        if (choice.requiresItem) {
+          const itemCount = matchState.inventory[choice.requiresItem];
+          if (itemCount === 0) {
+            disabled = true;
+            disabledClass = 'opacity: 0.5; cursor: not-allowed;';
+            disabledText = ' (Sin stock)';
+          }
+        }
+        
+        const choiceCard = document.createElement('div');
+        choiceCard.style.cssText = `
+          background: ${disabled ? '#f9fafb' : 'white'};
+          border: 3px solid ${disabled ? '#e5e7eb' : '#10b981'};
+          border-radius: 12px;
+          padding: 1.25rem;
+          cursor: ${disabled ? 'not-allowed' : 'pointer'};
+          transition: all 0.3s ease;
+          ${disabledClass}
+        `;
+        
+        choiceCard.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: start; gap: 1rem;">
+            <div style="flex: 1;">
+              <div style="font-weight: 700; color: #1f2937; font-size: 1.05rem; margin-bottom: 0.5rem;">
+                ${choice.text}${disabledText}
+              </div>
+              <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; font-size: 0.9rem;">
+                ${Object.entries(choice.effect).map(([key, value]) => {
+                  const icons = { energy: '⚡', focus: '🧠', hydration: '💧', muscle: '💪' };
+                  const color = value > 0 ? '#10b981' : '#ef4444';
+                  return `<span style="color: ${color};">${icons[key]} ${value > 0 ? '+' : ''}${value}</span>`;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+        
+        if (!disabled) {
+          choiceCard.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-4px)';
+            this.style.boxShadow = '0 8px 24px rgba(16,185,129,0.3)';
+          });
+          
+          choiceCard.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+          });
+          
+          choiceCard.addEventListener('click', () => makeChoice(choice));
+        }
+        
+        choicesContainer.appendChild(choiceCard);
+      });
+      
+      // Start decision timer (10 seconds)
+      startDecisionTimer();
+    }
+
+    function startDecisionTimer() {
+      let timeLeft = 10;
+      document.getElementById('timerSeconds').textContent = `${timeLeft}s`;
+      document.getElementById('decisionTimer').style.width = '100%';
+      document.getElementById('decisionTimer').style.transition = 'none';
+      
+      setTimeout(() => {
+        document.getElementById('decisionTimer').style.transition = 'width 10s linear';
+        document.getElementById('decisionTimer').style.width = '0%';
+      }, 50);
+      
+      matchState.decisionTimerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timerSeconds').textContent = `${timeLeft}s`;
+        
+        if (timeLeft <= 0) {
+          clearInterval(matchState.decisionTimerInterval);
+          // Auto-choose worst option if time runs out
+          makeChoice(matchState.currentSituation.choices[2] || matchState.currentSituation.choices[0], true);
+        }
+      }, 1000);
+    }
+
+    function makeChoice(choice, timeout = false) {
+      // Stop timer
+      if (matchState.decisionTimerInterval) {
+        clearInterval(matchState.decisionTimerInterval);
+      }
+      
+      // Apply effects
+      if (choice.effect.energy) matchState.energy += choice.effect.energy;
+      if (choice.effect.focus) matchState.focus += choice.effect.focus;
+      if (choice.effect.hydration) matchState.hydration += choice.effect.hydration;
+      if (choice.effect.muscle) matchState.muscle += choice.effect.muscle;
+      
+      // Consume item if required
+      if (choice.requiresItem && matchState.inventory[choice.requiresItem] !== Infinity) {
+        matchState.inventory[choice.requiresItem]--;
+      }
+      
+      // Natural decay over time
+      matchState.energy -= 3;
+      matchState.focus -= 2;
+      matchState.hydration -= 5;
+      matchState.muscle -= 2;
+      
+      // Clamp values
+      matchState.energy = Math.max(0, Math.min(100, matchState.energy));
+      matchState.focus = Math.max(0, Math.min(100, matchState.focus));
+      matchState.hydration = Math.max(0, Math.min(100, matchState.hydration));
+      matchState.muscle = Math.max(0, Math.min(100, matchState.muscle));
+      
+      // Calculate game result based on stats
+      const avgStats = (matchState.energy + matchState.focus + matchState.hydration + matchState.muscle) / 4;
+      const winChance = avgStats / 100;
+      const wonGame = Math.random() < winChance;
+      
+      if (timeout) {
+        matchState.playerScore -= 1; // Penalty for timeout
+      } else if (wonGame) {
+        matchState.playerScore++;
+      } else {
+        matchState.opponentScore++;
+      }
+      
+      // Show result
+      const resultCard = document.getElementById('gameResult');
+      const resultText = document.getElementById('gameResultText');
+      const resultIcon = resultCard.querySelector('.consequence-icon');
+      
+      if (timeout) {
+        resultCard.className = 'consequence-card error';
+        resultIcon.textContent = '⏱️';
+        resultText.textContent = '¡Tiempo agotado! Pierdes concentración y el game.';
+      } else {
+        const resultType = wonGame ? 'success' : 'warning';
+        resultCard.className = `consequence-card ${resultType}`;
+        resultIcon.textContent = wonGame ? '✅' : '⚠️';
+        resultText.textContent = `${choice.result} → ${wonGame ? '¡Ganaste el game!' : 'Perdiste el game'}`;
+      }
+      
+      resultCard.style.display = 'block';
+      
+      // Check for set end
+      if (matchState.playerScore >= 6 || matchState.opponentScore >= 6) {
+        setTimeout(() => endSet(), 2000);
+      } else {
+        // Continue to next game
+        matchState.gameNumber++;
+        updateMatchUI();
+        
+        // Disable choices temporarily
+        document.getElementById('gameChoices').style.opacity = '0.5';
+        document.getElementById('gameChoices').style.pointerEvents = 'none';
+        
+        setTimeout(() => {
+          document.getElementById('gameChoices').style.opacity = '1';
+          document.getElementById('gameChoices').style.pointerEvents = 'auto';
+          presentSituation();
+        }, 3000);
+      }
+    }
+
+    function endSet() {
+      if (matchState.playerScore > matchState.opponentScore) {
+        matchState.playerSets++;
+      } else {
+        matchState.opponentSets++;
+      }
+      
+      // Check for match end
+      if (matchState.playerSets === 2 || matchState.opponentSets === 2) {
+        endMatch();
+        return;
+      }
+      
+      // Start new set
+      matchState.currentSet++;
+      matchState.playerScore = 0;
+      matchState.opponentScore = 0;
+      
+      // Show set transition
+      const resultCard = document.getElementById('gameResult');
+      const resultText = document.getElementById('gameResultText');
+      const resultIcon = resultCard.querySelector('.consequence-icon');
+      
+      resultCard.className = 'consequence-card';
+      resultCard.style.background = 'linear-gradient(135deg, #e0e7ff, #ddd6fe)';
+      resultCard.style.borderLeftColor = '#6366f1';
+      resultIcon.textContent = '🎾';
+      resultText.textContent = `Set ${matchState.currentSet - 1} finalizado. Nuevo set comienza...`;
+      resultCard.style.display = 'block';
+      
+      updateMatchUI();
+      
+      setTimeout(() => {
+        presentSituation();
+      }, 3000);
+    }
+
+    function endMatch() {
+      const won = matchState.playerSets > matchState.opponentSets;
+      
+      // Hide game phase
+      document.getElementById('gamePhase').classList.add('hidden');
+      
+      // Show final report with match result
+      document.getElementById('phase1').classList.add('hidden');
+      document.getElementById('phase2').classList.add('hidden');
+      document.getElementById('phase3').classList.add('hidden');
+      
+      // Calculate final stats
+      const stats = {
+        energy: matchState.energy,
+        precision: matchState.focus,
+        recovery: matchState.muscle,
+        resistance: matchState.hydration
+      };
+      
+      const avgScore = (stats.energy + stats.precision + stats.recovery + stats.resistance) / 4;
+      
+      // Determine profile based on match performance
+      let profile = {
+        emoji: won ? '🏆' : '😓',
+        title: won ? '¡Victoria! Nutrición Inteligente' : 'Derrota - Mejora tu Estrategia',
+        description: won ? 
+          'Tus decisiones nutricionales te llevaron a la victoria.' : 
+          'La nutrición influye. Aprende y vuelve más fuerte.',
+        color: won ? '#10b981' : '#f59e0b'
+      };
+      
+      // Show report
+      document.getElementById('finalReport').classList.remove('hidden');
+      document.getElementById('finalAvatar').textContent = profile.emoji;
+      document.getElementById('profileTitle').textContent = profile.title;
+      document.getElementById('profileTitle').style.color = profile.color;
+      document.getElementById('profileDescription').textContent = profile.description;
+      
+      // Animate bars
+      setTimeout(() => {
+        updateStatBar('energy', stats.energy);
+        setTimeout(() => updateStatBar('precision', stats.precision), 200);
+        setTimeout(() => updateStatBar('recovery', stats.recovery), 400);
+        setTimeout(() => updateStatBar('resistance', stats.resistance), 600);
+      }, 300);
+    }
+
+    function setupEventListeners() {
+      // Phase 1 snack selection
+      document.querySelectorAll('[data-phase="1"]').forEach(card => {
+        card.addEventListener('click', async function() {
+          if (this.classList.contains('disabled')) return;
+          
+          document.querySelectorAll('[data-phase="1"]').forEach(c => {
+            c.classList.remove('selected');
+            c.classList.add('disabled');
+          });
+          this.classList.add('selected');
+          this.classList.remove('disabled');
+
+          const snack = this.dataset.snack;
+          phase1Choice = snack;
+          showConsequence(1, null, snack);
+          await saveChoice(1, snack);
+        });
+      });
+
+      // Start match button
+      document.getElementById('startMatchBtn').addEventListener('click', function() {
+        document.getElementById('phase1').classList.add('hidden');
+        document.getElementById('phase2').classList.remove('hidden');
+        currentPhase = 2;
+        if (typeof acScrollToTop === 'function') {
+          requestAnimationFrame(() => acScrollToTop());
+        }
+      });
+
+      // Phase 2 moment 1 snacks
+      document.querySelectorAll('[data-moment="1"]').forEach(card => {
+        card.addEventListener('click', async function() {
+          if (this.classList.contains('disabled')) return;
+          
+          document.querySelectorAll('[data-moment="1"]').forEach(c => {
+            c.classList.remove('selected');
+            c.classList.add('disabled');
+          });
+          this.classList.add('selected');
+          this.classList.remove('disabled');
+
+          const snack = this.dataset.snack;
+          phase2Choices.push(snack);
+          showConsequence(2, 1, snack);
+          await saveChoice(2, snack, 1);
+        });
+      });
+
+      // Phase 2 moment 2 snacks
+      document.querySelectorAll('[data-moment="2"]').forEach(card => {
+        card.addEventListener('click', async function() {
+          if (this.classList.contains('disabled')) return;
+          
+          document.querySelectorAll('[data-moment="2"]').forEach(c => {
+            c.classList.remove('selected');
+            c.classList.add('disabled');
+          });
+          this.classList.add('selected');
+          this.classList.remove('disabled');
+
+          const snack = this.dataset.snack;
+          phase2Choices.push(snack);
+          showConsequence(2, 2, snack);
+          await saveChoice(2, snack, 2);
+        });
+      });
+
+      // Phase 2 moment 3 snacks
+      document.querySelectorAll('[data-moment="3"]').forEach(card => {
+        card.addEventListener('click', async function() {
+          if (this.classList.contains('disabled')) return;
+          
+          document.querySelectorAll('[data-moment="3"]').forEach(c => {
+            c.classList.remove('selected');
+            c.classList.add('disabled');
+          });
+          this.classList.add('selected');
+          this.classList.remove('disabled');
+
+          const snack = this.dataset.snack;
+          phase2Choices.push(snack);
+          showConsequence(2, 3, snack);
+          await saveChoice(2, snack, 3);
+        });
+      });
+
+      // Continue button for phase 2
+      document.getElementById('continueBtn').addEventListener('click', function() {
+        if (currentMoment === 1) {
+          document.getElementById('moment1').classList.add('hidden');
+          document.getElementById('moment2').classList.remove('hidden');
+          document.getElementById('moment1Dot').classList.remove('active');
+          document.getElementById('moment2Dot').classList.add('active');
+          document.getElementById('momentDescription').textContent = 'Medio del partido';
+          currentMoment = 2;
+          this.disabled = true;
+        } else if (currentMoment === 2) {
+          document.getElementById('moment2').classList.add('hidden');
+          document.getElementById('moment3').classList.remove('hidden');
+          document.getElementById('moment2Dot').classList.remove('active');
+          document.getElementById('moment3Dot').classList.add('active');
+          document.getElementById('momentDescription').textContent = 'Partido largo';
+          currentMoment = 3;
+          this.disabled = true;
+        } else if (currentMoment === 3) {
+          document.getElementById('phase2').classList.add('hidden');
+          document.getElementById('phase3').classList.remove('hidden');
+          currentPhase = 3;
+          if (typeof acScrollToTop === 'function') {
+            requestAnimationFrame(() => acScrollToTop());
+          }
+        }
+      });
+
+      // Phase 3 snack selection
+      document.querySelectorAll('[data-phase="3"]').forEach(card => {
+        card.addEventListener('click', async function() {
+          if (this.classList.contains('disabled')) return;
+          
+          document.querySelectorAll('[data-phase="3"]').forEach(c => {
+            c.classList.remove('selected');
+            c.classList.add('disabled');
+          });
+          this.classList.add('selected');
+          this.classList.remove('disabled');
+
+          const snack = this.dataset.snack;
+          phase3Choice = snack;
+          showConsequence(3, null, snack);
+          await saveChoice(3, snack);
+        });
+      });
+
+      // Finish button
+      document.getElementById('finishBtn').addEventListener('click', function() {
+        document.getElementById('phase3').classList.add('hidden');
+        showFinalReport();
+      });
+
+      // Final report buttons
+      document.getElementById('repeatBtn').addEventListener('click', function() {
+        resetGame();
+      });
+
+      document.getElementById('saveBtn').addEventListener('click', async function() {
+        this.disabled = true;
+        this.textContent = '✓ Guardado';
+        
+        const stats = calculateStats();
+        const avgScore = (stats.energy + stats.precision + stats.recovery + stats.resistance) / 4;
+        
+        if (window.dataSdk) {
+          const finalRecord = {
+            id: `final_report_${Date.now()}`,
+            phase: 'final_report',
+            snack_choice: JSON.stringify({
+              phase1: phase1Choice,
+              phase2: phase2Choices,
+              phase3: phase3Choice
+            }),
+            energy_level: avgScore,
+            timestamp: new Date().toISOString()
+          };
+          
+          await window.dataSdk.create(finalRecord);
+        }
+        
+        setTimeout(() => {
+          this.disabled = false;
+          this.textContent = '💾 Guardar';
+        }, 2000);
+      });
+
+      document.getElementById('nextGameBtn').addEventListener('click', function() {
+        const message = document.createElement('div');
+        message.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem 3rem; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); text-align: center; z-index: 10000; max-width: 90%;';
+        message.innerHTML = `
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🏁</div>
+          <h3 style="color: #1f2937; margin-bottom: 0.5rem; font-size: 1.5rem;">Laboratorio completado</h3>
+          <p style="color: #6b7280; margin: 0; line-height: 1.6;">Ya cerraste el recorrido completo: entendiste qué comer antes, cómo sostener la energía durante el partido y cómo recuperarte mejor al terminar.</p>
+          <p style="color: #4b5563; margin: 1rem 0 0;">Puedes guardar tu informe o repetir el laboratorio para afinar todavía más tus decisiones.</p>
+          <button onclick="this.parentElement.remove()" style="margin-top: 1.5rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-weight: 600; cursor: pointer;">Volver al informe</button>
+        `;
+        document.body.appendChild(message);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeApp);
+    } else {
+      initializeApp();
+    }
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) {
+      acScrollToTop();
+      return;
+    }
+
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+
+    try {
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, Math.max(0, top));
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    window.scrollTo(0, 0);
+  });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>

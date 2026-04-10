@@ -1,0 +1,1369 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tu Reloj de Recuperación AC</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .app-wrapper {
+      width: 100%;
+      min-height: 100%;
+      background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+      padding: 40px 20px;
+    }
+
+    .game-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .game-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .game-title {
+      font-size: 48px;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0 0 10px 0;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .game-emoji {
+      font-size: 64px;
+      margin-bottom: 10px;
+    }
+
+    .phase-container {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      margin-bottom: 30px;
+    }
+
+    .phase-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .phase-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin: 0 0 10px 0;
+    }
+
+    .phase-subtitle {
+      font-size: 18px;
+      color: #666;
+      font-style: italic;
+      margin: 0;
+    }
+
+    .question-block {
+      margin-bottom: 35px;
+    }
+
+    .question-label {
+      font-size: 22px;
+      font-weight: 600;
+      color: #0f3460;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .question-number {
+      background: #16213e;
+      color: #ffffff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .option-card {
+      background: #f8f9fa;
+      border: 3px solid #e9ecef;
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .option-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(15, 52, 96, 0.15);
+      border-color: #16213e;
+    }
+
+    .option-card.selected {
+      background: #16213e;
+      border-color: #16213e;
+      color: #ffffff;
+    }
+
+    .option-emoji {
+      font-size: 36px;
+      margin-bottom: 8px;
+    }
+
+    .option-text {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .feedback-box {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      animation: slideIn 0.4s ease;
+    }
+
+    .feedback-box.positive {
+      background: #d1ecf1;
+      border-left-color: #17a2b8;
+    }
+
+    .feedback-box.negative {
+      background: #f8d7da;
+      border-left-color: #dc3545;
+    }
+
+    .feedback-text {
+      font-size: 16px;
+      color: #333;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .btn-primary {
+      background: #16213e;
+      color: #ffffff;
+      border: none;
+      padding: 18px 40px;
+      font-size: 18px;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      margin-top: 30px;
+    }
+
+    .btn-primary:hover {
+      background: #0f3460;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(15, 52, 96, 0.3);
+    }
+
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .diagnosis-container {
+      margin-top: 30px;
+    }
+
+    .metric-card {
+      background: #f8f9fa;
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+
+    .metric-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .metric-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .metric-value {
+      font-size: 16px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .metric-bar {
+      width: 100%;
+      height: 12px;
+      background: #e9ecef;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .metric-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.8s ease;
+    }
+
+    .recovery-badge {
+      text-align: center;
+      padding: 30px;
+      border-radius: 16px;
+      margin: 30px 0;
+    }
+
+    .recovery-badge.elite {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+    }
+
+    .recovery-badge.medium {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      color: #ffffff;
+    }
+
+    .recovery-badge.low {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: #ffffff;
+    }
+
+    .recovery-title {
+      font-size: 32px;
+      font-weight: 800;
+      margin: 0 0 15px 0;
+    }
+
+    .recovery-description {
+      font-size: 18px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .ritual-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+    }
+
+    .ritual-card {
+      background: #f8f9fa;
+      border: 3px solid #e9ecef;
+      border-radius: 16px;
+      padding: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .ritual-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(15, 52, 96, 0.15);
+      border-color: #16213e;
+    }
+
+    .ritual-card.selected {
+      background: #16213e;
+      border-color: #16213e;
+      color: #ffffff;
+    }
+
+    .ritual-card.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .ritual-emoji {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+
+    .ritual-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 10px 0;
+    }
+
+    .ritual-description {
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0;
+      opacity: 0.9;
+    }
+
+    .selected-count {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      color: #0f3460;
+      margin: 20px 0;
+    }
+
+    .final-ritual {
+      background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+      color: #ffffff;
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .final-ritual-title {
+      font-size: 32px;
+      font-weight: 800;
+      margin: 0 0 25px 0;
+    }
+
+    .ritual-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin: 25px 0;
+    }
+
+    .ritual-step {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 20px;
+      font-size: 18px;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      padding: 15px 30px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex: 1;
+    }
+
+    .btn-secondary:hover {
+      background: #ffffff;
+      color: #16213e;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+    }
+
+    .info-card {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 16px;
+      padding: 30px;
+      border-left: 5px solid #16213e;
+      transition: all 0.3s ease;
+    }
+
+    .info-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .info-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .info-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin: 0 0 15px 0;
+    }
+
+    .info-text {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #333;
+      margin: 0 0 12px 0;
+    }
+
+    .info-highlight {
+      font-size: 15px;
+      font-weight: 700;
+      color: #16213e;
+      font-style: italic;
+      margin: 15px 0 0 0;
+    }
+
+    .key-message {
+      background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+      color: #ffffff;
+      border-radius: 16px;
+      padding: 30px;
+      margin: 30px 0;
+      text-align: center;
+    }
+
+    .key-title {
+      font-size: 28px;
+      font-weight: 800;
+      margin: 0 0 15px 0;
+    }
+
+    .key-text {
+      font-size: 18px;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .advice-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin: 30px 0;
+    }
+
+    .advice-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      border-radius: 16px;
+      padding: 30px;
+      border: 3px solid #e9ecef;
+    }
+
+    .advice-icon {
+      font-size: 42px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .advice-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #16213e;
+      margin: 0 0 12px 0;
+      text-align: center;
+    }
+
+    .advice-description {
+      font-size: 16px;
+      line-height: 1.7;
+      color: #333;
+      margin: 0;
+      text-align: center;
+    }
+
+    .timeline {
+      margin: 30px 0;
+    }
+
+    .timeline-item {
+      background: #f8f9fa;
+      border-left: 4px solid #16213e;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .timeline-item:hover {
+      background: #e9ecef;
+      border-left-width: 6px;
+    }
+
+    .timeline-week {
+      font-size: 18px;
+      font-weight: 700;
+      color: #16213e;
+      margin: 0 0 8px 0;
+    }
+
+    .timeline-text {
+      font-size: 16px;
+      color: #333;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .prediction-badge {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border-radius: 16px;
+      padding: 30px;
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    .prediction-title {
+      font-size: 32px;
+      font-weight: 800;
+      margin: 0 0 15px 0;
+    }
+
+    .prediction-text {
+      font-size: 18px;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .game-title {
+        font-size: 36px;
+      }
+
+      .phase-container {
+        padding: 25px;
+      }
+
+      .phase-title {
+        font-size: 26px;
+      }
+
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .ritual-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+
+    .container,
+    .game-container,
+    .game-wrapper,
+    .app-wrapper,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .phase-container,
+    .phase-card,
+    .content,
+    .content-area,
+    .modal-content,
+    .results-card {
+      padding: 16px !important;
+    }
+
+    h1, .main-title, .game-title, .title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+
+    h2, .phase-title, .stage-title, .final-title {
+      font-size: clamp(1.3rem, 6vw, 1.7rem) !important;
+      line-height: 1.25 !important;
+    }
+
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label {
+      font-size: clamp(1rem, 4.5vw, 1.15rem) !important;
+      line-height: 1.4 !important;
+    }
+
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+
+    .button-group,
+    .action-buttons,
+    .final-buttons,
+    .controls-row {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+
+    button,
+    .btn,
+    .btn-primary,
+    .btn-secondary,
+    .action-button,
+    .option-btn {
+      width: 100% !important;
+    }
+
+    .scenario-grid,
+    .macronutrient-grid,
+    .options-grid,
+    .snack-grid,
+    .results-stats,
+    .pyramid-preview,
+    .week-grid,
+    .myths-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    setConfig: function () {},
+    config: {}
+  };
+
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body>
+  <div class="app-wrapper">
+   <div class="game-container">
+    <header class="game-header">
+     <div class="game-emoji">
+      🎮🔥
+     </div>
+     <h1 class="game-title" id="gameTitle">Tu Reloj de Recuperación AC</h1>
+    </header><!-- FASE 0: Introducción -->
+    <div id="phase0" class="phase-container">
+     <div class="phase-header">
+      <h2 class="phase-title">💡 ¿Por qué el sueño es tu arma secreta?</h2>
+      <p class="phase-subtitle">Descubre cómo los campeones usan el descanso para dominar</p>
+     </div>
+     <div class="info-grid">
+      <div class="info-card">
+       <div class="info-icon">
+        🏆
+       </div>
+       <h3 class="info-title">Los Pro duermen más de lo que crees</h3>
+       <p class="info-text">Roger Federer: <strong>12 horas</strong> por noche<br>
+        LeBron James: <strong>12 horas</strong> por noche<br>
+        Usain Bolt: <strong>8-10 horas</strong> + siestas</p>
+       <p class="info-highlight">No es lujo, es entrenamiento invisible.</p>
+      </div>
+      <div class="info-card">
+       <div class="info-icon">
+        ⚡
+       </div>
+       <h3 class="info-title">Qué pasa cuando duermes mal</h3>
+       <p class="info-text">• Reflejos <strong>30% más lentos</strong><br>
+         • Riesgo de lesión <strong>aumenta 60%</strong><br>
+         • Toma de decisiones <strong>más débil</strong><br>
+         • Recuperación muscular <strong>incompleta</strong></p>
+       <p class="info-highlight">Una mala noche = un mal partido.</p>
+      </div>
+      <div class="info-card">
+       <div class="info-icon">
+        🧠
+       </div>
+       <h3 class="info-title">Lo que el sueño hace por ti</h3>
+       <p class="info-text">• Consolida técnica y táctica<br>
+         • Repara fibras musculares<br>
+         • Regula emociones bajo presión<br>
+         • Aumenta velocidad de reacción</p>
+       <p class="info-highlight">Tu cerebro entrena mientras duermes.</p>
+      </div>
+      <div class="info-card">
+       <div class="info-icon">
+        🎯
+       </div>
+       <h3 class="info-title">El ritual nocturno marca la diferencia</h3>
+       <p class="info-text">Un tenista con <strong>ritual de sueño</strong> tiene:<br>
+         • Más energía constante<br>
+         • Mejor concentración<br>
+         • Recuperación 2x más rápida<br>
+         • Menos lesiones por fatiga</p>
+       <p class="info-highlight">La rutina crea consistencia.</p>
+      </div>
+     </div>
+     <div class="key-message">
+      <h3 class="key-title">🔑 Mensaje clave</h3>
+      <p class="key-text">El sueño no es tiempo perdido. Es donde tu cuerpo se convierte en la mejor versión de ti mismo. Los campeones no duermen porque tengan tiempo, hacen tiempo porque saben que es su ventaja competitiva.</p>
+     </div><button class="btn-primary" id="startGameBtn">🚀 Comenzar mi diagnóstico</button>
+    </div><!-- FASE 1: Diagnóstico -->
+    <div id="phase1" class="phase-container">
+     <div class="phase-header">
+      <h2 class="phase-title" id="phase1Title">FASE 1 — Escanea tu noche: ¿cómo dormiste realmente?</h2>
+      <p class="phase-subtitle">Conocer la calidad del sueño es el primer paso de un atleta serio.</p>
+     </div>
+     <div class="question-block">
+      <div class="question-label"><span class="question-number">1</span> <span>¿Cuántas horas dormiste anoche?</span>
+      </div>
+      <div class="options-grid" id="hoursOptions"></div>
+      <div id="hoursFeedback"></div>
+     </div>
+     <div class="question-block">
+      <div class="question-label"><span class="question-number">2</span> <span>¿Cómo fue la calidad de tu sue  o?</span>
+      </div>
+      <div class="options-grid" id="qualityOptions"></div>
+      <div id="qualityFeedback"></div>
+     </div>
+     <div class="question-block">
+      <div class="question-label"><span class="question-number">3</span> <span>¿Qué hiciste justo antes de dormir?</span>
+      </div>
+      <div class="options-grid" id="activityOptions"></div>
+      <div id="activityFeedback"></div>
+     </div><button class="btn-primary" id="diagnosisBtn" disabled>Ver tu diagnóstico nocturno</button>
+    </div><!-- FASE 2: Diagnóstico AC -->
+    <div id="phase2" class="phase-container hidden">
+     <div class="phase-header">
+      <h2 class="phase-title" id="phase2Title">FASE 2 — Diagnóstico AC: Tu Nivel de Recuperación Hoy</h2>
+     </div>
+     <div id="recoveryBadge"></div>
+     <div class="diagnosis-container">
+      <div class="metric-card">
+       <div class="metric-header"><span class="metric-name">⚡ Energía física</span> <span class="metric-value" id="energyValue"></span>
+       </div>
+       <div class="metric-bar">
+        <div class="metric-fill" id="energyBar"></div>
+       </div>
+      </div>
+      <div class="metric-card">
+       <div class="metric-header"><span class="metric-name">⚡ Reacción</span> <span class="metric-value" id="reactionValue"></span>
+       </div>
+       <div class="metric-bar">
+        <div class="metric-fill" id="reactionBar"></div>
+       </div>
+      </div>
+      <div class="metric-card">
+       <div class="metric-header"><span class="metric-name">🧠 Claridad mental</span> <span class="metric-value" id="mentalValue"></span>
+       </div>
+       <div class="metric-bar">
+        <div class="metric-fill" id="mentalBar"></div>
+       </div>
+      </div>
+      <div class="metric-card">
+       <div class="metric-header"><span class="metric-name">😊 Estado emocional</span> <span class="metric-value" id="emotionalValue"></span>
+       </div>
+       <div class="metric-bar">
+        <div class="metric-fill" id="emotionalBar"></div>
+       </div>
+      </div>
+     </div><button class="btn-primary" id="ritualBtn">🌀 Construir tu ritual de sueño AC</button>
+    </div><!-- FASE 3: Construir Ritual -->
+    <div id="phase3" class="phase-container hidden">
+     <div class="phase-header">
+      <h2 class="phase-title" id="phase3Title">FASE 3 — Construye tu Ritual de Sueño AC</h2>
+      <p class="phase-subtitle">Elige 3 hábitos para tu ritual nocturno</p>
+     </div>
+     <div class="selected-count" id="selectedCount">
+      Seleccionados: 0/3
+     </div>
+     <div class="ritual-grid" id="ritualOptions"></div><button class="btn-primary" id="saveRitualBtn" disabled>✔ Guardar mi ritual AC</button>
+    </div><!-- Ritual Final -->
+    <div id="finalRitual" class="phase-container hidden">
+     <div class="final-ritual">
+      <h2 class="final-ritual-title">🎯 Tu Ritual AC Personal</h2>
+      <div class="ritual-steps" id="ritualSteps"></div>
+      <p style="font-size: 20px; margin: 25px 0 0 0; font-weight: 600;">Tu sueño mejorará desde hoy.</p>
+     </div><button class="btn-primary" id="seeAdviceBtn" style="background: #10b981; margin-top: 20px;">📊 Ver cómo me irá con este ritual</button>
+    </div><!-- FASE FINAL: Predicción y Consejos -->
+    <div id="phaseFinal" class="phase-container hidden">
+     <div class="phase-header">
+      <h2 class="phase-title">🔮 Tu Futuro con este Ritual</h2>
+      <p class="phase-subtitle">Descubre qué cambios experimentarás semana a semana</p>
+     </div>
+     <div class="prediction-badge">
+      <h3 class="prediction-title" id="predictionTitle"></h3>
+      <p class="prediction-text" id="predictionText"></p>
+     </div>
+     <h3 style="font-size: 26px; font-weight: 700; color: #1a1a2e; margin: 40px 0 20px 0; text-align: center;">📈 Tu evolución semana a semana</h3>
+     <div class="timeline" id="timeline"></div>
+     <h3 style="font-size: 26px; font-weight: 700; color: #1a1a2e; margin: 40px 0 20px 0; text-align: center;">💡 Consejos para maximizar tu ritual</h3>
+     <div class="advice-grid" id="adviceGrid"></div>
+     <div class="key-message">
+      <h3 class="key-title">⚡ Recuerda</h3>
+      <p class="key-text">La consistencia es más importante que la perfección. Mantén tu ritual al menos 21 días para que se convierta en un hábito automático. Los campeones no nacen, se construyen noche tras noche.</p>
+     </div>
+     <div class="action-buttons"><button class="btn-secondary" id="repeatBtnFinal" style="border-color: #1a1a2e; color: #1a1a2e;">🔄 Cambiar ritual</button> <button class="btn-secondary" id="newGameBtnFinal" style="border-color: #1a1a2e; color: #1a1a2e;">🎮 Nuevo diagnóstico</button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const sleepHours = [
+      { value: '5-6', emoji: '😪', text: '5-6 horas', feedback: 'Dormiste por debajo de lo ideal para un tenista. Energía limitada.', type: 'negative', score: 40 },
+      { value: '6-7', emoji: '😐', text: '6-7 horas', feedback: 'Dormiste por debajo de lo ideal. Energía limitada.', type: 'negative', score: 60 },
+      { value: '7-8', emoji: '😊', text: '7-8 horas', feedback: 'Buen sueño. Tu cuerpo tuvo descanso adecuado.', type: 'positive', score: 80 },
+      { value: '8-9', emoji: '😄', text: '8-9 horas', feedback: 'Sueño óptimo para rendimiento. Tu cuerpo se recargó.', type: 'positive', score: 95 },
+      { value: '9-10', emoji: '🤩', text: '9-10 horas', feedback: 'Excelente descanso. Recuperación profunda.', type: 'positive', score: 95 },
+      { value: '10+', emoji: '😴', text: '10+ horas', feedback: 'Sueño de élite. Recuperación máxima (estilo Federer).', type: 'positive', score: 100 }
+    ];
+
+    const sleepQuality = [
+      { value: 'deep', emoji: '😴', text: 'Dormí profundo', feedback: '+ Claridad mental<br>+ Recuperación muscular<br>+ Reflejos rápidos', type: 'positive', score: 100 },
+      { value: 'normal', emoji: '    ', text: 'Normal', feedback: 'Descanso aceptable. Rendimiento estándar.', type: '', score: 70 },
+      { value: 'interrupted', emoji: '😕', text: 'Me desperté varias veces', feedback: 'Sueño fragmentado. Recuperación incompleta.', type: 'negative', score: 50 },
+      { value: 'poor', emoji: '😵', text: 'Casi no descansé', feedback: 'Reflejos lentos<br>Concentración débil<br>Emociones inestables', type: 'negative', score: 30 }
+    ];
+
+    const preSleepActivities = [
+      { value: 'phone', emoji: '📱', text: 'Celular 30-60 min', feedback: 'La luz azul bloquea melatonina → sueño superficial.', type: 'negative', score: 40 },
+      { value: 'calm', emoji: '💤', text: 'Rutina tranquila', feedback: 'Preparas tu mente para descanso profundo.', type: 'positive', score: 90 },
+      { value: 'ate-late', emoji: '🍔', text: 'Comí tarde', feedback: 'Digestión activa interfiere con el sueño profundo.', type: 'negative', score: 50 },
+      { value: 'games', emoji: '🎮', text: 'Juegos / pantallas', feedback: 'Estimulación alta → sistema nervioso activado.', type: 'negative', score: 35 },
+      { value: 'stretching', emoji: '🧘', text: 'Estiramientos suaves', feedback: 'Relaja sistema nervioso → sueño profundo.', type: 'positive', score: 95 }
+    ];
+
+    const ritualHabits = [
+      { value: 'no-screens', emoji: '📵', text: 'Apagar pantallas 45 min antes', description: 'Aumenta melatonina → sueño más profundo.' },
+      { value: 'breathing', emoji: '🧘', text: 'Respiración 4-2-6', description: 'Baja tu sistema nervioso en menos de un minuto.' },
+      { value: 'shower', emoji: '🚿', text: 'Ducha tibia', description: 'Reduce temperatura corporal → induce sueño.' },
+      { value: 'clean-room', emoji: '🛏', text: 'Ordenar habitación', description: 'Entorno tranquilo = mente tranquila.' },
+      { value: 'reading', emoji: '📚', text: 'Leer 10 min', description: 'Calma la mente y reduce estrés.' },
+      { value: 'stretching', emoji: '😌', text: 'Estiramientos suaves', description: 'Relaja cuerpo → previene tensión nocturna.' },
+      { value: 'hydration', emoji: '💧', text: 'Hidratarse ligeramente', description: 'Evita calambres, ayuda a recuperación muscular.' },
+      { value: 'schedule', emoji: '🕰', text: 'Dormir siempre a la misma hora', description: 'La consistencia del sueño cambia tu energía semanal.' }
+    ];
+
+    let selectedAnswers = {
+      hours: null,
+      quality: null,
+      activity: null
+    };
+
+    let selectedRituals = [];
+    let isLoading = false;
+
+    const defaultConfig = {
+      game_title: 'Tu Reloj de Recuperación AC',
+      phase_1_title: 'FASE 1 — Escanea tu noche: ¿cómo dormiste realmente?',
+      phase_2_title: 'FASE 2 — Diagnóstico AC: Tu Nivel de Recuperación Hoy',
+      phase_3_title: 'FASE 3 — Construye tu Ritual de Sueño AC'
+    };
+
+    function renderOptions(container, options, category) {
+      container.innerHTML = options.map(option => `
+        <div class="option-card" data-value="${option.value}" data-category="${category}">
+          <div class="option-emoji">${option.emoji}</div>
+          <p class="option-text">${option.text}</p>
+        </div>
+      `).join('');
+
+      container.querySelectorAll('.option-card').forEach(card => {
+        card.addEventListener('click', () => selectOption(card, category, options));
+      });
+    }
+
+    function selectOption(card, category, options) {
+      const container = card.parentElement;
+      container.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+
+      const value = card.dataset.value;
+      const selected = options.find(o => o.value === value);
+      selectedAnswers[category] = selected;
+
+      showFeedback(category, selected);
+      checkDiagnosisReady();
+    }
+
+    function showFeedback(category, option) {
+      const feedbackDiv = document.getElementById(`${category}Feedback`);
+      const feedbackClass = option.type ? `feedback-box ${option.type}` : 'feedback-box';
+      feedbackDiv.innerHTML = `
+        <div class="${feedbackClass}">
+          <p class="feedback-text">${option.feedback}</p>
+        </div>
+      `;
+    }
+
+    function checkDiagnosisReady() {
+      const btn = document.getElementById('diagnosisBtn');
+      if (selectedAnswers.hours && selectedAnswers.quality && selectedAnswers.activity) {
+        btn.disabled = false;
+      }
+    }
+
+    function calculateRecoveryLevel() {
+      const avgScore = (
+        selectedAnswers.hours.score +
+        selectedAnswers.quality.score +
+        selectedAnswers.activity.score
+      ) / 3;
+
+      if (avgScore >= 85) return 'elite';
+      if (avgScore >= 65) return 'medium';
+      return 'low';
+    }
+
+    function showDiagnosis() {
+      document.getElementById('phase1').classList.add('hidden');
+      document.getElementById('phase2').classList.remove('hidden');
+
+      const level = calculateRecoveryLevel();
+      const avgScore = (
+        selectedAnswers.hours.score +
+        selectedAnswers.quality.score +
+        selectedAnswers.activity.score
+      ) / 3;
+
+      const badges = {
+        elite: {
+          title: '🟢 RECUPERACIÓN ÉLITE',
+          description: 'Tu cuerpo está listo para competir duro hoy.<br>Tienes la recuperación de un jugador profesional.',
+          class: 'elite'
+        },
+        medium: {
+          title: '🟡 RECUPERACIÓN MEDIA',
+          description: 'Podrás entrenar, pero no al máximo.<br>Considera descanso adicional.',
+          class: 'medium'
+        },
+        low: {
+          title: '🔴 RECUPERACIÓN BAJA',
+          description: 'Tu riesgo de lesión aumenta.<br>Hoy necesitas calma y consistencia.<br>Evita cargas excesivas.',
+          class: 'low'
+        }
+      };
+
+      const badge = badges[level];
+      document.getElementById('recoveryBadge').innerHTML = `
+        <div class="recovery-badge ${badge.class}">
+          <h3 class="recovery-title">${badge.title}</h3>
+          <p class="recovery-description">${badge.description}</p>
+        </div>
+      `;
+
+      const metrics = [
+        { id: 'energy', label: 'Alta', value: avgScore, color: '#10b981' },
+        { id: 'reaction', label: 'Rápida', value: avgScore * 0.95, color: '#3b82f6' },
+        { id: 'mental', label: 'Clara', value: avgScore * 0.98, color: '#8b5cf6' },
+        { id: 'emotional', label: 'Estable', value: avgScore * 0.92, color: '#f59e0b' }
+      ];
+
+      if (level === 'medium') {
+        metrics.forEach(m => m.value *= 0.7);
+        metrics.forEach(m => m.label = 'Media');
+      } else if (level === 'low') {
+        metrics.forEach(m => m.value *= 0.45);
+        metrics.forEach(m => m.label = 'Baja');
+      }
+
+      metrics.forEach(metric => {
+        document.getElementById(`${metric.id}Value`).textContent = metric.label;
+        document.getElementById(`${metric.id}Value`).style.background = metric.color;
+        document.getElementById(`${metric.id}Value`).style.color = '#ffffff';
+        
+        const bar = document.getElementById(`${metric.id}Bar`);
+        bar.style.background = metric.color;
+        setTimeout(() => {
+          bar.style.width = `${metric.value}%`;
+        }, 100);
+      });
+    }
+
+    function renderRitualOptions() {
+      const container = document.getElementById('ritualOptions');
+      container.innerHTML = ritualHabits.map(habit => `
+        <div class="ritual-card" data-value="${habit.value}">
+          <div class="ritual-emoji">${habit.emoji}</div>
+          <h4 class="ritual-title">${habit.text}</h4>
+          <p class="ritual-description">${habit.description}</p>
+        </div>
+      `).join('');
+
+      container.querySelectorAll('.ritual-card').forEach(card => {
+        card.addEventListener('click', () => toggleRitualSelection(card));
+      });
+    }
+
+    function toggleRitualSelection(card) {
+      const value = card.dataset.value;
+
+      if (card.classList.contains('selected')) {
+        card.classList.remove('selected');
+        selectedRituals = selectedRituals.filter(v => v !== value);
+      } else if (selectedRituals.length < 3) {
+        card.classList.add('selected');
+        selectedRituals.push(value);
+      }
+
+      updateRitualCount();
+    }
+
+    function updateRitualCount() {
+      document.getElementById('selectedCount').textContent = `Seleccionados: ${selectedRituals.length}/3`;
+      document.getElementById('saveRitualBtn').disabled = selectedRituals.length !== 3;
+      
+      if (selectedRituals.length === 3) {
+        document.querySelectorAll('.ritual-card:not(.selected)').forEach(card => {
+          card.classList.add('disabled');
+        });
+      } else {
+        document.querySelectorAll('.ritual-card').forEach(card => {
+          card.classList.remove('disabled');
+        });
+      }
+    }
+
+    async function saveRitual() {
+      if (isLoading || selectedRituals.length !== 3) return;
+      
+      isLoading = true;
+      document.getElementById('saveRitualBtn').classList.add('loading');
+      document.getElementById('saveRitualBtn').textContent = 'Guardando...';
+
+      const recoveryLevel = calculateRecoveryLevel();
+      
+      const result = await window.dataSdk.create({
+        id: Date.now().toString(),
+        sleep_hours: selectedAnswers.hours.value,
+        sleep_quality: selectedAnswers.quality.value,
+        pre_sleep_activity: selectedAnswers.activity.value,
+        ritual_step_1: selectedRituals[0],
+        ritual_step_2: selectedRituals[1],
+        ritual_step_3: selectedRituals[2],
+        recovery_level: recoveryLevel,
+        timestamp: new Date().toISOString()
+      });
+
+      isLoading = false;
+
+      if (result.isOk) {
+        showFinalRitual();
+      } else {
+        document.getElementById('saveRitualBtn').classList.remove('loading');
+        document.getElementById('saveRitualBtn').textContent = '✔ Guardar mi ritual AC';
+        
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'feedback-box negative';
+        errorDiv.style.marginTop = '20px';
+        errorDiv.innerHTML = '<p class="feedback-text">Error al guardar el ritual. Por favor, intenta de nuevo.</p>';
+        document.getElementById('phase3').appendChild(errorDiv);
+        setTimeout(() => errorDiv.remove(), 3000);
+      }
+    }
+
+    function showFinalRitual() {
+      document.getElementById('phase3').classList.add('hidden');
+      document.getElementById('finalRitual').classList.remove('hidden');
+
+      const steps = selectedRituals.map(value => {
+        const habit = ritualHabits.find(h => h.value === value);
+        return `
+          <div class="ritual-step">
+            ${habit.emoji} ${habit.text}
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('ritualSteps').innerHTML = steps;
+      if (typeof acScrollToTop === 'function') {
+        requestAnimationFrame(() => acScrollToTop());
+      }
+    }
+
+    function startGame() {
+      document.getElementById('phase0').classList.add('hidden');
+      document.getElementById('phase1').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showAdvice() {
+      document.getElementById('finalRitual').classList.add('hidden');
+      document.getElementById('phaseFinal').classList.remove('hidden');
+      generateAdvice();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function generateAdvice() {
+      const recoveryLevel = calculateRecoveryLevel();
+      
+      // Predicción principal según nivel de recuperación actual
+      const predictions = {
+        elite: {
+          title: '🌟 Proyección: Rendimiento de Élite Sostenible',
+          text: 'Con tu actual nivel de recuperación ALTA y este ritual optimizado, estás en el camino de los profesionales. Tu cuerpo ya conoce el descanso profundo.'
+        },
+        medium: {
+          title: '📈 Proyección: Transformación en 3 Semanas',
+          text: 'Tu recuperación actual es MEDIA. Con este ritual, verás mejoras significativas en energía y concentración. Tu cuerpo aprenderá a descansar mejor.'
+        },
+        low: {
+          title: '🚀 Proyección: Cambio Radical en 4 Semanas',
+          text: 'Tu recuperación actual es BAJA, pero este ritual es tu punto de inflexión. Los primeros 7 días notarás cambios. En 3 semanas, serás otro atleta.'
+        }
+      };
+
+      const prediction = predictions[recoveryLevel];
+      document.getElementById('predictionTitle').textContent = prediction.title;
+      document.getElementById('predictionText').textContent = prediction.text;
+
+      // Timeline de evolución
+      const timelines = {
+        elite: [
+          { week: 'Semana 1', text: 'Mantienes alto rendimiento. Mayor consistencia día a día.' },
+          { week: 'Semana 2', text: 'Recuperación aún más rápida. Menos fatiga acumulada.' },
+          { week: 'Semana 3', text: 'Tu ritual es automático. Duermes profundo sin esfuerzo.' },
+          { week: 'Semana 4+', text: 'Rendimiento de élite sostenible. Menor riesgo de lesiones.' }
+        ],
+        medium: [
+          { week: 'Semana 1', text: 'Notas más energía por las mañanas. Menos somnolencia.' },
+          { week: 'Semana 2', text: 'Mejor concentración en entrenamientos. Reflejos más rápidos.' },
+          { week: 'Semana 3', text: 'Recuperación muscular visible. Te despiertas renovado.' },
+          { week: 'Semana 4+', text: 'Tu cuerpo alcanza recuperación óptima constante.' }
+        ],
+        low: [
+          { week: 'Semana 1', text: 'Comienzas a dormir más profundo. Menos despertares nocturnos.' },
+          { week: 'Semana 2', text: 'Aumenta energía física. Mejor estado de ánimo general.' },
+          { week: 'Semana 3', text: 'Cambio notable: concentración, fuerza y claridad mental mejoran.' },
+          { week: 'Semana 4+', text: 'Transformación completa. Eres un atleta diferente.' }
+        ]
+      };
+
+      const timeline = timelines[recoveryLevel];
+      document.getElementById('timeline').innerHTML = timeline.map(item => `
+        <div class="timeline-item">
+          <h4 class="timeline-week">${item.week}</h4>
+          <p class="timeline-text">${item.text}</p>
+        </div>
+      `).join('');
+
+      // Consejos personalizados según los rituales elegidos
+      const adviceMap = {
+        'no-screens': {
+          icon: '📵',
+          title: 'Aleja las pantallas gradualmente',
+          description: 'Si 45 min es difícil, empieza con 20 min. Cada semana aumenta 10 min. Usa modo nocturno si necesitas el celular.'
+        },
+        'breathing': {
+          icon: '🧘',
+          title: 'Practica en cualquier momento',
+          description: 'La respiración 4-2-6 también funciona antes de partidos para calmar nervios. Es tu herramienta secreta anti-estrés.'
+        },
+        'shower': {
+          icon: '🚿',
+          title: 'Temperatura perfecta',
+          description: 'Ni muy caliente ni muy fría. Tibia. Esto baja la temperatura corporal gradualmente, señal para dormir.'
+        },
+        'clean-room': {
+          icon: '🛏',
+          title: 'Hazlo 10 min antes del ritual',
+          description: 'Una habitación ordenada calma la mente. Incluso solo ordenar la cama marca diferencia.'
+        },
+        'reading': {
+          icon: '📚',
+          title: 'Elige contenido ligero',
+          description: 'Nada emocionante o estresante. Biografías, ficción suave. El objetivo es relajar, no aprender.'
+        },
+        'stretching': {
+          icon: '😌',
+          title: 'Enfócate en tensiones del día',
+          description: 'Cuello, hombros, espalda baja. Solo 5-7 min. No fuerces, solo suelta.'
+        },
+        'hydration': {
+          icon: '💧',
+          title: 'Cantidad justa',
+          description: '100-150ml máximo. Suficiente para hidratarte sin despertarte para ir al baño.'
+        },
+        'schedule': {
+          icon: '🕰',
+          title: 'Consistencia es clave',
+          description: 'Mismo horario incluso fines de semana. Tu cuerpo crea un reloj interno. En 2 semanas dormirás sin alarma.'
+        }
+      };
+
+      const selectedAdvice = selectedRituals.map(ritual => adviceMap[ritual]);
+      
+      document.getElementById('adviceGrid').innerHTML = selectedAdvice.map(advice => `
+        <div class="advice-card">
+          <div class="advice-icon">${advice.icon}</div>
+          <h4 class="advice-title">${advice.title}</h4>
+          <p class="advice-description">${advice.description}</p>
+        </div>
+      `).join('');
+    }
+
+    function resetGame() {
+      selectedAnswers = { hours: null, quality: null, activity: null };
+      selectedRituals = [];
+      
+      document.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
+      document.querySelectorAll('[id$="Feedback"]').forEach(div => div.innerHTML = '');
+      
+      document.getElementById('diagnosisBtn').disabled = true;
+      document.getElementById('phase0').classList.remove('hidden');
+      document.getElementById('phase1').classList.add('hidden');
+      document.getElementById('phase2').classList.add('hidden');
+      document.getElementById('phase3').classList.add('hidden');
+      document.getElementById('finalRitual').classList.add('hidden');
+      document.getElementById('phaseFinal').classList.add('hidden');
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function onConfigChange(config) {
+      document.getElementById('gameTitle').textContent = config.game_title || defaultConfig.game_title;
+      document.getElementById('phase1Title').textContent = config.phase_1_title || defaultConfig.phase_1_title;
+      document.getElementById('phase2Title').textContent = config.phase_2_title || defaultConfig.phase_2_title;
+      document.getElementById('phase3Title').textContent = config.phase_3_title || defaultConfig.phase_3_title;
+    }
+
+    const dataHandler = {
+      onDataChanged(data) {
+        // UI is updated through user interactions, not data changes
+      }
+    };
+
+    async function init() {
+      const sdkResult = await window.dataSdk.init(dataHandler);
+      
+      if (!sdkResult.isOk) {
+        console.error('Failed to initialize Data SDK');
+      }
+
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities: (config) => ({
+            recolorables: [],
+            borderables: [],
+            fontEditable: undefined,
+            fontSizeable: undefined
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ['game_title', config.game_title || defaultConfig.game_title],
+            ['phase_1_title', config.phase_1_title || defaultConfig.phase_1_title],
+            ['phase_2_title', config.phase_2_title || defaultConfig.phase_2_title],
+            ['phase_3_title', config.phase_3_title || defaultConfig.phase_3_title]
+          ])
+        });
+      }
+
+      renderOptions(document.getElementById('hoursOptions'), sleepHours, 'hours');
+      renderOptions(document.getElementById('qualityOptions'), sleepQuality, 'quality');
+      renderOptions(document.getElementById('activityOptions'), preSleepActivities, 'activity');
+      renderRitualOptions();
+
+      document.getElementById('startGameBtn').addEventListener('click', startGame);
+      document.getElementById('diagnosisBtn').addEventListener('click', showDiagnosis);
+      document.getElementById('ritualBtn').addEventListener('click', () => {
+        document.getElementById('phase2').classList.add('hidden');
+        document.getElementById('phase3').classList.remove('hidden');
+      });
+      document.getElementById('saveRitualBtn').addEventListener('click', saveRitual);
+      document.getElementById('seeAdviceBtn').addEventListener('click', showAdvice);
+      document.getElementById('repeatBtnFinal').addEventListener('click', () => {
+        document.getElementById('phaseFinal').classList.add('hidden');
+        document.getElementById('phase3').classList.remove('hidden');
+        selectedRituals = [];
+        updateRitualCount();
+        document.querySelectorAll('.ritual-card').forEach(card => {
+          card.classList.remove('selected', 'disabled');
+        });
+        if (typeof acScrollToTop === 'function') {
+          requestAnimationFrame(() => acScrollToTop());
+        }
+      });
+      document.getElementById('newGameBtnFinal').addEventListener('click', resetGame);
+
+      onConfigChange(window.elementSdk?.config || defaultConfig);
+    }
+
+    init();
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) {
+      acScrollToTop();
+      return;
+    }
+
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+
+    try {
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, Math.max(0, top));
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    window.scrollTo(0, 0);
+  });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>

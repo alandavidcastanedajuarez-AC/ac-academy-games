@@ -1,0 +1,2078 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crea tu Plato del Rendimiento AC</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .game-wrapper {
+      width: 100%;
+      min-height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .game-container {
+      width: 100%;
+      max-width: 900px;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      min-height: 600px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .game-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .game-title {
+      font-size: 42px;
+      font-weight: 800;
+      color: #2d3748;
+      margin: 0 0 12px 0;
+      line-height: 1.2;
+    }
+
+    .game-subtitle {
+      font-size: 24px;
+      font-weight: 600;
+      color: #667eea;
+      margin: 0;
+    }
+
+    .phase-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .phase-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      transition: all 0.3s ease;
+    }
+
+    .phase-dot.active {
+      background: #667eea;
+      width: 32px;
+      border-radius: 6px;
+    }
+
+    .phase-content {
+      flex: 1;
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .phase-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .macronutrient-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .macro-card {
+      background: linear-gradient(135deg, #f6f8fb 0%, #ffffff 100%);
+      border-radius: 16px;
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 3px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .macro-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .macro-card.carbs {
+      border-color: #f59e0b;
+    }
+
+    .macro-card.protein {
+      border-color: #ef4444;
+    }
+
+    .macro-card.fats {
+      border-color: #10b981;
+    }
+
+    .macro-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      display: block;
+      text-align: center;
+    }
+
+    .macro-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      text-align: center;
+    }
+
+    .macro-percentage {
+      font-size: 18px;
+      font-weight: 600;
+      color: #64748b;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .macro-description {
+      font-size: 16px;
+      color: #475569;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .macro-detail {
+      display: none;
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+      margin-bottom: 24px;
+      animation: slideIn 0.3s ease;
+    }
+
+    .macro-detail.active {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .detail-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 0 24px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .detail-section {
+      margin-bottom: 20px;
+    }
+
+    .detail-label {
+      font-size: 16px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .detail-text {
+      font-size: 18px;
+      color: #334155;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .food-examples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .food-tag {
+      background: #f1f5f9;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-block;
+      text-align: center;
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    .btn:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .btn-secondary:hover {
+      background: #cbd5e1;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .plate-container {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto 32px;
+      position: relative;
+    }
+
+    .plate-circle {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      position: relative;
+      overflow: hidden;
+      border: 8px solid #e2e8f0;
+    }
+
+    .plate-section {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .plate-section.carbs-zone {
+      background: rgba(245, 158, 11, 0.15);
+      clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 50% 100%);
+    }
+
+    .plate-section.protein-zone {
+      background: rgba(239, 68, 68, 0.15);
+      clip-path: polygon(50% 50%, 0% 0%, 50% 0%);
+    }
+
+    .plate-section.fats-zone {
+      background: rgba(16, 185, 129, 0.15);
+      clip-path: polygon(50% 50%, 0% 0%, 0% 100%, 50% 100%);
+    }
+
+    .zone-label {
+      font-size: 18px;
+      font-weight: 700;
+      color: #334155;
+      position: absolute;
+      z-index: 10;
+    }
+
+    .food-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .food-item {
+      background: white;
+      border: 3px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      cursor: grab;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .food-item:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .food-item.dragging {
+      opacity: 0.5;
+      cursor: grabbing;
+    }
+
+    .food-item.selected {
+      border-color: #667eea;
+      background: #f0f4ff;
+    }
+
+    .food-icon {
+      font-size: 48px;
+      margin-bottom: 8px;
+    }
+
+    .food-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .drop-zones {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .drop-zone {
+      background: #f8fafc;
+      border: 3px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 24px;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .drop-zone.drag-over {
+      border-color: #667eea;
+      background: #f0f4ff;
+      transform: scale(1.02);
+    }
+
+    .drop-zone-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .drop-zone.carbs .drop-zone-title {
+      color: #f59e0b;
+    }
+
+    .drop-zone.protein .drop-zone-title {
+      color: #ef4444;
+    }
+
+    .drop-zone.fats .drop-zone-title {
+      color: #10b981;
+    }
+
+    .dropped-food {
+      background: white;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+    }
+
+    .evaluation-card {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 32px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .evaluation-card.warning {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .evaluation-card.error {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+
+    .evaluation-title {
+      font-size: 32px;
+      font-weight: 800;
+      margin: 0 0 16px 0;
+    }
+
+    .evaluation-text {
+      font-size: 20px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .benefits-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .benefit-item {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .corrections-list {
+      background: white;
+      color: #334155;
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 24px;
+    }
+
+    .correction-item {
+      padding: 12px;
+      margin-bottom: 12px;
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .tennis-court-container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto 32px;
+      padding: 24px;
+      background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .court-animation {
+      width: 100%;
+      height: 300px;
+      background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+      border-radius: 12px;
+      position: relative;
+      border: 4px solid white;
+      overflow: hidden;
+    }
+
+    .tennis-net {
+      position: absolute;
+      top: 45%;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: white;
+      z-index: 2;
+    }
+
+    .tennis-net::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 0;
+      right: 0;
+      height: 20px;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 10px,
+        white 10px,
+        white 12px
+      );
+    }
+
+    .player-avatar {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 48px;
+      z-index: 3;
+      transition: all 0.3s ease;
+    }
+
+    .tennis-ball {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 32px;
+      z-index: 4;
+      opacity: 0;
+    }
+
+    @keyframes rally-success {
+      0% {
+        top: 20px;
+        left: 20px;
+        opacity: 1;
+      }
+      25% {
+        top: 45%;
+        left: 50%;
+      }
+      50% {
+        top: 70%;
+        left: 80%;
+      }
+      75% {
+        top: 45%;
+        left: 50%;
+      }
+      100% {
+        top: 20px;
+        left: 20px;
+        opacity: 1;
+      }
+    }
+
+    @keyframes rally-failure {
+      0% {
+        top: 20px;
+        left: 20px;
+        opacity: 1;
+      }
+      50% {
+        top: 50%;
+        left: 50%;
+      }
+      100% {
+        top: 80%;
+        left: 90%;
+        opacity: 0;
+      }
+    }
+
+    @keyframes player-move-success {
+      0%, 100% {
+        left: 50%;
+      }
+      25% {
+        left: 30%;
+      }
+      50% {
+        left: 70%;
+      }
+      75% {
+        left: 40%;
+      }
+    }
+
+    @keyframes player-move-failure {
+      0% {
+        left: 50%;
+      }
+      50% {
+        left: 35%;
+        transform: translateX(-50%) scale(0.9);
+      }
+      100% {
+        left: 50%;
+        transform: translateX(-50%) scale(1);
+      }
+    }
+
+    .rally-success .tennis-ball {
+      animation: rally-success 3s ease-in-out;
+    }
+
+    .rally-success .player-avatar {
+      animation: player-move-success 3s ease-in-out;
+    }
+
+    .rally-failure .tennis-ball {
+      animation: rally-failure 2s ease-in-out;
+    }
+
+    .rally-failure .player-avatar {
+      animation: player-move-failure 2s ease-in-out;
+    }
+
+    .scenario-card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .scenario-icon {
+      font-size: 72px;
+      margin-bottom: 16px;
+    }
+
+    .scenario-title {
+      font-size: 28px;
+      font-weight: 800;
+      margin: 0 0 16px 0;
+      color: #334155;
+    }
+
+    .scenario-description {
+      font-size: 20px;
+      color: #64748b;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .consequences-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .consequence-item {
+      background: #fef3c7;
+      padding: 16px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #92400e;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .final-plate-display {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .final-foods-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin: 24px 0;
+    }
+
+    .final-food-card {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      border: 3px solid #e2e8f0;
+    }
+
+    .final-food-card.carbs {
+      border-color: #f59e0b;
+    }
+
+    .final-food-card.protein {
+      border-color: #ef4444;
+    }
+
+    .final-food-card.fats {
+      border-color: #10b981;
+    }
+
+    .final-food-icon {
+      font-size: 56px;
+      margin-bottom: 12px;
+    }
+
+    .final-food-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .final-proportion {
+      background: #f1f5f9;
+      padding: 24px;
+      border-radius: 12px;
+      margin: 24px 0;
+    }
+
+    .proportion-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      font-size: 18px;
+      font-weight: 600;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .proportion-item:last-child {
+      border-bottom: none;
+    }
+
+    .proportion-bar {
+      width: 60%;
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-left: 16px;
+    }
+
+    .proportion-fill {
+      height: 100%;
+      transition: width 0.5s ease;
+    }
+
+    .proportion-fill.carbs {
+      background: #f59e0b;
+    }
+
+    .proportion-fill.protein {
+      background: #ef4444;
+    }
+
+    .proportion-fill.fats {
+      background: #10b981;
+    }
+
+    .final-advice-card {
+      padding: 24px;
+      border-radius: 12px;
+      margin: 24px 0;
+      text-align: center;
+    }
+
+    .final-advice-card.excellent {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+    }
+
+    .final-advice-card.good {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+    }
+
+    .final-advice-card.needs-work {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+    }
+
+    .final-advice-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+
+    .final-advice-title {
+      font-size: 32px;
+      font-weight: 800;
+      margin: 0 0 12px 0;
+    }
+
+    .final-advice-text {
+      font-size: 20px;
+      line-height: 1.6;
+    }
+
+    .recommendations-container {
+      width: 100%;
+    }
+
+    .recommendation-section {
+      margin-bottom: 32px;
+    }
+
+    .recommendation-card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .recommendation-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .recommendation-card.highlight {
+      background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+      border: 3px solid #667eea;
+    }
+
+    .recommendation-icon {
+      font-size: 48px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .recommendation-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: #334155;
+      margin: 0 0 20px 0;
+      text-align: center;
+    }
+
+    .recommendation-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .recommendation-list li {
+      font-size: 17px;
+      color: #475569;
+      line-height: 1.8;
+      margin-bottom: 16px;
+      padding-left: 32px;
+      position: relative;
+    }
+
+    .recommendation-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: #10b981;
+    }
+
+    .recommendation-list li strong {
+      color: #334155;
+      font-weight: 700;
+    }
+
+    .specific-recommendation-item {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      border-left: 5px solid #667eea;
+      font-size: 18px;
+      color: #334155;
+      line-height: 1.6;
+      font-weight: 600;
+    }
+
+    .specific-recommendation-item .emoji {
+      font-size: 24px;
+      margin-right: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .game-container {
+        padding: 24px;
+      }
+
+      .game-title {
+        font-size: 32px;
+      }
+
+      .game-subtitle {
+        font-size: 18px;
+      }
+
+      .macronutrient-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .drop-zones {
+        grid-template-columns: 1fr;
+      }
+
+      .food-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      }
+
+      .final-foods-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .court-animation {
+        height: 250px;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+
+    .container,
+    .game-container,
+    .game-wrapper,
+    .app-wrapper,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .phase-container,
+    .phase-card,
+    .content,
+    .content-area,
+    .modal-content,
+    .results-card {
+      padding: 16px !important;
+    }
+
+    h1, .main-title, .game-title, .title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+
+    h2, .phase-title, .stage-title, .final-title {
+      font-size: clamp(1.3rem, 6vw, 1.7rem) !important;
+      line-height: 1.25 !important;
+    }
+
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label {
+      font-size: clamp(1rem, 4.5vw, 1.15rem) !important;
+      line-height: 1.4 !important;
+    }
+
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+
+    .button-group,
+    .action-buttons,
+    .final-buttons,
+    .controls-row {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+
+    button,
+    .btn,
+    .btn-primary,
+    .btn-secondary,
+    .action-button,
+    .option-btn {
+      width: 100% !important;
+    }
+
+    .scenario-grid,
+    .macronutrient-grid,
+    .options-grid,
+    .snack-grid,
+    .results-stats,
+    .pyramid-preview,
+    .week-grid,
+    .myths-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    setConfig: function () {},
+    config: {}
+  };
+
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body>
+  <div class="game-wrapper">
+   <div class="game-container">
+    <div class="game-header">
+     <h1 class="game-title" id="main-title">🎮🔥 Crea tu Plato del Rendimiento AC</h1>
+     <p class="game-subtitle" id="current-phase-title">Conoce tus 3 fuentes de poder</p>
+    </div>
+    <div class="phase-indicator">
+     <div class="phase-dot active" data-phase="1"></div>
+     <div class="phase-dot" data-phase="2"></div>
+     <div class="phase-dot" data-phase="3"></div>
+     <div class="phase-dot" data-phase="4"></div>
+     <div class="phase-dot" data-phase="5"></div>
+    </div><!-- FASE 1: Conoce tus 3 fuentes de poder -->
+    <div class="phase-content active" id="phase1">
+     <div class="macronutrient-grid">
+      <div class="macro-card carbs" data-macro="carbs">
+       <div class="macro-icon">
+        🔶
+       </div>
+       <h3 class="macro-title" style="color: #f59e0b;">CARBOHIDRATOS</h3>
+       <p class="macro-percentage">55-60%</p>
+       <p class="macro-description">Tu gasolina rápida</p>
+      </div>
+      <div class="macro-card protein" data-macro="protein">
+       <div class="macro-icon">
+            
+       </div>
+       <h3 class="macro-title" style="color: #ef4444;">PROTEÍNAS</h3>
+       <p class="macro-percentage">15-20%</p>
+       <p class="macro-description">Tus ladrillos de reparación</p>
+      </div>
+      <div class="macro-card fats" data-macro="fats">
+       <div class="macro-icon">
+        🟩
+       </div>
+       <h3 class="macro-title" style="color: #10b981;">GRASAS SALUDABLES</h3>
+       <p class="macro-percentage">20-25%</p>
+       <p class="macro-description">Tu energía estable</p>
+      </div>
+     </div>
+     <div id="macro-details-container"></div>
+     <div class="button-container" id="phase1-buttons" style="display: none;"><button class="btn" id="start-phase2">Crear mi plato</button>
+     </div>
+    </div><!-- FASE 2: Arma tu plato perfecto -->
+    <div class="phase-content" id="phase2">
+     <div class="drop-zones">
+      <div class="drop-zone carbs" data-zone="carbs">
+       <div class="drop-zone-title">
+        🔶 Carbohidratos
+       </div>
+       <div class="zone-foods" id="carbs-zone"></div>
+      </div>
+      <div class="drop-zone protein" data-zone="protein">
+       <div class="drop-zone-title">
+        🔴 Proteínas
+       </div>
+       <div class="zone-foods" id="protein-zone"></div>
+      </div>
+      <div class="drop-zone fats" data-zone="fats">
+       <div class="drop-zone-title">
+        🟩 Grasas Saludables
+       </div>
+       <div class="zone-foods" id="fats-zone"></div>
+      </div>
+     </div>
+     <div class="food-grid" id="food-items"></div>
+     <div class="button-container"><button class="btn" id="evaluate-plate" disabled>Evaluar mi plato</button>
+     </div>
+    </div><!-- FASE 3: Evalúa tu plato -->
+    <div class="phase-content" id="phase3">
+     <div id="evaluation-result"></div>
+     <div class="button-container"><button class="btn" id="see-scenario">Ver en la cancha</button>
+     </div>
+    </div><!-- FASE 4: Escenario Real -->
+    <div class="phase-content" id="phase4">
+     <div class="tennis-court-container">
+      <div class="court-animation" id="court-animation">
+       <div class="tennis-net"></div>
+       <div class="player-avatar" id="player"></div>
+       <div class="tennis-ball" id="ball"></div>
+      </div>
+     </div>
+     <div id="scenario-result"></div>
+     <div class="button-container"><button class="btn" id="see-final-result">Ver resultado final</button>
+     </div>
+    </div><!-- FASE 5: Resultado Final -->
+    <div class="phase-content" id="phase5">
+     <div id="final-result"></div>
+     <div class="button-container"><button class="btn" id="see-recommendations">Ver recomendaciones</button> <button class="btn btn-secondary" id="restart-game">Crear otro plato</button>
+     </div>
+    </div><!-- FASE 6: Recomendaciones -->
+    <div class="phase-content" id="phase6">
+     <div class="recommendations-container">
+      <h2 style="text-align: center; font-size: 36px; font-weight: 800; color: #334155; margin-bottom: 32px;">📋 Recomendaciones para una Vida Saludable</h2>
+      <div class="recommendation-section">
+       <div class="recommendation-card highlight">
+        <div class="recommendation-icon">
+         🎯
+        </div>
+        <h3 class="recommendation-title">Recomendaciones Específicas para Ti</h3>
+        <div id="specific-recommendations"></div>
+       </div>
+      </div>
+      <div class="recommendation-section">
+       <div class="recommendation-card">
+        <div class="recommendation-icon">
+         🍽️
+        </div>
+        <h3 class="recommendation-title">Alimentación Equilibrada</h3>
+        <ul class="recommendation-list">
+         <li><strong>Come cada 3-4 horas:</strong> Mantén tu energía estable durante todo el día con 5-6 comidas pequeñas.</li>
+         <li><strong>Hidratación constante:</strong> Bebe al menos 2-3 litros de agua al día. Más si entrenas intenso.</li>
+         <li><strong>Colores en tu plato:</strong> Mientras más variedad de colores naturales (frutas y verduras), mejor nutrición.</li>
+         <li><strong>Proteína en cada comida:</strong> Ayuda a mantener tus músculos y controlar el hambre.</li>
+        </ul>
+       </div>
+       <div class="recommendation-card">
+        <div class="recommendation-icon">
+         ⏰
+        </div>
+        <h3 class="recommendation-title">Timing Nutricional</h3>
+        <ul class="recommendation-list">
+         <li><strong>2-3 horas antes de entrenar:</strong> Comida completa con carbohidratos, proteína moderada y poca grasa.</li>
+         <li><strong>30-60 min antes:</strong> Snack ligero de carbohidratos (plátano, barrita energética).</li>
+         <li><strong>Inmediatamente después:</strong> Carbohidratos + proteína para recuperación rápida.</li>
+         <li><strong>Antes de dormir:</strong> Proteína de digestión lenta (yogurt griego, queso cottage).</li>
+        </ul>
+       </div>
+       <div class="recommendation-card">
+        <div class="recommendation-icon">
+         🏃‍♂️
+        </div>
+        <h3 class="recommendation-title">Hábitos de Rendimiento</h3>
+        <ul class="recommendation-list">
+         <li><strong>Desayuno obligatorio:</strong> Es la comida más importante, especialmente si entrenas en la mañana.</li>
+         <li><strong>No saltarse comidas:</strong> Tu cuerpo necesita combustible constante para entrenar y estudiar.</li>
+         <li><strong>Duerme 8-9 horas:</strong> El sueño es cuando tu cuerpo se repara y crece.</li>
+         <li><strong>Limita azúcares procesados:</strong> Prefiere carbohidratos complejos que dan energía sostenida.</li>
+        </ul>
+       </div>
+       <div class="recommendation-card">
+        <div class="recommendation-icon">
+         🥗
+        </div>
+        <h3 class="recommendation-title">Snacks Inteligentes</h3>
+        <ul class="recommendation-list">
+         <li><strong>Para entrenar:</strong> Plátano + mantequilla de maní, avena con fruta, smoothie.</li>
+         <li><strong>Para recuperar:</strong> Chocolate con leche, yogurt con granola, sándwich de pavo.</li>
+         <li><strong>Para estudiar:</strong> Nueces + fruta seca, hummus con vegetales, queso con galletas integrales.</li>
+         <li><strong>Evita:</strong> Bebidas azucaradas, frituras, dulces procesados antes de entrenar.</li>
+        </ul>
+       </div>
+       <div class="recommendation-card">
+        <div class="recommendation-icon">
+         💧
+        </div>
+        <h3 class="recommendation-title">Hidratación Estratégica</h3>
+        <ul class="recommendation-list">
+         <li><strong>Al despertar:</strong> 1-2 vasos de agua para rehidratar después de dormir.</li>
+         <li><strong>Durante entrenamiento:</strong> 150-250ml cada 15-20 minutos de ejercicio.</li>
+         <li><strong>Monitorea tu orina:</strong> Debe ser amarillo claro. Si es oscuro, necesitas más agua.</li>
+         <li><strong>Bebidas deportivas:</strong> Solo si entrenas más de 60 minutos intenso o hace mucho calor.</li>
+        </ul>
+       </div>
+       <div class="recommendation-card">
+        <div class="recommendation-icon">
+         📊
+        </div>
+        <h3 class="recommendation-title">Control y Progreso</h3>
+        <ul class="recommendation-list">
+         <li><strong>Lleva un diario:</strong> Anota qué comes y cómo te sientes en entrenamientos.</li>
+         <li><strong>Escucha tu cuerpo:</strong> Si estás cansado o sin energía, revisa tu alimentación.</li>
+         <li><strong>Consulta profesionales:</strong> Un nutricionista deportivo puede personalizar tu plan.</li>
+         <li><strong>Sé consistente:</strong> Los resultados vienen con hábitos diarios, no dietas extremas.</li>
+        </ul>
+       </div>
+       <div class="recommendation-card highlight">
+        <div class="recommendation-icon">
+         🎾
+        </div>
+        <h3 class="recommendation-title">Mentalidad AC (Alta Competencia)</h3>
+        <ul class="recommendation-list">
+         <li><strong>Planifica tus comidas:</strong> Como planificas tus entrenamientos, planifica tu nutrición.</li>
+         <li><strong>80/20:</strong> Come bien el 80% del tiempo, permite flexibilidad el 20%.</li>
+         <li><strong>Nutrición = Ventaja:</strong> Mientras mejor comas, mejor recuperas y entrenas que tu competencia.</li>
+         <li><strong>Desarrolla tu rutina:</strong> Los mejores atletas tienen rutinas de alimentación establecidas.</li>
+        </ul>
+       </div>
+      </div>
+     </div>
+     <div class="button-container"><button class="btn btn-secondary" id="back-to-result">Volver al resultado</button> <button class="btn" id="restart-from-recommendations">Crear otro plato</button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      main_title: "🎮🔥 Crea tu Plato del Rendimiento AC",
+      phase1_title: "Conoce tus 3 fuentes de poder",
+      phase2_title: "Arma tu plato perfecto",
+      phase3_title: "Evalúa tu plato",
+      phase4_title: "Escenario Real: ¿Cómo rinde tu plato?",
+      phase5_title: "Tu Plato del Rendimiento AC",
+      recommendations_title: "Recomendaciones para una Vida Saludable",
+      understood_button: "Entendido",
+      create_plate_button: "Crear mi plato",
+      next_button: "Siguiente",
+      see_scenario_button: "Ver en la cancha",
+      restart_button: "Crear otro plato",
+      recommendations_button: "Ver recomendaciones",
+      primary_color: "#667eea",
+      secondary_color: "#764ba2",
+      success_color: "#10b981",
+      warning_color: "#f59e0b",
+      text_color: "#2d3748"
+    };
+
+    const macronutrients = {
+      carbs: {
+        title: "CARBOHIDRATOS",
+        percentage: "55-60%",
+        subtitle: "Tu gasolina rápida",
+        icon: "🔶",
+        color: "#f59e0b",
+        function: "Son tu energía principal para correr, reaccionar, acelerar y sostener puntos largos.",
+        examples: ["Arroz", "Pasta", "Avena", "Fruta", "Pan integral"],
+        lacking: "Fatiga rápida, piernas pesadas, mente lenta.",
+        excess: "Pesadez y digestión lenta."
+      },
+      protein: {
+        title: "PROTEÍNAS",
+        percentage: "15-20%",
+        subtitle: "Tus ladrillos de reparación",
+        icon: "🔴",
+        color: "#ef4444",
+        function: "Reparan músculos, mejoran recuperación y mantienen fuerza.",
+        examples: ["Pollo", "Atún", "Yogurt griego", "Huevos"],
+        lacking: "Lenta recuperación, riesgo de lesión.",
+        level: "Un cuarto del plato."
+      },
+      fats: {
+        title: "GRASAS SALUDABLES",
+        percentage: "20-25%",
+        subtitle: "Tu energía estable",
+        icon: "🟩",
+        color: "#10b981",
+        function: "Mantienen energía sostenida y tu sistema hormonal funcionando bien.",
+        examples: ["Nueces", "Aguacate", "Aceite de oliva", "Semillas"],
+        lacking: "Cansancio, poca concentración, poca estabilidad energética.",
+        level: "Solo un pequeño espacio del plato."
+      }
+    };
+
+    const foods = {
+      carbs: [
+        { name: "Avena", icon: "🥣" },
+        { name: "Arroz", icon: "🍚" },
+        { name: "Pasta integral", icon: "🍝" },
+        { name: "Plátano", icon: "🍌" }
+      ],
+      protein: [
+        { name: "Pollo", icon: "   " },
+        { name: "Pescado", icon: "🐟" },
+        { name: "Huevo", icon: "🥚" },
+        { name: "Yogurt griego", icon: "🥛" }
+      ],
+      fats: [
+        { name: "Aguacate", icon: "🥑" },
+        { name: "Nueces", icon: "🌰" },
+        { name: "Aceite de oliva", icon: "🫒" },
+        { name: "Semillas", icon: "🌻" }
+      ]
+    };
+
+    let currentPhase = 1;
+    let macrosViewed = new Set();
+    let selectedFoods = {
+      carbs: [],
+      protein: [],
+      fats: []
+    };
+
+    function updatePhaseIndicator() {
+      const dots = document.querySelectorAll('.phase-dot');
+      dots.forEach((dot, index) => {
+        if (index + 1 === currentPhase) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+    }
+
+    function showPhase(phaseNumber) {
+      document.querySelectorAll('.phase-content').forEach(phase => {
+        phase.classList.remove('active');
+      });
+      
+      const phaseElement = document.getElementById(`phase${phaseNumber}`);
+      if (phaseElement) {
+        phaseElement.classList.add('active');
+      }
+      
+      currentPhase = phaseNumber;
+      updatePhaseIndicator();
+      
+      const phaseTitles = {
+        1: window.elementSdk?.config?.phase1_title || defaultConfig.phase1_title,
+        2: window.elementSdk?.config?.phase2_title || defaultConfig.phase2_title,
+        3: window.elementSdk?.config?.phase3_title || defaultConfig.phase3_title,
+        4: window.elementSdk?.config?.phase4_title || defaultConfig.phase4_title,
+        5: window.elementSdk?.config?.phase5_title || defaultConfig.phase5_title,
+        6: window.elementSdk?.config?.recommendations_title || defaultConfig.recommendations_title
+      };
+      
+      const currentPhaseTitleElement = document.getElementById('current-phase-title');
+      if (currentPhaseTitleElement) {
+        currentPhaseTitleElement.textContent = phaseTitles[phaseNumber];
+      }
+
+      if (typeof acScrollToTop === 'function') {
+        requestAnimationFrame(() => acScrollToTop());
+      }
+    }
+
+    function showMacroDetail(macroType) {
+      const macro = macronutrients[macroType];
+      const container = document.getElementById('macro-details-container');
+      const understoodText = window.elementSdk?.config?.understood_button || defaultConfig.understood_button;
+      
+      const detailHTML = `
+        <div class="macro-detail active" id="detail-${macroType}">
+          <h2 class="detail-title" style="color: ${macro.color};">
+            ${macro.icon} ${macro.title}
+          </h2>
+          
+          <div class="detail-section">
+            <div class="detail-label">✔ Función:</div>
+            <div class="detail-text">"${macro.function}"</div>
+          </div>
+          
+          <div class="detail-section">
+            <div class="detail-label">✔ Ejemplos:</div>
+            <div class="food-examples">
+              ${macro.examples.map(food => `<span class="food-tag">${food}</span>`).join('')}
+            </div>
+          </div>
+          
+          <div class="detail-section">
+            <div class="detail-label">✔ ${macro.lacking ? 'Efecto si faltan:' : 'Consecuencia si faltan:'}</div>
+            <div class="detail-text">"${macro.lacking}"</div>
+          </div>
+          
+          ${macro.excess ? `
+            <div class="detail-section">
+              <div class="detail-label">✔ Efecto si sobran:</div>
+              <div class="detail-text">"${macro.excess}"</div>
+            </div>
+          ` : ''}
+          
+          ${macro.level ? `
+            <div class="detail-section">
+              <div class="detail-label">✔ ${macroType === 'protein' ? 'Nivel ideal:' : 'Ideal:'}</div>
+              <div class="detail-text">"${macro.level}"</div>
+            </div>
+          ` : ''}
+          
+          <div class="button-container" style="margin-top: 24px;">
+            <button class="btn" onclick="closeMacroDetail('${macroType}')">${understoodText}</button>
+          </div>
+        </div>
+      `;
+      
+      container.innerHTML = detailHTML;
+      macrosViewed.add(macroType);
+      
+      if (macrosViewed.size === 3) {
+        document.getElementById('phase1-buttons').style.display = 'flex';
+      }
+    }
+
+    function closeMacroDetail(macroType) {
+      const detail = document.getElementById(`detail-${macroType}`);
+      if (detail) {
+        detail.classList.remove('active');
+        setTimeout(() => {
+          detail.remove();
+        }, 300);
+      }
+    }
+
+    function initPhase2() {
+      const foodItemsContainer = document.getElementById('food-items');
+      foodItemsContainer.innerHTML = '';
+      
+      Object.entries(foods).forEach(([category, items]) => {
+        items.forEach((food, index) => {
+          const foodElement = document.createElement('div');
+          foodElement.className = 'food-item';
+          foodElement.draggable = true;
+          foodElement.dataset.category = category;
+          foodElement.dataset.foodId = `${category}-${index}`;
+          foodElement.innerHTML = `
+            <div class="food-icon">${food.icon}</div>
+            <div class="food-name">${food.name}</div>
+          `;
+          
+          foodElement.addEventListener('dragstart', handleDragStart);
+          foodElement.addEventListener('dragend', handleDragEnd);
+          foodElement.addEventListener('click', () => handleFoodClick(foodElement));
+          
+          foodItemsContainer.appendChild(foodElement);
+        });
+      });
+      
+      document.querySelectorAll('.drop-zone').forEach(zone => {
+        zone.addEventListener('dragover', handleDragOver);
+        zone.addEventListener('dragleave', handleDragLeave);
+        zone.addEventListener('drop', handleDrop);
+      });
+    }
+
+    let draggedElement = null;
+
+    function handleDragStart(e) {
+      draggedElement = this;
+      this.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragEnd(e) {
+      this.classList.remove('dragging');
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      this.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+      this.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      this.classList.remove('drag-over');
+      
+      if (draggedElement) {
+        const category = draggedElement.dataset.category;
+        const zoneCategory = this.dataset.zone;
+        
+        if (category === zoneCategory) {
+          addFoodToZone(draggedElement, zoneCategory);
+        }
+      }
+    }
+
+    function handleFoodClick(foodElement) {
+      const category = foodElement.dataset.category;
+      addFoodToZone(foodElement, category);
+    }
+
+    function addFoodToZone(foodElement, category) {
+      const existingIndex = selectedFoods[category].findIndex(
+        f => f.id === foodElement.dataset.foodId
+      );
+      
+      if (existingIndex !== -1) {
+        selectedFoods[category].splice(existingIndex, 1);
+        foodElement.classList.remove('selected');
+      } else {
+        selectedFoods[category].push({
+          id: foodElement.dataset.foodId,
+          name: foodElement.querySelector('.food-name').textContent,
+          icon: foodElement.querySelector('.food-icon').textContent
+        });
+        foodElement.classList.add('selected');
+      }
+      
+      updateZoneDisplay(category);
+      updateEvaluateButton();
+    }
+
+    function updateZoneDisplay(category) {
+      const zoneElement = document.getElementById(`${category}-zone`);
+      if (!zoneElement) return;
+      
+      zoneElement.innerHTML = '';
+      
+      selectedFoods[category].forEach(food => {
+        const foodDiv = document.createElement('div');
+        foodDiv.className = 'dropped-food';
+        foodDiv.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 20px; margin-right: 8px;">${food.icon}</span>
+            <span style="flex: 1; font-weight: 600;">${food.name}</span>
+          </div>
+        `;
+        zoneElement.appendChild(foodDiv);
+      });
+    }
+
+    function updateEvaluateButton() {
+      const hasCarbs = selectedFoods.carbs.length > 0;
+      const hasProtein = selectedFoods.protein.length > 0;
+      const hasFats = selectedFoods.fats.length > 0;
+      
+      const evaluateButton = document.getElementById('evaluate-plate');
+      if (evaluateButton) {
+        evaluateButton.disabled = !(hasCarbs && hasProtein && hasFats);
+      }
+    }
+
+    let isPlateBalanced = false;
+
+    function evaluatePlate() {
+      const totalItems = selectedFoods.carbs.length + selectedFoods.protein.length + selectedFoods.fats.length;
+      
+      const carbsPercent = (selectedFoods.carbs.length / totalItems) * 100;
+      const proteinPercent = (selectedFoods.protein.length / totalItems) * 100;
+      const fatsPercent = (selectedFoods.fats.length / totalItems) * 100;
+      
+      isPlateBalanced = 
+        carbsPercent >= 45 && carbsPercent <= 65 &&
+        proteinPercent >= 10 && proteinPercent <= 30 &&
+        fatsPercent >= 15 && fatsPercent <= 35;
+      
+      const resultContainer = document.getElementById('evaluation-result');
+      
+      if (isPlateBalanced) {
+        resultContainer.innerHTML = `
+          <div class="evaluation-card">
+            <div class="evaluation-title">✅ ¡Tienes un Plato AC de Rendimiento!</div>
+            <div class="evaluation-text">
+              Perfecto para entrenar, competir y mantener energía estable.
+            </div>
+            <div class="benefits-list">
+              <div class="benefit-item">⚡ Energía constante</div>
+              <div class="benefit-item">💪 Recuperación óptima</div>
+              <div class="benefit-item">🧠 Mente clara</div>
+              <div class="benefit-item">⚡ Reacción rápida</div>
+            </div>
+          </div>
+        `;
+      } else {
+        const corrections = [];
+        
+        if (carbsPercent < 45) {
+          corrections.push("Te vas a cansar rápido. Aumenta carbohidratos para tu esfuerzo.");
+        } else if (carbsPercent > 65) {
+          corrections.push("Demasiados carbohidratos. Tu digestión será pesada.");
+        }
+        
+        if (proteinPercent > 30) {
+          corrections.push("Tu plato es muy pesado para competir. Reduce proteína y aumenta carbohidrato.");
+        } else if (proteinPercent < 10) {
+          corrections.push("Añade más proteína para mejor recuperación muscular.");
+        }
+        
+        if (fatsPercent < 15) {
+          corrections.push("Necesitas grasas para estabilidad mental y hormonal.");
+        } else if (fatsPercent > 35) {
+          corrections.push("La digestión será pesada. Reduce aguacate o nueces.");
+        }
+        
+        resultContainer.innerHTML = `
+          <div class="evaluation-card warning">
+            <div class="evaluation-title">⚠️ Tu plato necesita ajustes</div>
+            <div class="evaluation-text">
+              Revisa las siguientes recomendaciones para optimizar tu rendimiento:
+            </div>
+            <div class="corrections-list">
+              ${corrections.map(c => `<div class="correction-item">✔ ${c}</div>`).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      showPhase(3);
+    }
+
+    function showScenario() {
+      const courtAnimation = document.getElementById('court-animation');
+      const scenarioResult = document.getElementById('scenario-result');
+      
+      courtAnimation.classList.remove('rally-success', 'rally-failure');
+      
+      const player = document.getElementById('player');
+      const ball = document.getElementById('ball');
+      
+      player.textContent = '🎾';
+      ball.textContent = '🟡';
+      
+      setTimeout(() => {
+        if (isPlateBalanced) {
+          courtAnimation.classList.add('rally-success');
+          
+          scenarioResult.innerHTML = `
+            <div class="scenario-card">
+              <div class="scenario-icon">🌟</div>
+              <div class="scenario-title">¡Energía estable durante todo el rally!</div>
+              <div class="scenario-description">
+                Gracias a tu plato balanceado, tienes:
+              </div>
+              <div class="benefits-list">
+                <div class="benefit-item">⚡ Piernas ligeras y rápidas</div>
+                <div class="benefit-item">🎯 Mente enfocada</div>
+                <div class="benefit-item">💪 Aguante durante todo el punto</div>
+                <div class="benefit-item">🏆 ¡Ganas el punto con un buen patrón!</div>
+              </div>
+            </div>
+          `;
+        } else {
+          courtAnimation.classList.add('rally-failure');
+          
+          const consequences = [
+            "⚠️ Piernas pesadas… llegas tarde al golpe",
+            "😓 Fatiga temprana durante el rally",
+            "🧠 Mente lenta, decisiones lentas",
+            "💥 Calambres después del punto"
+          ];
+          
+          scenarioResult.innerHTML = `
+            <div class="scenario-card">
+              <div class="scenario-icon">⚠️</div>
+              <div class="scenario-title">Tu plato te está frenando...</div>
+              <div class="scenario-description">
+                Las consecuencias de un plato desbalanceado:
+              </div>
+              <div class="consequences-list">
+                ${consequences.map(c => `<div class="consequence-item">${c}</div>`).join('')}
+              </div>
+            </div>
+          `;
+        }
+      }, 100);
+      
+      showPhase(4);
+    }
+
+    function showFinalResult() {
+      const finalResultContainer = document.getElementById('final-result');
+      const totalItems = selectedFoods.carbs.length + selectedFoods.protein.length + selectedFoods.fats.length;
+      
+      const carbsPercent = (selectedFoods.carbs.length / totalItems) * 100;
+      const proteinPercent = (selectedFoods.protein.length / totalItems) * 100;
+      const fatsPercent = (selectedFoods.fats.length / totalItems) * 100;
+      
+      const selectedFoodsList = [
+        ...selectedFoods.carbs.map(f => ({ ...f, category: 'carbs', categoryName: 'Carbohidratos' })),
+        ...selectedFoods.protein.map(f => ({ ...f, category: 'protein', categoryName: 'Proteínas' })),
+        ...selectedFoods.fats.map(f => ({ ...f, category: 'fats', categoryName: 'Grasas' }))
+      ];
+      
+      let adviceClass = 'needs-work';
+      let adviceIcon = '🔴';
+      let adviceTitle = 'Tu plato necesita ajustes';
+      let adviceText = 'Lo que comes determina cómo te mueves. Revisa las proporciones para mejorar tu rendimiento.';
+      
+      if (isPlateBalanced) {
+        adviceClass = 'excellent';
+        adviceIcon = '🟢';
+        adviceTitle = 'Tienes un plato de alta energía';
+        adviceText = 'Listo para entrenamientos intensos. Mantén estas proporciones para tu mejor rendimiento.';
+      } else if (Math.abs(carbsPercent - 55) < 15 && Math.abs(proteinPercent - 17.5) < 10 && Math.abs(fatsPercent - 22.5) < 10) {
+        adviceClass = 'good';
+        adviceIcon = '🟡';
+        adviceTitle = 'Tienes un plato decente';
+        adviceText = 'Puedes mejorar la proporción para rendimiento máximo. Estás en buen camino.';
+      }
+      
+      finalResultContainer.innerHTML = `
+        <div class="final-plate-display">
+          <h2 style="text-align: center; font-size: 32px; font-weight: 800; color: #334155; margin-bottom: 24px;">
+            Tu Plato del Rendimiento AC
+          </h2>
+          
+          <h3 style="text-align: center; font-size: 20px; font-weight: 700; color: #64748b; margin-bottom: 24px;">
+            Alimentos seleccionados:
+          </h3>
+          
+          <div class="final-foods-grid">
+            ${selectedFoodsList.map(food => `
+              <div class="final-food-card ${food.category}">
+                <div class="final-food-icon">${food.icon}</div>
+                <div class="final-food-name">${food.name}</div>
+                <div style="font-size: 14px; color: #64748b; margin-top: 8px;">${food.categoryName}</div>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div class="final-proportion">
+            <h3 style="text-align: center; font-size: 20px; font-weight: 700; color: #334155; margin-bottom: 16px;">
+              Proporciones de tu plato:
+            </h3>
+            
+            <div class="proportion-item">
+              <span style="color: #f59e0b;">🔶 Carbohidratos</span>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 16px; color: #64748b;">${carbsPercent.toFixed(0)}%</span>
+                <div class="proportion-bar">
+                  <div class="proportion-fill carbs" style="width: ${carbsPercent}%"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="proportion-item">
+              <span style="color: #ef4444;">🔴 Proteínas</span>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 16px; color: #64748b;">${proteinPercent.toFixed(0)}%</span>
+                <div class="proportion-bar">
+                  <div class="proportion-fill protein" style="width: ${proteinPercent}%"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="proportion-item">
+              <span style="color: #10b981;">🟩 Grasas Saludables</span>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 16px; color: #64748b;">${fatsPercent.toFixed(0)}%</span>
+                <div class="proportion-bar">
+                  <div class="proportion-fill fats" style="width: ${fatsPercent}%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="final-advice-card ${adviceClass}">
+          <div class="final-advice-icon">${adviceIcon}</div>
+          <div class="final-advice-title">${adviceTitle}</div>
+          <div class="final-advice-text">${adviceText}</div>
+        </div>
+      `;
+      
+      showPhase(5);
+    }
+
+    function restartGame() {
+      currentPhase = 1;
+      macrosViewed.clear();
+      selectedFoods = {
+        carbs: [],
+        protein: [],
+        fats: []
+      };
+      isPlateBalanced = false;
+      
+      document.getElementById('macro-details-container').innerHTML = '';
+      document.getElementById('phase1-buttons').style.display = 'none';
+      document.getElementById('evaluation-result').innerHTML = '';
+      document.getElementById('scenario-result').innerHTML = '';
+      document.getElementById('final-result').innerHTML = '';
+      
+      const courtAnimation = document.getElementById('court-animation');
+      if (courtAnimation) {
+        courtAnimation.classList.remove('rally-success', 'rally-failure');
+      }
+      
+      document.querySelectorAll('.food-item').forEach(item => {
+        item.classList.remove('selected');
+      });
+      
+      ['carbs', 'protein', 'fats'].forEach(category => {
+        const zoneElement = document.getElementById(`${category}-zone`);
+        if (zoneElement) {
+          zoneElement.innerHTML = '';
+        }
+      });
+      
+      showPhase(1);
+    }
+
+    document.querySelectorAll('.macro-card').forEach(card => {
+      card.addEventListener('click', function() {
+        const macroType = this.dataset.macro;
+        showMacroDetail(macroType);
+      });
+    });
+
+    function showRecommendations() {
+      const totalItems = selectedFoods.carbs.length + selectedFoods.protein.length + selectedFoods.fats.length;
+      const carbsPercent = (selectedFoods.carbs.length / totalItems) * 100;
+      const proteinPercent = (selectedFoods.protein.length / totalItems) * 100;
+      const fatsPercent = (selectedFoods.fats.length / totalItems) * 100;
+      
+      const specificContainer = document.getElementById('specific-recommendations');
+      const specificRecommendations = [];
+      
+      if (isPlateBalanced) {
+        specificRecommendations.push({
+          emoji: '🌟',
+          text: '¡Excelente balance! Mantén estas proporciones antes de tus entrenamientos para máximo rendimiento.'
+        });
+        specificRecommendations.push({
+          emoji: '💪',
+          text: 'Tu plato es ideal para competencias. Consume esto 2-3 horas antes de jugar un partido.'
+        });
+        specificRecommendations.push({
+          emoji: '⚡',
+          text: 'Con este balance tendrás energía constante sin sentirte pesado. Perfecto para sesiones largas.'
+        });
+      } else {
+        if (carbsPercent < 45) {
+          specificRecommendations.push({
+            emoji: '🔶',
+            text: 'Aumenta carbohidratos: Agrega más arroz, pasta, avena o frutas para tener energía durante todo el entrenamiento.'
+          });
+          specificRecommendations.push({
+            emoji: '🍌',
+            text: 'Snack recomendado: Plátano + avena 1 hora antes de entrenar para boost de energía rápida.'
+          });
+        }
+        
+        if (carbsPercent > 65) {
+          specificRecommendations.push({
+            emoji: '⚠️',
+            text: 'Reduce carbohidratos: Demasiados te harán sentir pesado. Balancea con más proteína y grasas saludables.'
+          });
+        }
+        
+        if (proteinPercent < 10) {
+          specificRecommendations.push({
+            emoji: '🔴',
+            text: 'Aumenta proteína: Añade pollo, pescado, huevos o yogurt griego para mejor recuperación muscular.'
+          });
+          specificRecommendations.push({
+            emoji: '🥛',
+            text: 'Post-entrenamiento: Toma un batido de proteína o come yogurt griego con fruta inmediatamente después.'
+          });
+        }
+        
+        if (proteinPercent > 30) {
+          specificRecommendations.push({
+            emoji: '⚖️',
+            text: 'Reduce proteína: Mucha proteína antes de entrenar puede hacerte sentir pesado. Guárdala para después del entrenamiento.'
+          });
+        }
+        
+        if (fatsPercent < 15) {
+          specificRecommendations.push({
+            emoji: '🟩',
+            text: 'Añade grasas saludables: Incluye aguacate, nueces o aceite de oliva para energía sostenida y mejor concentración.'
+          });
+        }
+        
+        if (fatsPercent > 35) {
+          specificRecommendations.push({
+            emoji: '🥑',
+            text: 'Reduce grasas: Son importantes pero en exceso hacen digestión lenta. Reduce aguacate y nueces antes de entrenar.'
+          });
+        }
+      }
+      
+      specificContainer.innerHTML = specificRecommendations.map(rec => `
+        <div class="specific-recommendation-item">
+          <span class="emoji">${rec.emoji}</span>
+          ${rec.text}
+        </div>
+      `).join('');
+      
+      showPhase(6);
+    }
+
+    document.getElementById('start-phase2').addEventListener('click', () => {
+      initPhase2();
+      showPhase(2);
+    });
+
+    document.getElementById('evaluate-plate').addEventListener('click', evaluatePlate);
+    document.getElementById('see-scenario').addEventListener('click', showScenario);
+    document.getElementById('see-final-result').addEventListener('click', showFinalResult);
+    document.getElementById('see-recommendations').addEventListener('click', showRecommendations);
+    document.getElementById('back-to-result').addEventListener('click', () => showPhase(5));
+    document.getElementById('restart-from-recommendations').addEventListener('click', restartGame);
+    document.getElementById('restart-game').addEventListener('click', restartGame);
+
+    async function onConfigChange(config) {
+      const mainTitleElement = document.getElementById('main-title');
+      if (mainTitleElement) {
+        mainTitleElement.textContent = config.main_title || defaultConfig.main_title;
+      }
+
+      const currentPhaseTitleElement = document.getElementById('current-phase-title');
+      if (currentPhaseTitleElement && currentPhase === 1) {
+        currentPhaseTitleElement.textContent = config.phase1_title || defaultConfig.phase1_title;
+      } else if (currentPhaseTitleElement && currentPhase === 2) {
+        currentPhaseTitleElement.textContent = config.phase2_title || defaultConfig.phase2_title;
+      } else if (currentPhaseTitleElement && currentPhase === 3) {
+        currentPhaseTitleElement.textContent = config.phase3_title || defaultConfig.phase3_title;
+      } else if (currentPhaseTitleElement && currentPhase === 4) {
+        currentPhaseTitleElement.textContent = config.phase4_title || defaultConfig.phase4_title;
+      } else if (currentPhaseTitleElement && currentPhase === 5) {
+        currentPhaseTitleElement.textContent = config.phase5_title || defaultConfig.phase5_title;
+      } else if (currentPhaseTitleElement && currentPhase === 6) {
+        currentPhaseTitleElement.textContent = config.recommendations_title || defaultConfig.recommendations_title;
+      }
+
+      const seeRecommendationsBtn = document.getElementById('see-recommendations');
+      if (seeRecommendationsBtn) {
+        seeRecommendationsBtn.textContent = config.recommendations_button || defaultConfig.recommendations_button;
+      }
+
+      const restartBtn = document.getElementById('restart-game');
+      if (restartBtn) {
+        restartBtn.textContent = config.restart_button || defaultConfig.restart_button;
+      }
+
+      const restartFromRecommendationsBtn = document.getElementById('restart-from-recommendations');
+      if (restartFromRecommendationsBtn) {
+        restartFromRecommendationsBtn.textContent = config.restart_button || defaultConfig.restart_button;
+      }
+
+      const primaryColor = config.primary_color || defaultConfig.primary_color;
+      const secondaryColor = config.secondary_color || defaultConfig.secondary_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+
+      document.querySelector('.game-wrapper').style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
+      
+      document.querySelectorAll('.btn:not(.btn-secondary)').forEach(btn => {
+        btn.style.background = primaryColor;
+      });
+      
+      document.querySelectorAll('.game-title').forEach(title => {
+        title.style.color = textColor;
+      });
+      
+      document.querySelectorAll('.game-subtitle').forEach(subtitle => {
+        subtitle.style.color = primaryColor;
+      });
+      
+      document.querySelectorAll('.phase-dot.active').forEach(dot => {
+        dot.style.background = primaryColor;
+      });
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.primary_color || defaultConfig.primary_color,
+              set: (value) => {
+                config.primary_color = value;
+                window.elementSdk.setConfig({ primary_color: value });
+              }
+            },
+            {
+              get: () => config.secondary_color || defaultConfig.secondary_color,
+              set: (value) => {
+                config.secondary_color = value;
+                window.elementSdk.setConfig({ secondary_color: value });
+              }
+            },
+            {
+              get: () => config.success_color || defaultConfig.success_color,
+              set: (value) => {
+                config.success_color = value;
+                window.elementSdk.setConfig({ success_color: value });
+              }
+            },
+            {
+              get: () => config.warning_color || defaultConfig.warning_color,
+              set: (value) => {
+                config.warning_color = value;
+                window.elementSdk.setConfig({ warning_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["main_title", config.main_title || defaultConfig.main_title],
+          ["phase1_title", config.phase1_title || defaultConfig.phase1_title],
+          ["phase2_title", config.phase2_title || defaultConfig.phase2_title],
+          ["phase3_title", config.phase3_title || defaultConfig.phase3_title],
+          ["phase4_title", config.phase4_title || defaultConfig.phase4_title],
+          ["phase5_title", config.phase5_title || defaultConfig.phase5_title],
+          ["recommendations_title", config.recommendations_title || defaultConfig.recommendations_title],
+          ["understood_button", config.understood_button || defaultConfig.understood_button],
+          ["create_plate_button", config.create_plate_button || defaultConfig.create_plate_button],
+          ["next_button", config.next_button || defaultConfig.next_button],
+          ["see_scenario_button", config.see_scenario_button || defaultConfig.see_scenario_button],
+          ["restart_button", config.restart_button || defaultConfig.restart_button],
+          ["recommendations_button", config.recommendations_button || defaultConfig.recommendations_button]
+        ])
+      });
+    }
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) {
+      acScrollToTop();
+      return;
+    }
+
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+
+    try {
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, Math.max(0, top));
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    window.scrollTo(0, 0);
+  });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>
