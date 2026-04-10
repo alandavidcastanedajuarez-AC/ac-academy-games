@@ -1,0 +1,1272 @@
+<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Respira Como un Profesional</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+      min-height: 100%;
+      width: 100%;
+      color: #1a202c;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 2rem;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: white;
+      animation: fadeInDown 0.8s ease;
+    }
+
+    .header h1 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+    }
+
+    .header p {
+      font-size: 1.2rem;
+      opacity: 0.95;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .phase-screen {
+      display: none;
+      background: white;
+      border-radius: 20px;
+      padding: 3rem;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+      animation: fadeIn 0.5s ease;
+      margin-bottom: 2rem;
+    }
+
+    .phase-screen.active {
+      display: block;
+    }
+
+    .phase-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 3px solid #e2e8f0;
+    }
+
+    .phase-header h2 {
+      color: #1a365d;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .phase-header p {
+      color: #4a5568;
+      font-size: 1.1rem;
+    }
+
+    .player-visual {
+      text-align: center;
+      margin: 2rem 0;
+      position: relative;
+    }
+
+    .player-container {
+      display: inline-block;
+      position: relative;
+      padding: 2rem;
+    }
+
+    .player-icon {
+      font-size: 8rem;
+      display: block;
+      transition: all 0.5s ease;
+    }
+
+    .stress-lines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+    }
+
+    .stress-line {
+      position: absolute;
+      width: 3px;
+      height: 40px;
+      background: #f56565;
+      opacity: 0;
+    }
+
+    .stress-lines.active .stress-line {
+      animation: stressLineAnimation 0.8s ease-in-out infinite;
+    }
+
+    @keyframes stressLineAnimation {
+      0%, 100% { opacity: 0; transform: translateY(0); }
+      50% { opacity: 1; }
+    }
+
+    .stress-line:nth-child(1) { top: 20%; left: -20px; transform: rotate(-45deg); animation-delay: 0s; }
+    .stress-line:nth-child(2) { top: 20%; right: -20px; transform: rotate(45deg); animation-delay: 0.1s; }
+    .stress-line:nth-child(3) { top: 40%; left: -30px; transform: rotate(-30deg); animation-delay: 0.2s; }
+    .stress-line:nth-child(4) { top: 40%; right: -30px; transform: rotate(30deg); animation-delay: 0.3s; }
+
+    .action-button {
+      background: linear-gradient(135deg, #38b2ac 0%, #319795 100%);
+      color: white;
+      border: none;
+      padding: 1.2rem 2.5rem;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(56, 178, 172, 0.4);
+      display: inline-block;
+      margin: 0.5rem;
+    }
+
+    .action-button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(56, 178, 172, 0.6);
+    }
+
+    .action-button:disabled {
+      background: #cbd5e0;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .teaching-box {
+      background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+      border-left: 5px solid #4299e1;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .teaching-box strong {
+      color: #2c5282;
+      font-size: 1.2rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .teaching-box p {
+      color: #1a202c;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    .option-card {
+      background: white;
+      border: 3px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      font-size: 1.1rem;
+    }
+
+    .option-card:hover {
+      border-color: #667eea;
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .option-card.correct {
+      border-color: #48bb78;
+      background: #c6f6d5;
+      animation: pulse 0.5s ease;
+    }
+
+    .option-card.incorrect {
+      border-color: #f56565;
+      background: #fed7d7;
+      animation: shake 0.5s ease;
+    }
+
+    .option-card.disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .progress-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .progress-dot {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #cbd5e0;
+      transition: all 0.3s ease;
+    }
+
+    .progress-dot.completed {
+      background: #38b2ac;
+      transform: scale(1.2);
+    }
+
+    .progress-dot.active {
+      background: #4299e1;
+      transform: scale(1.4);
+      box-shadow: 0 0 10px rgba(66, 153, 225, 0.6);
+    }
+
+    .breathing-animation {
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      margin: 2rem auto;
+      background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+      font-weight: bold;
+      transition: transform 1s ease;
+      box-shadow: 0 10px 30px rgba(66, 153, 225, 0.4);
+    }
+
+    .breathing-animation.inhale {
+      transform: scale(1.4);
+    }
+
+    .breathing-animation.hold {
+      transform: scale(1.4);
+    }
+
+    .breathing-animation.exhale {
+      transform: scale(1);
+    }
+
+    .breath-counter {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .breath-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 3px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #cbd5e0;
+      transition: all 0.3s ease;
+    }
+
+    .breath-circle.completed {
+      border-color: #38b2ac;
+      background: #b2f5ea;
+      color: #234e52;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .mb-2 {
+      margin-bottom: 2rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .player-aura {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(102, 126, 234, 0.4) 0%, rgba(102, 126, 234, 0) 70%);
+      transition: all 1s ease;
+      pointer-events: none;
+    }
+
+    .player-aura.active {
+      width: 300px;
+      height: 300px;
+      animation: auraGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes auraGlow {
+      0%, 100% { 
+        opacity: 0.6;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      50% { 
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1);
+      }
+    }
+
+    .scoreboard {
+      background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      margin: 2rem 0;
+      font-size: 2rem;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .game-scenario {
+      background: #f7fafc;
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+
+    .scenario-moment {
+      background: white;
+      border-left: 5px solid #667eea;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .scenario-moment h3 {
+      color: #667eea;
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+
+    .mini-player {
+      display: inline-block;
+      font-size: 4rem;
+      transition: all 0.3s ease;
+    }
+
+    .rhythm-choice {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .rhythm-option {
+      background: white;
+      border: 3px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .rhythm-option:hover {
+      border-color: #4299e1;
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+    .rhythm-option.selected {
+      border-color: #4299e1;
+      background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+    }
+
+    .rhythm-option .icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .rhythm-option .title {
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #2d3748;
+      margin-bottom: 0.5rem;
+    }
+
+    .completion-badge {
+      text-align: center;
+      padding: 3rem;
+      background: linear-gradient(135deg, #38b2ac 0%, #319795 100%);
+      color: white;
+      border-radius: 20px;
+      margin: 2rem 0;
+      box-shadow: 0 10px 30px rgba(56, 178, 172, 0.4);
+    }
+
+    .completion-badge h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .completion-badge .icon {
+      font-size: 5rem;
+      margin-bottom: 1rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .completion-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+      padding: 2rem;
+    }
+
+    .stat-item {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .stat-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: white;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ <style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+  .mt-30 { margin-top: 30px !important; }
+  @media (max-width: 768px) {
+    .container,
+    .game-container,
+    .game-card,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .section,
+    .phase,
+    .phase-screen,
+    .final-screen,
+    .final-results,
+    .modal-content {
+      padding: 16px !important;
+    }
+    h1, .main-title, .game-title {
+      font-size: clamp(1.8rem, 7vw, 2.2rem) !important;
+      line-height: 1.15 !important;
+    }
+    h2, .phase-title, .stage-title {
+      font-size: clamp(1.3rem, 6vw, 1.6rem) !important;
+      line-height: 1.25 !important;
+    }
+    p, .instruction, .phase-instruction, .stage-subtitle, .game-subtitle {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+    .button-group, .final-buttons, .action-buttons {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+    .btn, .btn-primary, .btn-secondary, .btn-main {
+      width: 100% !important;
+    }
+  }
+</style>
+<style>
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+    .header h1, .main-title, .game-title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+    .header p, .game-subtitle, .phase-subtitle, .instruction, .stage-subtitle,
+    .game-objective, .phase-instruction, .phase-header p, .stage-intro {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+    .container, .game-container, .app-container, .main-wrapper {
+      padding: 1rem !important;
+    }
+    .phase-screen, .game-card, .stage-wrapper, .content-area {
+      padding: 1.25rem !important;
+      border-radius: 18px !important;
+    }
+    .progress-indicator, .progress-steps {
+      flex-wrap: wrap !important;
+      gap: 0.5rem !important;
+    }
+    .progress-dot {
+      width: 12px !important;
+      height: 12px !important;
+    }
+    .progress-step {
+      min-width: 90px;
+    }
+    .player-icon {
+      font-size: clamp(3.5rem, 18vw, 6rem) !important;
+    }
+    .breathing-animation {
+      width: 180px !important;
+      height: 180px !important;
+      font-size: 1.5rem !important;
+    }
+    .breath-circle {
+      width: 48px !important;
+      height: 48px !important;
+      font-size: 1.1rem !important;
+    }
+    .action-button, .action-btn, .option-card, .bubble, .ritual-item,
+    .viz-option, .action-card, .tool-card, .emotion-card, .thought-card,
+    .question-card, .card-item {
+      width: 100% !important;
+    }
+    .balloons-container, .thought-bubbles, .ritual-items, .visualization-options,
+    .actions-grid, .tools-grid, .emotions-grid, .completion-stats,
+    .rhythm-choice, .content-grid, .options-grid, .choices-grid, .cards-grid,
+    .module-grid, .steps-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .transformation-area {
+      flex-direction: column !important;
+      gap: 1rem !important;
+    }
+    .emoji-header {
+      font-size: clamp(3rem, 16vw, 4.5rem) !important;
+    }
+    .action-emoji, .emotion-icon, .ritual-icon {
+      font-size: clamp(2.5rem, 14vw, 3.5rem) !important;
+    }
+    .timer-value {
+      font-size: clamp(1.8rem, 9vw, 2.4rem) !important;
+    }
+    .breathing-bar {
+      height: 28px !important;
+    }
+    .character {
+      width: 90px !important;
+      height: 90px !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    config: {}
+  };
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+</head>
+ <body>
+  <div class="container">
+   <header class="header">
+    <h1 id="main-title">💨 Respira Como un Profesional</h1>
+    <p id="subtitle">Domina tu respiración, domina tu mente</p>
+   </header><!-- Progress Indicator -->
+   <div class="progress-indicator">
+    <div class="progress-dot active" id="dot-1"></div>
+    <div class="progress-dot" id="dot-2"></div>
+    <div class="progress-dot" id="dot-3"></div>
+   </div><!-- PHASE 1: Aprende el Patrón -->
+   <section id="phase1" class="phase-screen active">
+    <div class="phase-header">
+     <h2 id="phase1-title">🫁 FASE 1: Aprende el Patrón</h2>
+     <p>La respiración que regula tu sistema nervioso</p>
+    </div><!-- SITUACIÓN INICIAL -->
+    <div class="teaching-box" style="background: linear-gradient(135deg, #fc8181 0%, #e53e3e 100%); color: white; border: none;"><strong style="color: #fffbeb; font-size: 1.5rem;">⚠️ SITUACIÓN:</strong>
+     <p style="color: white; font-size: 1.2rem; margin-top: 1rem; line-height: 1.8;">Estás en el partido más importante del año. <strong>Set empatado 5-5</strong>.<br>
+       Tu rival acaba de ganar 3 puntos seguidos.<br><br>
+       Tu corazón late rápido. Tus manos sudan. Tu mente grita: <em>"¡Vas a perder!"</em><br><br><strong style="font-size: 1.3rem;">🚨 Tu sistema nervioso está en MODO PÁNICO.</strong></p>
+    </div>
+    <div class="player-visual" style="margin: 2rem 0;">
+     <div class="player-container">
+      <div class="stress-lines active">
+       <div class="stress-line"></div>
+       <div class="stress-line"></div>
+       <div class="stress-line"></div>
+       <div class="stress-line"></div>
+      </div><span class="player-icon" style="font-size: 10rem;">😰</span>
+     </div>
+    </div>
+    <div class="teaching-box" style="background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); color: white; border: none;"><strong style="color: #fffbeb; font-size: 1.4rem;">💡 LA SOLUCIÓN: Respiración 4-2-6</strong>
+     <p style="color: white; font-size: 1.1rem; margin-top: 1rem;">Vas a aprender la respiración que <strong>regula tu sistema nervioso</strong> en segundos.<br><strong>INHALA 4 segundos</strong> → <strong>PAUSA 2 segundos</strong> → <strong>EXHALA 6 segundos</strong></p>
+    </div>
+    <div class="breathing-animation" id="intro-breathing-circle" style="font-size: 1.5rem;">
+     ¿Listo?
+    </div>
+    <div class="text-center">
+     <h3 style="color: #667eea; font-size: 1.6rem; margin: 1.5rem 0;">Sigue el círculo y RESPIRA</h3>
+     <p style="font-size: 1.3rem; color: #2d3748; margin-bottom: 1rem; font-weight: bold;">Repetición <span id="breath-count">1</span> de 3</p>
+     <p style="font-size: 1.1rem; color: #718096; margin-bottom: 2rem;">El círculo te guiará. Tú solo síguelo con tu cuerpo.</p><button class="action-button" onclick="startIntroBreathing()" id="intro-start-btn" style="font-size: 1.4rem; padding: 1.5rem 3rem;"> 🫁 COMENZAR RESPIRACIÓN (1/3) </button>
+    </div>
+    <div id="intro-instruction" class="text-center" style="margin-top: 2rem; font-size: 1.3rem; font-weight: bold; color: #667eea; min-height: 50px;"></div>
+    <div id="intro-complete" class="hidden">
+     <div class="player-visual" style="margin: 2rem 0;">
+      <div class="player-container">
+       <div class="player-aura active"></div><span class="player-icon" style="font-size: 10rem;">😌</span>
+      </div>
+     </div>
+     <div class="teaching-box" style="background: linear-gradient(135deg, #38b2ac 0%, #319795 100%); color: white; border: none;"><strong style="color: #fffbeb; font-size: 1.5rem;">🎉 ¡FELICIDADES! Acabas de regular tu sistema nervioso</strong>
+      <p style="color: white; font-size: 1.2rem; margin-top: 1rem; line-height: 1.8;"><strong>¿Qué acabas de hacer?</strong><br><br>
+            <strong>INHALACIÓN (4 seg):</strong> Activaste tu sistema nervioso simpático de forma CONTROLADA. Le dijiste a tu cerebro: <em>"Tengo el control, no el pánico"</em>.<br><br>
+        ✅ <strong>PAUSA (2 seg):</strong> Creaste un espacio entre el estímulo y tu reacción. Aquí es donde vive la INTELIGENCIA EMOCIONAL. Ya no reaccionas impulsivamente.<br><br>
+        ✅ <strong>EXHALACIÓN (6 seg):</strong> Activaste tu sistema nervioso parasimpático. Esto es literalmente el <strong>"BOTÓN DE CALMA"</strong> de tu cuerpo. Tu frecuencia cardíaca bajó, tu cortisol (hormona del estrés) disminuyó.<br><br><strong style="font-size: 1.3rem;">🧠 RESULTADO: Pasaste de PÁNICO a CONTROL en 12 segundos.</strong><br><br>
+        Esto no es magia. Es <strong>neurociencia aplicada</strong>. Esto es lo que hacen Djokovic, Nadal, Federer entre puntos. No están "descansando"... están <strong>regulando su sistema nervioso</strong>.</p>
+     </div>
+     <div class="teaching-box" style="border-left-color: #4299e1;"><strong style="color: #2c5282; font-size: 1.3rem;">📊 Ciencia detrás de la respiración 4-2-6:</strong>
+      <p style="font-size: 1.1rem; line-height: 1.7;">• <strong>Variabilidad de frecuencia cardíaca (HRV):</strong> La exhalación larga aumenta tu HRV, indicador #1 de resiliencia mental.<br><br>
+        • <strong>Nervio vago:</strong> La respiración lenta estimula el nervio vago, tu "cable de calma" que conecta cerebro y cuerpo.<br><br>
+        • <strong>Corteza prefrontal:</strong> La pausa activa la parte del cerebro responsable de DECISIONES INTELIGENTES, no emocionales.<br><br>
+        • <strong>Amígdala:</strong> La exhalación larga "apaga" la amígdala, tu alarma de pánico interno.</p>
+     </div>
+     <div class="teaching-box" style="background: #f7fafc; border-left-color: #f6ad55;"><strong style="color: #c05621; font-size: 1.2rem;">🎾 En la cancha esto significa:</strong>
+      <p style="font-size: 1.1rem;">→ <strong>Antes del punto:</strong> Entras calmado, no ansioso<br>
+        → <strong>Después de un error:</strong> Reseteas en 12 segundos<br>
+        → <strong>En un momento clave:</strong> Piensas con claridad, no con miedo</p>
+     </div>
+     <div class="text-center"><button class="action-button" onclick="completePhase1()" style="font-size: 1.3rem; padding: 1.5rem 3rem;"> ✓ Entendido, personalizar mi ritmo </button>
+     </div>
+    </div>
+   </section><!-- PHASE 2: Tu Ritmo Personal -->
+   <section id="phase2" class="phase-screen">
+    <div class="phase-header">
+     <h2 id="phase2-title">⚡ FASE 2: Tu Ritmo Personal</h2>
+     <p>Experimenta tu respiración según TU necesidad</p>
+    </div>
+    <div class="text-center mb-2">
+     <h3 style="color: #667eea; font-size: 1.6rem;">¿Qué necesitas AHORA?</h3>
+     <p style="font-size: 1.2rem; color: #718096; margin: 1rem 0;">Elige un estado y practica 3 veces (con 1 vez puedes continuar)</p>
+    </div>
+    <div class="rhythm-choice">
+     <div class="rhythm-option" onclick="selectFeeling('calm')">
+      <div class="icon">
+       🧘
+      </div>
+      <div class="title">
+       CALMARME
+      </div>
+      <p style="margin-top: 0.5rem; color: #718096;">Bajar ansiedad rápido</p>
+      <div style="margin-top: 1rem; padding: 0.8rem; background: #f7fafc; border-radius: 8px; font-weight: bold; color: #667eea;">
+       4-2-8 seg
+      </div>
+     </div>
+     <div class="rhythm-option" onclick="selectFeeling('focused')">
+      <div class="icon">
+       🎯
+      </div>
+      <div class="title">
+       ENFOCARME
+      </div>
+      <p style="margin-top: 0.5rem; color: #718096;">Concentración máxima</p>
+      <div style="margin-top: 1rem; padding: 0.8rem; background: #f7fafc; border-radius: 8px; font-weight: bold; color: #667eea;">
+       4-2-4 seg
+      </div>
+     </div>
+     <div class="rhythm-option" onclick="selectFeeling('energized')">
+      <div class="icon">
+       ⚡
+      </div>
+      <div class="title">
+       ACTIVARME
+      </div>
+      <p style="margin-top: 0.5rem; color: #718096;">Energía controlada</p>
+      <div style="margin-top: 1rem; padding: 0.8rem; background: #f7fafc; border-radius: 8px; font-weight: bold; color: #667eea;">
+       3-1-4 seg
+      </div>
+     </div>
+    </div>
+    <div id="phase2-practice" class="hidden">
+     <div class="teaching-box" style="background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); color: white; border: none; margin: 2rem 0;"><strong style="color: #fffbeb; font-size: 1.3rem;">🎯 Ritmo seleccionado:</strong>
+      <p id="selected-rhythm-display" style="color: white; font-size: 1.8rem; font-weight: bold; margin-top: 1rem;">4-2-8</p>
+      <p style="color: white; font-size: 1.1rem; margin-top: 0.5rem;">Practica 3 veces para dominar el ritmo</p>
+     </div>
+     <div class="breath-counter" id="breath-counter">
+      <div class="breath-circle" id="circle-1">
+       1
+      </div>
+      <div class="breath-circle" id="circle-2">
+       2
+      </div>
+      <div class="breath-circle" id="circle-3">
+       3
+      </div>
+     </div>
+     <div class="breathing-animation" id="phase2-breathing-circle" style="font-size: 1.5rem;">
+      ¿Listo?
+     </div>
+     <div id="phase2-instruction" class="text-center" style="margin: 1.5rem 0; font-size: 1.4rem; font-weight: bold; color: #667eea; min-height: 50px;"></div>
+     <div class="text-center"><button class="action-button" onclick="startPhase2Practice()" id="phase2-practice-btn" style="font-size: 1.3rem; padding: 1.3rem 2.5rem;"> 🫁 Practicar Repetición <span id="current-rep">1</span>/3 </button>
+     </div>
+     <div id="phase2-continue-section" class="hidden" style="margin-top: 2rem;">
+      <div class="teaching-box" style="background: linear-gradient(135deg, #38b2ac 0%, #319795 100%); color: white; border: none;"><strong style="color: #fffbeb; font-size: 1.4rem;">✅ ¡Excelente!</strong>
+       <p style="color: white; font-size: 1.2rem; margin-top: 1rem;">Has practicado el ritmo <span id="practice-rhythm">4-2-8</span>.<br>
+         Puedes continuar o seguir practicando para dominar mejor el patrón.</p>
+      </div>
+      <div class="text-center"><button class="action-button" onclick="completePhase2()" style="font-size: 1.3rem; padding: 1.5rem 3rem;"> ✓ Continuar a Aplicación Real </button>
+      </div>
+     </div>
+    </div>
+   </section><!-- PHASE 3: Protocolo de Cancha -->
+   <section id="phase3" class="phase-screen">
+    <div class="phase-header">
+     <h2 id="phase3-title">🎾 FASE 3: Protocolo de Cancha</h2>
+     <p>3 momentos clave en competencia</p>
+    </div>
+    <div class="teaching-box" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; border: none;"><strong style="color: #ffd700; font-size: 1.3rem;">🎯 Tu arma secreta:</strong>
+     <p style="color: white; font-size: 1.1rem; margin-top: 1rem;">Vas a aprender CUÁNDO y CÓMO usar tu respiración en competencia.<br>
+       Esto es lo que separa amateurs de profesionales.</p>
+    </div><!-- Moment 1: PRE-PUNTO -->
+    <div id="phase3-moment1" class="game-scenario">
+     <div class="scenario-moment">
+      <h3 style="color: #667eea; font-size: 1.5rem;">📍 MOMENTO 1: PRE-PUNTO</h3>
+      <div class="scoreboard" style="font-size: 1.5rem; margin: 1.5rem 0;">
+       40 - 40 | BREAK POINT
+      </div>
+      <div class="text-center">
+       <div class="mini-player" style="font-size: 5rem;">
+        🎾
+       </div>
+      </div>
+      <p class="text-center" style="font-size: 1.2rem; margin: 1.5rem 0; color: #2d3748;"><strong>Situación:</strong> Punto clave. Tu corazón late fuerte.<br>
+        ¿Qué haces ANTES de servir/recibir?</p>
+      <div class="option-card" onclick="selectPrePoint(this, false)">
+       🏃 Saltar para activarme
+      </div>
+      <div class="option-card" onclick="selectPrePoint(this, true)">
+       💨 Exhalar largo (6-8 seg)
+      </div>
+      <div class="option-card" onclick="selectPrePoint(this, false)">
+       🧠 Pensar en la táctica
+      </div>
+     </div>
+     <div id="pre-point-complete" class="hidden">
+      <div class="teaching-box" style="background: #c6f6d5; border-left-color: #48bb78;"><strong style="color: #2f855a;">✅ CORRECTO - Protocolo PRE-PUNTO:</strong>
+       <p style="font-size: 1.1rem; line-height: 1.7;"><strong>1 exhalación larga (6-8 seg)</strong> antes del punto.<br><br>
+         📊 <strong>Ciencia:</strong> Baja frecuencia cardíaca 10-15 latidos. Tu cuerpo entra en "modo ejecución" en lugar de "modo pánico".<br><br>
+         🎾 <strong>En cancha:</strong> Hazlo mirando tus cuerdas o mientras botas la pelota.</p>
+      </div>
+      <div class="text-center"><button class="action-button" onclick="showMoment2Phase3()">Siguiente Momento →</button>
+      </div>
+     </div>
+    </div><!-- Moment 2: DURANTE PUNTO -->
+    <div id="phase3-moment2" class="hidden">
+     <div class="game-scenario">
+      <div class="scenario-moment">
+       <h3 style="color: #ed8936; font-size: 1.5rem;">📍 MOMENTO 2: DURANTE EL PUNTO</h3>
+       <div class="text-center">
+        <div class="mini-player" style="font-size: 5rem;">
+         🏃‍♂️💨
+        </div>
+       </div>
+       <p class="text-center" style="font-size: 1.2rem; margin: 1.5rem 0; color: #2d3748;"><strong>Situación:</strong> Estás en medio de un rally intenso.<br>
+         ¿Cómo respiras mientras te mueves?</p>
+       <div class="option-card" onclick="selectDuringPoint(this, false)">
+        😮 Aguantar la respiración
+       </div>
+       <div class="option-card" onclick="selectDuringPoint(this, true)">
+           Respiraciones cortas por nariz
+       </div>
+       <div class="option-card" onclick="selectDuringPoint(this, false)">
+        😤 Exhalar fuerte con cada golpe
+       </div>
+      </div>
+      <div id="during-point-complete" class="hidden">
+       <div class="teaching-box" style="background: #c6f6d5; border-left-color: #48bb78;"><strong style="color: #2f855a;">✅ CORRECTO - Protocolo DURANTE PUNTO:</strong>
+        <p style="font-size: 1.1rem; line-height: 1.7;"><strong>Respiraciones cortas y rítmicas por nariz</strong> mientras te mueves.<br><br>
+          📊 <strong>Ciencia:</strong> La respiración nasal filtra aire, mantiene CO2 óptimo y te da oxígeno constante sin hiperventilación.<br><br>
+          🎾 <strong>En cancha:</strong> Exhala naturalmente al golpear, pero mantén respiración nasal entre golpes.</p>
+       </div>
+       <div class="text-center"><button class="action-button" onclick="showMoment3Phase3()">Último Momento →</button>
+       </div>
+      </div>
+     </div>
+    </div><!-- Moment 3: POST-PUNTO -->
+    <div id="phase3-moment3" class="hidden">
+     <div class="game-scenario">
+      <div class="scenario-moment">
+       <h3 style="color: #48bb78; font-size: 1.5rem;">📍 MOMENTO 3: POST-PUNTO (Cometiste error)</h3>
+       <div class="text-center">
+        <div class="mini-player" style="font-size: 5rem;">
+         😤
+        </div>
+       </div>
+       <p class="text-center" style="font-size: 1.2rem; margin: 1.5rem 0; color: #2d3748;"><strong>Situación:</strong> Doble falta. Perdiste el punto.<br>
+         Tienes 20 segundos antes del siguiente. ¿Qué haces?</p>
+       <div class="option-card" onclick="selectPostPoint(this, false)">
+        😠 Mirar al suelo y reprocharme
+       </div>
+       <div class="option-card" onclick="selectPostPoint(this, true)">
+        🔄 Respirar 4-2-6 mientras camino
+       </div>
+       <div class="option-card" onclick="selectPostPoint(this, false)">
+        🎾 Prepararme rápido para el siguiente
+       </div>
+      </div>
+      <div id="post-point-complete" class="hidden">
+       <div class="teaching-box" style="background: #c6f6d5; border-left-color: #48bb78;"><strong style="color: #2f855a;">✅ CORRECTO - Protocolo POST-PUNTO:</strong>
+        <p style="font-size: 1.1rem; line-height: 1.7;"><strong>1 ciclo completo 4-2-6</strong> mientras caminas hacia posición.<br><br>
+          📊 <strong>Ciencia:</strong> Este es tu "botón de reset" neurológico. En 12 segundos reseteas la amígdala (centro de estrés) y reactivas tu corteza prefrontal (toma de decisiones).<br><br>
+          🎾 <strong>En cancha:</strong> Hazlo mientras ajustas cuerdas o caminas hacia línea de fondo.</p>
+       </div>
+       <div class="teaching-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; margin-top: 1.5rem;"><strong style="color: #ffd700; font-size: 1.4rem;">🏆 PROTOCOLO COMPLETO DE COMPETENCIA:</strong>
+        <p style="color: white; font-size: 1.1rem; margin-top: 1rem; line-height: 1.8;"><strong>1️⃣ PRE-PUNTO:</strong> 1 exhalación larga (6-8 seg)<br><strong>2️⃣ DURANTE:</strong> Respiración nasal corta y rítmica<br><strong>3️⃣ POST-PUNTO:</strong> 1 ciclo 4-2-6 (12 seg) = Reset mental</p>
+       </div>
+       <div class="teaching-box" style="border-left-color: #667eea; margin-top: 1.5rem;"><strong style="color: #667eea; font-size: 1.2rem;">📝 PRACTICA ESTO HOY:</strong>
+        <p style="font-size: 1.1rem;">1. <strong>En tu próximo partido:</strong> Úsalo en 1 solo game. Luego eval  a.<br>
+          2. <strong>En tu casa:</strong> Practica el protocolo post-punto después de cometer errores en videojuegos o tareas.<br>
+          3. <strong>Antes de dormir:</strong> Repite el ciclo 4-2-6 cinco veces para grabar el patrón.</p>
+       </div>
+       <div class="text-center"><button class="action-button" onclick="showFinalCompletion()" style="font-size: 1.3rem; padding: 1.5rem 3rem;"> ✓ Protocolo Aprendido - Ver Certificado </button>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- FINAL COMPLETION SCREEN -->
+   <section id="final-completion" class="phase-screen">
+    <div class="completion-badge">
+     <div class="icon">
+      🏆
+     </div>
+     <h2>¡Felicidades!</h2>
+     <p style="font-size: 1.3rem; margin: 1.5rem 0;">Has completado "Respira Como un Profesional"</p>
+     <div class="completion-stats">
+      <div class="stat-item">
+       <div class="stat-icon">
+        🫁
+       </div>
+       <div class="stat-label">
+        Patrón 4-2-6 Dominado
+       </div>
+      </div>
+      <div class="stat-item">
+       <div class="stat-icon">
+        ⚡
+       </div>
+       <div class="stat-label">
+        Ritmo Personalizado
+       </div>
+      </div>
+      <div class="stat-item">
+       <div class="stat-icon">
+        🎾
+       </div>
+       <div class="stat-label">
+        Protocolo de Cancha
+       </div>
+      </div>
+     </div>
+     <div class="teaching-box" style="background: rgba(255,255,255,0.2); border-left-color: white;"><strong style="color: white;">     Tu nuevo poder:</strong>
+      <p style="color: white;">Ahora tienes 3 herramientas prácticas:<br><br><strong>1)</strong> Respiración 4-2-6 para regular tu sistema nervioso<br><strong>2)</strong> Tu ritmo personalizado (<span id="saved-rhythm">4-2-6</span>) según tu necesidad<br><strong>3)</strong> Protocolo de 3 momentos para competencia<br><br>
+        Úsalas AHORA. No esperes. Cada situación de estrés es una oportunidad para practicar.</p>
+     </div>
+     <div class="text-center" style="margin-top: 2rem;"><button class="action-button" onclick="window.location.reload()">Repetir práctica</button></div>
+    </div>
+   </section>
+  </div>
+  <script>
+    const defaultConfig = {
+      main_title: "💨 Respira Como un Profesional",
+      subtitle: "Domina tu respiración, domina tu mente",
+      phase1_title: "🫁 FASE 1: Aprende el Patrón",
+      phase2_title: "⚡ FASE 2: Tu Ritmo Personal",
+      phase3_title: "🎾 FASE 3: Protocolo de Cancha"
+    };
+
+    let currentPhase = 1;
+    let breathRepetitions = 0;
+    let selectedFeeling = null;
+    let customInhale = 4;
+    let customPause = 2;
+    let customExhale = 8;
+    let phase2Repetitions = 0;
+
+    async function onConfigChange(config) {
+      document.getElementById('main-title').textContent = config.main_title || defaultConfig.main_title;
+      document.getElementById('subtitle').textContent = config.subtitle || defaultConfig.subtitle;
+      document.getElementById('phase1-title').textContent = config.phase1_title || defaultConfig.phase1_title;
+      document.getElementById('phase2-title').textContent = config.phase2_title || defaultConfig.phase2_title;
+      document.getElementById('phase3-title').textContent = config.phase3_title || defaultConfig.phase3_title;
+    }
+
+    // Phase 1: Intro Exercise
+    function startIntroBreathing() {
+      const circle = document.getElementById('intro-breathing-circle');
+      const instruction = document.getElementById('intro-instruction');
+      const btn = document.getElementById('intro-start-btn');
+      const countDisplay = document.getElementById('breath-count');
+      
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      
+      breathRepetitions++;
+      countDisplay.textContent = breathRepetitions;
+      
+      // INHALE - 4 seconds
+      circle.textContent = 'INHALA';
+      circle.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+      instruction.textContent = '🫁 Respira por la nariz... llena tus pulmones';
+      instruction.style.color = '#667eea';
+      circle.classList.add('inhale');
+      
+      setTimeout(() => {
+        // HOLD - 2 seconds
+        circle.classList.remove('inhale');
+        circle.classList.add('hold');
+        circle.textContent = 'PAUSA';
+        instruction.textContent = '⏸️ Mantén el aire... siente el control';
+        instruction.style.color = '#ed8936';
+        
+        setTimeout(() => {
+          // EXHALE - 6 seconds
+          circle.classList.remove('hold');
+          circle.classList.add('exhale');
+          circle.textContent = 'EXHALA';
+          instruction.textContent = '💨 Suelta lento por la boca... vacía todo';
+          instruction.style.color = '#48bb78';
+          
+          setTimeout(() => {
+            // Complete one cycle
+            circle.classList.remove('exhale');
+            circle.textContent = '✓';
+            circle.style.background = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
+            instruction.textContent = `✓ Respiración ${breathRepetitions}/3 completa`;
+            instruction.style.color = '#48bb78';
+            
+            setTimeout(() => {
+              if (breathRepetitions < 3) {
+                // Reset for next repetition
+                circle.textContent = '¿Listo?';
+                circle.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                instruction.textContent = '¡Muy bien! Ahora repitamos para fortalecer el efecto';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.textContent = `🫁 CONTINUAR RESPIRACIÓN (${breathRepetitions + 1}/3)`;
+              } else {
+                // All 3 repetitions complete
+                document.getElementById('intro-complete').classList.remove('hidden');
+              }
+            }, 1500);
+          }, 6000);
+        }, 2000);
+      }, 4000);
+    }
+
+    function completePhase1() {
+      updateProgress(1);
+      document.getElementById('phase1').classList.remove('active');
+      document.getElementById('phase2').classList.add('active');
+      currentPhase = 2;
+      acScrollToElement('phase2');
+    }
+
+    // Phase 2: Personal Rhythm Practice
+    function selectFeeling(feeling) {
+      selectedFeeling = feeling;
+      phase2Repetitions = 0;
+      
+      const options = document.querySelectorAll('.rhythm-option');
+      options.forEach(opt => opt.classList.remove('selected'));
+      event.currentTarget.classList.add('selected');
+      
+      if (feeling === 'calm') {
+        customInhale = 4;
+        customPause = 2;
+        customExhale = 8;
+        document.getElementById('selected-rhythm-display').textContent = '4-2-8';
+        document.getElementById('practice-rhythm').textContent = '4-2-8';
+        document.getElementById('saved-rhythm').textContent = '4-2-8';
+      } else if (feeling === 'focused') {
+        customInhale = 4;
+        customPause = 2;
+        customExhale = 4;
+        document.getElementById('selected-rhythm-display').textContent = '4-2-4';
+        document.getElementById('practice-rhythm').textContent = '4-2-4';
+        document.getElementById('saved-rhythm').textContent = '4-2-4';
+      } else if (feeling === 'energized') {
+        customInhale = 3;
+        customPause = 1;
+        customExhale = 4;
+        document.getElementById('selected-rhythm-display').textContent = '3-1-4';
+        document.getElementById('practice-rhythm').textContent = '3-1-4';
+        document.getElementById('saved-rhythm').textContent = '3-1-4';
+      }
+      
+      // Reset breath circles
+      for (let i = 1; i <= 3; i++) {
+        const circle = document.getElementById(`circle-${i}`);
+        circle.classList.remove('completed');
+      }
+      
+      document.getElementById('phase2-continue-section').classList.add('hidden');
+      
+      setTimeout(() => {
+        document.getElementById('phase2-practice').classList.remove('hidden');
+        window.scrollTo({ top: document.getElementById('phase2-practice').offsetTop - 100, behavior: 'smooth' });
+      }, 500);
+    }
+
+    function startPhase2Practice() {
+      const btn = document.getElementById('phase2-practice-btn');
+      const circle = document.getElementById('phase2-breathing-circle');
+      const instruction = document.getElementById('phase2-instruction');
+      
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      
+      phase2Repetitions++;
+      document.getElementById('current-rep').textContent = phase2Repetitions;
+      
+      // INHALE
+      circle.textContent = 'INHALA';
+      circle.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+      instruction.textContent = `🫁 Inhala ${customInhale} segundos`;
+      instruction.style.color = '#667eea';
+      circle.classList.add('inhale');
+      
+      setTimeout(() => {
+        // HOLD
+        circle.classList.remove('inhale');
+        circle.classList.add('hold');
+        circle.textContent = 'PAUSA';
+        instruction.textContent = `⏸️ Pausa ${customPause} segundos`;
+        instruction.style.color = '#ed8936';
+        
+        setTimeout(() => {
+          // EXHALE
+          circle.classList.remove('hold');
+          circle.classList.add('exhale');
+          circle.textContent = 'EXHALA';
+          instruction.textContent = `💨 Exhala ${customExhale} segundos`;
+          instruction.style.color = '#48bb78';
+          
+          setTimeout(() => {
+            // Complete
+            circle.classList.remove('exhale');
+            circle.textContent = '✓';
+            circle.style.background = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
+            instruction.textContent = `✓ Repetición ${phase2Repetitions}/3 completa`;
+            instruction.style.color = '#48bb78';
+            
+            // Mark circle as completed
+            document.getElementById(`circle-${phase2Repetitions}`).classList.add('completed');
+            
+            setTimeout(() => {
+              if (phase2Repetitions < 3) {
+                // Reset for next rep
+                circle.textContent = '¿Listo?';
+                circle.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                instruction.textContent = '¡Excelente! Sigamos practicando';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                document.getElementById('current-rep').textContent = phase2Repetitions + 1;
+              } else {
+                // All 3 repetitions complete
+                instruction.textContent = '🎉 ¡Has completado las 3 repeticiones!';
+              }
+              
+              // Show continue button after first rep
+              if (phase2Repetitions >= 1) {
+                document.getElementById('phase2-continue-section').classList.remove('hidden');
+                window.scrollTo({ top: document.getElementById('phase2-continue-section').offsetTop - 100, behavior: 'smooth' });
+              }
+            }, 1500);
+          }, customExhale * 1000);
+        }, customPause * 1000);
+      }, customInhale * 1000);
+    }
+
+    function completePhase2() {
+      updateProgress(2);
+      document.getElementById('phase2').classList.remove('active');
+      document.getElementById('phase3').classList.add('active');
+      currentPhase = 3;
+      acScrollToElement('phase3');
+    }
+
+    // Phase 3: Court Protocol
+    function selectPrePoint(element, isCorrect) {
+      const options = document.querySelectorAll('#phase3-moment1 .option-card');
+      options.forEach(opt => opt.classList.add('disabled'));
+      
+      if (isCorrect) {
+        element.classList.add('correct');
+        setTimeout(() => {
+          document.getElementById('pre-point-complete').classList.remove('hidden');
+          window.scrollTo({ top: document.getElementById('pre-point-complete').offsetTop - 100, behavior: 'smooth' });
+        }, 500);
+      } else {
+        element.classList.add('incorrect');
+      }
+    }
+
+    function showMoment2Phase3() {
+      document.getElementById('phase3-moment1').classList.add('hidden');
+      document.getElementById('phase3-moment2').classList.remove('hidden');
+      acScrollToElement('phase3');
+    }
+
+    function selectDuringPoint(element, isCorrect) {
+      const options = document.querySelectorAll('#phase3-moment2 .option-card');
+      options.forEach(opt => opt.classList.add('disabled'));
+      
+      if (isCorrect) {
+        element.classList.add('correct');
+        setTimeout(() => {
+          document.getElementById('during-point-complete').classList.remove('hidden');
+          window.scrollTo({ top: document.getElementById('during-point-complete').offsetTop - 100, behavior: 'smooth' });
+        }, 500);
+      } else {
+        element.classList.add('incorrect');
+      }
+    }
+
+    function showMoment3Phase3() {
+      document.getElementById('phase3-moment2').classList.add('hidden');
+      document.getElementById('phase3-moment3').classList.remove('hidden');
+      acScrollToElement('phase3');
+    }
+
+    function selectPostPoint(element, isCorrect) {
+      const options = document.querySelectorAll('#phase3-moment3 .option-card');
+      options.forEach(opt => opt.classList.add('disabled'));
+      
+      if (isCorrect) {
+        element.classList.add('correct');
+        setTimeout(() => {
+          document.getElementById('post-point-complete').classList.remove('hidden');
+          window.scrollTo({ top: document.getElementById('post-point-complete').offsetTop - 100, behavior: 'smooth' });
+        }, 500);
+      } else {
+        element.classList.add('incorrect');
+      }
+    }
+
+    function showFinalCompletion() {
+      updateProgress(3);
+      document.getElementById('phase3').classList.remove('active');
+      document.getElementById('final-completion').classList.add('active');
+      acScrollToTop();
+    }
+
+    // Progress Management
+    function updateProgress(phase) {
+      for (let i = 1; i <= 3; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        dot.classList.remove('active', 'completed');
+        
+        if (i < phase) {
+          dot.classList.add('completed');
+        } else if (i === phase) {
+          dot.classList.add('active');
+        }
+      }
+    }
+
+    // Initialize Element SDK
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["main_title", config.main_title || defaultConfig.main_title],
+          ["subtitle", config.subtitle || defaultConfig.subtitle],
+          ["phase1_title", config.phase1_title || defaultConfig.phase1_title],
+          ["phase2_title", config.phase2_title || defaultConfig.phase2_title],
+          ["phase3_title", config.phase3_title || defaultConfig.phase3_title]
+        ])
+      });
+    }
+  </script>
+<script>
+function acScrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function acScrollToElement(id, offset) {
+  var target = document.getElementById(id);
+  if (!target) {
+    acScrollToTop();
+    return;
+  }
+  var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  window.scrollTo(0, 0);
+});
+</script>
+</body>
+</html>

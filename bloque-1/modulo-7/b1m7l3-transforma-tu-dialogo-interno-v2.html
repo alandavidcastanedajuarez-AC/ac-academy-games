@@ -1,0 +1,1890 @@
+<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transformador Mental</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .game-card {
+      background: white;
+      border-radius: 24px;
+      padding: 3rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .game-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #2d3748;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+    }
+
+    .game-subtitle {
+      font-size: 1.125rem;
+      color: #718096;
+      font-weight: 500;
+    }
+
+    .phase-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .phase-subtitle {
+      font-size: 1rem;
+      color: #a0aec0;
+      text-align: center;
+      margin-bottom: 2rem;
+      font-style: italic;
+    }
+
+    .balloons-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .balloon {
+      background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+      border: 3px solid #818cf8;
+      border-radius: 50% 50% 50% 0;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.95rem;
+      color: #3730a3;
+      font-weight: 600;
+    }
+
+    .balloon:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .balloon.popped {
+      animation: pop 0.4s ease-out forwards;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.5; }
+      100% { transform: scale(0); opacity: 0; }
+    }
+
+    .teaching-box {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border-left: 4px solid #f59e0b;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 2rem 0;
+      font-size: 1.125rem;
+      color: #92400e;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .transformation-area {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .cards-column {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .column-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #4a5568;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .thought-card {
+      background: #fee;
+      border: 2px solid #f56565;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      cursor: move;
+      transition: all 0.3s ease;
+      text-align: center;
+      color: #c53030;
+      font-weight: 600;
+    }
+
+    .thought-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .transformer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      margin: 2rem auto;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .transformer:hover {
+      transform: rotate(180deg) scale(1.1);
+    }
+
+    .transformer::before {
+      content: "⚙️";
+      font-size: 3rem;
+    }
+
+    .options-container {
+      background: #f7fafc;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .option-btn {
+      width: 100%;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 0.75rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+      color: #2d3748;
+      font-weight: 600;
+      text-align: left;
+    }
+
+    .option-btn:hover {
+      border-color: #667eea;
+      background: #f7fafc;
+      transform: translateX(5px);
+    }
+
+    .option-btn.correct {
+      background: #f0fff4;
+      border-color: #48bb78;
+      color: #2f855a;
+    }
+
+    .option-btn.incorrect {
+      background: #fff5f5;
+      border-color: #fc8181;
+      color: #c53030;
+    }
+
+    .moment-card {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .moment-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 1rem;
+    }
+
+    .final-screen {
+      text-align: center;
+    }
+
+    .final-message {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #667eea;
+      margin-bottom: 1.5rem;
+      line-height: 1.3;
+    }
+
+    .final-quote {
+      font-size: 1.25rem;
+      color: #4a5568;
+      margin-bottom: 1rem;
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    .final-tagline {
+      font-size: 1.5rem;
+      color: #2d3748;
+      font-weight: 700;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 1rem 2rem;
+      font-size: 1.125rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+
+    .btn-secondary:hover {
+      background: #f7fafc;
+    }
+
+    .progress-bar {
+      background: #e2e8f0;
+      height: 8px;
+      border-radius: 4px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      height: 100%;
+      transition: width 0.5s ease;
+      border-radius: 4px;
+    }
+
+    .feedback-message {
+      padding: 1rem;
+      border-radius: 12px;
+      margin-top: 1rem;
+      font-weight: 600;
+      text-align: center;
+      animation: slideIn 0.4s ease;
+    }
+
+    .feedback-message.success {
+      background: #f0fff4;
+      color: #2f855a;
+      border: 2px solid #48bb78;
+    }
+
+    .feedback-message.error {
+      background: #fff5f5;
+      color: #c53030;
+      border: 2px solid #fc8181;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .transformed-cards {
+      min-height: 200px;
+      background: #f0fff4;
+      border: 2px dashed #48bb78;
+      border-radius: 12px;
+      padding: 1rem;
+    }
+
+    .transformed-card {
+      background: #f0fff4;
+      border: 2px solid #48bb78;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      color: #2f855a;
+      font-weight: 600;
+      text-align: center;
+      animation: slideIn 0.5s ease;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .intro-section {
+      margin-bottom: 2rem;
+    }
+
+    .intro-subtitle {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .intro-text {
+      font-size: 1.125rem;
+      line-height: 1.8;
+      color: #4a5568;
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .principles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .principle-card {
+      background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .principle-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+      border-color: #667eea;
+    }
+
+    .principle-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .principle-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 0.75rem;
+    }
+
+    .principle-text {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #4a5568;
+    }
+
+    .learning-list {
+      list-style: none;
+      padding: 0;
+      max-width: 600px;
+      margin: 1rem auto;
+    }
+
+    .learning-list li {
+      background: #f7fafc;
+      border-left: 4px solid #667eea;
+      padding: 1rem 1.5rem;
+      margin-bottom: 0.75rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #2d3748;
+    }
+
+    .data-box {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      border: 2px solid #3b82f6;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      font-size: 1.125rem;
+      line-height: 1.7;
+      color: #1e3a8a;
+      text-align: center;
+    }
+
+    .game-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-box {
+      background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .stat-box:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: #718096;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #2d3748;
+    }
+
+    .stat-box.timer-low .stat-value {
+      color: #c53030;
+      animation: pulse 0.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .combo-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3rem;
+      font-weight: 900;
+      color: #f59e0b;
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+      animation: comboAppear 0.8s ease-out forwards;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    @keyframes comboAppear {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+      }
+      50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1) translateY(-100px);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.6);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .game-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ <style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+  .mt-30 { margin-top: 30px !important; }
+  @media (max-width: 768px) {
+    .container,
+    .game-container,
+    .game-card,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .section,
+    .phase,
+    .phase-screen,
+    .final-screen,
+    .final-results,
+    .modal-content {
+      padding: 16px !important;
+    }
+    h1, .main-title, .game-title {
+      font-size: clamp(1.8rem, 7vw, 2.2rem) !important;
+      line-height: 1.15 !important;
+    }
+    h2, .phase-title, .stage-title {
+      font-size: clamp(1.3rem, 6vw, 1.6rem) !important;
+      line-height: 1.25 !important;
+    }
+    p, .instruction, .phase-instruction, .stage-subtitle, .game-subtitle {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+    .button-group, .final-buttons, .action-buttons {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+    .btn, .btn-primary, .btn-secondary, .btn-main {
+      width: 100% !important;
+    }
+  }
+</style>
+<style>
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+    .header h1, .main-title, .game-title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+    .header p, .game-subtitle, .phase-subtitle, .instruction, .stage-subtitle,
+    .game-objective, .phase-instruction, .phase-header p, .stage-intro {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+    .container, .game-container, .app-container, .main-wrapper {
+      padding: 1rem !important;
+    }
+    .phase-screen, .game-card, .stage-wrapper, .content-area {
+      padding: 1.25rem !important;
+      border-radius: 18px !important;
+    }
+    .progress-indicator, .progress-steps {
+      flex-wrap: wrap !important;
+      gap: 0.5rem !important;
+    }
+    .progress-dot {
+      width: 12px !important;
+      height: 12px !important;
+    }
+    .progress-step {
+      min-width: 90px;
+    }
+    .player-icon {
+      font-size: clamp(3.5rem, 18vw, 6rem) !important;
+    }
+    .breathing-animation {
+      width: 180px !important;
+      height: 180px !important;
+      font-size: 1.5rem !important;
+    }
+    .breath-circle {
+      width: 48px !important;
+      height: 48px !important;
+      font-size: 1.1rem !important;
+    }
+    .action-button, .action-btn, .option-card, .bubble, .ritual-item,
+    .viz-option, .action-card, .tool-card, .emotion-card, .thought-card,
+    .question-card, .card-item {
+      width: 100% !important;
+    }
+    .balloons-container, .thought-bubbles, .ritual-items, .visualization-options,
+    .actions-grid, .tools-grid, .emotions-grid, .completion-stats,
+    .rhythm-choice, .content-grid, .options-grid, .choices-grid, .cards-grid,
+    .module-grid, .steps-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .transformation-area {
+      flex-direction: column !important;
+      gap: 1rem !important;
+    }
+    .emoji-header {
+      font-size: clamp(3rem, 16vw, 4.5rem) !important;
+    }
+    .action-emoji, .emotion-icon, .ritual-icon {
+      font-size: clamp(2.5rem, 14vw, 3.5rem) !important;
+    }
+    .timer-value {
+      font-size: clamp(1.8rem, 9vw, 2.4rem) !important;
+    }
+    .breathing-bar {
+      height: 28px !important;
+    }
+    .character {
+      width: 90px !important;
+      height: 90px !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    config: {}
+  };
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+</head>
+ <body>
+  <div class="container">
+   <div class="game-card">
+    <div class="header">
+     <h1 class="game-title" id="gameTitle">Convierte tu Voz Interior en tu Mejor Coach</h1>
+     <p class="game-subtitle" id="gameSubtitle">Un juego para cambiar el diálogo interno en segundos</p>
+    </div>
+    <div class="progress-bar">
+     <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+    </div>
+    <div id="intro" class="phase-content">
+     <h2 class="phase-title">🧠 La Ciencia de tu Voz Interior</h2>
+     <div class="intro-section">
+      <h3 class="intro-subtitle">¿Por qué esto cambia tu juego?</h3>
+      <p class="intro-text">La neurociencia deportiva ha demostrado que <strong>el diálogo interno no es solo motivación</strong>, es una herramienta de regulación emocional y control atencional que utilizan los atletas de élite.</p>
+     </div>
+     <div class="principles-grid">
+      <div class="principle-card">
+       <div class="principle-icon">
+        🎯
+       </div>
+       <h4 class="principle-title">Principio 1: Reconocimiento</h4>
+       <p class="principle-text"><strong>El 80% de tus pensamientos automáticos son negativos</strong> (sesgo de negatividad). Detectarlos es el primer paso para no ser controlado por ellos.</p>
+      </div>
+      <div class="principle-card">
+       <div class="principle-icon">
+        ⚙️
+       </div>
+       <h4 class="principle-title">Principio 2: Transformación</h4>
+       <p class="principle-text"><strong>Tu cerebro no distingue entre realidad e imaginación v  vida.</strong> Las frases que usas activan las mismas áreas cerebrales que las acciones reales.</p>
+      </div>
+      <div class="principle-card">
+       <div class="principle-icon">
+        ⚡
+       </div>
+       <h4 class="principle-title">Principio 3: Aplicación</h4>
+       <p class="principle-text"><strong>El diálogo interno efectivo debe ser en tiempo presente y orientado al proceso.</strong> "Respiro y ajusto" funciona mejor que "Voy a ganar" porque activa acción inmediata.</p>
+      </div>
+     </div>
+     <div class="intro-section">
+      <h3 class="intro-subtitle">📊 Lo que aprenderás:</h3>
+      <ul class="learning-list">
+       <li><strong>Fase 1:</strong> Identificar pensamientos que drenan tu energía mental (sin que lo notes)</li>
+       <li><strong>Fase 2:</strong> Reemplazarlos con frases que tu cerebro pueda creer y ejecutar</li>
+       <li><strong>Fase 3:</strong> Aplicar tu nueva voz en situaciones reales de presión</li>
+      </ul>
+     </div>
+     <div class="data-box"><strong>📈 Dato clave:</strong> Estudios con tenistas profesionales muestran que <strong>cambiar una sola frase negativa por una neutral reduce errores no forzados en un 23%</strong> (Journal of Applied Sport Psychology, 2019).
+     </div><button class="btn" id="startGameBtn">     Comenzar el Entrenamiento Mental</button>
+    </div>
+    <div id="phase1" class="phase-content hidden">
+     <h2 class="phase-title" id="phase1Title">El Detector de Pensamientos</h2>
+     <p class="phase-subtitle">Reconocer lo que te sabotea</p>
+     <div class="intro-section" style="margin-bottom: 2rem;">
+      <h3 class="intro-subtitle">Elige tu desafío:</h3>
+      <div class="principles-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+       <div class="principle-card" style="cursor: pointer; border: 3px solid #e2e8f0;" id="game1Card">
+        <div class="principle-icon">
+         ❌
+        </div>
+        <h4 class="principle-title">Juego 1: Elimina lo Negativo</h4>
+        <p class="principle-text">Identifica y elimina SOLO los <strong>pensamientos negativos</strong> que te sabotean.</p><button class="btn" id="startGame1Btn" style="margin-top: 1rem;">🎯 Jugar</button>
+       </div>
+       <div class="principle-card" style="cursor: pointer; border: 3px solid #e2e8f0;" id="game2Card">
+        <div class="principle-icon">
+         ✅
+        </div>
+        <h4 class="principle-title">Juego 2: Detecta lo Constructivo</h4>
+        <p class="principle-text">Identifica SOLO los <strong>pensamientos positivos CONSTRUCTIVOS</strong>. ¡No todo lo positivo es útil!</p><button class="btn" id="startGame2Btn" style="margin-top: 1rem;">🧠 Jugar</button>
+       </div>
+      </div>
+     </div>
+     <div id="gameArea" class="hidden">
+      <div class="data-box" style="margin-bottom: 2rem;" id="gameInstructions"></div>
+      <div class="game-stats">
+       <div class="stat-box">
+        <div class="stat-label">
+         ⏱️ Tiempo
+        </div>
+        <div class="stat-value" id="timer">
+         60
+        </div>
+       </div>
+       <div class="stat-box">
+        <div class="stat-label">
+         ✅ Aciertos
+        </div>
+        <div class="stat-value" id="hits">
+         0
+        </div>
+       </div>
+       <div class="stat-box">
+        <div class="stat-label">
+         ❌ Errores
+        </div>
+        <div class="stat-value" id="misses">
+         0
+        </div>
+       </div>
+       <div class="stat-box">
+        <div class="stat-label">
+         🎯 Puntos
+        </div>
+        <div class="stat-value" id="points">
+         0
+        </div>
+       </div>
+      </div>
+      <div class="balloons-container" id="balloonsContainer"></div>
+      <div id="phase1Feedback"></div><button class="btn btn-secondary" id="backToMenuBtn" style="margin-top: 1rem;">     Volver al menú</button>
+     </div>
+     <div class="teaching-box hidden" id="phase1Teaching"></div><button class="btn hidden" id="phase1NextBtn">Transformar pensamientos</button>
+    </div>
+    <div id="phase2" class="phase-content hidden">
+     <h2 class="phase-title" id="phase2Title">El Laboratorio Mental</h2>
+     <p class="phase-subtitle">Transformar lo negativo en útil</p>
+     <div id="currentThoughtCard" class="thought-card"></div>
+     <div class="transformer" id="transformer"></div>
+     <div class="options-container hidden" id="optionsContainer"></div>
+     <div id="phase2Feedback"></div>
+     <div class="transformed-cards" id="transformedCards">
+      <p style="text-align: center; color: #48bb78; font-weight: 600;">Tus frases transformadas aparecerán aquí ✨</p>
+     </div>
+     <div class="teaching-box hidden" id="phase2Teaching">
+      💡 La mente cree lo que suena real. S   positivo… pero honesto.
+     </div><button class="btn hidden" id="phase2NextBtn">Aplicar tus nuevas frases en la cancha</button>
+    </div>
+    <div id="phase3" class="phase-content hidden">
+     <h2 class="phase-title" id="phase3Title">El Punto Interno</h2>
+     <p class="phase-subtitle">Usar el nuevo diálogo dentro de un punto real</p>
+     <div id="momentsContainer"></div>
+     <div class="teaching-box hidden" id="phase3Teaching">
+      💡 Tu frase dirige tu intención. Tu intención dirige tu golpe.
+     </div><button class="btn hidden" id="phase3NextBtn">Ver resultado final</button>
+    </div>
+    <div id="finalScreen" class="phase-content hidden final-screen">
+     <h2 class="final-message" id="finalMessage">Tu Voz Ahora Tiene Poder</h2>
+     <p class="final-quote">"Un jugador fuerte no se habla bonito…<br>
+       se habla útil."</p>
+     <p class="final-tagline">Tu voz interna es tu mejor entrenador.</p><button class="btn" id="restartBtn">🔄 Repetir</button> <button class="btn btn-secondary" id="saveBtn">💾 Guardar resultado</button>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "Convierte tu Voz Interior en tu Mejor Coach",
+      game_subtitle: "Un juego para cambiar el diálogo interno en segundos",
+      phase1_title: "El Detector de Pensamientos",
+      phase2_title: "El Laboratorio Mental",
+      phase3_title: "El Punto Interno",
+      final_message: "Tu Voz Ahora Tiene Poder",
+      background_color: "#667eea",
+      card_color: "#ffffff",
+      text_color: "#2d3748",
+      primary_button_color: "#667eea",
+      accent_color: "#f59e0b",
+      font_family: "Inter",
+      font_size: 16
+    };
+
+    let currentPhase = 1;
+    let phase1Score = 0;
+    let phase2Completed = 0;
+    let phase3Completed = 0;
+
+    let gameTimer = null;
+    let balloonSpawner = null;
+    let timeLeft = 60;
+    let hits = 0;
+    let misses = 0;
+    let points = 0;
+    let combo = 0;
+    let gameActive = false;
+    let currentGameMode = null;
+
+    const balloonTextsGame1 = [
+      // Pensamientos negativos destructivos (50 pensamientos)
+      { text: "Siempre fallo en esto", negative: true },
+      { text: "No puedo ganar", negative: true },
+      { text: "Todo me sale mal", negative: true },
+      { text: "Soy peor que él", negative: true },
+      { text: "Nunca lo lograré", negative: true },
+      { text: "Soy un fracaso", negative: true },
+      { text: "Esto es imposible", negative: true },
+      { text: "No sirvo para nada", negative: true },
+      { text: "Ya perdí el partido", negative: true },
+      { text: "El árbitro está en mi contra", negative: true },
+      { text: "Hoy no es mi d  a", negative: true },
+      { text: "Mi rival es mucho mejor", negative: true },
+      { text: "Estoy jugando horrible", negative: true },
+      { text: "No debería estar aquí", negative: true },
+      { text: "Voy a decepcionar a todos", negative: true },
+      { text: "Siempre me pasa lo mismo", negative: true },
+      { text: "No tengo nivel para esto", negative: true },
+      { text: "Mi técnica es mala", negative: true },
+      { text: "Nunca mejoro", negative: true },
+      { text: "Todos juegan mejor que yo", negative: true },
+      { text: "Mi saque es un desastre", negative: true },
+      { text: "No tengo condición física", negative: true },
+      { text: "Soy muy lento", negative: true },
+      { text: "Mi entrenamiento no sirve", negative: true },
+      { text: "No puedo con la presión", negative: true },
+      { text: "Siempre cometo los mismos errores", negative: true },
+      { text: "Mi coach se va a decepcionar", negative: true },
+      { text: "No valgo para este deporte", negative: true },
+      { text: "Debería rendirme", negative: true },
+      { text: "Nunca seré profesional", negative: true },
+      { text: "Mi derecha no funciona", negative: true },
+      { text: "Soy demasiado nervioso", negative: true },
+      { text: "No puedo concentrarme", negative: true },
+      { text: "Mi volea es terrible", negative: true },
+      { text: "No sirvo bajo presión", negative: true },
+      { text: "Siempre pierdo los puntos importantes", negative: true },
+      { text: "Mi rival me tiene dominado", negative: true },
+      { text: "No puedo remontar esto", negative: true },
+      { text: "Estoy jugando el peor partido de mi vida", negative: true },
+      { text: "No tengo mentalidad ganadora", negative: true },
+      { text: "Mi juego es predecible", negative: true },
+      { text: "No puedo manejar el viento", negative: true },
+      { text: "Siempre fallo en los tie-breaks", negative: true },
+      { text: "No tengo estrategia", negative: true },
+      { text: "Mi timing está mal", negative: true },
+      { text: "No leo bien las bolas", negative: true },
+      { text: "Mi movimiento es lento", negative: true },
+      { text: "No tengo variedad en mi juego", negative: true },
+      { text: "Siempre me bloqueo mentalmente", negative: true },
+      { text: "No puedo cerrar los partidos", negative: true },
+      // Pensamientos positivos constructivos (50 pensamientos)
+      { text: "Un punto a la vez", negative: false },
+      { text: "Respiro y ajusto", negative: false },
+      { text: "Confío en mi juego", negative: false },
+      { text: "Sigo adelante", negative: false },
+      { text: "Puedo mejorar", negative: false },
+      { text: "Me enfoco en el proceso", negative: false },
+      { text: "Controlo lo que puedo", negative: false },
+      { text: "Sigo firme", negative: false },
+      { text: "Aprendo de cada punto", negative: false },
+      { text: "Me mantengo en el presente", negative: false },
+      { text: "Ejecuto mi plan", negative: false },
+      { text: "Confío en mi preparación", negative: false },
+      { text: "Ajusto y sigo", negative: false },
+      { text: "Me enfoco en mi tarea", negative: false },
+      { text: "Respiro profundo y continúo", negative: false },
+      { text: "Acepto y avanzo", negative: false },
+      { text: "Me centro en la bola", negative: false },
+      { text: "Controlo mi ritmo", negative: false },
+      { text: "Sigo mi rutina", negative: false },
+      { text: "Me adapto al momento", negative: false },
+      { text: "Mantengo la calma", negative: false },
+      { text: "Ejecuto con confianza", negative: false },
+      { text: "Respiro y me reseteo", negative: false },
+      { text: "Juego mi juego", negative: false },
+      { text: "Me enfoco en mis fortalezas", negative: false },
+      { text: "Un golpe a la vez", negative: false },
+      { text: "Confío en mi técnica", negative: false },
+      { text: "Me mantengo agresivo", negative: false },
+      { text: "Acepto el desafío", negative: false },
+      { text: "Controlo mi energía", negative: false },
+      { text: "Sigo luchando", negative: false },
+      { text: "Me enfoco en soluciones", negative: false },
+      { text: "Respiro y ejecuto", negative: false },
+      { text: "Mantengo mi intensidad", negative: false },
+      { text: "Confío en mis decisiones", negative: false },
+      { text: "Me adapto a las condiciones", negative: false },
+      { text: "Sigo mi estrategia", negative: false },
+      { text: "Mantengo el foco", negative: false },
+      { text: "Ejecuto con precisión", negative: false },
+      { text: "Me mantengo positivo", negative: false },
+      { text: "Controlo mi tempo", negative: false },
+      { text: "Confío en mi entrenamiento", negative: false },
+      { text: "Me concentro en el siguiente punto", negative: false },
+      { text: "Acepto el error y sigo", negative: false },
+      { text: "Mantengo la compostura", negative: false },
+      { text: "Juego con libertad", negative: false },
+      { text: "Me enfoco en mis objetivos", negative: false },
+      { text: "Respiro y me reconecto", negative: false },
+      { text: "Confío en mi capacidad", negative: false },
+      { text: "Sigo construyendo el punto", negative: false }
+    ];
+
+    const balloonTextsGame2 = [
+      // Pensamientos negativos destructivos (20 pensamientos)
+      { text: "Siempre fallo en esto", negative: true },
+      { text: "No puedo ganar", negative: true },
+      { text: "Todo me sale mal", negative: true },
+      { text: "Soy un desastre", negative: true },
+      { text: "Ya perdí", negative: true },
+      { text: "No tengo oportunidad", negative: true },
+      { text: "Soy el peor", negative: true },
+      { text: "Nunca lo conseguiré", negative: true },
+      { text: "Estoy jugando horrible", negative: true },
+      { text: "No sirvo para esto", negative: true },
+      { text: "Mi rival me supera", negative: true },
+      { text: "Voy a fallar de nuevo", negative: true },
+      { text: "No merezco ganar", negative: true },
+      { text: "Siempre me equivoco", negative: true },
+      { text: "Hoy todo saldrá mal", negative: true },
+      { text: "No puedo con la presión", negative: true },
+      { text: "Mi técnica es terrible", negative: true },
+      { text: "Nunca mejoro", negative: true },
+      { text: "Soy muy débil mentalmente", negative: true },
+      { text: "Debería rendirme", negative: true },
+      // Pensamientos positivos IRREALES - Fantasías no constructivas (20 pensamientos)
+      { text: "Soy invencible", negative: true },
+      { text: "Ya gané este partido", negative: true },
+      { text: "Nunca pierdo", negative: true },
+      { text: "Todo me sale perfecto", negative: true },
+      { text: "Soy el mejor del mundo", negative: true },
+      { text: "Esto es s  per fácil", negative: true },
+      { text: "No puedo fallar", negative: true },
+      { text: "Soy imparable", negative: true },
+      { text: "Ganaré todos los puntos", negative: true },
+      { text: "Mi rival no tiene chance", negative: true },
+      { text: "Soy perfecto", negative: true },
+      { text: "Ya lo tengo ganado", negative: true },
+      { text: "Nadie me puede vencer", negative: true },
+      { text: "Todo saldrá perfecto", negative: true },
+      { text: "Soy imbatible", negative: true },
+      { text: "Voy a ganar 6-0 6-0", negative: true },
+      { text: "No necesito esforzarme", negative: true },
+      { text: "Mi rival va a abandonar", negative: true },
+      { text: "Soy superior a todos", negative: true },
+      { text: "Nunca fallo un golpe", negative: true },
+      // Pensamientos positivos CONSTRUCTIVOS - Realistas y útiles (60 pensamientos)
+      { text: "Un punto a la vez", negative: false },
+      { text: "Respiro y ajusto", negative: false },
+      { text: "Confío en mi proceso", negative: false },
+      { text: "Sigo firme", negative: false },
+      { text: "Me enfoco en la bola", negative: false },
+      { text: "Controlo mi ritmo", negative: false },
+      { text: "Ejecuto mi plan", negative: false },
+      { text: "Me mantengo presente", negative: false },
+      { text: "Ajusto mi estrategia", negative: false },
+      { text: "Confío en mi preparación", negative: false },
+      { text: "Respiro y me centro", negative: false },
+      { text: "Sigo mi rutina", negative: false },
+      { text: "Me enfoco en mi tarea", negative: false },
+      { text: "Acepto y continúo", negative: false },
+      { text: "Un golpe a la vez", negative: false },
+      { text: "Mantengo la calma", negative: false },
+      { text: "Controlo lo que puedo", negative: false },
+      { text: "Aprendo de cada punto", negative: false },
+      { text: "Respiro profundo y continúo", negative: false },
+      { text: "Confío en mi técnica", negative: false },
+      { text: "Me adapto al momento", negative: false },
+      { text: "Acepto el desafío", negative: false },
+      { text: "Ejecuto con confianza", negative: false },
+      { text: "Me enfoco en soluciones", negative: false },
+      { text: "Sigo construyendo", negative: false },
+      { text: "Mantengo mi intensidad", negative: false },
+      { text: "Me concentro en el siguiente punto", negative: false },
+      { text: "Acepto el error y sigo", negative: false },
+      { text: "Juego mi juego", negative: false },
+      { text: "Confío en mi entrenamiento", negative: false },
+      { text: "Sigo adelante paso a paso", negative: false },
+      { text: "Me centro en mi respiración", negative: false },
+      { text: "Ejecuto con precisión", negative: false },
+      { text: "Mantengo mi enfoque", negative: false },
+      { text: "Confío en mis decisiones", negative: false },
+      { text: "Me adapto y aprendo", negative: false },
+      { text: "Sigo mi plan de juego", negative: false },
+      { text: "Respiro y me reconecto", negative: false },
+      { text: "Controlo mi energía", negative: false },
+      { text: "Me mantengo en el ahora", negative: false },
+      { text: "Confío en mi capacidad", negative: false },
+      { text: "Sigo trabajando el punto", negative: false },
+      { text: "Acepto el momento y actúo", negative: false },
+      { text: "Me enfoco en ejecutar", negative: false },
+      { text: "Mantengo la compostura", negative: false },
+      { text: "Respiro y reseteo", negative: false },
+      { text: "Sigo mi proceso interno", negative: false },
+      { text: "Confío en mi movimiento", negative: false },
+      { text: "Me centro en la acción", negative: false },
+      { text: "Ejecuto con libertad", negative: false },
+      { text: "Acepto y avanzo", negative: false },
+      { text: "Mantengo mi ritmo interno", negative: false },
+      { text: "Confío en mi juego natural", negative: false },
+      { text: "Sigo con determinación", negative: false },
+      { text: "Respiro y fluyo", negative: false },
+      { text: "Me enfoco en mi fortaleza", negative: false },
+      { text: "Ejecuto mi mejor versión", negative: false },
+      { text: "Acepto el reto presente", negative: false },
+      { text: "Mantengo mi concentración", negative: false },
+      { text: "Confío y ejecuto", negative: false }
+    ];
+
+    const transformations = [
+      {
+        negative: "No puedo ganar este partido",
+        options: [
+          { text: "Voy a ganar seguro", correct: false, feedback: "Lo positivo sin realismo no funciona." },
+          { text: "Confío en mi juego", correct: false, feedback: "Bien, pero puede ser más específico." },
+          { text: "Un punto a la vez, respiro y ajusto", correct: true, feedback: "¡Perfecto! Real, positivo y útil." }
+        ]
+      },
+      {
+        negative: "Mi revés es muy malo",
+        options: [
+          { text: "Soy invencible con mi revés", correct: false, feedback: "Lo positivo sin realismo no funciona." },
+          { text: "Confío en mi revés", correct: false, feedback: "Mejor, pero aún puede mejorar." },
+          { text: "Respiro, ajusto y mejoro", correct: true, feedback: "    Excelente! Honesto y enfocado." }
+        ]
+      },
+      {
+        negative: "Estoy jugando horrible",
+        options: [
+          { text: "Ya no puedo jugar peor", correct: false, feedback: "Eso no te ayuda a mejorar." },
+          { text: "El siguiente punto es mío", correct: false, feedback: "Demasiado resultado, poco proceso." },
+          { text: "Sigue firme, un golpe a la vez", correct: true, feedback: "¡Perfecto! Te centra en el proceso." }
+        ]
+      }
+    ];
+
+    const moments = [
+      {
+        title: "⚪ Momento 1 – Antes del punto (nervios)",
+        options: [
+          { text: "No falles", correct: false, feedback: "Tu mente debe enfocarte en control, no en presión." },
+          { text: "Respira y sigue", correct: true, feedback: "¡Perfecto! Tu mente se enfoca en control." },
+          { text: "Gana este punto ahora", correct: false, feedback: "Eso genera presión innecesaria." }
+        ]
+      },
+      {
+        title: "   Momento 2 – Error propio",
+        options: [
+          { text: "Soy un desastre", correct: false, feedback: "Los errores se limpian con una frase, no con drama." },
+          { text: "Un punto a la vez", correct: true, feedback: "  Excelente! Limpieza mental rápida." },
+          { text: "No puedo ser tan malo", correct: false, feedback: "Sigues en el problema, no en la solución." }
+        ]
+      },
+      {
+        title: "⚪ Momento 3 – Situación de ataque",
+        options: [
+          { text: "Confía en tu derecha", correct: true, feedback: "¡Perfecto! Tu frase dirige tu intención." },
+          { text: "Y si fallo  ", correct: false, feedback: "La duda bloquea la ejecución." },
+          { text: "Mejor no arriesgo", correct: false, feedback: "El miedo limita tu potencial." }
+        ]
+      }
+    ];
+
+    let currentTransformation = 0;
+    let currentMoment = 0;
+
+    function shuffleArray(array) {
+      const newArray = [...array];
+      for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+      }
+      return newArray;
+    }
+
+    function startGame(mode) {
+      if (gameTimer) clearInterval(gameTimer);
+      if (balloonSpawner) clearInterval(balloonSpawner);
+      
+      currentGameMode = mode;
+      timeLeft = 60;
+      hits = 0;
+      misses = 0;
+      points = 0;
+      combo = 0;
+      gameActive = false;
+      availableBalloons = [];
+      balloonsUsed = 0;
+      
+      document.querySelector('.intro-section').classList.add('hidden');
+      document.getElementById('gameArea').classList.remove('hidden');
+      document.getElementById('balloonsContainer').innerHTML = '';
+      document.getElementById('phase1Feedback').innerHTML = '';
+      
+      if (mode === 1) {
+        document.getElementById('gameInstructions').innerHTML = `
+          <strong>🎯 Juego 1: Elimina lo Negativo</strong><br>
+          Tienes <strong>60 segundos</strong> para eliminar SOLO los pensamientos <strong>negativos</strong> haciendo clic. 
+          <br><strong>⚠️ Cuidado:</strong> Cada error te resta <strong>5 segundos</strong>. Cada acierto suma <strong>100 puntos</strong>.
+        `;
+      } else {
+        document.getElementById('gameInstructions').innerHTML = `
+          <strong>🎯 Juego 2: Detecta lo Constructivo</strong><br>
+          Tienes <strong>60 segundos</strong> para identificar SOLO los pensamientos <strong>POSITIVOS CONSTRUCTIVOS</strong>. 
+          <br><strong>⚠️ Cuidado:</strong> No todos los pensamientos positivos son útiles. Los irreales NO sirven. Cada error te resta <strong>5 segundos</strong>.
+        `;
+      }
+      
+      updateStats();
+      
+      const startCountdown = document.getElementById('phase1Feedback');
+      let countdown = 3;
+      startCountdown.innerHTML = `<div class="feedback-message success" style="font-size: 2rem;">Comienza en ${countdown}...</div>`;
+      
+      const countInterval = setInterval(() => {
+        countdown--;
+        if (countdown > 0) {
+          startCountdown.innerHTML = `<div class="feedback-message success" style="font-size: 2rem;">Comienza en ${countdown}...</div>`;
+        } else {
+          startCountdown.innerHTML = `<div class="feedback-message success" style="font-size: 2rem;">¡YA! 🎯</div>`;
+          setTimeout(() => {
+            startCountdown.innerHTML = '';
+            gameActive = true;
+            
+            for (let i = 0; i < 5; i++) {
+              setTimeout(() => spawnBalloons(), i * 600);
+            }
+            
+            balloonSpawner = setInterval(() => {
+              if (gameActive) {
+                spawnBalloons();
+              }
+            }, 3000);
+            
+            gameTimer = setInterval(() => {
+              timeLeft--;
+              updateStats();
+              
+              if (timeLeft <= 0) {
+                endGame();
+              }
+            }, 1000);
+          }, 800);
+          clearInterval(countInterval);
+        }
+      }, 1000);
+    }
+
+    let availableBalloons = [];
+    let balloonsUsed = 0;
+
+    function spawnBalloons() {
+      if (!gameActive) return;
+      
+      const container = document.getElementById('balloonsContainer');
+      const balloonTexts = currentGameMode === 1 ? balloonTextsGame1 : balloonTextsGame2;
+      
+      if (availableBalloons.length === 0) {
+        availableBalloons = shuffleArray([...balloonTexts]);
+      }
+      
+      const newBalloon = availableBalloons.shift();
+      
+      const balloonEl = document.createElement('div');
+      balloonEl.className = 'balloon';
+      balloonEl.textContent = newBalloon.text;
+      balloonEl.dataset.negative = newBalloon.negative;
+      balloonEl.style.animation = 'slideIn 0.5s ease';
+      
+      balloonEl.addEventListener('click', handleBalloonClick);
+      container.appendChild(balloonEl);
+      
+      if (container.children.length > 12) {
+        const firstChild = container.firstChild;
+        if (firstChild && firstChild.style.pointerEvents !== 'none') {
+          firstChild.remove();
+        }
+      }
+    }
+
+    function updateStats() {
+      document.getElementById('timer').textContent = timeLeft;
+      document.getElementById('hits').textContent = hits;
+      document.getElementById('misses').textContent = misses;
+      document.getElementById('points').textContent = points;
+      
+      const timerBox = document.querySelector('.stat-box');
+      if (timeLeft <= 10) {
+        timerBox.classList.add('timer-low');
+      } else {
+        timerBox.classList.remove('timer-low');
+      }
+    }
+
+    function showCombo(comboCount) {
+      const comboEl = document.createElement('div');
+      comboEl.className = 'combo-message';
+      
+      if (comboCount === 3) comboEl.textContent = '🔥 ¡COMBO x3!';
+      else if (comboCount === 5) comboEl.textContent = '⚡ ¡COMBO x5!';
+      else if (comboCount >= 7) comboEl.textContent = '💥 ¡IMPARABLE!';
+      
+      document.body.appendChild(comboEl);
+      
+      setTimeout(() => comboEl.remove(), 800);
+    }
+
+    function endGame() {
+      clearInterval(gameTimer);
+      clearInterval(balloonSpawner);
+      gameActive = false;
+      
+      document.getElementById('balloonsContainer').innerHTML = `
+        <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%); border-radius: 16px; border: 3px solid #48bb78;">
+          <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+          <h3 style="font-size: 2rem; font-weight: 800; color: #2f855a; margin-bottom: 1rem;">¡FASE 1 COMPLETADA!</h3>
+          <p style="font-size: 1.25rem; color: #276749; font-weight: 600; margin-bottom: 1.5rem;">Has terminado "El Detector de Pensamientos"</p>
+          <div style="background: white; border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem;">
+            <div style="font-size: 3rem; font-weight: 900; color: #667eea; margin-bottom: 0.5rem;">${points} PUNTOS</div>
+            <div style="font-size: 1.125rem; color: #4a5568; margin-bottom: 1rem;">
+              <strong>✅ Aciertos:</strong> ${hits} &nbsp;&nbsp; <strong>❌ Errores:</strong> ${misses}
+            </div>
+          </div>
+        </div>
+      `;
+      
+      let performance = '';
+      if (points >= 1000) performance = '🏆 ¡Eres un maestro mental! Tu capacidad de detección es excepcional.';
+      else if (points >= 600) performance = '🎯 ¡Excelente detección! Tienes buen ojo para identificar pensamientos.';
+      else if (points >= 300) performance = '   ¡Bien hecho! Vas por buen camino, sigue practicando.';
+      else performance = '💪 Buen intento. Cada práctica mejora tu habilidad mental.';
+      
+      const feedbackDiv = document.getElementById('phase1Feedback');
+      feedbackDiv.innerHTML = `<div class="feedback-message success" style="font-size: 1.125rem; padding: 1.5rem;">${performance}</div>`;
+      
+      let teachingMessage = '';
+      if (currentGameMode === 1) {
+        teachingMessage = '💡 APRENDISTE: Tu primer paso para mejorar es saber qué te afecta… y eliminarlo rápido. Ahora que puedes DETECTAR lo negativo, es momento de TRANSFORMARLO.';
+      } else {
+        teachingMessage = '💡 APRENDISTE: No todos los pensamientos positivos son útiles. Los constructivos te dan control REAL, no fantasía. Ahora sabes distinguir entre lo que suena bien y lo que FUNCIONA.';
+      }
+      
+      document.getElementById('phase1Teaching').innerHTML = `
+        <div style="font-size: 1.25rem; line-height: 1.8;">${teachingMessage}</div>
+      `;
+      document.getElementById('phase1Teaching').classList.remove('hidden');
+      
+      const nextBtn = document.getElementById('phase1NextBtn');
+      nextBtn.innerHTML = '🚀 Continuar a Fase 2: Transformar Pensamientos →';
+      nextBtn.style.fontSize = '1.25rem';
+      nextBtn.style.padding = '1.5rem 2rem';
+      nextBtn.style.animation = 'pulse 2s infinite';
+      nextBtn.classList.remove('hidden');
+      
+      updateProgress(33);
+    }
+
+    function initPhase1() {
+      document.querySelector('.intro-section').classList.remove('hidden');
+      document.getElementById('gameArea').classList.add('hidden');
+      document.getElementById('phase1Teaching').classList.add('hidden');
+      document.getElementById('phase1NextBtn').classList.add('hidden');
+    }
+
+    function handleBalloonClick(e) {
+      if (!gameActive) return;
+      
+      const balloon = e.currentTarget;
+      
+      if (balloon.classList.contains('processing')) return;
+      balloon.classList.add('processing');
+      
+      const isNegative = balloon.dataset.negative === 'true';
+      
+      balloon.style.pointerEvents = 'none';
+      
+      let isCorrect = false;
+      let errorMessage = '';
+      
+      if (currentGameMode === 1) {
+        isCorrect = isNegative;
+        errorMessage = '❌ Este pensamiento te ayuda (-5 segundos)';
+      } else {
+        isCorrect = !isNegative;
+        errorMessage = '❌ Este pensamiento NO es constructivo (-5 segundos)';
+      }
+      
+      if (isCorrect) {
+        balloon.classList.add('popped');
+        hits++;
+        combo++;
+        
+        let pointsEarned = 100;
+        if (combo >= 3) {
+          pointsEarned = 100 + (combo * 10);
+          if (combo % 3 === 0) showCombo(combo);
+        }
+        
+        points += pointsEarned;
+        
+        const feedbackDiv = document.getElementById('phase1Feedback');
+        if (combo >= 3) {
+          feedbackDiv.innerHTML = `<div class="feedback-message success" style="font-size: 1.125rem;">🔥 ¡Combo x${combo}! +${pointsEarned} puntos</div>`;
+          setTimeout(() => {
+            if (feedbackDiv.innerHTML.includes('Combo')) {
+              feedbackDiv.innerHTML = '';
+            }
+          }, 800);
+        }
+        
+        updateStats();
+        
+        setTimeout(() => {
+          balloon.remove();
+        }, 400);
+        
+      } else {
+        misses++;
+        combo = 0;
+        timeLeft = Math.max(0, timeLeft - 5);
+        
+        balloon.style.background = 'linear-gradient(135deg, #fee 0%, #fcc 100%)';
+        balloon.style.borderColor = '#f56565';
+        balloon.style.transform = 'scale(0.9)';
+        
+        const feedbackDiv = document.getElementById('phase1Feedback');
+        feedbackDiv.innerHTML = `<div class="feedback-message error" style="font-size: 1.25rem;">${errorMessage}</div>`;
+        
+        setTimeout(() => {
+          if (feedbackDiv.innerHTML.includes(errorMessage)) {
+            feedbackDiv.innerHTML = '';
+          }
+          balloon.remove();
+        }, 1200);
+        
+        updateStats();
+      }
+    }
+
+    function initPhase2() {
+      showTransformation();
+    }
+
+    function showTransformation() {
+      if (currentTransformation >= transformations.length) {
+        document.getElementById('currentThoughtCard').innerHTML = `
+          <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 3px solid #f59e0b; border-radius: 16px;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">✨</div>
+            <h3 style="font-size: 2rem; font-weight: 800; color: #92400e; margin-bottom: 1rem;">¡FASE 2 COMPLETADA!</h3>
+            <p style="font-size: 1.25rem; color: #92400e; font-weight: 600;">Has transformado ${transformations.length} pensamientos negativos</p>
+          </div>
+        `;
+        
+        document.getElementById('transformer').style.display = 'none';
+        document.getElementById('optionsContainer').classList.add('hidden');
+        
+        document.getElementById('phase2Teaching').innerHTML = `
+          <div style="font-size: 1.25rem; line-height: 1.8; text-align: center;">
+            💡 <strong>APRENDISTE:</strong> La mente cree lo que suena real. Sé positivo… pero honesto.<br><br>
+            Ahora tienes ${transformations.length} frases nuevas que tu cerebro SÍ puede ejecutar.<br>
+            Es momento de usarlas en situaciones REALES de presión.
+          </div>
+        `;
+        document.getElementById('phase2Teaching').classList.remove('hidden');
+        
+        const nextBtn = document.getElementById('phase2NextBtn');
+        nextBtn.innerHTML = '🎾 Continuar a Fase 3: Aplicar en la Cancha →';
+        nextBtn.style.fontSize = '1.25rem';
+        nextBtn.style.padding = '1.5rem 2rem';
+        nextBtn.style.animation = 'pulse 2s infinite';
+        nextBtn.classList.remove('hidden');
+        
+        updateProgress(66);
+        return;
+      }
+
+      const transformation = transformations[currentTransformation];
+      document.getElementById('currentThoughtCard').textContent = transformation.negative;
+      document.getElementById('optionsContainer').classList.add('hidden');
+      document.getElementById('phase2Feedback').innerHTML = '';
+    }
+
+    document.getElementById('transformer').addEventListener('click', function() {
+      if (currentTransformation >= transformations.length) return;
+      
+      const transformation = transformations[currentTransformation];
+      const container = document.getElementById('optionsContainer');
+      container.innerHTML = '';
+      container.classList.remove('hidden');
+      
+      transformation.options.forEach((option, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = option.text;
+        btn.addEventListener('click', () => handleOptionSelect(option, btn));
+        container.appendChild(btn);
+      });
+    });
+
+    function handleOptionSelect(option, btn) {
+      const feedbackDiv = document.getElementById('phase2Feedback');
+      const allBtns = document.querySelectorAll('.option-btn');
+      
+      allBtns.forEach(b => b.style.pointerEvents = 'none');
+      
+      if (option.correct) {
+        btn.classList.add('correct');
+        feedbackDiv.innerHTML = `<div class="feedback-message success">✅ ${option.feedback}</div>`;
+        
+        const transformedContainer = document.getElementById('transformedCards');
+        if (phase2Completed === 0) {
+          transformedContainer.innerHTML = '';
+        }
+        
+        const card = document.createElement('div');
+        card.className = 'transformed-card';
+        card.textContent = option.text;
+        transformedContainer.appendChild(card);
+        
+        phase2Completed++;
+        currentTransformation++;
+        
+        setTimeout(() => {
+          showTransformation();
+        }, 1500);
+      } else {
+        btn.classList.add('incorrect');
+        feedbackDiv.innerHTML = `<div class="feedback-message error">❌ ${option.feedback}</div>`;
+        
+        setTimeout(() => {
+          feedbackDiv.innerHTML = '';
+          allBtns.forEach(b => {
+            b.style.pointerEvents = 'auto';
+            b.classList.remove('incorrect');
+          });
+        }, 2000);
+      }
+    }
+
+    function initPhase3() {
+      showMoment();
+    }
+
+    function showMoment() {
+      if (currentMoment >= moments.length) {
+        const completionCard = document.createElement('div');
+        completionCard.style.cssText = `
+          text-align: center; 
+          padding: 3rem; 
+          background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); 
+          border: 3px solid #3b82f6; 
+          border-radius: 16px; 
+          margin-top: 2rem;
+        `;
+        completionCard.innerHTML = `
+          <div style="font-size: 4rem; margin-bottom: 1rem;">   </div>
+          <h3 style="font-size: 2rem; font-weight: 800; color: #1e3a8a; margin-bottom: 1rem;">¡FASE 3 COMPLETADA!</h3>
+          <p style="font-size: 1.25rem; color: #1e40af; font-weight: 600; margin-bottom: 1rem;">Has aplicado tu nuevo diálogo en ${moments.length} momentos de presión</p>
+          <div style="background: white; border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem;">
+            <p style="font-size: 1.125rem; color: #1e3a8a; font-weight: 700;">✅ Tu voz interna ahora es tu aliada, no tu enemiga</p>
+          </div>
+        `;
+        
+        document.getElementById('momentsContainer').appendChild(completionCard);
+        
+        document.getElementById('phase3Teaching').innerHTML = `
+          <div style="font-size: 1.25rem; line-height: 1.8; text-align: center;">
+            💡 <strong>APRENDISTE:</strong> Tu frase dirige tu intención. Tu intención dirige tu golpe.<br><br>
+            Ahora sabes cómo hablar contigo mismo en los momentos que REALMENTE importan.<br>
+            Has completado el entrenamiento mental. ¡Es momento de ver tu transformación completa!
+          </div>
+        `;
+        document.getElementById('phase3Teaching').classList.remove('hidden');
+        
+        const nextBtn = document.getElementById('phase3NextBtn');
+        nextBtn.innerHTML = '🌟 Ver Mi Transformación Completa →';
+        nextBtn.style.fontSize = '1.25rem';
+        nextBtn.style.padding = '1.5rem 2rem';
+        nextBtn.style.animation = 'pulse 2s infinite';
+        nextBtn.classList.remove('hidden');
+        
+        updateProgress(100);
+        return;
+      }
+
+      const moment = moments[currentMoment];
+      const container = document.getElementById('momentsContainer');
+      
+      const momentCard = document.createElement('div');
+      momentCard.className = 'moment-card';
+      momentCard.innerHTML = `<div class="moment-title">${moment.title}</div>`;
+      
+      moment.options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = option.text;
+        btn.addEventListener('click', () => handleMomentSelect(option, btn, momentCard));
+        momentCard.appendChild(btn);
+      });
+      
+      container.appendChild(momentCard);
+    }
+
+    function handleMomentSelect(option, btn, card) {
+      const allBtns = card.querySelectorAll('.option-btn');
+      allBtns.forEach(b => b.style.pointerEvents = 'none');
+      
+      if (option.correct) {
+        btn.classList.add('correct');
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback-message success';
+        feedback.textContent = `💡 ${option.feedback}`;
+        card.appendChild(feedback);
+        
+        phase3Completed++;
+        currentMoment++;
+        
+        setTimeout(() => {
+          showMoment();
+        }, 1500);
+      } else {
+        btn.classList.add('incorrect');
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback-message error';
+        feedback.textContent = `❌ ${option.feedback}`;
+        card.appendChild(feedback);
+        
+        setTimeout(() => {
+          feedback.remove();
+          allBtns.forEach(b => {
+            b.style.pointerEvents = 'auto';
+            b.classList.remove('incorrect');
+          });
+        }, 2000);
+      }
+    }
+
+    function updateProgress(percent) {
+      document.getElementById('progressBar').style.width = percent + '%';
+    }
+
+    function showPhase(phase) {
+      document.querySelectorAll('.phase-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`phase${phase}`).classList.remove('hidden');
+      currentPhase = phase;
+      acScrollToElement(`phase${phase}`);
+    }
+
+    function resetGame() {
+      if (gameTimer) clearInterval(gameTimer);
+      if (balloonSpawner) clearInterval(balloonSpawner);
+      
+      currentPhase = 1;
+      phase1Score = 0;
+      phase2Completed = 0;
+      phase3Completed = 0;
+      currentTransformation = 0;
+      currentMoment = 0;
+      
+      timeLeft = 60;
+      hits = 0;
+      misses = 0;
+      points = 0;
+      combo = 0;
+      gameActive = false;
+      
+      updateProgress(0);
+      document.querySelectorAll('.phase-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById('intro').classList.remove('hidden');
+      acScrollToElement('intro');
+      
+      document.getElementById('phase1Teaching').classList.add('hidden');
+      document.getElementById('phase1NextBtn').classList.add('hidden');
+      document.getElementById('phase1NextBtn').innerHTML = 'Transformar pensamientos';
+      document.getElementById('phase1NextBtn').style.animation = '';
+      
+      document.getElementById('phase2Teaching').classList.add('hidden');
+      document.getElementById('phase2NextBtn').classList.add('hidden');
+      document.getElementById('phase2NextBtn').innerHTML = 'Aplicar tus nuevas frases en la cancha';
+      document.getElementById('phase2NextBtn').style.animation = '';
+      document.getElementById('transformer').style.display = 'flex';
+      document.getElementById('transformedCards').innerHTML = '<p style="text-align: center; color: #48bb78; font-weight: 600;">Tus frases transformadas aparecerán aquí ✨</p>';
+      
+      document.getElementById('phase3Teaching').classList.add('hidden');
+      document.getElementById('phase3NextBtn').classList.add('hidden');
+      document.getElementById('phase3NextBtn').innerHTML = 'Ver resultado final';
+      document.getElementById('phase3NextBtn').style.animation = '';
+      
+      document.getElementById('momentsContainer').innerHTML = '';
+      document.getElementById('phase1Feedback').innerHTML = '';
+    }
+
+    document.getElementById('phase1NextBtn').addEventListener('click', () => {
+      showPhase(2);
+      initPhase2();
+    });
+
+    document.getElementById('phase2NextBtn').addEventListener('click', () => {
+      showPhase(3);
+      initPhase3();
+    });
+
+    document.getElementById('phase3NextBtn').addEventListener('click', () => {
+      document.querySelectorAll('.phase-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById('finalScreen').classList.remove('hidden');
+      acScrollToElement('finalScreen');
+    });
+
+    document.getElementById('startGameBtn').addEventListener('click', () => {
+      document.getElementById('intro').classList.add('hidden');
+      document.getElementById('phase1').classList.remove('hidden');
+      updateProgress(0);
+      initPhase1();
+      acScrollToElement('intro');
+    });
+
+    document.getElementById('startGame1Btn').addEventListener('click', () => {
+      startGame(1);
+    });
+
+    document.getElementById('startGame2Btn').addEventListener('click', () => {
+      startGame(2);
+    });
+
+    document.getElementById('backToMenuBtn').addEventListener('click', () => {
+      if (gameTimer) clearInterval(gameTimer);
+      if (balloonSpawner) clearInterval(balloonSpawner);
+      gameActive = false;
+      currentGameMode = null;
+      
+      document.getElementById('gameArea').classList.add('hidden');
+      document.querySelector('.intro-section').classList.remove('hidden');
+      document.getElementById('phase1Feedback').innerHTML = '';
+      document.getElementById('balloonsContainer').innerHTML = '';
+      
+      timeLeft = 60;
+      hits = 0;
+      misses = 0;
+      points = 0;
+      combo = 0;
+      updateStats();
+      acScrollToElement('intro');
+    });
+
+    document.getElementById('restartBtn').addEventListener('click', resetGame);
+
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      btn.textContent = '💾 Guardando...';
+      
+      const result = await window.dataSdk.create({
+        id: Date.now().toString(),
+        phase: 3,
+        score: phase1Score + phase2Completed + phase3Completed,
+        completedAt: new Date().toISOString()
+      });
+      
+      if (result.isOk) {
+        btn.textContent = '✅ Guardado';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.textContent = '💾 Guardar resultado';
+        }, 2000);
+      } else {
+        btn.textContent = '❌ Error al guardar';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.textContent = '💾 Guardar resultado';
+        }, 2000);
+      }
+    });
+
+    const dataHandler = {
+      onDataChanged(data) {
+      }
+    };
+
+    async function onConfigChange(config) {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const baseFontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+      
+      document.getElementById('gameTitle').textContent = config.game_title || defaultConfig.game_title;
+      document.getElementById('gameSubtitle').textContent = config.game_subtitle || defaultConfig.game_subtitle;
+      document.getElementById('phase1Title').textContent = config.phase1_title || defaultConfig.phase1_title;
+      document.getElementById('phase2Title').textContent = config.phase2_title || defaultConfig.phase2_title;
+      document.getElementById('phase3Title').textContent = config.phase3_title || defaultConfig.phase3_title;
+      document.getElementById('finalMessage').textContent = config.final_message || defaultConfig.final_message;
+      
+      document.body.style.background = `linear-gradient(135deg, ${config.background_color || defaultConfig.background_color} 0%, ${config.primary_button_color || defaultConfig.primary_button_color} 100%)`;
+      
+      document.querySelectorAll('.game-card').forEach(el => {
+        el.style.background = config.card_color || defaultConfig.card_color;
+      });
+      
+      document.querySelectorAll('.game-title, .phase-title, .moment-title, .final-message, .final-tagline').forEach(el => {
+        el.style.fontFamily = `${customFont}, ${baseFontStack}`;
+        el.style.color = config.text_color || defaultConfig.text_color;
+      });
+      
+      document.querySelectorAll('.game-subtitle, .phase-subtitle, .final-quote').forEach(el => {
+        el.style.fontFamily = `${customFont}, ${baseFontStack}`;
+      });
+      
+      document.querySelectorAll('.btn').forEach(el => {
+        el.style.background = `linear-gradient(135deg, ${config.primary_button_color || defaultConfig.primary_button_color} 0%, ${config.background_color || defaultConfig.background_color} 100%)`;
+      });
+      
+      document.querySelectorAll('.teaching-box').forEach(el => {
+        el.style.borderLeftColor = config.accent_color || defaultConfig.accent_color;
+      });
+      
+      document.querySelector('.game-title').style.fontSize = `${baseSize * 2}px`;
+      document.querySelector('.game-subtitle').style.fontSize = `${baseSize * 1.125}px`;
+      document.querySelectorAll('.phase-title').forEach(el => {
+        el.style.fontSize = `${baseSize * 1.75}px`;
+      });
+      document.querySelectorAll('.phase-subtitle').forEach(el => {
+        el.style.fontSize = `${baseSize}px`;
+      });
+      document.querySelectorAll('.teaching-box').forEach(el => {
+        el.style.fontSize = `${baseSize * 1.125}px`;
+      });
+      document.querySelectorAll('.btn').forEach(el => {
+        el.style.fontSize = `${baseSize * 1.125}px`;
+      });
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.card_color || defaultConfig.card_color,
+              set: (value) => {
+                config.card_color = value;
+                window.elementSdk.setConfig({ card_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_button_color || defaultConfig.primary_button_color,
+              set: (value) => {
+                config.primary_button_color = value;
+                window.elementSdk.setConfig({ primary_button_color: value });
+              }
+            },
+            {
+              get: () => config.accent_color || defaultConfig.accent_color,
+              set: (value) => {
+                config.accent_color = value;
+                window.elementSdk.setConfig({ accent_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["game_title", config.game_title || defaultConfig.game_title],
+          ["game_subtitle", config.game_subtitle || defaultConfig.game_subtitle],
+          ["phase1_title", config.phase1_title || defaultConfig.phase1_title],
+          ["phase2_title", config.phase2_title || defaultConfig.phase2_title],
+          ["phase3_title", config.phase3_title || defaultConfig.phase3_title],
+          ["final_message", config.final_message || defaultConfig.final_message]
+        ])
+      });
+    }
+
+    window.dataSdk.init(dataHandler).then(result => {
+      if (result.isOk) {
+        console.log('Data SDK initialized');
+      }
+    });
+  </script>
+<script>
+function acScrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function acScrollToElement(id, offset) {
+  var target = document.getElementById(id);
+  if (!target) {
+    acScrollToTop();
+    return;
+  }
+  var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  window.scrollTo(0, 0);
+});
+</script>
+</body>
+</html>

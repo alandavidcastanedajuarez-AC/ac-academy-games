@@ -1,0 +1,2051 @@
+<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tu Mapa Mental de Competidor</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+      min-height: 100%;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    .main-wrapper {
+      width: 100%;
+      min-height: 100%;
+      padding: 2% 3%;
+    }
+
+    /* Header Styles */
+    .game-header {
+      text-align: center;
+      margin-bottom: 2%;
+      animation: fadeInDown 0.8s ease;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .game-title {
+      font-size: 3em;
+      font-weight: 900;
+      color: #ffffff;
+      margin: 0 0 1%;
+      text-shadow: 3px 3px 12px rgba(0,0,0,0.4);
+      letter-spacing: -1px;
+    }
+
+    .game-objective {
+      font-size: 1.1em;
+      color: rgba(255,255,255,0.95);
+      margin: 0;
+      font-weight: 500;
+    }
+
+    /* Stage Container */
+    .stage-wrapper {
+      background: white;
+      border-radius: 28px;
+      padding: 3% 4%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 1400px;
+      margin: 0 auto;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .stage-header {
+      text-align: center;
+      margin-bottom: 3%;
+      padding-bottom: 2%;
+      border-bottom: 3px solid #f0f0f0;
+    }
+
+    .stage-number {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 1% 3%;
+      border-radius: 50px;
+      font-size: 1em;
+      font-weight: 700;
+      margin-bottom: 1%;
+    }
+
+    .stage-title {
+      font-size: 2.2em;
+      font-weight: 800;
+      color: #1a202c;
+      margin: 1% 0 0.5%;
+      line-height: 1.2;
+    }
+
+    .stage-subtitle {
+      font-size: 1.3em;
+      color: #4a5568;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .stage-intro {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border-left: 5px solid #f59e0b;
+      border-radius: 12px;
+      padding: 2% 3%;
+      margin: 2% 0;
+      font-size: 1.05em;
+      color: #78350f;
+      line-height: 1.6;
+      font-weight: 600;
+    }
+
+    /* Emotion Cards Grid - Stage 1 */
+    .emotions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin: 3% 0;
+    }
+
+    .emotion-card {
+      background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+      border-radius: 20px;
+      padding: 6% 4%;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 3px solid #e2e8f0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .emotion-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .emotion-card:hover {
+      transform: translateY(-10px) scale(1.03);
+      box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
+      border-color: #667eea;
+    }
+
+    .emotion-card:hover::before {
+      opacity: 1;
+    }
+
+    .emotion-card.selected {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-color: #5a67d8;
+      transform: scale(1.05);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+    }
+
+    .emotion-card.selected::before {
+      opacity: 0;
+    }
+
+    .emotion-card.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .emotion-icon {
+      font-size: 4em;
+      margin-bottom: 4%;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .emotion-card:hover .emotion-icon {
+      transform: scale(1.2) rotate(5deg);
+    }
+
+    .emotion-card.selected .emotion-icon {
+      transform: scale(1.15);
+    }
+
+    .emotion-name {
+      font-size: 1.4em;
+      font-weight: 800;
+      color: #2d3748;
+      margin: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .emotion-card.selected .emotion-name {
+      color: white;
+    }
+
+    /* Tool Box - Stage 1 */
+    .tools-container {
+      margin: 3% 0;
+    }
+
+    .tool-box {
+      background: linear-gradient(135deg, #d4fc79, #96e6a1);
+      border-radius: 20px;
+      padding: 3% 4%;
+      margin-bottom: 2%;
+      border-left: 6px solid #10b981;
+      animation: slideInRight 0.5s ease;
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(-40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .tool-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2%;
+    }
+
+    .tool-emoji {
+      font-size: 2.5em;
+      margin-right: 3%;
+    }
+
+    .tool-emotion-label {
+      font-size: 1.5em;
+      font-weight: 800;
+      color: #065f46;
+      margin: 0;
+    }
+
+    .tool-content {
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 12px;
+      padding: 2% 3%;
+      margin-top: 2%;
+    }
+
+    .tool-title {
+      font-size: 1em;
+      font-weight: 700;
+      color: #047857;
+      margin: 0 0 1%;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tool-description {
+      font-size: 1.2em;
+      font-weight: 700;
+      color: #064e3b;
+      margin: 0 0 2%;
+      line-height: 1.5;
+    }
+
+    .tool-explanation {
+      font-size: 1em;
+      color: #065f46;
+      font-style: italic;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .selection-counter {
+      text-align: center;
+      font-size: 1.1em;
+      color: #4a5568;
+      font-weight: 600;
+      margin: 2% 0;
+      padding: 1.5% 3%;
+      background: #f7fafc;
+      border-radius: 12px;
+      display: inline-block;
+      width: 100%;
+    }
+
+    /* Situations Grid - Stage 2 */
+    .situations-container {
+      margin: 3% 0;
+    }
+
+    .situation-card {
+      background: linear-gradient(145deg, #ffffff, #f7fafc);
+      border-radius: 20px;
+      padding: 3% 4%;
+      margin-bottom: 3%;
+      border: 3px solid #e2e8f0;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    .situation-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+    }
+
+    .situation-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2%;
+      padding-bottom: 2%;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .situation-emoji {
+      font-size: 2.5em;
+      margin-right: 2%;
+    }
+
+    .situation-title {
+      font-size: 1.5em;
+      font-weight: 800;
+      color: #1a202c;
+      margin: 0;
+      flex: 1;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin: 2% 0;
+    }
+
+    .option-button {
+      background: white;
+      border: 3px solid #cbd5e0;
+      border-radius: 14px;
+      padding: 4% 3%;
+      font-size: 1.05em;
+      font-weight: 700;
+      color: #2d3748;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .option-button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(102, 126, 234, 0.1);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .option-button:hover {
+      background: #f7fafc;
+      border-color: #667eea;
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.2);
+    }
+
+    .option-button:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .option-button.correct {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border-color: #047857;
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    }
+
+    .option-button.incorrect {
+      background: #f1f5f9;
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .option-button span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .principle-box {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border-radius: 14px;
+      padding: 2.5% 3%;
+      margin-top: 2%;
+      border-left: 5px solid #f59e0b;
+      display: none;
+      animation: slideInRight 0.5s ease;
+    }
+
+    .principle-box.show {
+      display: block;
+    }
+
+    .principle-label {
+      font-size: 0.9em;
+      font-weight: 700;
+      color: #92400e;
+      margin: 0 0 1%;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .principle-text {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #78350f;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* Anchors Grid - Stage 3 */
+    .anchors-circle-container {
+      max-width: 900px;
+      margin: 3% auto;
+      position: relative;
+    }
+
+    .anchors-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 25px;
+    }
+
+    .anchor-card {
+      background: linear-gradient(145deg, #ffffff, #f1f5f9);
+      border-radius: 20px;
+      padding: 5% 4%;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 3px solid #e2e8f0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .anchor-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+      transform: rotate(45deg);
+      transition: all 0.6s ease;
+    }
+
+    .anchor-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 15px 35px rgba(102, 126, 234, 0.25);
+      border-color: #667eea;
+    }
+
+    .anchor-card:hover::before {
+      left: 100%;
+    }
+
+    .anchor-card.selected {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-color: #5a67d8;
+      transform: scale(1.05);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+    }
+
+    .anchor-card.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .anchor-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 3%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .anchor-emoji {
+      font-size: 3em;
+      margin-right: 4%;
+    }
+
+    .anchor-number {
+      background: #667eea;
+      color: white;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1em;
+    }
+
+    .anchor-card.selected .anchor-number {
+      background: white;
+      color: #667eea;
+    }
+
+    .anchor-title {
+      font-size: 1.6em;
+      font-weight: 800;
+      color: #1a202c;
+      margin: 0 0 2%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .anchor-card.selected .anchor-title {
+      color: white;
+    }
+
+    .anchor-description {
+      font-size: 1.1em;
+      color: #4a5568;
+      font-weight: 600;
+      line-height: 1.5;
+      margin: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .anchor-card.selected .anchor-description {
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .anchor-options {
+      margin-top: 2%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .anchor-option {
+      display: inline-block;
+      background: #e2e8f0;
+      color: #2d3748;
+      padding: 2% 4%;
+      border-radius: 8px;
+      margin: 1% 1% 1% 0;
+      font-size: 0.95em;
+      font-weight: 700;
+      transition: all 0.3s ease;
+    }
+
+    .anchor-card.selected .anchor-option {
+      background: rgba(255, 255, 255, 0.25);
+      color: white;
+    }
+
+    .ritual-summary {
+      background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+      border-radius: 20px;
+      padding: 4% 5%;
+      margin: 4% auto 3%;
+      max-width: 700px;
+      text-align: center;
+      box-shadow: 0 15px 40px rgba(139, 92, 246, 0.3);
+      display: none;
+      animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .ritual-summary.show {
+      display: block;
+    }
+
+    .ritual-title {
+      font-size: 1.8em;
+      font-weight: 800;
+      color: white;
+      margin: 0 0 3%;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .ritual-formula {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      padding: 3% 4%;
+      margin: 2% 0;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .ritual-items {
+      font-size: 1.4em;
+      font-weight: 800;
+      color: white;
+      margin: 0;
+      line-height: 1.8;
+    }
+
+    .ritual-instruction {
+      font-size: 1.1em;
+      color: rgba(255, 255, 255, 0.95);
+      margin: 3% 0 0;
+      font-weight: 600;
+    }
+
+    /* Mission Board - Stage 4 */
+    .missions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin: 3% 0;
+    }
+
+    .mission-card {
+      background: linear-gradient(145deg, #ffffff, #f8fafc);
+      border-radius: 20px;
+      padding: 5% 4%;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 3px solid #e2e8f0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mission-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .mission-card:hover {
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: 0 15px 35px rgba(16, 185, 129, 0.25);
+      border-color: #10b981;
+    }
+
+    .mission-card:hover::before {
+      opacity: 1;
+    }
+
+    .mission-card.selected {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-color: #047857;
+      transform: scale(1.05);
+      box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+    }
+
+    .mission-card.selected::before {
+      opacity: 0;
+    }
+
+    .mission-card.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .mission-icon {
+      font-size: 3.5em;
+      text-align: center;
+      display: block;
+      margin-bottom: 3%;
+      transition: transform 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mission-card:hover .mission-icon {
+      transform: scale(1.15) rotate(5deg);
+    }
+
+    .mission-card.selected .mission-icon {
+      transform: scale(1.1);
+    }
+
+    .mission-name {
+      font-size: 1.5em;
+      font-weight: 800;
+      color: #1a202c;
+      text-align: center;
+      margin: 0 0 3%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mission-card.selected .mission-name {
+      color: white;
+    }
+
+    .mission-practice {
+      font-size: 1.05em;
+      color: #4a5568;
+      font-weight: 600;
+      line-height: 1.5;
+      text-align: center;
+      margin: 0;
+      display: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mission-card.selected .mission-practice {
+      display: block;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .missions-container {
+      margin: 3% 0;
+    }
+
+    /* Personal Plan Summary */
+    .personal-plan-summary {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border-radius: 20px;
+      padding: 4% 5%;
+      margin: 4% auto 3%;
+      max-width: 900px;
+      box-shadow: 0 15px 40px rgba(245, 158, 11, 0.4);
+      display: none;
+      animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .personal-plan-summary.show {
+      display: block;
+    }
+
+    .plan-header {
+      text-align: center;
+      margin-bottom: 3%;
+    }
+
+    .plan-main-title {
+      font-size: 2em;
+      font-weight: 900;
+      color: white;
+      margin: 0 0 2%;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .plan-subtitle {
+      font-size: 1.2em;
+      color: rgba(255, 255, 255, 0.95);
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .missions-list {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      padding: 3% 4%;
+      margin: 2% 0;
+    }
+
+    .mission-item {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      padding: 3% 4%;
+      margin-bottom: 2%;
+      border-left: 5px solid white;
+    }
+
+    .mission-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .mission-item-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5%;
+    }
+
+    .mission-item-emoji {
+      font-size: 2em;
+      margin-right: 3%;
+    }
+
+    .mission-item-name {
+      font-size: 1.3em;
+      font-weight: 800;
+      color: white;
+      margin: 0;
+    }
+
+    .mission-item-practice {
+      font-size: 1.05em;
+      color: rgba(255, 255, 255, 0.95);
+      margin: 0;
+      line-height: 1.5;
+      padding-left: 12%;
+    }
+
+    /* Final Message */
+    .final-message-box {
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      border-radius: 20px;
+      padding: 4% 5%;
+      text-align: center;
+      margin: 3% 0;
+      box-shadow: 0 15px 40px rgba(139, 92, 246, 0.4);
+      animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .final-message-title {
+      font-size: 2em;
+      font-weight: 900;
+      color: white;
+      margin: 0 0 2%;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .final-message-text {
+      font-size: 1.3em;
+      color: rgba(255, 255, 255, 0.95);
+      margin: 0;
+      line-height: 1.7;
+      font-weight: 600;
+    }
+
+    /* Buttons */
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin: 3% 0;
+    }
+
+    .btn-main {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 3% 6%;
+      font-size: 1.3em;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-main::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-main:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-main:hover::before {
+      width: 400px;
+      height: 400px;
+    }
+
+    .btn-main:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-main span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 3px solid #667eea;
+      border-radius: 14px;
+      padding: 2.5% 5%;
+      font-size: 1.1em;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .btn-secondary:hover {
+      background: #667eea;
+      color: white;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Progress Indicator */
+    .progress-bar {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50px;
+      height: 8px;
+      margin: 2% auto;
+      max-width: 600px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #10b981, #059669);
+      height: 100%;
+      border-radius: 50px;
+      transition: width 0.6s ease;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    }
+
+    @media (max-width: 768px) {
+      .game-title {
+        font-size: 2em;
+      }
+
+      .stage-title {
+        font-size: 1.6em;
+      }
+
+      .emotions-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+      }
+
+      .emotion-icon {
+        font-size: 3em;
+      }
+
+      .anchors-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .missions-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ <style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+  .mt-30 { margin-top: 30px !important; }
+  @media (max-width: 768px) {
+    .container,
+    .game-container,
+    .game-card,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .section,
+    .phase,
+    .phase-screen,
+    .final-screen,
+    .final-results,
+    .modal-content {
+      padding: 16px !important;
+    }
+    h1, .main-title, .game-title {
+      font-size: clamp(1.8rem, 7vw, 2.2rem) !important;
+      line-height: 1.15 !important;
+    }
+    h2, .phase-title, .stage-title {
+      font-size: clamp(1.3rem, 6vw, 1.6rem) !important;
+      line-height: 1.25 !important;
+    }
+    p, .instruction, .phase-instruction, .stage-subtitle, .game-subtitle {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+    .button-group, .final-buttons, .action-buttons {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+    .btn, .btn-primary, .btn-secondary, .btn-main {
+      width: 100% !important;
+    }
+  }
+</style>
+<style>
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+    .header h1, .main-title, .game-title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+    .header p, .game-subtitle, .phase-subtitle, .instruction, .stage-subtitle,
+    .game-objective, .phase-instruction, .phase-header p, .stage-intro {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+    .container, .game-container, .app-container, .main-wrapper {
+      padding: 1rem !important;
+    }
+    .phase-screen, .game-card, .stage-wrapper, .content-area {
+      padding: 1.25rem !important;
+      border-radius: 18px !important;
+    }
+    .progress-indicator, .progress-steps {
+      flex-wrap: wrap !important;
+      gap: 0.5rem !important;
+    }
+    .progress-dot {
+      width: 12px !important;
+      height: 12px !important;
+    }
+    .progress-step {
+      min-width: 90px;
+    }
+    .player-icon {
+      font-size: clamp(3.5rem, 18vw, 6rem) !important;
+    }
+    .breathing-animation {
+      width: 180px !important;
+      height: 180px !important;
+      font-size: 1.5rem !important;
+    }
+    .breath-circle {
+      width: 48px !important;
+      height: 48px !important;
+      font-size: 1.1rem !important;
+    }
+    .action-button, .action-btn, .option-card, .bubble, .ritual-item,
+    .viz-option, .action-card, .tool-card, .emotion-card, .thought-card,
+    .question-card, .card-item {
+      width: 100% !important;
+    }
+    .balloons-container, .thought-bubbles, .ritual-items, .visualization-options,
+    .actions-grid, .tools-grid, .emotions-grid, .completion-stats,
+    .rhythm-choice, .content-grid, .options-grid, .choices-grid, .cards-grid,
+    .module-grid, .steps-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .transformation-area {
+      flex-direction: column !important;
+      gap: 1rem !important;
+    }
+    .emoji-header {
+      font-size: clamp(3rem, 16vw, 4.5rem) !important;
+    }
+    .action-emoji, .emotion-icon, .ritual-icon {
+      font-size: clamp(2.5rem, 14vw, 3.5rem) !important;
+    }
+    .timer-value {
+      font-size: clamp(1.8rem, 9vw, 2.4rem) !important;
+    }
+    .breathing-bar {
+      height: 28px !important;
+    }
+    .character {
+      width: 90px !important;
+      height: 90px !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    config: {}
+  };
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+</head>
+ <body>
+  <main class="main-wrapper"><!-- Header -->
+   <header class="game-header">
+    <h1 class="game-title" id="gameTitle">🎮 TU MAPA MENTAL DE COMPETIDOR</h1>
+    <p class="game-objective">Desarrolla autoconciencia, regulación emocional y consistencia mental</p>
+   </header><!-- Progress Bar -->
+   <div class="progress-bar">
+    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+   </div><!-- ETAPA 1: Lectura Mental Pre-Partido -->
+   <section id="stage1" class="stage-wrapper">
+    <div class="stage-header"><span class="stage-number">ETAPA 1 DE 4</span>
+     <h2 class="stage-title" id="stage1Title">Lectura Mental Pre-Partido</h2>
+     <p class="stage-subtitle" id="stage1Subtitle">¿Quién eres hoy?</p>
+    </div>
+    <div class="stage-intro">
+     Antes de competir, hay que saber desde dónde juegas. <strong>Elige 2 estados mentales</strong> que describan cómo te sientes ahora.
+    </div>
+    <div class="selection-counter" id="emotionCounter">
+     Has seleccionado 0 de 2 emociones
+    </div>
+    <div class="emotions-grid">
+     <div class="emotion-card" data-emotion="enfocado"><span class="emotion-icon">🎯</span>
+      <p class="emotion-name">Enfocado</p>
+     </div>
+     <div class="emotion-card" data-emotion="motivado"><span class="emotion-icon">🔵</span>
+      <p class="emotion-name">Motivado</p>
+     </div>
+     <div class="emotion-card" data-emotion="calmo"><span class="emotion-icon">🟢</span>
+      <p class="emotion-name">Calmo</p>
+     </div>
+     <div class="emotion-card" data-emotion="nervioso"><span class="emotion-icon">🟡</span>
+      <p class="emotion-name">Nervioso</p>
+     </div>
+     <div class="emotion-card" data-emotion="tenso"><span class="emotion-icon">🟣</span>
+      <p class="emotion-name">Tenso</p>
+     </div>
+     <div class="emotion-card" data-emotion="cansado"><span class="emotion-icon">🟠</span>
+      <p class="emotion-name">Cansado</p>
+     </div>
+     <div class="emotion-card" data-emotion="exigente"><span class="emotion-icon">⚫</span>
+      <p class="emotion-name">Exigente</p>
+     </div>
+     <div class="emotion-card" data-emotion="desconectado"><span class="emotion-icon">⚪</span>
+      <p class="emotion-name">Desconectado</p>
+     </div>
+    </div>
+    <div class="tools-container" id="toolsContainer"></div>
+    <div class="action-buttons"><button class="btn-main" id="continueToStage2" disabled> <span>Entrar al partido →</span> </button>
+    </div>
+   </section><!-- ETAPA 2: Decisiones Mentales -->
+   <section id="stage2" class="stage-wrapper hidden">
+    <div class="stage-header"><span class="stage-number">ETAPA 2 DE 4</span>
+     <h2 class="stage-title" id="stage2Title">Decisiones Mentales Dentro del Partido</h2>
+     <p class="stage-subtitle">Aquí nace el competidor de verdad</p>
+    </div>
+    <div class="stage-intro">
+     Enfrentarás <strong>6 situaciones reales</strong> de tenis. Cada una es un gatillo emocional auténtico. Elige la mejor respuesta mental.
+    </div>
+    <div class="situations-container"><!-- Situación 1 -->
+     <div class="situation-card">
+      <div class="situation-header"><span class="situation-emoji">🔥</span>
+       <h3 class="situation-title">Situación 1 — Fallas un golpe fácil</h3>
+      </div>
+      <div class="options-grid"><button class="option-button" data-situation="1" data-correct="false"> <span>Auto-ataque</span> </button> <button class="option-button" data-situation="1" data-correct="true"> <span>Respira</span> </button> <button class="option-button" data-situation="1" data-correct="false"> <span>Acelerar sin control</span> </button> <button class="option-button" data-situation="1" data-correct="false"> <span>Huir del error</span> </button>
+      </div>
+      <div class="principle-box" data-principle="1">
+       <p class="principle-label">💡 Principio Mental</p>
+       <p class="principle-text">"Respira para cortar el impulso… no para olvidar el error."</p>
+      </div>
+     </div><!-- Situación 2 -->
+     <div class="situation-card">
+      <div class="situation-header"><span class="situation-emoji">📉</span>
+       <h3 class="situation-title">Situación 2 — Te va ganando 3–0</h3>
+      </div>
+      <div class="options-grid"><button class="option-button" data-situation="2" data-correct="false"> <span>Pensar en el set</span> </button> <button class="option-button" data-situation="2" data-correct="false"> <span>Pánico</span> </button> <button class="option-button" data-situation="2" data-correct="true"> <span>Un punto a la vez</span> </button> <button class="option-button" data-situation="2" data-correct="false"> <span>Culpar condiciones</span> </button>
+      </div>
+      <div class="principle-box" data-principle="2">
+       <p class="principle-label">💡 Principio Mental</p>
+       <p class="principle-text">"Reducir el partido a una acción te devuelve poder."</p>
+      </div>
+     </div><!-- Situación 3 -->
+     <div class="situation-card">
+      <div class="situation-header"><span class="situation-emoji">⚡</span>
+       <h3 class="situation-title">Situación 3 — Vas ganando pero sientes miedo</h3>
+      </div>
+      <div class="options-grid"><button class="option-button" data-situation="3" data-correct="false"> <span>Jugar para no perder</span> </button> <button class="option-button" data-situation="3" data-correct="true"> <span>Atacar con claridad</span> </button> <button class="option-button" data-situation="3" data-correct="false"> <span>Jugar al medio sin intención</span> </button> <button class="option-button" data-situation="3" data-correct="false"> <span>Pensar en cerrar rápido</span> </button>
+      </div>
+      <div class="principle-box" data-principle="3">
+       <p class="principle-label">💡 Principio Mental</p>
+       <p class="principle-text">"Los puntos importantes se ganan con intención… no con miedo."</p>
+      </div>
+     </div><!-- Situación 4 -->
+     <div class="situation-card">
+      <div class="situation-header"><span class="situation-emoji">😤</span>
+       <h3 class="situation-title">Situación 4 — Estás frustrado</h3>
+      </div>
+      <div class="options-grid"><button class="option-button" data-situation="4" data-correct="true"> <span>Ritual</span> </button> <button class="option-button" data-situation="4" data-correct="false"> <span>Grito</span> </button> <button class="option-button" data-situation="4" data-correct="false"> <span>Desconexión</span> </button> <button class="option-button" data-situation="4" data-correct="false"> <span>Golpear la raqueta</span> </button>
+      </div>
+      <div class="principle-box" data-principle="4">
+       <p class="principle-label">💡 Principio Mental</p>
+       <p class="principle-text">"Repetir ritual = limpiar emoción + reiniciar enfoque."</p>
+      </div>
+     </div><!-- Situación 5 -->
+     <div class="situation-card">
+      <div class="situation-header"><span class="situation-emoji">🎾</span>
+       <h3 class="situation-title">Situación 5 — Dudas antes del saque</h3>
+      </div>
+      <div class="options-grid"><button class="option-button" data-situation="5" data-correct="true"> <span>Respiración</span> </button> <button class="option-button" data-situation="5" data-correct="false"> <span>Distraerte</span> </button> <button class="option-button" data-situation="5" data-correct="false"> <span>Pensar en el marcador</span> </button> <button class="option-button" data-situation="5" data-correct="false"> <span>Tensión en hombros</span> </button>
+      </div>
+      <div class="principle-box" data-principle="5">
+       <p class="principle-label">💡 Principio Mental</p>
+       <p class="principle-text">"Respirar te da decisión. La duda mata tu saque."</p>
+      </div>
+     </div><!-- Situación 6 -->
+     <div class="situation-card">
+      <div class="situation-header"><span class="situation-emoji">💥</span>
+       <h3 class="situation-title">Situación 6 — Rival se acelera y te presiona</h3>
+      </div>
+      <div class="options-grid"><button class="option-button" data-situation="6" data-correct="false"> <span>Defender pasivo</span> </button> <button class="option-button" data-situation="6" data-correct="false"> <span>Pensar 'me está aplastando'</span> </button> <button class="option-button" data-situation="6" data-correct="true"> <span>Profundidad + consistencia</span> </button> <button class="option-button" data-situation="6" data-correct="false"> <span>Cambiar estilo sin sentido</span> </button>
+      </div>
+      <div class="principle-box" data-principle="6">
+       <p class="principle-label">💡 Principio Mental</p>
+       <p class="principle-text">"La profundidad neutraliza las rachas del rival."</p>
+      </div>
+     </div>
+    </div>
+    <div class="action-buttons"><button class="btn-main" id="continueToStage3"> <span>Regularte después del punto →</span> </button>
+    </div>
+   </section><!-- ETAPA 3: Recuperación Mental -->
+   <section id="stage3" class="stage-wrapper hidden">
+    <div class="stage-header"><span class="stage-number">ETAPA 3 DE 4</span>
+     <h2 class="stage-title" id="stage3Title">Recuperación Mental Rápida</h2>
+     <p class="stage-subtitle" id="stage3Subtitle">Reinicio en 10 Segundos</p>
+    </div>
+    <div class="stage-intro">
+     Entre puntos se gana más mentalidad que en todo el partido. <strong>Elige 2 anclas mentales</strong> para crear tu ritual express de reinicio.
+    </div>
+    <div class="selection-counter" id="anchorCounter">
+     Has seleccionado 0 de 2 anclas
+    </div>
+    <div class="anchors-circle-container">
+     <div class="anchors-grid"><!-- Ancla 1 -->
+      <div class="anchor-card" data-anchor="respiracion">
+       <div class="anchor-header"><span class="anchor-emoji">🌬️</span> <span class="anchor-number">1</span>
+       </div>
+       <h3 class="anchor-title">Respiración</h3>
+       <p class="anchor-description">Exhala largo para soltar tensión.</p>
+      </div><!-- Ancla 2 -->
+      <div class="anchor-card" data-anchor="lenguaje">
+       <div class="anchor-header"><span class="anchor-emoji">💪</span> <span class="anchor-number">2</span>
+       </div>
+       <h3 class="anchor-title">Lenguaje Corporal</h3>
+       <p class="anchor-description">Hombros atrás, mentón neutro, ojos firmes. Esto cambia la química del cuerpo.</p>
+      </div><!-- Ancla 3 -->
+      <div class="anchor-card" data-anchor="palabra">
+       <div class="anchor-header"><span class="anchor-emoji">🗣️</span> <span class="anchor-number">3</span>
+       </div>
+       <h3 class="anchor-title">Palabra Clave</h3>
+       <p class="anchor-description">Tu palabra dirige tu atención.</p>
+       <div class="anchor-options"><span class="anchor-option">Simple</span> <span class="anchor-option">Profundo</span> <span class="anchor-option">Sigue</span> <span class="anchor-option">Calma</span>
+       </div>
+      </div><!-- Ancla 4 -->
+      <div class="anchor-card" data-anchor="visualizacion">
+       <div class="anchor-header"><span class="anchor-emoji">👁️</span> <span class="anchor-number">4</span>
+       </div>
+       <h3 class="anchor-title">Micro-Visualización</h3>
+       <p class="anchor-description">Imaginar el primer paso hacia tu derecha. Visualizar microacciones es más efectivo que fantasías.</p>
+      </div>
+     </div>
+    </div>
+    <div class="ritual-summary" id="ritualSummary">
+     <h3 class="ritual-title">✨ Tu Ritual Express AC</h3>
+     <div class="ritual-formula">
+      <p class="ritual-items" id="ritualItems"></p>
+     </div>
+     <p class="ritual-instruction">Úsalo entre puntos para reiniciar tu mente</p>
+    </div>
+    <div class="action-buttons"><button class="btn-main" id="continueToStage4" disabled> <span>Crear tu plan mental →</span> </button>
+    </div>
+   </section><!-- ETAPA 4: Tu Plan Mental AC -->
+   <section id="stage4" class="stage-wrapper hidden">
+    <div class="stage-header"><span class="stage-number">ETAPA 4 DE 4</span>
+     <h2 class="stage-title" id="stage4Title">Tu Plan Mental AC</h2>
+     <p class="stage-subtitle" id="stage4Subtitle">Post-Partido: Donde el jugador evoluciona</p>
+    </div>
+    <div class="stage-intro">
+     El juego mental no termina en la cancha. <strong>Elige 3 áreas para mejorar</strong> y recibe prácticas diarias ultra simples para evolucionar como competidor.
+    </div>
+    <div class="selection-counter" id="missionCounter">
+     Has seleccionado 0 de 3 misiones
+    </div>
+    <div class="missions-container">
+     <div class="missions-grid"><!-- Misión 1: Calma -->
+      <div class="mission-card" data-mission="calma"><span class="mission-icon">🧊</span>
+       <p class="mission-name">Calma</p>
+       <p class="mission-practice">Haz 3 ciclos de respiración al despertar.</p>
+      </div><!-- Misión 2: Enfoque -->
+      <div class="mission-card" data-mission="enfoque"><span class="mission-icon">🎯</span>
+       <p class="mission-name">Enfoque</p>
+       <p class="mission-practice">Elimina una distracción antes de entrenar.</p>
+      </div><!-- Misión 3: Autodiálogo -->
+      <div class="mission-card" data-mission="autodialogo"><span class="mission-icon">💬</span>
+       <p class="mission-name">Autodiálogo</p>
+       <p class="mission-practice">Cambia solo UNA frase negativa por una frase firme al día.</p>
+      </div><!-- Misión 4: Resiliencia -->
+      <div class="mission-card" data-mission="resiliencia"><span class="mission-icon">🌀</span>
+       <p class="mission-name">Resiliencia</p>
+       <p class="mission-practice">Después de dos errores seguidos → sonríe, respira, continúa.</p>
+      </div><!-- Misión 5: Estrategia -->
+      <div class="mission-card" data-mission="estrategia"><span class="mission-icon">🧠</span>
+       <p class="mission-name">Estrategia</p>
+       <p class="mission-practice">Antes de cada punto: define intención (profundidad, ángulo o consistencia).</p>
+      </div><!-- Misión 6: Constancia -->
+      <div class="mission-card" data-mission="constancia"><span class="mission-icon">📈</span>
+       <p class="mission-name">Constancia</p>
+       <p class="mission-practice">Durante 5 puntos seguidos: profundidad sin arriesgar.</p>
+      </div><!-- Misión 7: Reacción Emocional -->
+      <div class="mission-card" data-mission="reaccion"><span class="mission-icon">⚖️</span>
+       <p class="mission-name">Reacción Emocional</p>
+       <p class="mission-practice">Cuenta hasta 3 antes de reaccionar a un error o mal llamado.</p>
+      </div><!-- Misión 8: Intensidad -->
+      <div class="mission-card" data-mission="intensidad"><span class="mission-icon">🔥</span>
+       <p class="mission-name">Intensidad</p>
+       <p class="mission-practice">Primer paso explosivo en cada punto del primer juego.</p>
+      </div>
+     </div>
+    </div>
+    <div class="personal-plan-summary" id="personalPlanSummary">
+     <div class="plan-header">
+      <h3 class="plan-main-title">🎯 Este es tu plan mental de competidor</h3>
+      <p class="plan-subtitle">Tus 3 Misiones Mentales AC</p>
+     </div>
+     <div class="missions-list" id="missionsList"></div>
+    </div>
+    <div class="action-buttons"><button class="btn-main" id="showFinalMessage" disabled> <span>Ver mensaje final 🎉</span> </button>
+    </div>
+   </section><!-- Final Message Section -->
+   <section id="finalSection" class="stage-wrapper hidden">
+    <div class="final-message-box">
+     <h2 class="final-message-title" id="finalMessageTitle">🎉 Tu mente ya es parte de tu entrenamiento</h2>
+     <p class="final-message-text">El tenis se entrena con piernas y raqueta…<br><strong>pero se gana con mente, calma y decisiones.</strong></p>
+    </div>
+    <div class="action-buttons"><button class="btn-main" onclick="location.reload()"> <span>🔄 Repetir juego</span> </button> <button class="btn-secondary" id="saveMissionsBtn"> <span>💾 Guardar misiones</span> </button>
+    </div>
+    <div id="saveMissionsMessage" style="display: none; margin-top: 20px; padding: 18px 20px; border-radius: 14px; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.28); color: rgba(255,255,255,0.96); font-size: 0.98em; line-height: 1.6; text-align: center;">
+      Tus misiones ya quedaron visibles en pantalla. Si quieres conservarlas, haz una captura o copia este plan antes de salir del juego.
+    </div>
+   </section>
+  </main>
+  <script>
+    const defaultConfig = {
+      main_title: "🎮 TU MAPA MENTAL DE COMPETIDOR",
+      stage1_title: "Lectura Mental Pre-Partido",
+      stage1_subtitle: "¿Quién eres hoy?",
+      stage2_title: "Decisiones Mentales Dentro del Partido",
+      stage3_title: "Recuperación Mental Rápida",
+      stage3_subtitle: "Reinicio en 10 Segundos",
+      stage4_title: "Tu Plan Mental AC",
+      stage4_subtitle: "Post-Partido: Donde el jugador evoluciona",
+      final_message: "Tu mente ya es parte de tu entrenamiento",
+      background_color: "#1e3c72",
+      surface_color: "#ffffff",
+      text_color: "#1a202c",
+      primary_action_color: "#667eea",
+      secondary_action_color: "#764ba2",
+      font_family: "Inter",
+      font_size: 16
+    };
+
+    const emotionTools = {
+      enfocado: {
+        emoji: "🎯",
+        name: "Enfocado",
+        tool: "Tu palabra de anclaje: 'simple' → cada vez que te aceleres, repítela.",
+        explanation: "La palabra clave te devuelve al presente cuando tu mente se dispersa."
+      },
+      motivado: {
+        emoji: "🔵",
+        name: "Motivado",
+        tool: "Define micro-objetivo: 'ganar la batalla de profundidad'.",
+        explanation: "La motivación sin dirección se convierte en ansiedad. Dale un objetivo específico."
+      },
+      calmo: {
+        emoji: "🟢",
+        name: "Calmo",
+        tool: "Mantén tu ritmo natural entre puntos: respira, camina, decide.",
+        explanation: "La calma es tu ventaja. No la rompas acelerándote sin razón."
+      },
+      nervioso: {
+        emoji: "🟡",
+        name: "Nervioso",
+        tool: "Respiración 4–2–6 + mira la pelota 3 segundos antes de cada punto.",
+        explanation: "La respiración baja la activación y mirar la pelota fija tu atención."
+      },
+      tenso: {
+        emoji: "🟣",
+        name: "Tenso",
+        tool: "Suelta hombros + pasos pequeños al iniciar cada punto.",
+        explanation: "La tensión muscular bloquea tu fluidez. Afloja el cuerpo para liberar la mente."
+      },
+      cansado: {
+        emoji: "🟠",
+        name: "Cansado",
+        tool: "Juega con intención de consistencia: 4 pelotas dentro antes de arriesgar.",
+        explanation: "Cuando estás cansado, tu mejor aliado es la paciencia táctica."
+      },
+      exigente: {
+        emoji: "⚫",
+        name: "Exigente",
+        tool: "Acepta 1 error por game sin juzgarte. Es parte del proceso.",
+        explanation: "El perfeccionismo te paraliza. Date permiso para fallar sin castigarte."
+      },
+      desconectado: {
+        emoji: "⚪",
+        name: "Desconectado",
+        tool: "Haz mini ritual express: respira, ajusta cuerdas, mira un punto fijo.",
+        explanation: "El ritual físico reconecta tu atención con el presente."
+      }
+    };
+
+    const anchorNames = {
+      respiracion: "Respiración",
+      lenguaje: "Lenguaje Corporal",
+      palabra: "Palabra Clave",
+      visualizacion: "Micro-Visualización"
+    };
+
+    const anchorDescriptions = {
+      respiracion: "Tú respiras para cortar el impulso emocional. Eres un jugador que gestiona presión desde la fisiología.",
+      lenguaje: "Controlas tu cuerpo para controlar tu mente. Eres un competidor que sabe que la postura cambia el estado.",
+      palabra: "Usas el lenguaje como director de atención. Eres un jugador que sabe dónde poner su foco.",
+      visualizacion: "Visualizas microacciones, no fantasías. Eres un competidor que prepara su cuerpo con imágenes precisas."
+    };
+
+    const missionData = {
+      calma: {
+        emoji: "🧊",
+        name: "Calma",
+        practice: "Haz 3 ciclos de respiración al despertar.",
+        impact: "regulación emocional",
+        archetype: "controlador"
+      },
+      enfoque: {
+        emoji: "🎯",
+        name: "Enfoque",
+        practice: "Elimina una distracción antes de entrenar.",
+        impact: "claridad mental",
+        archetype: "estratega"
+      },
+      autodialogo: {
+        emoji: "💬",
+        name: "Autodiálogo",
+        practice: "Cambia solo UNA frase negativa por una frase firme al día.",
+        impact: "confianza interna",
+        archetype: "mentor interno"
+      },
+      resiliencia: {
+        emoji: "🌀",
+        name: "Resiliencia",
+        practice: "Después de dos errores seguidos → sonríe, respira, continúa.",
+        impact: "recuperación rápida",
+        archetype: "guerrero"
+      },
+      estrategia: {
+        emoji: "🧠",
+        name: "Estrategia",
+        practice: "Antes de cada punto: define intención (profundidad, ángulo o consistencia).",
+        impact: "intención táctica",
+        archetype: "estratega"
+      },
+      constancia: {
+        emoji: "📈",
+        name: "Constancia",
+        practice: "Durante 5 puntos seguidos: profundidad sin arriesgar.",
+        impact: "paciencia competitiva",
+        archetype: "constructor"
+      },
+      reaccion: {
+        emoji: "⚖️",
+        name: "Reacción Emocional",
+        practice: "Cuenta hasta 3 antes de reaccionar a un error o mal llamado.",
+        impact: "control emocional",
+        archetype: "controlador"
+      },
+      intensidad: {
+        emoji: "🔥",
+        name: "Intensidad",
+        practice: "Primer paso explosivo en cada punto del primer juego.",
+        impact: "energía sostenida",
+        archetype: "guerrero"
+      }
+    };
+
+    let selectedEmotions = [];
+    let selectedAnchors = [];
+    let selectedMissions = [];
+    let correctSituations = 0;
+    let currentStage = 1;
+    let playerProfile = {
+      emotionalState: [],
+      recoveryStyle: [],
+      developmentAreas: [],
+      archetype: ""
+    };
+
+    async function onConfigChange(config) {
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const fontStack = `${customFont}, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+
+      document.getElementById('gameTitle').textContent = config.main_title || defaultConfig.main_title;
+      document.getElementById('gameTitle').style.fontSize = `${baseSize * 1.875}px`;
+      document.getElementById('gameTitle').style.fontFamily = fontStack;
+
+      document.getElementById('stage1Title').textContent = config.stage1_title || defaultConfig.stage1_title;
+      document.getElementById('stage1Title').style.fontSize = `${baseSize * 1.375}px`;
+      document.getElementById('stage1Title').style.fontFamily = fontStack;
+
+      document.getElementById('stage1Subtitle').textContent = config.stage1_subtitle || defaultConfig.stage1_subtitle;
+      document.getElementById('stage1Subtitle').style.fontSize = `${baseSize * 0.8125}px`;
+      document.getElementById('stage1Subtitle').style.fontFamily = fontStack;
+
+      document.getElementById('stage2Title').textContent = config.stage2_title || defaultConfig.stage2_title;
+      document.getElementById('stage2Title').style.fontSize = `${baseSize * 1.375}px`;
+      document.getElementById('stage2Title').style.fontFamily = fontStack;
+
+      document.getElementById('stage3Title').textContent = config.stage3_title || defaultConfig.stage3_title;
+      document.getElementById('stage3Title').style.fontSize = `${baseSize * 1.375}px`;
+      document.getElementById('stage3Title').style.fontFamily = fontStack;
+
+      document.getElementById('stage3Subtitle').textContent = config.stage3_subtitle || defaultConfig.stage3_subtitle;
+      document.getElementById('stage3Subtitle').style.fontSize = `${baseSize * 0.8125}px`;
+      document.getElementById('stage3Subtitle').style.fontFamily = fontStack;
+
+      document.getElementById('stage4Title').textContent = config.stage4_title || defaultConfig.stage4_title;
+      document.getElementById('stage4Title').style.fontSize = `${baseSize * 1.375}px`;
+      document.getElementById('stage4Title').style.fontFamily = fontStack;
+
+      document.getElementById('stage4Subtitle').textContent = config.stage4_subtitle || defaultConfig.stage4_subtitle;
+      document.getElementById('stage4Subtitle').style.fontSize = `${baseSize * 0.8125}px`;
+      document.getElementById('stage4Subtitle').style.fontFamily = fontStack;
+
+      document.getElementById('finalMessageTitle').textContent = config.final_message || defaultConfig.final_message;
+      document.getElementById('finalMessageTitle').style.fontFamily = fontStack;
+
+      document.body.style.background = `linear-gradient(135deg, ${config.background_color || defaultConfig.background_color} 0%, #2a5298 50%, ${config.secondary_action_color || defaultConfig.secondary_action_color} 100%)`;
+
+      const stageWrappers = document.querySelectorAll('.stage-wrapper');
+      stageWrappers.forEach(wrapper => {
+        wrapper.style.background = config.surface_color || defaultConfig.surface_color;
+      });
+
+      const stageTitles = document.querySelectorAll('.stage-title');
+      stageTitles.forEach(title => {
+        title.style.color = config.text_color || defaultConfig.text_color;
+      });
+
+      const mainButtons = document.querySelectorAll('.btn-main');
+      mainButtons.forEach(btn => {
+        btn.style.background = `linear-gradient(135deg, ${config.primary_action_color || defaultConfig.primary_action_color}, ${config.secondary_action_color || defaultConfig.secondary_action_color})`;
+        btn.style.fontFamily = fontStack;
+        btn.style.fontSize = `${baseSize * 0.8125}px`;
+      });
+
+      const stageNumbers = document.querySelectorAll('.stage-number');
+      stageNumbers.forEach(num => {
+        num.style.background = `linear-gradient(135deg, ${config.primary_action_color || defaultConfig.primary_action_color}, ${config.secondary_action_color || defaultConfig.secondary_action_color})`;
+      });
+
+      const allText = document.querySelectorAll('p, h1, h2, h3, button, span, div');
+      allText.forEach(el => {
+        if (!el.style.fontFamily) {
+          el.style.fontFamily = fontStack;
+        }
+      });
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              if (window.elementSdk) {
+                window.elementSdk.config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              if (window.elementSdk) {
+                window.elementSdk.config.surface_color = value;
+                window.elementSdk.setConfig({ surface_color: value });
+              }
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              if (window.elementSdk) {
+                window.elementSdk.config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            }
+          },
+          {
+            get: () => config.primary_action_color || defaultConfig.primary_action_color,
+            set: (value) => {
+              if (window.elementSdk) {
+                window.elementSdk.config.primary_action_color = value;
+                window.elementSdk.setConfig({ primary_action_color: value });
+              }
+            }
+          },
+          {
+            get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+            set: (value) => {
+              if (window.elementSdk) {
+                window.elementSdk.config.secondary_action_color = value;
+                window.elementSdk.setConfig({ secondary_action_color: value });
+              }
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            if (window.elementSdk) {
+              window.elementSdk.config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            if (window.elementSdk) {
+              window.elementSdk.config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["main_title", config.main_title || defaultConfig.main_title],
+        ["stage1_title", config.stage1_title || defaultConfig.stage1_title],
+        ["stage1_subtitle", config.stage1_subtitle || defaultConfig.stage1_subtitle],
+        ["stage2_title", config.stage2_title || defaultConfig.stage2_title],
+        ["stage3_title", config.stage3_title || defaultConfig.stage3_title],
+        ["stage3_subtitle", config.stage3_subtitle || defaultConfig.stage3_subtitle],
+        ["stage4_title", config.stage4_title || defaultConfig.stage4_title],
+        ["stage4_subtitle", config.stage4_subtitle || defaultConfig.stage4_subtitle],
+        ["final_message", config.final_message || defaultConfig.final_message]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+
+    // STAGE 1: Emotion Selection
+    const emotionCards = document.querySelectorAll('.emotion-card');
+    const emotionCounter = document.getElementById('emotionCounter');
+    const toolsContainer = document.getElementById('toolsContainer');
+    const continueToStage2Btn = document.getElementById('continueToStage2');
+
+    emotionCards.forEach(card => {
+      card.addEventListener('click', function() {
+        const emotion = this.dataset.emotion;
+
+        if (this.classList.contains('selected')) {
+          this.classList.remove('selected');
+          selectedEmotions = selectedEmotions.filter(e => e !== emotion);
+          removeTool(emotion);
+        } else {
+          if (selectedEmotions.length < 2) {
+            this.classList.add('selected');
+            selectedEmotions.push(emotion);
+            addTool(emotion);
+          }
+        }
+
+        updateEmotionCounter();
+        updateEmotionCardsState();
+        continueToStage2Btn.disabled = selectedEmotions.length !== 2;
+      });
+    });
+
+    function updateEmotionCounter() {
+      emotionCounter.textContent = `Has seleccionado ${selectedEmotions.length} de 2 emociones`;
+    }
+
+    function updateEmotionCardsState() {
+      emotionCards.forEach(card => {
+        if (selectedEmotions.length >= 2 && !card.classList.contains('selected')) {
+          card.classList.add('disabled');
+        } else {
+          card.classList.remove('disabled');
+        }
+      });
+    }
+
+    function addTool(emotion) {
+      const tool = emotionTools[emotion];
+      const toolBox = document.createElement('div');
+      toolBox.className = 'tool-box';
+      toolBox.dataset.emotion = emotion;
+      toolBox.innerHTML = `
+        <div class="tool-header">
+          <span class="tool-emoji">${tool.emoji}</span>
+          <h3 class="tool-emotion-label">${tool.name}</h3>
+        </div>
+        <div class="tool-content">
+          <p class="tool-title">     Herramienta</p>
+          <p class="tool-description">${tool.tool}</p>
+          <p class="tool-explanation">${tool.explanation}</p>
+        </div>
+      `;
+      toolsContainer.appendChild(toolBox);
+    }
+
+    function removeTool(emotion) {
+      const toolBox = toolsContainer.querySelector(`[data-emotion="${emotion}"]`);
+      if (toolBox) {
+        toolBox.remove();
+      }
+    }
+
+    continueToStage2Btn.addEventListener('click', function() {
+      playerProfile.emotionalState = selectedEmotions;
+      document.getElementById('stage1').classList.add('hidden');
+      document.getElementById('stage2').classList.remove('hidden');
+      currentStage = 2;
+      updateProgressBar();
+      acScrollToTop();
+    });
+
+    // STAGE 2: Situation Decisions
+    const optionButtons = document.querySelectorAll('.option-button');
+
+    optionButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const situation = this.dataset.situation;
+        const isCorrect = this.dataset.correct === 'true';
+        const situationButtons = document.querySelectorAll(`[data-situation="${situation}"]`);
+
+        situationButtons.forEach(b => {
+          b.disabled = true;
+          if (b.dataset.correct === 'false') {
+            b.classList.add('incorrect');
+          }
+        });
+
+        if (isCorrect) {
+          this.classList.add('correct');
+          correctSituations++;
+          const principleBox = document.querySelector(`[data-principle="${situation}"]`);
+          principleBox.classList.add('show');
+        }
+      });
+    });
+
+    document.getElementById('continueToStage3').addEventListener('click', function() {
+      document.getElementById('stage2').classList.add('hidden');
+      document.getElementById('stage3').classList.remove('hidden');
+      currentStage = 3;
+      updateProgressBar();
+      acScrollToTop();
+    });
+
+    // STAGE 3: Anchor Selection
+    const anchorCards = document.querySelectorAll('.anchor-card');
+    const anchorCounter = document.getElementById('anchorCounter');
+    const ritualSummary = document.getElementById('ritualSummary');
+    const ritualItems = document.getElementById('ritualItems');
+    const continueToStage4Btn = document.getElementById('continueToStage4');
+
+    anchorCards.forEach(card => {
+      card.addEventListener('click', function() {
+        const anchor = this.dataset.anchor;
+
+        if (this.classList.contains('selected')) {
+          this.classList.remove('selected');
+          selectedAnchors = selectedAnchors.filter(a => a !== anchor);
+        } else {
+          if (selectedAnchors.length < 2) {
+            this.classList.add('selected');
+            selectedAnchors.push(anchor);
+          }
+        }
+
+        updateAnchorCounter();
+        updateAnchorCardsState();
+        updateRitualSummary();
+        continueToStage4Btn.disabled = selectedAnchors.length !== 2;
+      });
+    });
+
+    function updateAnchorCounter() {
+      anchorCounter.textContent = `Has seleccionado ${selectedAnchors.length} de 2 anclas`;
+    }
+
+    function updateAnchorCardsState() {
+      anchorCards.forEach(card => {
+        if (selectedAnchors.length >= 2 && !card.classList.contains('selected')) {
+          card.classList.add('disabled');
+        } else {
+          card.classList.remove('disabled');
+        }
+      });
+    }
+
+    function updateRitualSummary() {
+      if (selectedAnchors.length === 2) {
+        const anchor1 = anchorNames[selectedAnchors[0]];
+        const anchor2 = anchorNames[selectedAnchors[1]];
+        ritualItems.textContent = `${anchor1} + ${anchor2}`;
+        
+        playerProfile.recoveryStyle = selectedAnchors;
+        
+        const ritualAnalysis = document.createElement('div');
+        ritualAnalysis.style.cssText = 'margin-top: 3%; padding: 2% 3%; background: rgba(255,255,255,0.3); border-radius: 10px;';
+        ritualAnalysis.innerHTML = `
+          <p style="font-size: 0.95em; color: rgba(255,255,255,0.95); margin: 0; line-height: 1.6; font-weight: 600;">
+            ${anchorDescriptions[selectedAnchors[0]]}<br><br>
+            ${anchorDescriptions[selectedAnchors[1]]}
+          </p>
+        `;
+        
+        const existingAnalysis = ritualSummary.querySelector('div[style*="margin-top: 3%"]');
+        if (existingAnalysis) {
+          existingAnalysis.remove();
+        }
+        ritualSummary.appendChild(ritualAnalysis);
+        
+        ritualSummary.classList.add('show');
+      } else {
+        ritualSummary.classList.remove('show');
+      }
+    }
+
+    continueToStage4Btn.addEventListener('click', function() {
+      document.getElementById('stage3').classList.add('hidden');
+      document.getElementById('stage4').classList.remove('hidden');
+      currentStage = 4;
+      updateProgressBar();
+      acScrollToTop();
+    });
+
+    // STAGE 4: Mission Selection
+    const missionCards = document.querySelectorAll('.mission-card');
+    const missionCounter = document.getElementById('missionCounter');
+    const personalPlanSummary = document.getElementById('personalPlanSummary');
+    const missionsList = document.getElementById('missionsList');
+    const showFinalMessageBtn = document.getElementById('showFinalMessage');
+
+    missionCards.forEach(card => {
+      card.addEventListener('click', function() {
+        const mission = this.dataset.mission;
+
+        if (this.classList.contains('selected')) {
+          this.classList.remove('selected');
+          selectedMissions = selectedMissions.filter(m => m !== mission);
+        } else {
+          if (selectedMissions.length < 3) {
+            this.classList.add('selected');
+            selectedMissions.push(mission);
+          }
+        }
+
+        updateMissionCounter();
+        updateMissionCardsState();
+        updatePersonalPlanSummary();
+        showFinalMessageBtn.disabled = selectedMissions.length !== 3;
+      });
+    });
+
+    function updateMissionCounter() {
+      missionCounter.textContent = `Has seleccionado ${selectedMissions.length} de 3 misiones`;
+    }
+
+    function updateMissionCardsState() {
+      missionCards.forEach(card => {
+        if (selectedMissions.length >= 3 && !card.classList.contains('selected')) {
+          card.classList.add('disabled');
+        } else {
+          card.classList.remove('disabled');
+        }
+      });
+    }
+
+    function updatePersonalPlanSummary() {
+      if (selectedMissions.length === 3) {
+        missionsList.innerHTML = '';
+        playerProfile.developmentAreas = selectedMissions;
+        
+        const archetypes = selectedMissions.map(m => missionData[m].archetype);
+        const archetypeCount = {};
+        archetypes.forEach(a => archetypeCount[a] = (archetypeCount[a] || 0) + 1);
+        playerProfile.archetype = Object.keys(archetypeCount).reduce((a, b) => 
+          archetypeCount[a] > archetypeCount[b] ? a : b
+        );
+        
+        selectedMissions.forEach(missionKey => {
+          const mission = missionData[missionKey];
+          const missionItem = document.createElement('div');
+          missionItem.className = 'mission-item';
+          missionItem.innerHTML = `
+            <div class="mission-item-header">
+              <span class="mission-item-emoji">${mission.emoji}</span>
+              <h4 class="mission-item-name">${mission.name}</h4>
+            </div>
+            <p class="mission-item-practice">${mission.practice}</p>
+            <p style="font-size: 0.9em; color: rgba(255,255,255,0.85); margin: 1.5% 0 0; padding-left: 12%; font-style: italic;">
+              Desarrollas: ${mission.impact}
+            </p>
+          `;
+          missionsList.appendChild(missionItem);
+        });
+        personalPlanSummary.classList.add('show');
+      } else {
+        personalPlanSummary.classList.remove('show');
+      }
+    }
+
+    showFinalMessageBtn.addEventListener('click', function() {
+      playerProfile.emotionalState = selectedEmotions;
+      generatePersonalizedFinalMessage();
+      document.getElementById('stage4').classList.add('hidden');
+      document.getElementById('finalSection').classList.remove('hidden');
+      updateProgressBar();
+      acScrollToTop();
+    });
+
+    document.getElementById('saveMissionsBtn').addEventListener('click', function() {
+      const message = document.getElementById('saveMissionsMessage');
+      message.style.display = 'block';
+      acScrollToElement('saveMissionsMessage', 16);
+    });
+
+    function generatePersonalizedFinalMessage() {
+      const archetypeMessages = {
+        guerrero: {
+          title: "🔥 Eres un GUERRERO MENTAL",
+          message: "Tu fuerza está en la resiliencia y la intensidad. Conviertes la presión en combustible y los errores en motivación. Tu próximo nivel: canalizar esa energía sin desgastarte."
+        },
+        estratega: {
+          title: "🧠 Eres un ESTRATEGA DE CANCHA",
+          message: "Tu ventaja competitiva es la claridad táctica y el enfoque quirúrgico. Ves patrones donde otros ven caos. Tu próximo nivel: mantener esa lucidez cuando la emoción sube."
+        },
+        controlador: {
+          title: "🧊 Eres un CONTROLADOR EMOCIONAL",
+          message: "Tu superpoder es la regulación bajo presión. Mientras otros explotan, tú respiras y decides. Tu próximo nivel: añadir agresividad controlada a tu calma."
+        },
+        "mentor interno": {
+          title: "💬 Eres tu PROPIO MENTOR",
+          message: "Tu fortaleza está en el diálogo interno constructivo. Transformas la autocrítica en instrucción y el miedo en claridad. Tu próximo nivel: traducir palabras en acción inmediata."
+        },
+        constructor: {
+          title: "📈 Eres un CONSTRUCTOR DE PARTIDOS",
+          message: "Tu habilidad es la paciencia competitiva y la constancia letal. Construyes victorias punto a punto, sin ansiedad. Tu próximo nivel: acelerar cuando el rival duda."
+        }
+      };
+
+      const performanceMessages = {
+        mastery: "✅ Completaste 5-6 situaciones correctamente. Tienes mentalidad de competidor avanzado.",
+        advanced: "💪 Completaste 3-4 situaciones correctamente. Tu comprensión mental es sólida.",
+        developing: "🌱 Completaste 1-2 situaciones correctamente. Estás en proceso de construcción mental."
+      };
+
+      let performanceLevel = "developing";
+      if (correctSituations >= 5) performanceLevel = "mastery";
+      else if (correctSituations >= 3) performanceLevel = "advanced";
+
+      const archetypeData = archetypeMessages[playerProfile.archetype] || archetypeMessages.guerrero;
+      
+      const finalMessageBox = document.querySelector('.final-message-box');
+      finalMessageBox.innerHTML = `
+        <h2 class="final-message-title">${archetypeData.title}</h2>
+        <p class="final-message-text" style="margin-bottom: 4%;">
+          ${archetypeData.message}
+        </p>
+        <div style="background: rgba(255,255,255,0.2); border-radius: 14px; padding: 3% 4%; margin: 3% 0; border: 2px solid rgba(255,255,255,0.3);">
+          <p style="font-size: 1.1em; color: rgba(255,255,255,0.95); margin: 0; font-weight: 700;">
+            ${performanceMessages[performanceLevel]}
+          </p>
+        </div>
+        <p class="final-message-text" style="margin-top: 4%; font-size: 1.1em;">
+          El tenis se entrena con piernas y raqueta…<br>
+          <strong>pero se gana con mente, calma y decisiones.</strong>
+        </p>
+        <div style="margin-top: 4%; padding: 3% 4%; background: rgba(255,255,255,0.15); border-radius: 12px; border-left: 5px solid white;">
+          <p style="font-size: 0.95em; color: rgba(255,255,255,0.95); margin: 0; line-height: 1.7; text-align: left;">
+            <strong>Tu perfil completo:</strong><br>
+            • Estados iniciales: ${selectedEmotions.map(e => emotionTools[e].name).join(', ')}<br>
+            • Ritual de recuperación: ${selectedAnchors.map(a => anchorNames[a]).join(' + ')}<br>
+            • Áreas de desarrollo: ${selectedMissions.map(m => missionData[m].name).join(', ')}<br>
+            • Decisiones correctas: ${correctSituations}/6
+          </p>
+        </div>
+      `;
+    }
+
+    function updateProgressBar() {
+      const progress = (currentStage / 4) * 100;
+      document.getElementById('progressBar').style.width = `${progress}%`;
+    }
+
+    updateProgressBar();
+  </script>
+ <script>
+function acScrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  window.scrollTo(0, 0);
+});
+</script>
+</body>
+</html>

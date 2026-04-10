@@ -1,0 +1,1460 @@
+<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ritual Imparable Entre Puntos</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+      overflow-x: hidden;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .app-container {
+      width: 100%;
+      min-height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 48px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .app-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .game-card {
+      width: 100%;
+      max-width: 900px;
+      background: white;
+      border-radius: 32px;
+      padding: 56px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .main-title {
+      font-size: 48px;
+      font-weight: 800;
+      color: #667eea;
+      margin: 0 0 16px 0;
+      line-height: 1.2;
+      text-shadow: 0 2px 10px rgba(102, 126, 234, 0.2);
+    }
+
+    .emoji-header {
+      font-size: 72px;
+      margin-bottom: 20px;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .phase-title {
+      font-size: 36px;
+      font-weight: 800;
+      color: #2d3748;
+      margin: 0 0 20px 0;
+      text-align: center;
+      letter-spacing: -0.5px;
+    }
+
+    .phase-instruction {
+      font-size: 20px;
+      color: #4a5568;
+      margin: 0 0 40px 0;
+      text-align: center;
+      line-height: 1.7;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin: 32px 0;
+    }
+
+    .action-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+      border: 3px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .action-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+      border-color: #cbd5e0;
+    }
+
+    .action-card.correct {
+      border-color: #48bb78;
+      background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+    }
+
+    .action-card.incorrect {
+      border-color: #f56565;
+      background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+    }
+
+    .action-card.exploded {
+      animation: explode 0.5s ease-out;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .action-card.wrong-click {
+      animation: shake 0.5s ease;
+      border-color: #f56565;
+    }
+
+    @keyframes explode {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.5);
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(0);
+        opacity: 0;
+      }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .action-emoji {
+      font-size: 56px;
+      margin-bottom: 16px;
+      display: inline-block;
+      transition: transform 0.3s ease;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+
+    .action-card:hover .action-emoji {
+      transform: scale(1.1);
+    }
+
+    .action-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2d3748;
+      line-height: 1.4;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin: 32px 0;
+    }
+
+    .tool-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+      border: 3px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #667eea10, #764ba210);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+      border-color: #cbd5e0;
+    }
+
+    .tool-card.selected {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+      box-shadow: 0 12px 32px rgba(102, 126, 234, 0.25);
+      transform: translateY(-4px);
+    }
+
+    .tool-card.selected::before {
+      opacity: 1;
+    }
+
+    .tool-card.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: scale(0.98);
+    }
+
+    .tool-emoji {
+      font-size: 64px;
+      margin-bottom: 16px;
+      display: inline-block;
+      transition: transform 0.3s ease;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.1));
+      position: relative;
+      z-index: 1;
+    }
+
+    .tool-card:hover .tool-emoji {
+      transform: scale(1.15) rotate(5deg);
+    }
+
+    .tool-card.selected .tool-emoji {
+      transform: scale(1.1);
+      animation: bounce 0.6s ease;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: scale(1.1) translateY(0); }
+      50% { transform: scale(1.2) translateY(-8px); }
+    }
+
+    .tool-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tool-description {
+      font-size: 16px;
+      color: #4a5568;
+      line-height: 1.6;
+      display: none;
+      margin-top: 8px;
+      padding-top: 12px;
+      border-top: 2px solid #667eea40;
+      position: relative;
+      z-index: 1;
+      font-style: italic;
+    }
+
+    .tool-card.selected .tool-description {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .selected-count {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: #667eea;
+      margin: 32px 0;
+      padding: 16px 24px;
+      background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+      border-radius: 16px;
+      border: 2px solid #667eea30;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+      letter-spacing: 0.3px;
+    }
+
+    .ritual-display {
+      background: linear-gradient(135deg, #667eea15, #764ba215);
+      border-radius: 24px;
+      padding: 40px 32px;
+      margin: 40px 0;
+      text-align: center;
+      border: 3px solid #667eea30;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ritual-display::before {
+      content: '✨';
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      font-size: 32px;
+      opacity: 0.6;
+    }
+
+    .ritual-display::after {
+      content: '✨';
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-size: 32px;
+      opacity: 0.6;
+    }
+
+    .ritual-steps {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+
+    .ritual-step {
+      background: white;
+      border-radius: 16px;
+      padding: 18px 28px;
+      font-size: 19px;
+      font-weight: 700;
+      color: #667eea;
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.2);
+      border: 2px solid #667eea20;
+      transition: all 0.3s ease;
+      animation: popIn 0.5s ease backwards;
+    }
+
+    .ritual-step:nth-child(1) { animation-delay: 0.1s; }
+    .ritual-step:nth-child(2) { animation-delay: 0.2s; }
+    .ritual-step:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .ritual-step:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 24px rgba(102, 126, 234, 0.3);
+    }
+
+    .situation-card {
+      background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+      border-radius: 24px;
+      padding: 40px;
+      margin: 32px 0;
+      border: 3px solid #e2e8f0;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .situation-card:hover {
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .situation-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #2d3748;
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
+    .situation-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .option-btn {
+      background: white;
+      border: 3px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 22px 20px;
+      font-size: 17px;
+      font-weight: 700;
+      color: #2d3748;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .option-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(102, 126, 234, 0.1);
+      transform: translate(-50%, -50%);
+      transition: width 0.4s ease, height 0.4s ease;
+    }
+
+    .option-btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .option-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      border-color: #cbd5e0;
+    }
+
+    .option-btn.correct-choice {
+      border-color: #48bb78;
+      background: linear-gradient(135deg, #f0fff4, #c6f6d5);
+      animation: pulse 0.6s ease;
+      box-shadow: 0 8px 24px rgba(72, 187, 120, 0.3);
+    }
+
+    .option-btn.wrong-choice {
+      border-color: #f56565;
+      background: linear-gradient(135deg, #fff5f5, #fed7d7);
+      animation: shake 0.5s ease;
+      box-shadow: 0 4px 12px rgba(245, 101, 101, 0.2);
+    }
+
+    .option-btn.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+
+    .learning-message {
+      background: linear-gradient(135deg, #ffd89b, #19547b);
+      color: white;
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin: 32px 0;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      display: none;
+      animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 10px 30px rgba(25, 84, 123, 0.3);
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      line-height: 1.6;
+      letter-spacing: 0.3px;
+    }
+
+    .learning-message.show {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 18px 56px;
+      font-size: 21px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-block;
+      margin: 16px auto;
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
+    }
+
+    .btn-primary:active {
+      transform: translateY(-1px) scale(0.98);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .btn-primary:disabled:hover {
+      transform: none;
+    }
+
+    .btn-container {
+      text-align: center;
+      margin-top: 32px;
+    }
+
+    .phase {
+      display: none;
+    }
+
+    .phase.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .success-animation {
+      text-align: center;
+      padding: 56px 48px;
+      animation: celebrate 1s ease;
+      background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+      border-radius: 32px;
+      border: 4px solid #48bb78;
+      box-shadow: 0 20px 60px rgba(72, 187, 120, 0.3);
+    }
+
+    @keyframes celebrate {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.05) rotate(-3deg); }
+      75% { transform: scale(1.05) rotate(3deg); }
+    }
+
+    .success-emoji {
+      font-size: 112px;
+      margin-bottom: 28px;
+      display: inline-block;
+      animation: bounce-big 1s ease infinite;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
+    }
+
+    @keyframes bounce-big {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    .success-title {
+      font-size: 42px;
+      font-weight: 900;
+      color: #48bb78;
+      margin-bottom: 20px;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 8px rgba(72, 187, 120, 0.2);
+    }
+
+    .success-message {
+      font-size: 26px;
+      color: #2d3748;
+      line-height: 1.7;
+      font-weight: 600;
+    }
+
+    .final-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 3px solid #667eea;
+      border-radius: 16px;
+      padding: 16px 40px;
+      font-size: 19px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+      letter-spacing: 0.3px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-secondary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      transition: width 0.4s ease;
+      z-index: 0;
+    }
+
+    .btn-secondary span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-secondary:hover::before {
+      width: 100%;
+    }
+
+    .btn-secondary:hover {
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary:active {
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 768px) {
+      .app-container {
+        padding: 32px 16px;
+      }
+
+      .game-card {
+        padding: 32px 24px;
+        border-radius: 24px;
+      }
+
+      .emoji-header {
+        font-size: 56px;
+      }
+
+      .main-title {
+        font-size: 28px;
+      }
+
+      .phase-title {
+        font-size: 26px;
+      }
+
+      .phase-instruction {
+        font-size: 18px;
+      }
+
+      .actions-grid,
+      .tools-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .action-card,
+      .tool-card {
+        padding: 24px 20px;
+      }
+
+      .ritual-steps {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .ritual-step {
+        width: 100%;
+      }
+
+      .situation-card {
+        padding: 28px 20px;
+      }
+
+      .situation-options {
+        grid-template-columns: 1fr;
+      }
+
+      .btn-primary {
+        padding: 16px 40px;
+        font-size: 18px;
+      }
+
+      .btn-secondary {
+        padding: 14px 32px;
+        font-size: 17px;
+      }
+
+      .success-animation {
+        padding: 40px 24px;
+      }
+
+      .success-emoji {
+        font-size: 80px;
+      }
+
+      .success-title {
+        font-size: 32px;
+      }
+
+      .success-message {
+        font-size: 20px;
+      }
+
+      .learning-message {
+        font-size: 19px;
+        padding: 24px 20px;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ <style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+  .mt-30 { margin-top: 30px !important; }
+  @media (max-width: 768px) {
+    .container,
+    .game-container,
+    .game-card,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .section,
+    .phase,
+    .phase-screen,
+    .final-screen,
+    .final-results,
+    .modal-content {
+      padding: 16px !important;
+    }
+    h1, .main-title, .game-title {
+      font-size: clamp(1.8rem, 7vw, 2.2rem) !important;
+      line-height: 1.15 !important;
+    }
+    h2, .phase-title, .stage-title {
+      font-size: clamp(1.3rem, 6vw, 1.6rem) !important;
+      line-height: 1.25 !important;
+    }
+    p, .instruction, .phase-instruction, .stage-subtitle, .game-subtitle {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+    .button-group, .final-buttons, .action-buttons {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+    .btn, .btn-primary, .btn-secondary, .btn-main {
+      width: 100% !important;
+    }
+  }
+</style>
+<style>
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+    .header h1, .main-title, .game-title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+    .header p, .game-subtitle, .phase-subtitle, .instruction, .stage-subtitle,
+    .game-objective, .phase-instruction, .phase-header p, .stage-intro {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+    .container, .game-container, .app-container, .main-wrapper {
+      padding: 1rem !important;
+    }
+    .phase-screen, .game-card, .stage-wrapper, .content-area {
+      padding: 1.25rem !important;
+      border-radius: 18px !important;
+    }
+    .progress-indicator, .progress-steps {
+      flex-wrap: wrap !important;
+      gap: 0.5rem !important;
+    }
+    .progress-dot {
+      width: 12px !important;
+      height: 12px !important;
+    }
+    .progress-step {
+      min-width: 90px;
+    }
+    .player-icon {
+      font-size: clamp(3.5rem, 18vw, 6rem) !important;
+    }
+    .breathing-animation {
+      width: 180px !important;
+      height: 180px !important;
+      font-size: 1.5rem !important;
+    }
+    .breath-circle {
+      width: 48px !important;
+      height: 48px !important;
+      font-size: 1.1rem !important;
+    }
+    .action-button, .action-btn, .option-card, .bubble, .ritual-item,
+    .viz-option, .action-card, .tool-card, .emotion-card, .thought-card,
+    .question-card, .card-item {
+      width: 100% !important;
+    }
+    .balloons-container, .thought-bubbles, .ritual-items, .visualization-options,
+    .actions-grid, .tools-grid, .emotions-grid, .completion-stats,
+    .rhythm-choice, .content-grid, .options-grid, .choices-grid, .cards-grid,
+    .module-grid, .steps-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .transformation-area {
+      flex-direction: column !important;
+      gap: 1rem !important;
+    }
+    .emoji-header {
+      font-size: clamp(3rem, 16vw, 4.5rem) !important;
+    }
+    .action-emoji, .emotion-icon, .ritual-icon {
+      font-size: clamp(2.5rem, 14vw, 3.5rem) !important;
+    }
+    .timer-value {
+      font-size: clamp(1.8rem, 9vw, 2.4rem) !important;
+    }
+    .breathing-bar {
+      height: 28px !important;
+    }
+    .character {
+      width: 90px !important;
+      height: 90px !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    config: {}
+  };
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+</head>
+ <body>
+  <div class="app-container">
+   <div class="game-card">
+    <div class="header">
+     <div class="emoji-header">
+      🎮🔥
+     </div>
+     <h1 class="main-title" id="mainTitle">Crea tu Ritual Imparable Entre Puntos</h1>
+    </div><!-- FASE 1: Rompe el Caos -->
+    <div id="phase1" class="phase active">
+     <h2 class="phase-title" id="phase1Title">🟦 FASE 1 — "Rompe el Caos"</h2>
+     <p class="phase-instruction" id="phase1Instruction">🎯 Toca SOLO las acciones incorrectas para eliminar el caos.<br>
+       ⚠️ No toques las acciones correctas.</p>
+     <div class="actions-grid" id="actionsGrid">
+      <div class="action-card" data-correct="false" data-action="gritar">
+       <div class="action-emoji">
+        😤
+       </div>
+       <div class="action-text">
+        Gritar
+       </div>
+      </div>
+      <div class="action-card" data-correct="true" data-action="ajustar">
+       <div class="action-emoji">
+        🎾
+       </div>
+       <div class="action-text">
+        Ajustar cuerdas
+       </div>
+      </div>
+      <div class="action-card" data-correct="false" data-action="golpear">
+       <div class="action-emoji">
+        💢
+       </div>
+       <div class="action-text">
+        Golpear la raqueta
+       </div>
+      </div>
+      <div class="action-card" data-correct="true" data-action="respirar">
+       <div class="action-emoji">
+        🌬️
+       </div>
+       <div class="action-text">
+        Respirar profundo
+       </div>
+      </div>
+      <div class="action-card" data-correct="false" data-action="hablarse">
+       <div class="action-emoji">
+        🗣️
+       </div>
+       <div class="action-text">
+        Hablarse mal
+       </div>
+      </div>
+      <div class="action-card" data-correct="false" data-action="mirar">
+       <div class="action-emoji">
+        👀
+       </div>
+       <div class="action-text">
+        Mirar al coach buscando salvación
+       </div>
+      </div>
+     </div>
+     <div id="phase1Learning" class="learning-message">
+      💡 Tu ritual empieza eliminando lo que te quita control.
+     </div>
+     <div class="btn-container"><button id="phase1NextBtn" class="btn-primary" disabled>Construir tu ritual</button>
+     </div>
+    </div><!-- FASE 2: Elige tus 3 pilares -->
+    <div id="phase2" class="phase">
+     <h2 class="phase-title" id="phase2Title">🟩 FASE 2 — "Elige tus 3 pilares del ritual"</h2>
+     <p class="phase-instruction" id="phase2Instruction">🎯 Selecciona 3 herramientas para construir tu ritual personal.<br>
+       Toca cada una para ver su función.</p>
+     <div class="selected-count" id="selectedCount">
+      Has seleccionado 0 de 3 herramientas
+     </div>
+     <div class="tools-grid" id="toolsGrid">
+      <div class="tool-card" data-tool="respiracion">
+       <div class="tool-emoji">
+        🌬️
+       </div>
+       <div class="tool-name">
+        Respiración
+       </div>
+       <div class="tool-description">
+        Reinicia tu sistema nervioso
+       </div>
+      </div>
+      <div class="tool-card" data-tool="cuerdas">
+       <div class="tool-emoji">
+        🎾
+       </div>
+       <div class="tool-name">
+        Ajuste de cuerdas
+       </div>
+       <div class="tool-description">
+        Activas tu enfoque
+       </div>
+      </div>
+      <div class="tool-card" data-tool="caminar">
+       <div class="tool-emoji">
+        🚶
+       </div>
+       <div class="tool-name">
+        Caminar al fondo
+       </div>
+       <div class="tool-description">
+        Creas espacio mental
+       </div>
+      </div>
+      <div class="tool-card" data-tool="frase">
+       <div class="tool-emoji">
+        💪
+       </div>
+       <div class="tool-name">
+        Frase de confianza
+       </div>
+       <div class="tool-description">
+        Cambias tu diálogo interno
+       </div>
+      </div>
+      <div class="tool-card" data-tool="visualizacion">
+       <div class="tool-emoji">
+        👁️
+       </div>
+       <div class="tool-name">
+        Visualización
+       </div>
+       <div class="tool-description">
+        Preparas la siguiente jugada
+       </div>
+      </div>
+      <div class="tool-card" data-tool="pelota">
+       <div class="tool-emoji">
+        🎯
+       </div>
+       <div class="tool-name">
+        Enfoque en la pelota
+       </div>
+       <div class="tool-description">
+        Regresas al presente
+       </div>
+      </div>
+     </div>
+     <div id="ritualDisplay" class="ritual-display" style="display: none;">
+      <h3 style="font-size: 24px; font-weight: 700; color: #667eea; margin-bottom: 16px;">✨ Tu Ritual Personal</h3>
+      <div class="ritual-steps" id="ritualSteps"></div>
+     </div>
+     <div id="phase2Learning" class="learning-message">
+      💡 Un ritual simple, repetido siempre, controla tu mente mejor que cualquier técnica compleja.
+     </div>
+     <div class="btn-container"><button id="phase2NextBtn" class="btn-primary" disabled>Pon tu ritual en acción</button>
+     </div>
+    </div><!-- FASE 3: Simulador Real -->
+    <div id="phase3" class="phase">
+     <h2 class="phase-title" id="phase3Title">🟨 FASE 3 — "Simulador de Ritual Real"</h2>
+     <p class="phase-instruction">🎯 Aplica tu ritual en situaciones reales del partido.<br>
+       Selecciona las herramientas de TU ritual en cada situación.</p>
+     <div id="situation1" class="situation-card">
+      <div class="situation-title">
+       ▶️ Situación 1: Cometes un error fácil
+      </div>
+      <p style="font-size: 18px; color: #4a5568; margin-bottom: 16px;">¿Qué haces para recuperar el control?</p>
+      <div class="situation-options" id="situation1Options"></div>
+      <div id="situation1Learning" class="learning-message">
+       💡 Tu ritual corta el impulso emocional.
+      </div>
+     </div>
+     <div id="situation2" class="situation-card" style="display: none;">
+      <div class="situation-title">
+       ▶️ Situación 2: Vas ganando pero te aceleras
+      </div>
+      <p style="font-size: 18px; color: #4a5568; margin-bottom: 16px;">¿Cómo mantienes la calma y el control?</p>
+      <div class="situation-options" id="situation2Options"></div>
+      <div id="situation2Learning" class="learning-message">
+       💡 Tu ritual también te protege cuando vas arriba.
+      </div>
+     </div>
+     <div id="situation3" class="situation-card" style="display: none;">
+      <div class="situation-title">
+       ▶️ Situación 3: Punto importante (40-40)
+      </div>
+      <p style="font-size: 18px; color: #4a5568; margin-bottom: 16px;">¿Cómo te preparas para el momento decisivo?</p>
+      <div class="situation-options" id="situation3Options"></div>
+      <div id="situation3Learning" class="learning-message">
+       💡 Tu ritual es tu armadura mental. Úsalo cada punto, sin excepción.
+      </div>
+     </div>
+     <div id="phase3Success" style="display: none;">
+      <div class="success-animation">
+       <div class="success-emoji">
+        ✨🏆✨
+       </div>
+       <div class="success-title">
+        ¡Ritual ejecutado con éxito!
+       </div>
+       <div class="success-message">
+        Tu ritual es tu armadura mental.<br>
+         Úsalo cada punto, sin excepción.
+       </div>
+      </div>
+     </div>
+    </div><!-- PANTALLA FINAL -->
+    <div id="finalScreen" class="phase">
+     <div class="success-animation">
+      <div class="success-emoji">
+       🎉🎾🔥
+      </div>
+      <div class="success-title">
+       Tienes un ritual imparable
+      </div>
+      <div class="success-message" style="font-size: 28px; margin-top: 24px;">
+       Tu ritual te regresa al presente.<br><strong>Tu presente gana partidos.</strong>
+      </div>
+      <div id="finalRitualDisplay" class="ritual-display" style="margin-top: 32px;">
+       <h3 style="font-size: 24px; font-weight: 700; color: #667eea; margin-bottom: 16px;">✨ Tu Ritual Personal</h3>
+       <div class="ritual-steps" id="finalRitualSteps"></div>
+      </div>
+      <div class="final-buttons"><button id="restartBtn" class="btn-secondary">🔄 Repetir ritual</button> <button id="saveBtn" class="btn-primary">💾 Guardar para tu diario</button>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      main_title: "Crea tu Ritual Imparable Entre Puntos",
+      phase1_title: '🟦 FASE 1 — "Rompe el Caos"',
+      phase1_instruction: "🎯 Toca SOLO las acciones incorrectas para eliminar el caos. ⚠️ No toques las acciones correctas.",
+      phase2_title: '🟩 FASE 2 — "Elige tus 3 pilares del ritual"',
+      phase2_instruction: "🎯 Selecciona 3 herramientas para construir tu ritual personal. Toca cada una para ver su función.",
+      phase3_title: '🟨 FASE 3 — "Simulador de Ritual Real"',
+      background_color: "#667eea",
+      card_background: "#ffffff",
+      text_color: "#2d3748",
+      primary_action: "#667eea",
+      secondary_action: "#764ba2"
+    };
+
+    let selectedTools = [];
+    let incorrectActionsRemaining = 4;
+
+    const toolsMap = {
+      respiracion: { name: "Respiración", emoji: "🌬️" },
+      cuerdas: { name: "Ajustar cuerdas", emoji: "🎾" },
+      caminar: { name: "Caminar al fondo", emoji: "🚶" },
+      frase: { name: "Frase de confianza", emoji: "💪" },
+      visualizacion: { name: "Visualización", emoji: "👁️" },
+      pelota: { name: "Enfoque en la pelota", emoji: "🎯" }
+    };
+
+    async function onConfigChange(config) {
+      document.getElementById('mainTitle').textContent = config.main_title || defaultConfig.main_title;
+      document.getElementById('phase1Title').textContent = config.phase1_title || defaultConfig.phase1_title;
+      document.getElementById('phase1Instruction').textContent = config.phase1_instruction || defaultConfig.phase1_instruction;
+      document.getElementById('phase2Title').textContent = config.phase2_title || defaultConfig.phase2_title;
+      document.getElementById('phase2Instruction').textContent = config.phase2_instruction || defaultConfig.phase2_instruction;
+      document.getElementById('phase3Title').textContent = config.phase3_title || defaultConfig.phase3_title;
+
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryAction = config.primary_action || defaultConfig.primary_action;
+
+      document.querySelector('.app-container').style.background = `linear-gradient(135deg, ${bgColor} 0%, ${config.secondary_action || defaultConfig.secondary_action} 100%)`;
+      document.querySelectorAll('.phase-title, .action-text, .tool-name, .situation-title').forEach(el => {
+        el.style.color = textColor;
+      });
+      document.querySelectorAll('.main-title, .selected-count').forEach(el => {
+        el.style.color = primaryAction;
+      });
+    }
+
+    // FASE 1: Rompe el Caos
+    document.getElementById('actionsGrid').addEventListener('click', (e) => {
+      const card = e.target.closest('.action-card');
+      if (!card || card.classList.contains('exploded') || card.classList.contains('wrong-click')) return;
+
+      const isCorrect = card.dataset.correct === 'true';
+
+      if (!isCorrect) {
+        card.classList.add('exploded');
+        incorrectActionsRemaining--;
+
+        if (incorrectActionsRemaining === 0) {
+          setTimeout(() => {
+            document.getElementById('phase1Learning').classList.add('show');
+            document.getElementById('phase1NextBtn').disabled = false;
+          }, 500);
+        }
+      } else {
+        card.classList.add('wrong-click');
+        setTimeout(() => {
+          card.classList.remove('wrong-click');
+        }, 500);
+      }
+    });
+
+    document.getElementById('phase1NextBtn').addEventListener('click', () => {
+      document.getElementById('phase1').classList.remove('active');
+      document.getElementById('phase2').classList.add('active');
+      acScrollToElement('phase2');
+    });
+
+    // FASE 2: Elige tus 3 pilares
+    document.getElementById('toolsGrid').addEventListener('click', (e) => {
+      const card = e.target.closest('.tool-card');
+      if (!card || card.classList.contains('disabled')) return;
+
+      const tool = card.dataset.tool;
+
+      if (card.classList.contains('selected')) {
+        card.classList.remove('selected');
+        selectedTools = selectedTools.filter(t => t !== tool);
+      } else {
+        if (selectedTools.length < 3) {
+          card.classList.add('selected');
+          selectedTools.push(tool);
+        }
+      }
+
+      document.querySelectorAll('.tool-card').forEach(c => {
+        if (!c.classList.contains('selected') && selectedTools.length >= 3) {
+          c.classList.add('disabled');
+        } else if (selectedTools.length < 3) {
+          c.classList.remove('disabled');
+        }
+      });
+
+      document.getElementById('selectedCount').textContent = 
+        `Has seleccionado ${selectedTools.length} de 3 herramientas`;
+
+      if (selectedTools.length === 3) {
+        displayRitual();
+        document.getElementById('phase2Learning').classList.add('show');
+        document.getElementById('phase2NextBtn').disabled = false;
+      } else {
+        document.getElementById('ritualDisplay').style.display = 'none';
+        document.getElementById('phase2Learning').classList.remove('show');
+        document.getElementById('phase2NextBtn').disabled = true;
+      }
+    });
+
+    function displayRitual() {
+      const ritualDisplay = document.getElementById('ritualDisplay');
+      const ritualSteps = document.getElementById('ritualSteps');
+      
+      ritualSteps.innerHTML = '';
+      selectedTools.forEach((tool, index) => {
+        const step = document.createElement('div');
+        step.className = 'ritual-step';
+        step.textContent = `${index + 1}. ${toolsMap[tool].emoji} ${toolsMap[tool].name}`;
+        ritualSteps.appendChild(step);
+      });
+
+      ritualDisplay.style.display = 'block';
+    }
+
+    document.getElementById('phase2NextBtn').addEventListener('click', () => {
+      document.getElementById('phase2').classList.remove('active');
+      document.getElementById('phase3').classList.add('active');
+      setupPhase3();
+      acScrollToElement('phase3');
+    });
+
+    // FASE 3: Simulador Real
+    function setupPhase3() {
+      const situations = [
+        {
+          id: 'situation1',
+          wrongOptions: ['Gritar', 'Mirar al coach', 'Buscar excusas']
+        },
+        {
+          id: 'situation2',
+          wrongOptions: ['Celebración exagerada', 'Pensar en el resultado', 'Acelerar el juego']
+        },
+        {
+          id: 'situation3',
+          wrongOptions: ['Dudar', 'Mirar al público', 'Tensionarse']
+        }
+      ];
+
+      situations.forEach((situation, index) => {
+        const container = document.getElementById(`${situation.id}Options`);
+        container.innerHTML = '';
+
+        const allOptions = [...selectedTools.map(t => toolsMap[t].name), ...situation.wrongOptions];
+        allOptions.sort(() => Math.random() - 0.5);
+
+        allOptions.forEach(option => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = option;
+          
+          const isCorrect = selectedTools.some(t => toolsMap[t].name === option);
+          
+          btn.addEventListener('click', () => {
+            if (btn.classList.contains('disabled')) return;
+
+            if (isCorrect) {
+              btn.classList.add('correct-choice');
+              btn.classList.add('disabled');
+
+              const allCorrect = Array.from(container.querySelectorAll('.option-btn'))
+                .filter(b => selectedTools.some(t => toolsMap[t].name === b.textContent))
+                .every(b => b.classList.contains('correct-choice'));
+
+              if (allCorrect) {
+                setTimeout(() => {
+                  document.getElementById(`${situation.id}Learning`).classList.add('show');
+                  
+                  if (index < situations.length - 1) {
+                    setTimeout(() => {
+                      document.getElementById(situations[index + 1].id).style.display = 'block';
+                    }, 1500);
+                  } else {
+                    setTimeout(() => {
+                      document.getElementById('phase3Success').style.display = 'block';
+                      setTimeout(() => {
+                        document.getElementById('phase3').classList.remove('active');
+                        document.getElementById('finalScreen').classList.add('active');
+                        displayFinalRitual();
+                        acScrollToElement('finalScreen');
+                      }, 2000);
+                    }, 1500);
+                  }
+                }, 500);
+              }
+            } else {
+              btn.classList.add('wrong-choice');
+              setTimeout(() => {
+                btn.classList.remove('wrong-choice');
+              }, 500);
+            }
+          });
+
+          container.appendChild(btn);
+        });
+      });
+    }
+
+    function displayFinalRitual() {
+      const finalSteps = document.getElementById('finalRitualSteps');
+      finalSteps.innerHTML = '';
+      
+      selectedTools.forEach((tool, index) => {
+        const step = document.createElement('div');
+        step.className = 'ritual-step';
+        step.textContent = `${index + 1}. ${toolsMap[tool].emoji} ${toolsMap[tool].name}`;
+        finalSteps.appendChild(step);
+      });
+    }
+
+    document.getElementById('restartBtn').addEventListener('click', () => {
+      location.reload();
+    });
+
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      const ritualText = selectedTools.map((tool, i) => 
+        `${i + 1}. ${toolsMap[tool].emoji} ${toolsMap[tool].name}`
+      ).join('\n');
+
+      const message = document.createElement('div');
+      message.className = 'learning-message show';
+      message.textContent = '✅ ¡Ritual guardado! Úsalo en cada partido.';
+      message.style.marginTop = '24px';
+      
+      const container = document.querySelector('#finalScreen .success-animation');
+      container.appendChild(message);
+
+      setTimeout(() => {
+        message.remove();
+      }, 3000);
+    });
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.card_background || defaultConfig.card_background,
+              set: (value) => {
+                config.card_background = value;
+                window.elementSdk.setConfig({ card_background: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_action || defaultConfig.primary_action,
+              set: (value) => {
+                config.primary_action = value;
+                window.elementSdk.setConfig({ primary_action: value });
+              }
+            },
+            {
+              get: () => config.secondary_action || defaultConfig.secondary_action,
+              set: (value) => {
+                config.secondary_action = value;
+                window.elementSdk.setConfig({ secondary_action: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["main_title", config.main_title || defaultConfig.main_title],
+          ["phase1_title", config.phase1_title || defaultConfig.phase1_title],
+          ["phase1_instruction", config.phase1_instruction || defaultConfig.phase1_instruction],
+          ["phase2_title", config.phase2_title || defaultConfig.phase2_title],
+          ["phase2_instruction", config.phase2_instruction || defaultConfig.phase2_instruction],
+          ["phase3_title", config.phase3_title || defaultConfig.phase3_title]
+        ])
+      });
+    }
+  </script>
+ <script>
+function acScrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function acScrollToElement(id, offset) {
+  var target = document.getElementById(id);
+  if (!target) {
+    acScrollToTop();
+    return;
+  }
+  var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  window.scrollTo(0, 0);
+});
+</script>
+</body>
+</html>

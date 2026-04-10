@@ -1,0 +1,1060 @@
+<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sube tu Nivel Mental</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .game-container {
+      width: 100%;
+      max-width: 800px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      padding: 40px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 42px;
+      margin: 0 0 10px 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .level-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 8px 24px;
+      border-radius: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+
+    .instruction {
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    .character {
+      width: 120px;
+      height: 120px;
+      margin: 20px auto;
+      position: relative;
+    }
+
+    .breathing-bar {
+      width: 100%;
+      height: 40px;
+      background: #e0e0e0;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 20px 0;
+      position: relative;
+    }
+
+    .breathing-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      width: 0%;
+      transition: width 3s ease-in-out;
+      border-radius: 20px;
+    }
+
+    .breathing-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: bold;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .thought-bubbles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin: 30px 0;
+    }
+
+    .bubble {
+      background: white;
+      border: 3px solid #e0e0e0;
+      padding: 20px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 16px;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bubble:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .bubble.positive {
+      border-color: #4caf50;
+      background: #f1f8f4;
+    }
+
+    .bubble.negative {
+      border-color: #f44336;
+      background: #fff1f0;
+    }
+
+    .bubble.selected-correct {
+      border-color: #4caf50;
+      background: #4caf50;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .bubble.selected-wrong {
+      border-color: #f44336;
+      background: #f44336;
+      color: white;
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .ritual-items {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin: 30px 0;
+    }
+
+    .ritual-item {
+      background: white;
+      border: 3px solid #e0e0e0;
+      padding: 25px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .ritual-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .ritual-item.selected {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+    }
+
+    .ritual-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .visualization-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 30px 0;
+    }
+
+    .viz-option {
+      background: white;
+      border: 3px solid #e0e0e0;
+      padding: 30px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .viz-option:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .viz-icon {
+      font-size: 64px;
+      margin-bottom: 15px;
+    }
+
+    .boss-tools {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin: 30px 0;
+    }
+
+    .boss-tool {
+      background: white;
+      border: 3px solid #e0e0e0;
+      padding: 20px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0.5;
+    }
+
+    .boss-tool.available {
+      opacity: 1;
+      border-color: #667eea;
+    }
+
+    .boss-tool.available:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .boss-tool.used {
+      background: #4caf50;
+      color: white;
+      border-color: #4caf50;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 18px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      margin-top: 20px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .teaching-box {
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      padding: 20px;
+      border-radius: 15px;
+      margin: 20px 0;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .progress-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .progress-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #999;
+    }
+
+    .progress-dot.completed {
+      background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+      color: white;
+    }
+
+    .progress-dot.current {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      transform: scale(1.2);
+    }
+
+    .sequence-display {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+
+    .sequence-item {
+      background: #667eea;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .final-message {
+      font-size: 32px;
+      font-weight: bold;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 30px 0;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .cycles-counter {
+      font-size: 20px;
+      font-weight: bold;
+      color: #667eea;
+      margin: 15px 0;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .ritual-feedback {
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .ritual-feedback.error {
+      background: #fff1f0;
+      border: 2px solid #f44336;
+      color: #b42318;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ <style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+  .mt-30 { margin-top: 30px !important; }
+  @media (max-width: 768px) {
+    .container,
+    .game-container,
+    .game-card,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .section,
+    .phase,
+    .phase-screen,
+    .final-screen,
+    .final-results,
+    .modal-content {
+      padding: 16px !important;
+    }
+    h1, .main-title, .game-title {
+      font-size: clamp(1.8rem, 7vw, 2.2rem) !important;
+      line-height: 1.15 !important;
+    }
+    h2, .phase-title, .stage-title {
+      font-size: clamp(1.3rem, 6vw, 1.6rem) !important;
+      line-height: 1.25 !important;
+    }
+    p, .instruction, .phase-instruction, .stage-subtitle, .game-subtitle {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+    .button-group, .final-buttons, .action-buttons {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+    .btn, .btn-primary, .btn-secondary, .btn-main {
+      width: 100% !important;
+    }
+  }
+</style>
+<style>
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+    .header h1, .main-title, .game-title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+    .header p, .game-subtitle, .phase-subtitle, .instruction, .stage-subtitle,
+    .game-objective, .phase-instruction, .phase-header p, .stage-intro {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+    .container, .game-container, .app-container, .main-wrapper {
+      padding: 1rem !important;
+    }
+    .phase-screen, .game-card, .stage-wrapper, .content-area {
+      padding: 1.25rem !important;
+      border-radius: 18px !important;
+    }
+    .progress-indicator, .progress-steps {
+      flex-wrap: wrap !important;
+      gap: 0.5rem !important;
+    }
+    .progress-dot {
+      width: 12px !important;
+      height: 12px !important;
+    }
+    .progress-step {
+      min-width: 90px;
+    }
+    .player-icon {
+      font-size: clamp(3.5rem, 18vw, 6rem) !important;
+    }
+    .breathing-animation {
+      width: 180px !important;
+      height: 180px !important;
+      font-size: 1.5rem !important;
+    }
+    .breath-circle {
+      width: 48px !important;
+      height: 48px !important;
+      font-size: 1.1rem !important;
+    }
+    .action-button, .action-btn, .option-card, .bubble, .ritual-item,
+    .viz-option, .action-card, .tool-card, .emotion-card, .thought-card,
+    .question-card, .card-item {
+      width: 100% !important;
+    }
+    .balloons-container, .thought-bubbles, .ritual-items, .visualization-options,
+    .actions-grid, .tools-grid, .emotions-grid, .completion-stats,
+    .rhythm-choice, .content-grid, .options-grid, .choices-grid, .cards-grid,
+    .module-grid, .steps-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .transformation-area {
+      flex-direction: column !important;
+      gap: 1rem !important;
+    }
+    .emoji-header {
+      font-size: clamp(3rem, 16vw, 4.5rem) !important;
+    }
+    .action-emoji, .emotion-icon, .ritual-icon {
+      font-size: clamp(2.5rem, 14vw, 3.5rem) !important;
+    }
+    .timer-value {
+      font-size: clamp(1.8rem, 9vw, 2.4rem) !important;
+    }
+    .breathing-bar {
+      height: 28px !important;
+    }
+    .character {
+      width: 90px !important;
+      height: 90px !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    config: {}
+  };
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+</head>
+ <body>
+  <div class="game-container">
+   <h1 id="gameTitle">🎮 Sube tu Nivel Mental</h1>
+   <div class="progress-indicator">
+    <div class="progress-dot current" id="dot1">
+     1
+    </div>
+    <div class="progress-dot" id="dot2">
+     2
+    </div>
+    <div class="progress-dot" id="dot3">
+     3
+    </div>
+    <div class="progress-dot" id="dot4">
+     4
+    </div>
+    <div class="progress-dot" id="dot5">
+     👑
+    </div>
+   </div><!-- PANTALLA INICIAL -->
+   <div id="startScreen">
+    <p class="instruction" id="instructionText">Domina las 4 herramientas mentales que controlan tus emociones en partido. ¡Supera cada nivel y enfrenta el Boss Final! 🔥</p><button class="btn-primary" onclick="startGame()">¡Comenzar Juego!</button>
+   </div><!-- NIVEL 1: RESPIRACIÓN -->
+   <div id="level1" class="hidden">
+    <div class="level-badge">
+     🟦 NIVEL 1 - Control del Cuerpo
+    </div>
+    <div class="character">
+     🧘‍♂️
+    </div>
+    <p class="instruction">Tu cuerpo está tenso. Calma tu respiración siguiendo el ritmo.</p>
+    <div class="cycles-counter">
+     Ciclos completados: <span id="cyclesCount">0</span>/3
+    </div>
+    <div class="breathing-bar">
+     <div class="breathing-fill" id="breathingFill"></div>
+     <div class="breathing-label" id="breathingLabel">
+      Prepárate...
+     </div>
+    </div><button class="btn-primary" id="breathBtn" onclick="startBreathing()">🫁 Iniciar Respiración</button> <button class="btn-primary hidden" id="level1NextBtn" onclick="goToLevel2()">Subir al Nivel 2 ➡️</button>
+    <div class="teaching-box hidden" id="teaching1">
+     💡 "Si controlas tu respiración, tu cuerpo deja de pelear contra ti."
+    </div>
+   </div><!-- NIVEL 2: AUTODIÁLOGO -->
+   <div id="level2" class="hidden">
+    <div class="level-badge">
+     🟩 NIVEL 2 - Control de la Mente
+    </div>
+    <div class="character">
+     🤔
+    </div>
+    <p class="instruction">Selecciona SOLO las frases que te ayudan. Evita las negativas.</p>
+    <div class="thought-bubbles">
+     <div class="bubble" onclick="selectThought(this, true)" data-positive="true">
+      "Un punto a la vez."
+     </div>
+     <div class="bubble" onclick="selectThought(this, false)" data-positive="false">
+      "Siempre fallo en esto."
+     </div>
+     <div class="bubble" onclick="selectThought(this, true)" data-positive="true">
+      "Confío en mí."
+     </div>
+     <div class="bubble" onclick="selectThought(this, false)" data-positive="false">
+      "No puedo contra él."
+     </div>
+    </div>
+    <div class="teaching-box hidden" id="teaching2">
+     💡 "Lo que te dices cambia lo que haces."
+    </div><button class="btn-primary hidden" id="level2NextBtn" onclick="goToLevel3()">Subir al Nivel 3 ➡️</button>
+   </div><!-- NIVEL 3: RITUAL -->
+   <div id="level3" class="hidden">
+    <div class="level-badge">
+     🟨 NIVEL 3 - Control de la Atención
+    </div>
+    <div class="character">
+     🎾
+    </div>
+    <p class="instruction">Arma tu ritual entre puntos en el orden correcto:</p>
+    <p style="font-weight: bold; color: #667eea;">1️     Caminar → 2️⃣ Respirar/Ajustar → 3️⃣ Frase/Visualizar</p>
+    <div class="sequence-display" id="ritualSequence"></div>
+    <div class="ritual-feedback error hidden" id="ritualFeedback">Ese orden no te regula. Vuelve al paso 1 y reconstruye tu ritual con calma.</div>
+    <div class="ritual-items">
+     <div class="ritual-item" onclick="selectRitual(this, 'walk', 1)">
+      <div class="ritual-icon">
+       🚶‍♂️
+      </div>
+      <div>
+       Caminar al fondo
+      </div>
+     </div>
+     <div class="ritual-item" onclick="selectRitual(this, 'adjust', 2)">
+      <div class="ritual-icon">
+       🎾
+      </div>
+      <div>
+       Ajustar cuerdas
+      </div>
+     </div>
+     <div class="ritual-item" onclick="selectRitual(this, 'phrase', 3)">
+      <div class="ritual-icon">
+       💭
+      </div>
+      <div>
+       Repetir frase
+      </div>
+     </div>
+     <div class="ritual-item" onclick="selectRitual(this, 'wrong', 0)">
+      <div class="ritual-icon">
+       😤
+      </div>
+      <div>
+       Golpear el suelo
+      </div>
+     </div>
+    </div>
+    <div class="teaching-box hidden" id="teaching3">
+     💡 "Tu ritual es tu ancla. Te protege del caos."
+    </div><button class="btn-primary hidden" id="level3NextBtn" onclick="goToLevel4()">Subir al Nivel 4 ➡️</button>
+   </div><!-- NIVEL 4: VISUALIZACIÓN -->
+   <div id="level4" class="hidden">
+    <div class="level-badge">
+     🟫 NIVEL 4 - Control del Resultado
+    </div>
+    <div class="character">
+     👁️
+    </div>
+    <p class="instruction">Elige la visualización correcta antes del punto:</p>
+    <div class="visualization-options">
+     <div class="viz-option" onclick="selectVisualization(this, false)">
+      <div class="viz-icon">
+       😰
+      </div>
+      <div style="font-weight: bold;">
+       Opción A
+      </div>
+      <div>
+       Pensar en errores pasados y frustraciones
+      </div>
+     </div>
+     <div class="viz-option" onclick="selectVisualization(this, true)">
+      <div class="viz-icon">
+       💪
+      </div>
+      <div style="font-weight: bold;">
+       Opción B
+      </div>
+      <div>
+       Ver tu preparación sólida y ejecutar con confianza
+      </div>
+     </div>
+    </div>
+    <div class="teaching-box hidden" id="teaching4">
+     💡 "Visualiza la acción, no el resultado."
+    </div><button class="btn-primary hidden" id="level4NextBtn" onclick="goToBoss()">¡Enfrentar Boss Final! 👑</button>
+   </div><!-- BOSS FINAL -->
+   <div id="bossFight" class="hidden">
+    <div class="level-badge" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+     🔥 BOSS FINAL - La Tormenta Mental
+    </div>
+    <div class="character">
+     ⛈️
+    </div>
+    <p class="instruction">Acabas de perder un punto largo. El público está ruidoso. Tu respiración se acelera. ¡Usa las 4 herramientas en orden para calmarte!</p>
+    <p style="font-weight: bold; color: #f5576c; margin: 20px 0;">Orden correcto: Respiración → Ritual → Frase → Visualización</p>
+    <div class="sequence-display" id="bossSequence"></div>
+    <div class="boss-tools">
+     <div class="boss-tool available" data-order="1" onclick="useTool(this, 'breathing', 1)">
+      <div class="ritual-icon">
+       🫁
+      </div>
+      <div style="font-weight: bold;">
+       Respirar
+      </div>
+     </div>
+     <div class="boss-tool available" data-order="3" onclick="useTool(this, 'phrase', 3)">
+      <div class="ritual-icon">
+       💭
+      </div>
+      <div style="font-weight: bold;">
+       Frase positiva
+      </div>
+     </div>
+     <div class="boss-tool available" data-order="2" onclick="useTool(this, 'ritual', 2)">
+      <div class="ritual-icon">
+       🎾
+      </div>
+      <div style="font-weight: bold;">
+       Ritual
+      </div>
+     </div>
+     <div class="boss-tool available" data-order="4" onclick="useTool(this, 'visualization', 4)">
+      <div class="ritual-icon">
+       👁️
+      </div>
+      <div style="font-weight: bold;">
+       Visualización
+      </div>
+     </div>
+    </div>
+    <div class="teaching-box hidden" id="bossSuccess" style="background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);">
+     🎉 ¡La tormenta se ha calmado! Has dominado el autocontrol mental.
+    </div><button class="btn-primary hidden" id="bossNextBtn" onclick="showVictory()">Ver Resultado Final 🏆</button>
+   </div><!-- PANTALLA DE VICTORIA -->
+   <div id="victoryScreen" class="hidden">
+    <div class="character" style="font-size: 120px;">
+     🏆
+    </div>
+    <div class="final-message">
+     ¡Has desbloqueado el autocontrol AC!
+    </div>
+    <div class="teaching-box" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); font-size: 24px;">
+     "El jugador que controla su mente controla su juego."
+    </div>
+    <p style="font-size: 18px; color: #555; margin: 30px 0;">✅ Control del cuerpo (Respiración)<br>
+      ✅ Control de la mente (Autodiálogo)<br>
+      ✅ Control de la atención (Ritual)<br>
+      ✅ Control del resultado (Visualización)</p><button class="btn-primary" onclick="resetGame()">🔄 Jugar de Nuevo</button>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "🎮 Sube tu Nivel Mental",
+      instruction_text: "Domina las 4 herramientas mentales que controlan tus emociones en partido. ¡Supera cada nivel y enfrenta el Boss Final! 🔥"
+    };
+
+    let breathingCycles = 0;
+    let breathingActive = false;
+    let selectedPositiveCount = 0;
+    let ritualSequence = [];
+    let bossSequence = [];
+    let bossStep = 1;
+
+    async function onConfigChange(config) {
+      const gameTitle = config.game_title || defaultConfig.game_title;
+      const instructionText = config.instruction_text || defaultConfig.instruction_text;
+      
+      const gameTitleElement = document.getElementById('gameTitle');
+      const instructionTextElement = document.getElementById('instructionText');
+      
+      if (gameTitleElement) {
+        gameTitleElement.textContent = gameTitle;
+      }
+      
+      if (instructionTextElement) {
+        instructionTextElement.textContent = instructionText;
+      }
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["game_title", config.game_title || defaultConfig.game_title],
+        ["instruction_text", config.instruction_text || defaultConfig.instruction_text]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+
+    function startGame() {
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('level1').classList.remove('hidden');
+      updateProgress(1);
+      acScrollToElement('level1');
+    }
+
+    function updateProgress(level) {
+      for (let i = 1; i <= 5; i++) {
+        const dot = document.getElementById(`dot${i}`);
+        dot.classList.remove('current', 'completed');
+        if (i < level) {
+          dot.classList.add('completed');
+        } else if (i === level) {
+          dot.classList.add('current');
+        }
+      }
+    }
+
+    function startBreathing() {
+      if (breathingActive) return;
+      
+      breathingActive = true;
+      document.getElementById('breathBtn').disabled = true;
+      
+      const fill = document.getElementById('breathingFill');
+      const label = document.getElementById('breathingLabel');
+      
+      function breathCycle() {
+        label.textContent = 'Inhala...';
+        fill.style.width = '100%';
+        
+        setTimeout(() => {
+          label.textContent = 'Exhala...';
+          fill.style.width = '0%';
+          
+          setTimeout(() => {
+            breathingCycles++;
+            document.getElementById('cyclesCount').textContent = breathingCycles;
+            
+            if (breathingCycles < 3) {
+              breathCycle();
+            } else {
+              label.textContent = '¡Completado!';
+              breathingActive = false;
+              document.getElementById('teaching1').classList.remove('hidden');
+              document.getElementById('level1NextBtn').classList.remove('hidden');
+            }
+          }, 3000);
+        }, 3000);
+      }
+      
+      breathCycle();
+    }
+
+    function goToLevel2() {
+      document.getElementById('level1').classList.add('hidden');
+      document.getElementById('level2').classList.remove('hidden');
+      updateProgress(2);
+      acScrollToElement('level2');
+    }
+
+    function selectThought(element, isPositive) {
+      if (element.classList.contains('selected-correct') || element.classList.contains('selected-wrong')) {
+        return;
+      }
+      
+      if (isPositive) {
+        element.classList.add('selected-correct');
+        element.classList.add('positive');
+        selectedPositiveCount++;
+        
+        if (selectedPositiveCount === 2) {
+          setTimeout(() => {
+            document.getElementById('teaching2').classList.remove('hidden');
+            document.getElementById('level2NextBtn').classList.remove('hidden');
+          }, 500);
+        }
+      } else {
+        element.classList.add('selected-wrong');
+        element.classList.add('negative');
+        setTimeout(() => {
+          element.classList.remove('selected-wrong');
+        }, 500);
+      }
+    }
+
+    function goToLevel3() {
+      document.getElementById('level2').classList.add('hidden');
+      document.getElementById('level3').classList.remove('hidden');
+      updateProgress(3);
+      acScrollToElement('level3');
+    }
+
+    function selectRitual(element, type, order) {
+      if (ritualSequence.length >= 3) return;
+      document.getElementById('ritualFeedback').classList.add('hidden');
+      
+      if (type === 'wrong') {
+        element.style.animation = 'shake 0.5s';
+        setTimeout(() => {
+          element.style.animation = '';
+        }, 500);
+        return;
+      }
+      
+      element.classList.add('selected');
+      element.style.pointerEvents = 'none';
+      
+      ritualSequence.push({ type, order });
+      
+      const sequenceDisplay = document.getElementById('ritualSequence');
+      const sequenceItem = document.createElement('div');
+      sequenceItem.className = 'sequence-item';
+      sequenceItem.textContent = ritualSequence.length + '. ' + element.textContent.trim();
+      sequenceDisplay.appendChild(sequenceItem);
+      
+      if (ritualSequence.length === 3) {
+        const isCorrect = ritualSequence[0].order === 1 && 
+                         ritualSequence[1].order === 2 && 
+                         ritualSequence[2].order === 3;
+        
+        setTimeout(() => {
+          if (isCorrect) {
+            document.getElementById('teaching3').classList.remove('hidden');
+            document.getElementById('level3NextBtn').classList.remove('hidden');
+          } else {
+            sequenceDisplay.innerHTML = '';
+            ritualSequence = [];
+            const items = document.querySelectorAll('.ritual-item');
+            items.forEach(item => {
+              item.classList.remove('selected');
+              item.style.pointerEvents = 'auto';
+            });
+            document.getElementById('ritualFeedback').classList.remove('hidden');
+          }
+        }, 500);
+      }
+    }
+
+    function goToLevel4() {
+      document.getElementById('level3').classList.add('hidden');
+      document.getElementById('level4').classList.remove('hidden');
+      updateProgress(4);
+      acScrollToElement('level4');
+    }
+
+    function selectVisualization(element, isCorrect) {
+      const options = document.querySelectorAll('.viz-option');
+      options.forEach(opt => opt.style.pointerEvents = 'none');
+      
+      if (isCorrect) {
+        element.style.borderColor = '#4caf50';
+        element.style.background = '#f1f8f4';
+        setTimeout(() => {
+          document.getElementById('teaching4').classList.remove('hidden');
+          document.getElementById('level4NextBtn').classList.remove('hidden');
+        }, 500);
+      } else {
+        element.style.borderColor = '#f44336';
+        element.style.background = '#fff1f0';
+        element.style.animation = 'shake 0.5s';
+        setTimeout(() => {
+          element.style.animation = '';
+          element.style.borderColor = '#e0e0e0';
+          element.style.background = 'white';
+          options.forEach(opt => opt.style.pointerEvents = 'auto');
+        }, 500);
+      }
+    }
+
+    function goToBoss() {
+      document.getElementById('level4').classList.add('hidden');
+      document.getElementById('bossFight').classList.remove('hidden');
+      updateProgress(5);
+      acScrollToElement('bossFight');
+    }
+
+    function useTool(element, toolType, correctOrder) {
+      if (!element.classList.contains('available')) return;
+      
+      if (correctOrder === bossStep) {
+        element.classList.add('used');
+        element.classList.remove('available');
+        element.style.pointerEvents = 'none';
+        
+        const sequenceDisplay = document.getElementById('bossSequence');
+        const sequenceItem = document.createElement('div');
+        sequenceItem.className = 'sequence-item';
+        sequenceItem.textContent = bossStep + '. ' + element.textContent.trim();
+        sequenceDisplay.appendChild(sequenceItem);
+        
+        bossStep++;
+        
+        if (bossStep > 4) {
+          setTimeout(() => {
+            document.getElementById('bossSuccess').classList.remove('hidden');
+            document.getElementById('bossNextBtn').classList.remove('hidden');
+          }, 500);
+        }
+      } else {
+        element.style.animation = 'shake 0.5s';
+        setTimeout(() => {
+          element.style.animation = '';
+        }, 500);
+      }
+    }
+
+    function showVictory() {
+      document.getElementById('bossFight').classList.add('hidden');
+      document.getElementById('victoryScreen').classList.remove('hidden');
+      acScrollToElement('victoryScreen');
+    }
+
+    function resetGame() {
+      breathingCycles = 0;
+      breathingActive = false;
+      selectedPositiveCount = 0;
+      ritualSequence = [];
+      bossSequence = [];
+      bossStep = 1;
+      
+      document.getElementById('victoryScreen').classList.add('hidden');
+      document.getElementById('startScreen').classList.remove('hidden');
+      
+      document.getElementById('breathingFill').style.width = '0%';
+      document.getElementById('breathingLabel').textContent = 'Prepárate...';
+      document.getElementById('cyclesCount').textContent = '0';
+      document.getElementById('breathBtn').disabled = false;
+      document.getElementById('teaching1').classList.add('hidden');
+      document.getElementById('level1NextBtn').classList.add('hidden');
+      
+      const bubbles = document.querySelectorAll('.bubble');
+      bubbles.forEach(bubble => {
+        bubble.className = 'bubble';
+      });
+      document.getElementById('teaching2').classList.add('hidden');
+      document.getElementById('level2NextBtn').classList.add('hidden');
+      
+      const ritualItems = document.querySelectorAll('.ritual-item');
+      ritualItems.forEach(item => {
+        item.classList.remove('selected');
+        item.style.pointerEvents = 'auto';
+      });
+      document.getElementById('ritualSequence').innerHTML = '';
+      document.getElementById('ritualFeedback').classList.add('hidden');
+      document.getElementById('teaching3').classList.add('hidden');
+      document.getElementById('level3NextBtn').classList.add('hidden');
+      
+      const vizOptions = document.querySelectorAll('.viz-option');
+      vizOptions.forEach(opt => {
+        opt.style.borderColor = '#e0e0e0';
+        opt.style.background = 'white';
+        opt.style.pointerEvents = 'auto';
+      });
+      document.getElementById('teaching4').classList.add('hidden');
+      document.getElementById('level4NextBtn').classList.add('hidden');
+      
+      const bossTools = document.querySelectorAll('.boss-tool');
+      bossTools.forEach(tool => {
+        tool.className = 'boss-tool available';
+        tool.style.pointerEvents = 'auto';
+      });
+      document.getElementById('bossSequence').innerHTML = '';
+      document.getElementById('bossSuccess').classList.add('hidden');
+      document.getElementById('bossNextBtn').classList.add('hidden');
+      
+      updateProgress(1);
+      acScrollToElement('startScreen');
+    }
+  </script>
+<script>
+function acScrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function acScrollToElement(id, offset) {
+  var target = document.getElementById(id);
+  if (!target) {
+    acScrollToTop();
+    return;
+  }
+  var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  window.scrollTo(0, 0);
+});
+</script>
+</body>
+</html>

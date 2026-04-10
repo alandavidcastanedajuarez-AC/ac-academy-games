@@ -1,0 +1,2188 @@
+<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Circuito Mental AC - Nivel Élite</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #f1f5f9;
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .game-container {
+      width: 100%;
+      min-height: 100%;
+      padding: 2.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Header */
+    .game-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .game-title {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 1rem 0;
+      line-height: 1.1;
+    }
+
+    .game-subtitle {
+      font-size: 1.25rem;
+      color: #94a3b8;
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .elite-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-top: 1rem;
+      letter-spacing: 1px;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      width: 100%;
+      max-width: 900px;
+      margin-bottom: 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      border: 1px solid rgba(251, 191, 36, 0.2);
+    }
+
+    .progress-steps {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .progress-step {
+      flex: 1;
+      text-align: center;
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 0.5rem;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .progress-step.active {
+      background: rgba(251, 191, 36, 0.1);
+      border-color: #fbbf24;
+    }
+
+    .progress-step.completed {
+      background: rgba(34, 197, 94, 0.1);
+      border-color: #22c55e;
+    }
+
+    .step-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .step-label {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    /* Timer */
+    .timer-container {
+      background: rgba(220, 38, 38, 0.1);
+      border: 2px solid #dc2626;
+      border-radius: 1rem;
+      padding: 1rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .timer-label {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .timer-value {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: #dc2626;
+      font-family: 'Courier New', monospace;
+    }
+
+    .timer-value.warning {
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Main Content Area */
+    .content-area {
+      width: 100%;
+      max-width: 1200px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 1.5rem;
+      padding: 2.5rem;
+      border: 1px solid rgba(251, 191, 36, 0.2);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Welcome Screen */
+    .welcome-screen {
+      text-align: center;
+      padding: 2rem 0;
+    }
+
+    .welcome-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #fbbf24;
+      margin-bottom: 1.5rem;
+    }
+
+    .welcome-description {
+      font-size: 1.125rem;
+      line-height: 1.8;
+      color: #cbd5e1;
+      margin-bottom: 2rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .challenge-warning {
+      background: rgba(220, 38, 38, 0.1);
+      border: 2px solid #dc2626;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .warning-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .warning-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #dc2626;
+      margin-bottom: 0.75rem;
+    }
+
+    .warning-text {
+      font-size: 1rem;
+      color: #fca5a5;
+      line-height: 1.6;
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .skill-card {
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .skill-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .skill-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fbbf24;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 1rem 2.5rem;
+      font-size: 1.125rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      color: #0f172a;
+      box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 30px rgba(251, 191, 36, 0.6);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Block Header */
+    .block-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .block-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fbbf24;
+      margin-bottom: 0.5rem;
+    }
+
+    .block-description {
+      font-size: 1rem;
+      color: #94a3b8;
+    }
+
+    /* Scenario */
+    .scenario-container {
+      margin-bottom: 2rem;
+    }
+
+    .scenario-header {
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .scenario-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fbbf24;
+      margin-bottom: 0.75rem;
+    }
+
+    .scenario-description {
+      font-size: 1.125rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    .pressure-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .pressure-bar {
+      flex-grow: 1;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+
+    .pressure-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #fbbf24 0%, #dc2626 100%);
+      transition: width 0.3s ease;
+    }
+
+    .court-visual {
+      background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+      border-radius: 1rem;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      border: 3px solid rgba(251, 191, 36, 0.3);
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .court-lines {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0.3;
+    }
+
+    .center-line {
+      position: absolute;
+      width: 2px;
+      height: 100%;
+      background: white;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .player-icon {
+      font-size: 5rem;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+      z-index: 1;
+      animation: playerPulse 2s infinite;
+    }
+
+    @keyframes playerPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .option-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(148, 163, 184, 0.3);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      position: relative;
+    }
+
+    .option-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .option-card.selected {
+      background: rgba(251, 191, 36, 0.15);
+      border-color: #fbbf24;
+    }
+
+    .option-card.correct {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: #22c55e;
+    }
+
+    .option-card.incorrect {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: #ef4444;
+    }
+
+    .option-card.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .option-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .option-text {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .option-consequence {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
+    .selection-counter {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .feedback-box {
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .feedback-box.success {
+      background: rgba(34, 197, 94, 0.1);
+      border-color: #22c55e;
+    }
+
+    .feedback-box.error {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: #ef4444;
+    }
+
+    .feedback-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .feedback-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .feedback-text {
+      font-size: 1rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    .learning-point {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      margin-top: 1rem;
+    }
+
+    .learning-icon {
+      font-size: 1.5rem;
+      margin-right: 0.5rem;
+    }
+
+    .learning-text {
+      font-size: 1rem;
+      color: #93c5fd;
+      font-weight: 600;
+      font-style: italic;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    /* Block 2 - Connections */
+    .connections-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .connections-column {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(251, 191, 36, 0.2);
+      border-radius: 1rem;
+      padding: 1.5rem;
+    }
+
+    .column-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fbbf24;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .tool-item, .function-item {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(148, 163, 184, 0.3);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      cursor: grab;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .tool-item:active, .function-item:active {
+      cursor: grabbing;
+    }
+
+    .tool-item.dragging {
+      opacity: 0.5;
+      transform: scale(0.95);
+    }
+
+    .tool-item.matched, .function-item.matched {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: #22c55e;
+      cursor: default;
+    }
+
+    .tool-item.incorrect {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: #ef4444;
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .function-item.drop-zone {
+      min-height: 80px;
+      border-style: dashed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .function-item.drag-over {
+      background: rgba(251, 191, 36, 0.1);
+      border-color: #fbbf24;
+    }
+
+    .item-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .item-text {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      flex-grow: 1;
+      line-height: 1.3;
+    }
+
+    .attempts-counter {
+      background: rgba(220, 38, 38, 0.1);
+      border: 1px solid #dc2626;
+      border-radius: 0.75rem;
+      padding: 1rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .attempts-text {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #dc2626;
+    }
+
+    .connection-success-message {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid #22c55e;
+      border-radius: 0.75rem;
+      padding: 2rem;
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    .success-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .success-text {
+      font-size: 1.25rem;
+      color: #22c55e;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .success-message {
+      font-size: 1rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    /* Block 3 - Trivia */
+    .trivia-progress {
+      margin-bottom: 2rem;
+    }
+
+    .trivia-progress-text {
+      text-align: center;
+      font-size: 1rem;
+      color: #94a3b8;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+
+    .trivia-progress-bar {
+      width: 100%;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+
+    .trivia-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+      transition: width 0.4s ease;
+    }
+
+    .trivia-question-card {
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      border-radius: 1rem;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .question-number {
+      font-size: 0.875rem;
+      color: #fbbf24;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .question-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      line-height: 1.6;
+    }
+
+    .question-context {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-top: 0.75rem;
+      font-style: italic;
+    }
+
+    .trivia-options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .trivia-option {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(148, 163, 184, 0.3);
+      border-radius: 0.75rem;
+      padding: 1.25rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .trivia-option:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateX(4px);
+    }
+
+    .trivia-option.selected {
+      background: rgba(251, 191, 36, 0.15);
+      border-color: #fbbf24;
+    }
+
+    .trivia-option.correct {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: #22c55e;
+    }
+
+    .trivia-option.incorrect {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: #ef4444;
+    }
+
+    .trivia-option.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .option-letter {
+      width: 40px;
+      height: 40px;
+      background: rgba(251, 191, 36, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.125rem;
+      color: #fbbf24;
+      flex-shrink: 0;
+    }
+
+    .trivia-option.correct .option-letter {
+      background: rgba(34, 197, 94, 0.3);
+      color: #22c55e;
+    }
+
+    .trivia-option.incorrect .option-letter {
+      background: rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+
+    .option-answer {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      flex-grow: 1;
+    }
+
+    .trivia-feedback {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 0.75rem;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .trivia-feedback.correct {
+      background: rgba(34, 197, 94, 0.1);
+      border-color: #22c55e;
+    }
+
+    .trivia-feedback.incorrect {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: #ef4444;
+    }
+
+    .feedback-emoji {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .feedback-message {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    /* Final Screen */
+    .final-results {
+      text-align: center;
+      padding: 2rem 0;
+    }
+
+    .final-icon {
+      font-size: 5rem;
+      margin-bottom: 1rem;
+    }
+
+    .final-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fbbf24;
+      margin-bottom: 2rem;
+    }
+
+    .final-score-card {
+      background: rgba(251, 191, 36, 0.1);
+      border: 2px solid rgba(251, 191, 36, 0.3);
+      border-radius: 1.5rem;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .score-label {
+      font-size: 1rem;
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .score-value {
+      font-size: 4rem;
+      font-weight: 900;
+      color: #fbbf24;
+      margin-bottom: 1rem;
+      line-height: 1;
+    }
+
+    .score-rank {
+      font-size: 1.5rem;
+      font-weight: 700;
+      padding: 0.75rem 1.5rem;
+      border-radius: 2rem;
+      display: inline-block;
+    }
+
+    .score-rank.gold {
+      background: rgba(251, 191, 36, 0.2);
+      color: #fbbf24;
+    }
+
+    .score-rank.silver {
+      background: rgba(148, 163, 184, 0.2);
+      color: #cbd5e1;
+    }
+
+    .score-rank.bronze {
+      background: rgba(245, 158, 11, 0.2);
+      color: #f59e0b;
+    }
+
+    .score-rank.basic {
+      background: rgba(148, 163, 184, 0.1);
+      color: #94a3b8;
+    }
+
+    .final-message {
+      font-size: 1.125rem;
+      line-height: 1.8;
+      color: #cbd5e1;
+      margin-bottom: 2.5rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .final-tagline {
+      color: #fbbf24;
+      font-size: 1.25rem;
+      margin-top: 1rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 0.75rem;
+      padding: 1rem;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fbbf24;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      margin-top: 0.25rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .game-title {
+        font-size: 2rem;
+      }
+
+      .game-subtitle {
+        font-size: 1rem;
+      }
+
+      .content-area {
+        padding: 1.5rem;
+      }
+
+      .progress-steps {
+        flex-direction: column;
+      }
+
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .connections-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .timer-value {
+        font-size: 2rem;
+      }
+
+      .final-icon {
+        font-size: 3.5rem;
+      }
+
+      .score-value {
+        font-size: 3rem;
+      }
+    }
+
+    /* Hidden */
+    .hidden {
+      display: none;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ <style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+  .mt-30 { margin-top: 30px !important; }
+  @media (max-width: 768px) {
+    .container,
+    .game-container,
+    .game-card,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .section,
+    .phase,
+    .phase-screen,
+    .final-screen,
+    .final-results,
+    .modal-content {
+      padding: 16px !important;
+    }
+    h1, .main-title, .game-title {
+      font-size: clamp(1.8rem, 7vw, 2.2rem) !important;
+      line-height: 1.15 !important;
+    }
+    h2, .phase-title, .stage-title {
+      font-size: clamp(1.3rem, 6vw, 1.6rem) !important;
+      line-height: 1.25 !important;
+    }
+    p, .instruction, .phase-instruction, .stage-subtitle, .game-subtitle {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+    .button-group, .final-buttons, .action-buttons {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+    .btn, .btn-primary, .btn-secondary, .btn-main {
+      width: 100% !important;
+    }
+  }
+</style>
+<style>
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+    .header h1, .main-title, .game-title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+    .header p, .game-subtitle, .phase-subtitle, .instruction, .stage-subtitle,
+    .game-objective, .phase-instruction, .phase-header p, .stage-intro {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+    .container, .game-container, .app-container, .main-wrapper {
+      padding: 1rem !important;
+    }
+    .phase-screen, .game-card, .stage-wrapper, .content-area {
+      padding: 1.25rem !important;
+      border-radius: 18px !important;
+    }
+    .progress-indicator, .progress-steps {
+      flex-wrap: wrap !important;
+      gap: 0.5rem !important;
+    }
+    .progress-dot {
+      width: 12px !important;
+      height: 12px !important;
+    }
+    .progress-step {
+      min-width: 90px;
+    }
+    .player-icon {
+      font-size: clamp(3.5rem, 18vw, 6rem) !important;
+    }
+    .breathing-animation {
+      width: 180px !important;
+      height: 180px !important;
+      font-size: 1.5rem !important;
+    }
+    .breath-circle {
+      width: 48px !important;
+      height: 48px !important;
+      font-size: 1.1rem !important;
+    }
+    .action-button, .action-btn, .option-card, .bubble, .ritual-item,
+    .viz-option, .action-card, .tool-card, .emotion-card, .thought-card,
+    .question-card, .card-item {
+      width: 100% !important;
+    }
+    .balloons-container, .thought-bubbles, .ritual-items, .visualization-options,
+    .actions-grid, .tools-grid, .emotions-grid, .completion-stats,
+    .rhythm-choice, .content-grid, .options-grid, .choices-grid, .cards-grid,
+    .module-grid, .steps-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .transformation-area {
+      flex-direction: column !important;
+      gap: 1rem !important;
+    }
+    .emoji-header {
+      font-size: clamp(3rem, 16vw, 4.5rem) !important;
+    }
+    .action-emoji, .emotion-icon, .ritual-icon {
+      font-size: clamp(2.5rem, 14vw, 3.5rem) !important;
+    }
+    .timer-value {
+      font-size: clamp(1.8rem, 9vw, 2.4rem) !important;
+    }
+    .breathing-bar {
+      height: 28px !important;
+    }
+    .character {
+      width: 90px !important;
+      height: 90px !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    config: {}
+  };
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+</head>
+ <body>
+  <div class="game-container"><!-- Header -->
+   <header class="game-header">
+    <h1 class="game-title" id="gameTitle">    🔥 EL CIRCUITO MENTAL AC</h1>
+    <p class="game-subtitle" id="gameSubtitle">Tu examen práctico para dominar la mente de un competidor</p>
+    <div class="elite-badge">
+     🎯 NIVEL INTERMEDIO
+    </div>
+   </header><!-- Progress Bar -->
+   <div class="progress-container" id="progressContainer" style="display: none;">
+    <div class="progress-steps">
+     <div class="progress-step" id="step1">
+      <div class="step-number">
+       1
+      </div>
+      <div class="step-label">
+       Práctica Élite
+      </div>
+     </div>
+     <div class="progress-step" id="step2">
+      <div class="step-number">
+       2
+      </div>
+      <div class="step-label">
+       Conexión Pro
+      </div>
+     </div>
+     <div class="progress-step" id="step3">
+      <div class="step-number">
+       3
+      </div>
+      <div class="step-label">
+       Trivia Extrema
+      </div>
+     </div>
+    </div>
+   </div><!-- Content Area -->
+   <div class="content-area" id="contentArea"><!-- Welcome Screen -->
+    <div id="welcomeScreen">
+     <div class="welcome-screen">
+      <h2 class="welcome-title">Bienvenido al Circuito Mental Intermedio</h2>
+      <div class="challenge-warning">
+       <div class="warning-icon">
+        ⚡
+       </div>
+       <div class="warning-title">
+        NIVEL INTERMEDIO - DESAFÍO REAL
+       </div>
+       <div class="warning-text">
+        Este circuito pondrá a prueba tu conocimiento práctico.<br>
+         ⏱️ 2 minutos por escenario<br>
+         🧠 8 conexiones entre herramientas y funciones<br>
+         📚 10 preguntas clave sobre psicología deportiva<br>
+         🎯 Aprenderás aplicando las herramientas mentales
+       </div>
+      </div>
+      <p class="welcome-description">Conoces las herramientas básicas, ahora es momento de entender CÓMO y CUÁNDO usarlas. Este circuito te enseñará a aplicarlas en situaciones reales de presión y a comprender por qué funcionan.</p>
+      <div class="skills-grid">
+       <div class="skill-card">
+        <div class="skill-icon">
+         🫁
+        </div>
+        <div class="skill-name">
+         Control Autonómico
+        </div>
+       </div>
+       <div class="skill-card">
+        <div class="skill-icon">
+         💬
+        </div>
+        <div class="skill-name">
+         Autohabla Estratégica
+        </div>
+       </div>
+       <div class="skill-card">
+        <div class="skill-icon">
+         🎯
+        </div>
+        <div class="skill-name">
+         Regulación Emocional
+        </div>
+       </div>
+       <div class="skill-card">
+        <div class="skill-icon">
+         🔄
+        </div>
+        <div class="skill-name">
+         Reset Neurológico
+        </div>
+       </div>
+       <div class="skill-card">
+        <div class="skill-icon">
+         🧠
+        </div>
+        <div class="skill-name">
+         Arquitectura Mental
+        </div>
+       </div>
+       <div class="skill-card">
+        <div class="skill-icon">
+         ⚡
+        </div>
+        <div class="skill-name">
+         Zona Óptima
+        </div>
+       </div>
+      </div><button class="btn btn-primary" id="startGameBtn">Comenzar Circuito Intermedio</button>
+     </div>
+    </div><!-- Block 1: Elite Scenarios -->
+    <div id="block1Screen" class="hidden">
+     <div class="block-header">
+      <h2 class="block-title" id="block1Title">🟥 BLOQUE 1 — APLICACIÓN PRÁCTICA</h2>
+      <p class="block-description">4 situaciones reales de presión. Tienes 2 minutos para elegir la mejor herramienta mental.</p>
+     </div><!-- Timer -->
+     <div class="timer-container" id="timerContainer">
+      <div class="timer-label">
+       Tiempo Restante
+      </div>
+      <div class="timer-value" id="timerValue">
+       01:30
+      </div>
+     </div><!-- Scenarios will be injected here -->
+     <div id="scenariosContainer"></div>
+    </div><!-- Block 2: Elite Connections -->
+    <div id="block2Screen" class="hidden">
+     <div class="block-header">
+      <h2 class="block-title" id="block2Title">🟩 BLOQUE 2 — CONECTA HERRAMIENTAS Y FUNCIONES</h2>
+      <p class="block-description">8 conexiones entre herramientas mentales y para qué sirven. Máximo 12 intentos.</p>
+     </div>
+     <div class="attempts-counter" id="attemptsCounter">
+      <div class="attempts-text">
+       Intentos disponibles: <span id="attemptsValue">12</span>/12
+      </div>
+     </div>
+     <div id="connectionsContainer">
+      <div class="connections-grid">
+       <div class="connections-column">
+        <h3 class="column-title">Herramientas Mentales</h3>
+        <div id="toolsColumn" class="tools-list"></div>
+       </div>
+       <div class="connections-column">
+        <h3 class="column-title">Funciones Neurológicas</h3>
+        <div id="functionsColumn" class="functions-list"></div>
+       </div>
+      </div>
+      <div id="block2Feedback" class="hidden"></div>
+      <div class="action-buttons"><button class="btn btn-primary" id="checkConnectionsBtn" disabled>Verificar Conexiones</button>
+      </div>
+     </div>
+    </div><!-- Block 3: Elite Trivia -->
+    <div id="block3Screen" class="hidden">
+     <div class="block-header">
+      <h2 class="block-title" id="block3Title">🟦 BLOQUE 3 — TRIVIA DE PSICOLOGÍA DEPORTIVA</h2>
+      <p class="block-description">10 preguntas para entender por qué funcionan las herramientas mentales.</p>
+     </div>
+     <div id="triviaContainer">
+      <div class="trivia-progress">
+       <div class="trivia-progress-text">
+        Pregunta <span id="currentQuestion">1</span> de 10
+       </div>
+       <div class="trivia-progress-bar">
+        <div class="trivia-progress-fill" id="triviaProgressFill" style="width: 10%;"></div>
+       </div>
+      </div>
+      <div id="triviaQuestionContainer"></div>
+      <div class="action-buttons"><button class="btn btn-primary" id="triviaNextBtn" disabled>Siguiente Pregunta</button>
+      </div>
+     </div>
+    </div><!-- Final Results Screen -->
+    <div id="finalScreen" class="hidden">
+     <div class="final-results">
+      <div class="final-icon">
+       🎉
+      </div>
+      <h2 class="final-title">Has completado el CIRCUITO MENTAL INTERMEDIO</h2>
+      <div class="final-score-card">
+       <div class="score-label">
+        Calificación Final
+       </div>
+       <div class="score-value" id="finalScore">
+        0/10
+       </div>
+       <div class="score-rank" id="finalRank">
+        Nivel Intermedio
+       </div>
+      </div>
+      <div class="stats-grid">
+       <div class="stat-card">
+        <div class="stat-value" id="statScenarios">
+         0/4
+        </div>
+        <div class="stat-label">
+         Escenarios
+        </div>
+       </div>
+       <div class="stat-card">
+        <div class="stat-value" id="statConnections">
+         0/8
+        </div>
+        <div class="stat-label">
+         Conexiones
+        </div>
+       </div>
+       <div class="stat-card">
+        <div class="stat-value" id="statTrivia">
+         0/10
+        </div>
+        <div class="stat-label">
+         Trivia
+        </div>
+       </div>
+       <div class="stat-card">
+        <div class="stat-value" id="statTime">
+         0:00
+        </div>
+        <div class="stat-label">
+         Tiempo Total
+        </div>
+       </div>
+      </div>
+      <div class="final-message">
+       <p>"Conecta tus herramientas.<br>
+         Úsalas bajo presión.<br>
+         Domina tu mente."</p>
+       <p class="final-tagline"><strong>Ahora sí: compites como piensas.</strong></p>
+      </div>
+      <div class="action-buttons"><button class="btn btn-primary" id="restartBtn">Repetir Circuito Intermedio</button>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    // Configuration
+    const defaultConfig = {
+      game_title: "🎮🔥 EL CIRCUITO MENTAL AC",
+      game_subtitle: "Tu examen práctico para dominar la mente de un competidor",
+      block1_title: "🟥 BLOQUE 1 — APLICACIÓN PRÁCTICA",
+      block2_title: "🟩 BLOQUE 2 — CONECTA HERRAMIENTAS Y FUNCIONES",
+      block3_title: "🟦 BLOQUE 3 — TRIVIA DE PSICOLOGÍA DEPORTIVA"
+    };
+
+    // Intermediate Scenarios - 4 scenarios with 3 options each
+    const eliteScenarios = [
+      {
+        id: 1,
+        title: "🎾 Perdiste la Ventaja en el Set",
+        description: "Ibas ganando 4-1 y ahora está 4-4. Te sientes nervioso y tu rival está confiado. ¿Qué haces antes del siguiente punto?",
+        pressure: 75,
+        timeLimit: 120,
+        options: [
+          { id: 'a', icon: '🫁', text: 'Respirar profundo (4-6 segundos) + Tu ritual habitual', correct: true, consequence: 'Te calmas y vuelves a tu zona de control' },
+          { id: 'b', icon: '💭', text: 'Pensar en cómo recuperar la ventaja + Acelerar el juego', correct: false, consequence: 'Te pones más nervioso y pierdes concentración' },
+          { id: 'c', icon: '😤', text: 'Pensar "no puedo perder este set" + Presionarte más', correct: false, consequence: 'Aumenta tu ansiedad y tensión muscular' }
+        ],
+        learning: "Cuando pierdes ventaja, tu cuerpo necesita calmarse PRIMERO. La respiración lenta activa tu modo 'calma' y el ritual te ayuda a volver al presente."
+      },
+      {
+        id: 2,
+        title: "⚡ Errores Seguidos - Te Frustras",
+        description: "Llevas 4 errores seguidos y sientes que todo te sale mal. Estás frustrado y tu rival aprovecha. ¿Qué haces?",
+        pressure: 80,
+        timeLimit: 120,
+        options: [
+          { id: 'a', icon: '🔄', text: 'Parar, respirar profundo, cambiar postura (hombros atrás)', correct: true, consequence: 'Rompes el ciclo de errores y reseteas tu mente' },
+          { id: 'b', icon: '💪', text: 'Intentar un golpe ganador para recuperar confianza', correct: false, consequence: 'Más presión = más probabilidad de error' },
+          { id: 'c', icon: '🎭', text: 'Fingir que no te molesta y seguir igual', correct: false, consequence: 'La frustración sigue ahí y te distrae' }
+        ],
+        learning: "Los errores seguidos crean un ciclo negativo. Necesitas PARAR ese ciclo con respiración y cambiar tu postura física para cambiar tu estado mental."
+      },
+      {
+        id: 3,
+        title: "🏆 Punto Importante - Mucha Presión",
+        description: "Es 5-5 en el tie-break, tu turno de sacar. Sientes que este punto es súper importante y tus manos sudan. ¿Qué haces?",
+        pressure: 85,
+        timeLimit: 120,
+        options: [
+          { id: 'a', icon: '🎯', text: 'Tu ritual + Respirar + Pensar SOLO en tu movimiento', correct: true, consequence: 'Te enfocas en hacer, no en el resultado' },
+          { id: 'b', icon: '🏆', text: 'Pensar "si gano este punto, gano el tie-break"', correct: false, consequence: 'Pensar en ganar te pone más nervioso' },
+          { id: 'c', icon: '😶', text: 'Intentar no sentir nada y sacar rápido', correct: false, consequence: 'Bloquear emociones te hace jugar tenso' }
+        ],
+        learning: "En puntos de presión, NO pienses en ganar o perder. Enfócate solo en TU MOVIMIENTO (proceso). El ritual te mantiene en el presente."
+      },
+      {
+        id: 4,
+        title: "😤 Mala Decisión del Árbitro",
+        description: "El árbitro canta una pelota que para ti fue out como buena. Te sientes enojado porque era un punto importante. ¿Qué haces?",
+        pressure: 70,
+        timeLimit: 120,
+        options: [
+          { id: 'a', icon: '🧠', text: 'Aceptar la decisión + Respirar + Enfocarte en el siguiente punto', correct: true, consequence: 'Guardas energía mental para seguir jugando' },
+          { id: 'b', icon: '😡', text: 'Discutir con el árbitro e insistir en que te equivocaste', correct: false, consequence: 'Gastas energía y sigues enojado varios puntos' },
+          { id: 'c', icon: '😔', text: 'Pensar "siempre me pasa lo mismo" y resignarte', correct: false, consequence: 'Te pones en modo víctima y bajas tu nivel' }
+        ],
+        learning: "No puedes controlar las decisiones del árbitro. Aceptar rápido (aunque no estés de acuerdo) te permite seguir con energía. Discutir te roba concentración."
+      }
+    ];
+
+    // Intermediate Connections - 8 core connections
+    const connectionsData = [
+      { id: 'respiracion', icon: '🫁', tool: 'Respiración profunda', function: 'Te calma cuando estás nervioso' },
+      { id: 'frase', icon: '💬', tool: 'Palabra clave ("Vamos", "Calma")', function: 'Te enfoca en el presente' },
+      { id: 'lenguaje', icon: '💪', tool: 'Postura confiada', function: 'Te hace sentir más seguro' },
+      { id: 'ritual', icon: '🔄', tool: 'Ritual entre puntos', function: 'Resetea tu mente y te da control' },
+      { id: 'control', icon: '🎯', tool: 'Control emocional', function: 'Mantiene tus emociones en zona útil' },
+      { id: 'visualizacion', icon: '👁️', tool: 'Visualización positiva', function: 'Prepara tu cuerpo para ejecutar' },
+      { id: 'enfoque', icon: '🔍', tool: 'Enfoque en proceso', function: 'Elimina distracciones y pensamientos negativos' },
+      { id: 'autohabla', icon: '🗣️', tool: 'Autohabla positiva', function: 'Te guía sin criticarte' }
+    ];
+
+    // Intermediate Trivia - 10 accessible questions
+    const triviaQuestions = [
+      {
+        question: '¿Por qué funciona la respiración profunda cuando estás nervioso?',
+        context: 'Cómo funciona tu sistema nervioso',
+        options: ['Activa tu modo "calma" y reduce la frecuencia cardíaca', 'Te hace pensar en otra cosa', 'Te da más oxígeno para jugar mejor'],
+        correct: 0,
+        explanation: 'La respiración lenta (especialmente exhalar largo) activa tu sistema nervioso "calmante" que reduce tu ritmo cardíaco y ansiedad.'
+      },
+      {
+        question: '¿Qué pasa cuando adoptas una postura confiada (pecho abierto, hombros atrás)?',
+        context: 'Tu cuerpo cambia tu mente',
+        options: ['Tu cerebro produce hormonas que te hacen sentir más seguro', 'Solo te ves mejor', 'Es solo psicológico'],
+        correct: 0,
+        explanation: 'Tu postura física realmente cambia tu química cerebral. Una postura confiada aumenta hormonas de confianza y reduce las de estrés.'
+      },
+      {
+        question: '¿Por qué los rituales (como el de Nadal) ayudan bajo presión?',
+        context: 'El poder de las rutinas',
+        options: ['Te dan sensación de control y resetean tu mente', 'Son solo superstición', 'Te hacen ver profesional'],
+        correct: 0,
+        explanation: 'Los rituales crean un patrón automático que tu cerebro puede seguir fácilmente bajo presión, dándote control y calmándote.'
+      },
+      {
+        question: '¿Qué tipo de visualización funciona mejor antes de un punto importante?',
+        context: 'Cómo usar la visualización',
+        options: ['Verte a ti mismo ejecutando el movimiento desde tu perspectiva', 'Ver videos de profesionales', 'Visualizar que ganas el partido'],
+        correct: 0,
+        explanation: 'Visualizarte desde TU perspectiva (primera persona) y sentir el movimiento prepara tu cerebro y músculos como si ya lo estuvieras haciendo.'
+      },
+      {
+        question: '¿Qué es mejor decirte bajo presión?',
+        context: 'El poder del autohabla',
+        options: ['"Mira la pelota" (instrucción clara)', '"Voy a ganar" (motivación)', '"No falles" (evitar errores)'],
+        correct: 0,
+        explanation: 'Las instrucciones claras ("mira la pelota") te guían en QUÉ hacer, mientras que motivarte o pensar en no fallar te pone más nervioso.'
+      },
+      {
+        question: '¿Por qué es mejor pensar "punto a punto"?',
+        context: 'Mantener el enfoque en el presente',
+        options: ['Tu cerebro puede concentrarse solo en una cosa a la vez', 'Suena bien', 'Es lo que dicen los entrenadores'],
+        correct: 0,
+        explanation: 'Tu cerebro funciona mejor cuando se enfoca en UNA tarea presente. Pensar en el marcador o el futuro te distrae y te pone nervioso.'
+      },
+      {
+        question: '¿Qué pasa cuando tu postura está encorvada (hombros caídos, cabeza baja)?',
+        context: 'Tu cuerpo afecta tu confianza',
+        options: ['Tu cuerpo produce más hormonas de estrés', 'No pasa nada importante', 'Solo te duele la espalda'],
+        correct: 0,
+        explanation: 'Una postura encorvada le dice a tu cerebro que estás en peligro o derrotado, produciendo más hormonas de estrés y menos de confianza.'
+      },
+      {
+        question: 'Cuando crees "voy a perder", ¿qué sucede en tu juego?',
+        context: 'Profecías autocumplidas',
+        options: ['Tu atención busca confirmar esa creencia y juegas peor', 'Nada, son solo pensamientos', 'Te motivas para demostrar lo contrario'],
+        correct: 0,
+        explanation: 'Tu cerebro busca evidencia de lo que crees. Si crees que vas a perder, tu atención se fija en errores y confirma esa idea, afectando tu juego.'
+      },
+      {
+        question: '¿Cuál es la diferencia entre estar "activado" y estar "ansioso"?',
+        context: 'Energía útil vs energía que te bloquea',
+        options: ['Activado = energía positiva | Ansioso = energía + miedo', 'Son exactamente lo mismo', 'Ansioso es más intenso'],
+        correct: 0,
+        explanation: 'Ambos aumentan tu energía, pero la ansiedad añade interpretación NEGATIVA (miedo, amenaza) que te bloquea. La activación es energía sin miedo.'
+      },
+      {
+        question: '¿Por qué fallas en puntos importantes aunque sepas hacer el golpe?',
+        context: 'Presión y automatismos',
+        options: ['Tu mente consciente interfiere con movimientos automáticos', 'No practicaste suficiente', 'Mala suerte'],
+        correct: 0,
+        explanation: 'Bajo presión extrema, tu mente consciente intenta "ayudar" controlando movimientos que ya eran automáticos, y eso los bloquea.'
+      }
+    ];
+
+    // Game State
+    let gameState = {
+      currentBlock: 0,
+      currentScenario: 0,
+      scenarioResults: [],
+      block1Score: 0,
+      connectionsCorrect: 0,
+      connectionAttempts: 0,
+      maxAttempts: 12,
+      triviaScore: 0,
+      triviaAnswers: [],
+      startTime: null,
+      endTime: null,
+      scenarioTimer: null,
+      scenarioTimeRemaining: 120
+    };
+
+    let draggedItem = null;
+    let connections = {};
+
+    // Data Handler
+    const dataHandler = {
+      onDataChanged(data) {
+        console.log('Data updated:', data);
+      }
+    };
+
+    // Initialize SDKs
+    async function initializeApp() {
+      const dataResult = await window.dataSdk.init(dataHandler);
+      if (!dataResult.isOk) {
+        console.error('Failed to initialize Data SDK');
+      }
+
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange: async (config) => {
+            document.getElementById('gameTitle').textContent = config.game_title || defaultConfig.game_title;
+            document.getElementById('gameSubtitle').textContent = config.game_subtitle || defaultConfig.game_subtitle;
+            document.getElementById('block1Title').textContent = config.block1_title || defaultConfig.block1_title;
+            document.getElementById('block2Title').textContent = config.block2_title || defaultConfig.block2_title;
+            document.getElementById('block3Title').textContent = config.block3_title || defaultConfig.block3_title;
+          },
+          mapToCapabilities: (config) => ({
+            recolorables: [],
+            borderables: [],
+            fontEditable: undefined,
+            fontSizeable: undefined
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ['game_title', config.game_title || defaultConfig.game_title],
+            ['game_subtitle', config.game_subtitle || defaultConfig.game_subtitle],
+            ['block1_title', config.block1_title || defaultConfig.block1_title],
+            ['block2_title', config.block2_title || defaultConfig.block2_title],
+            ['block3_title', config.block3_title || defaultConfig.block3_title]
+          ])
+        });
+      }
+    }
+
+    // Start Game
+    document.getElementById('startGameBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      gameState.currentBlock = 1;
+      gameState.startTime = Date.now();
+      document.getElementById('welcomeScreen').classList.add('hidden');
+      document.getElementById('block1Screen').classList.remove('hidden');
+      document.getElementById('progressContainer').style.display = 'block';
+      updateProgress();
+      loadScenario(0);
+      acScrollToElement('block1Screen');
+    });
+
+    // Load Scenario
+    function loadScenario(index) {
+      if (index >= eliteScenarios.length) {
+        loadBlock2();
+        return;
+      }
+
+      gameState.currentScenario = index;
+      gameState.scenarioTimeRemaining = eliteScenarios[index].timeLimit;
+      
+      const scenario = eliteScenarios[index];
+      const container = document.getElementById('scenariosContainer');
+      
+      container.innerHTML = `
+        <div class="scenario-container">
+          <div class="scenario-header">
+            <h3 class="scenario-title">${scenario.title}</h3>
+            <p class="scenario-description">${scenario.description}</p>
+            <div class="pressure-indicator">
+              <span>Presión: ${scenario.pressure}%</span>
+              <div class="pressure-bar">
+                <div class="pressure-fill" style="width: ${scenario.pressure}%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="court-visual">
+            <div class="court-lines">
+              <div class="center-line"></div>
+            </div>
+            <div class="player-icon">${getPressureIcon(scenario.pressure)}</div>
+          </div>
+
+          <div class="selection-counter">Selecciona la mejor secuencia de acciones</div>
+
+          <div class="options-grid" id="scenarioOptions">
+            ${scenario.options.map(option => `
+              <div class="option-card" data-option="${option.id}" data-correct="${option.correct}">
+                <div class="option-icon">${option.icon}</div>
+                <div class="option-text">${option.text}</div>
+                <div class="option-consequence">${option.consequence}</div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div id="scenarioFeedback" class="hidden"></div>
+
+          <div class="action-buttons">
+            <button class="btn btn-primary" id="continueScenarioBtn" style="display: none;">Continuar al Siguiente</button>
+          </div>
+        </div>
+      `;
+
+      // Start timer
+      startScenarioTimer();
+
+      // Add click handlers
+      const optionsGrid = document.getElementById('scenarioOptions');
+      optionsGrid.addEventListener('click', handleScenarioAnswer);
+      acScrollToElement('block1Screen');
+    }
+
+    function getPressureIcon(pressure) {
+      if (pressure >= 95) return '💥';
+      if (pressure >= 90) return '⚡';
+      if (pressure >= 80) return '🔥';
+      return '🎾';
+    }
+
+    function startScenarioTimer() {
+      clearInterval(gameState.scenarioTimer);
+      
+      const timerValue = document.getElementById('timerValue');
+      
+      gameState.scenarioTimer = setInterval(() => {
+        gameState.scenarioTimeRemaining--;
+        
+        const minutes = Math.floor(gameState.scenarioTimeRemaining / 60);
+        const seconds = gameState.scenarioTimeRemaining % 60;
+        timerValue.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (gameState.scenarioTimeRemaining <= 30) {
+          timerValue.classList.add('warning');
+        }
+        
+        if (gameState.scenarioTimeRemaining <= 0) {
+          clearInterval(gameState.scenarioTimer);
+          handleTimeout();
+        }
+      }, 1000);
+    }
+
+    function handleTimeout() {
+      const optionsGrid = document.getElementById('scenarioOptions');
+      const allCards = optionsGrid.querySelectorAll('.option-card');
+      
+      allCards.forEach(card => {
+        card.classList.add('disabled');
+        if (card.dataset.correct === 'true') {
+          card.classList.add('correct');
+        }
+      });
+
+      showScenarioFeedback(false, true);
+    }
+
+    function handleScenarioAnswer(e) {
+      const card = e.target.closest('.option-card');
+      if (!card || card.classList.contains('disabled')) return;
+
+      clearInterval(gameState.scenarioTimer);
+
+      const isCorrect = card.dataset.correct === 'true';
+      const scenario = eliteScenarios[gameState.currentScenario];
+
+      const allCards = document.querySelectorAll('.option-card');
+      allCards.forEach(c => {
+        c.classList.add('disabled');
+        if (c.dataset.correct === 'true') {
+          c.classList.add('correct');
+        } else if (c === card) {
+          c.classList.add('incorrect');
+        }
+      });
+
+      gameState.scenarioResults.push(isCorrect);
+      if (isCorrect) gameState.block1Score++;
+
+      showScenarioFeedback(isCorrect, false);
+    }
+
+    function showScenarioFeedback(isCorrect, timeout) {
+      const scenario = eliteScenarios[gameState.currentScenario];
+      const feedbackDiv = document.getElementById('scenarioFeedback');
+      feedbackDiv.classList.remove('hidden');
+
+      if (timeout) {
+        feedbackDiv.innerHTML = `
+          <div class="feedback-box error">
+            <div class="feedback-icon">⏱️</div>
+            <div class="feedback-title">Tiempo Agotado</div>
+            <div class="feedback-text">
+              En situaciones de presión real, la velocidad de decisión es crítica. 
+              La respuesta correcta requería: <strong>${scenario.options.find(o => o.correct).text}</strong>
+            </div>
+            <div class="learning-point">
+              <span class="learning-icon">💡</span>
+              <span class="learning-text">${scenario.learning}</span>
+            </div>
+          </div>
+        `;
+      } else if (isCorrect) {
+        feedbackDiv.innerHTML = `
+          <div class="feedback-box success">
+            <div class="feedback-icon">✅</div>
+            <div class="feedback-title">Decisión Correcta - Nivel Élite</div>
+            <div class="feedback-text">
+              Bajo presión extrema, ejecutaste la secuencia óptima. Entiendes la arquitectura mental necesaria para el alto rendimiento.
+            </div>
+            <div class="learning-point">
+              <span class="learning-icon">🧠</span>
+              <span class="learning-text">${scenario.learning}</span>
+            </div>
+          </div>
+        `;
+      } else {
+        feedbackDiv.innerHTML = `
+          <div class="feedback-box error">
+            <div class="feedback-icon">❌</div>
+            <div class="feedback-title">Decisión Subóptima</div>
+            <div class="feedback-text">
+              La secuencia correcta era: <strong>${scenario.options.find(o => o.correct).text}</strong><br>
+              ${scenario.options.find(o => o.correct).consequence}
+            </div>
+            <div class="learning-point">
+              <span class="learning-icon">🧠</span>
+              <span class="learning-text">${scenario.learning}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      const continueBtn = document.getElementById('continueScenarioBtn');
+      continueBtn.style.display = 'block';
+      continueBtn.onclick = function(e) {
+        e.preventDefault();
+        loadScenario(gameState.currentScenario + 1);
+      };
+    }
+
+    // Block 2: Elite Connections
+    function loadBlock2() {
+      clearInterval(gameState.scenarioTimer);
+      document.getElementById('block1Screen').classList.add('hidden');
+      document.getElementById('block2Screen').classList.remove('hidden');
+      document.getElementById('timerContainer').style.display = 'none';
+      gameState.currentBlock = 2;
+      gameState.connectionAttempts = 0;
+      updateProgress();
+      renderConnections();
+      acScrollToElement('block2Screen');
+    }
+
+    function renderConnections() {
+      const toolsColumn = document.getElementById('toolsColumn');
+      const functionsColumn = document.getElementById('functionsColumn');
+      
+      toolsColumn.innerHTML = '';
+      functionsColumn.innerHTML = '';
+      
+      const shuffledTools = [...connectionsData].sort(() => Math.random() - 0.5);
+      
+      shuffledTools.forEach(item => {
+        const toolDiv = document.createElement('div');
+        toolDiv.className = 'tool-item';
+        toolDiv.draggable = true;
+        toolDiv.dataset.id = item.id;
+        toolDiv.innerHTML = `
+          <div class="item-icon">${item.icon}</div>
+          <div class="item-text">${item.tool}</div>
+        `;
+        
+        toolDiv.addEventListener('dragstart', handleDragStart);
+        toolDiv.addEventListener('dragend', handleDragEnd);
+        
+        toolsColumn.appendChild(toolDiv);
+      });
+      
+      const shuffledFunctions = [...connectionsData].sort(() => Math.random() - 0.5);
+      
+      shuffledFunctions.forEach(item => {
+        const functionDiv = document.createElement('div');
+        functionDiv.className = 'function-item drop-zone';
+        functionDiv.dataset.id = item.id;
+        functionDiv.innerHTML = `
+          <div class="item-text">${item.function}</div>
+        `;
+        
+        functionDiv.addEventListener('dragover', handleDragOver);
+        functionDiv.addEventListener('drop', handleDrop);
+        functionDiv.addEventListener('dragleave', handleDragLeave);
+        
+        functionsColumn.appendChild(functionDiv);
+      });
+    }
+
+    function handleDragStart(e) {
+      draggedItem = this;
+      this.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragEnd(e) {
+      this.classList.remove('dragging');
+    }
+
+    function handleDragOver(e) {
+      if (e.preventDefault) {
+        e.preventDefault();
+      }
+      e.dataTransfer.dropEffect = 'move';
+      this.classList.add('drag-over');
+      return false;
+    }
+
+    function handleDragLeave(e) {
+      this.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+      if (e.stopPropagation) {
+        e.stopPropagation();
+      }
+      
+      this.classList.remove('drag-over');
+      
+      if (draggedItem && gameState.connectionAttempts < gameState.maxAttempts) {
+        const toolId = draggedItem.dataset.id;
+        const functionId = this.dataset.id;
+        
+        gameState.connectionAttempts++;
+        document.getElementById('attemptsValue').textContent = `${gameState.maxAttempts - gameState.connectionAttempts}`;
+        
+        Object.keys(connections).forEach(key => {
+          if (connections[key] === functionId) {
+            const prevTool = document.querySelector(`.tool-item[data-id="${key}"]`);
+            if (prevTool) {
+              prevTool.classList.remove('matched');
+              prevTool.draggable = true;
+            }
+            delete connections[key];
+          }
+        });
+        
+        connections[toolId] = functionId;
+        
+        this.innerHTML = draggedItem.innerHTML;
+        this.classList.remove('drop-zone');
+        
+        if (toolId === functionId) {
+          draggedItem.classList.add('matched');
+          this.classList.add('matched');
+          draggedItem.draggable = false;
+        } else {
+          draggedItem.classList.add('incorrect');
+          setTimeout(() => {
+            draggedItem.classList.remove('incorrect');
+          }, 500);
+        }
+        
+        if (Object.keys(connections).length === connectionsData.length) {
+          document.getElementById('checkConnectionsBtn').disabled = false;
+        }
+        
+        if (gameState.connectionAttempts >= gameState.maxAttempts) {
+          document.getElementById('checkConnectionsBtn').disabled = false;
+        }
+      }
+      
+      return false;
+    }
+
+    document.getElementById('checkConnectionsBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      let correctCount = 0;
+      
+      Object.keys(connections).forEach(toolId => {
+        const functionId = connections[toolId];
+        const toolElement = document.querySelector(`.tool-item[data-id="${toolId}"]`);
+        const functionElement = document.querySelector(`.function-item[data-id="${functionId}"]`);
+        
+        if (toolId === functionId) {
+          correctCount++;
+          if (toolElement) toolElement.classList.add('matched');
+          if (functionElement) functionElement.classList.add('matched');
+        } else {
+          if (toolElement) toolElement.classList.add('incorrect');
+          if (functionElement) functionElement.classList.add('incorrect');
+        }
+      });
+      
+      gameState.connectionsCorrect = correctCount;
+      
+      const feedbackDiv = document.getElementById('block2Feedback');
+      feedbackDiv.classList.remove('hidden');
+      
+      if (correctCount === 8) {
+        feedbackDiv.innerHTML = `
+          <div class="connection-success-message">
+            <div class="success-icon">🏆</div>
+            <div class="success-text">¡Conexiones Perfectas - Excelente Comprensión!</div>
+            <div class="success-message">
+              Has demostrado que entiendes muy bien las herramientas mentales. 
+              Sabes para qué sirve cada una y cómo aplicarlas.
+            </div>
+          </div>
+        `;
+      } else if (correctCount >= 6) {
+        feedbackDiv.innerHTML = `
+          <div class="connection-success-message">
+            <div class="success-icon">💎</div>
+            <div class="success-text">Conexiones: ${correctCount}/8 - Buen Nivel</div>
+            <div class="success-message">
+              Dominas la mayoría de las conexiones. 
+              Con más práctica mejorarás tu comprensión.
+            </div>
+          </div>
+        `;
+      } else {
+        feedbackDiv.innerHTML = `
+          <div class="connection-success-message">
+            <div class="success-icon">📚</div>
+            <div class="success-text">Conexiones: ${correctCount}/8</div>
+            <div class="success-message">
+              Necesitas repasar cómo funcionan las herramientas mentales. 
+              Entender para qué sirve cada una te ayudará a usarlas mejor.
+            </div>
+          </div>
+        `;
+      }
+      
+      this.textContent = 'Continuar a Trivia';
+      this.onclick = function(e) {
+        e.preventDefault();
+        loadBlock3();
+      };
+    });
+
+    // Block 3: Elite Trivia
+    let currentTriviaQuestion = 0;
+
+    function loadBlock3() {
+      document.getElementById('block2Screen').classList.add('hidden');
+      document.getElementById('block3Screen').classList.remove('hidden');
+      gameState.currentBlock = 3;
+      updateProgress();
+      
+      currentTriviaQuestion = 0;
+      gameState.triviaAnswers = [];
+      renderTriviaQuestion();
+      acScrollToElement('block3Screen');
+    }
+
+    function renderTriviaQuestion() {
+      const questionData = triviaQuestions[currentTriviaQuestion];
+      const container = document.getElementById('triviaQuestionContainer');
+      
+      document.getElementById('currentQuestion').textContent = currentTriviaQuestion + 1;
+      const progressPercent = ((currentTriviaQuestion + 1) / triviaQuestions.length) * 100;
+      document.getElementById('triviaProgressFill').style.width = progressPercent + '%';
+      
+      const letters = ['A', 'B', 'C'];
+      
+      container.innerHTML = `
+        <div class="trivia-question-card">
+          <div class="question-number">Pregunta ${currentTriviaQuestion + 1} de 10</div>
+          <div class="question-text">${questionData.question}</div>
+          <div class="question-context">Contexto: ${questionData.context}</div>
+        </div>
+        
+        <div class="trivia-options" id="triviaOptions">
+          ${questionData.options.map((option, index) => `
+            <div class="trivia-option" data-index="${index}">
+              <div class="option-letter">${letters[index]}</div>
+              <div class="option-answer">${option}</div>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div id="triviaFeedback" class="hidden"></div>
+      `;
+      
+      const optionsDiv = document.getElementById('triviaOptions');
+      optionsDiv.addEventListener('click', handleTriviaAnswer);
+      
+      document.getElementById('triviaNextBtn').disabled = true;
+      document.getElementById('triviaNextBtn').textContent = 
+        currentTriviaQuestion < triviaQuestions.length - 1 ? 'Siguiente Pregunta' : 'Ver Resultados Finales';
+      acScrollToElement('block3Screen');
+    }
+
+    function handleTriviaAnswer(e) {
+      const option = e.target.closest('.trivia-option');
+      if (!option || option.classList.contains('disabled')) return;
+      
+      const selectedIndex = parseInt(option.dataset.index);
+      const questionData = triviaQuestions[currentTriviaQuestion];
+      const isCorrect = selectedIndex === questionData.correct;
+      
+      gameState.triviaAnswers.push(isCorrect);
+      
+      const allOptions = document.querySelectorAll('.trivia-option');
+      allOptions.forEach((opt, index) => {
+        opt.classList.add('disabled');
+        if (index === questionData.correct) {
+          opt.classList.add('correct');
+        } else if (index === selectedIndex && !isCorrect) {
+          opt.classList.add('incorrect');
+        }
+      });
+      
+      const feedbackDiv = document.getElementById('triviaFeedback');
+      feedbackDiv.classList.remove('hidden');
+      
+      if (isCorrect) {
+        feedbackDiv.innerHTML = `
+          <div class="trivia-feedback correct">
+            <div class="feedback-emoji">✅</div>
+            <div class="feedback-message">
+              <strong>¡Correcto!</strong><br>
+              ${questionData.explanation}
+            </div>
+          </div>
+        `;
+      } else {
+        feedbackDiv.innerHTML = `
+          <div class="trivia-feedback incorrect">
+            <div class="feedback-emoji">❌</div>
+            <div class="feedback-message">
+              <strong>Respuesta correcta:</strong> ${questionData.options[questionData.correct]}<br><br>
+              ${questionData.explanation}
+            </div>
+          </div>
+        `;
+      }
+      
+      document.getElementById('triviaNextBtn').disabled = false;
+    }
+
+    document.getElementById('triviaNextBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      currentTriviaQuestion++;
+      
+      if (currentTriviaQuestion < triviaQuestions.length) {
+        renderTriviaQuestion();
+      } else {
+        showFinalResults();
+      }
+    });
+
+    async function showFinalResults() {
+      gameState.triviaScore = gameState.triviaAnswers.filter(a => a).length;
+      gameState.endTime = Date.now();
+      
+      const totalTime = Math.floor((gameState.endTime - gameState.startTime) / 1000);
+      const minutes = Math.floor(totalTime / 60);
+      const seconds = totalTime % 60;
+      
+      document.getElementById('block3Screen').classList.add('hidden');
+      document.getElementById('finalScreen').classList.remove('hidden');
+      acScrollToElement('finalScreen');
+      
+      const score = gameState.triviaScore;
+      const scoreElement = document.getElementById('finalScore');
+      const rankElement = document.getElementById('finalRank');
+      
+      scoreElement.textContent = `${score}/10`;
+      
+      let rank = '';
+      let rankClass = '';
+      
+      if (score >= 9) {
+        rank = '🏆 Nivel Avanzado - Excelente';
+        rankClass = 'gold';
+      } else if (score >= 7) {
+        rank = '💎 Nivel Intermedio Alto';
+        rankClass = 'silver';
+      } else if (score >= 5) {
+        rank = '⚡ Nivel Intermedio';
+        rankClass = 'bronze';
+      } else {
+        rank = '📚 Nivel Básico - Sigue practicando';
+        rankClass = 'basic';
+      }
+      
+      rankElement.textContent = rank;
+      rankElement.className = `score-rank ${rankClass}`;
+      
+      // Update stats
+      document.getElementById('statScenarios').textContent = `${gameState.block1Score}/${eliteScenarios.length}`;
+      document.getElementById('statConnections').textContent = `${gameState.connectionsCorrect}/8`;
+      document.getElementById('statTrivia').textContent = `${score}/10`;
+      document.getElementById('statTime').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      
+      // Save to Data SDK
+      const result = await window.dataSdk.create({
+        player_name: 'Jugador Intermedio',
+        current_block: 3,
+        block1_completed: true,
+        block2_completed: true,
+        block3_completed: true,
+        scenario1_correct: gameState.scenarioResults[0] || false,
+        scenario2_correct: gameState.scenarioResults[1] || false,
+        scenario3_correct: gameState.scenarioResults[2] || false,
+        connections_correct: gameState.connectionsCorrect,
+        trivia_score: gameState.triviaScore,
+        trivia_completed: true,
+        total_score: gameState.triviaScore,
+        completion_date: new Date().toISOString()
+      });
+      
+      if (!result.isOk) {
+        console.error('Error saving results');
+      }
+    }
+
+    document.getElementById('restartBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      location.reload();
+    });
+
+    function updateProgress() {
+      const step1 = document.getElementById('step1');
+      const step2 = document.getElementById('step2');
+      const step3 = document.getElementById('step3');
+
+      step1.classList.remove('active', 'completed');
+      step2.classList.remove('active', 'completed');
+      step3.classList.remove('active', 'completed');
+
+      if (gameState.currentBlock === 1) {
+        step1.classList.add('active');
+      } else if (gameState.currentBlock === 2) {
+        step1.classList.add('completed');
+        step2.classList.add('active');
+      } else if (gameState.currentBlock === 3) {
+        step1.classList.add('completed');
+        step2.classList.add('completed');
+        step3.classList.add('active');
+      }
+    }
+
+    initializeApp();
+  </script>
+ <script>
+function acScrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function acScrollToElement(id, offset) {
+  var target = document.getElementById(id);
+  if (!target) {
+    acScrollToTop();
+    return;
+  }
+  var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  window.scrollTo(0, 0);
+});
+</script>
+</body>
+</html>
