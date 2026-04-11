@@ -1,0 +1,965 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reto de Saque y Contacto Alto</title>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body, #app {
+      height: 100%;
+      width: 100%;
+    }
+
+    #app {
+      background: #1a1a2e;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #ffffff;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .game-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      opacity: 0.9;
+    }
+
+    .phase-card {
+      background: #0f3460;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      border: 2px solid #16213e;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .phase-number {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      border: 1px solid rgba(16, 185, 129, 0.5);
+    }
+
+    .phase-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .quote {
+      font-size: 18px;
+      font-style: italic;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      border-left: 4px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .instruction {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .checklist {
+      margin: 20px 0;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      margin-bottom: 12px;
+      background: #16213e;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid #1a1a2e;
+    }
+
+    .check-item:hover {
+      background: #1e3a5f;
+      transform: translateX(4px);
+    }
+
+    .check-item.checked {
+      background: rgba(52, 211, 153, 0.2);
+      border: 1px solid rgba(52, 211, 153, 0.4);
+    }
+
+    .checkbox {
+      width: 24px;
+      height: 24px;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      border-radius: 4px;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .check-item.checked .checkbox {
+      background: rgba(52, 211, 153, 0.3);
+      border-color: rgba(52, 211, 153, 0.6);
+    }
+
+    .btn {
+      background: #10b981;
+      color: #ffffff;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .btn:hover {
+      background: #059669;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .options {
+      margin: 20px 0;
+    }
+
+    .option {
+      padding: 16px;
+      margin-bottom: 12px;
+      background: #16213e;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid #1a1a2e;
+    }
+
+    .option:hover {
+      background: #1e3a5f;
+      transform: translateX(4px);
+    }
+
+    .option.selected {
+      background: #10b981;
+      border-color: #059669;
+    }
+
+    .option-icon {
+      font-size: 20px;
+      margin-right: 12px;
+    }
+
+    .feedback {
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      border-left: 4px solid #fbbf24;
+    }
+
+    .feedback-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .feedback-text {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .principle {
+      margin-top: 24px;
+      padding: 16px;
+      background: rgba(251, 191, 36, 0.1);
+      border-radius: 8px;
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      font-size: 15px;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .error-list {
+      margin: 20px 0;
+    }
+
+    .error-item {
+      padding: 16px;
+      margin-bottom: 12px;
+      background: rgba(239, 68, 68, 0.1);
+      border-radius: 8px;
+      border-left: 4px solid rgba(239, 68, 68, 0.5);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .error-item:hover {
+      background: rgba(239, 68, 68, 0.15);
+      transform: translateX(4px);
+    }
+
+    .error-item.selected {
+      background: rgba(239, 68, 68, 0.2);
+    }
+
+    .correction {
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(52, 211, 153, 0.1);
+      border-radius: 8px;
+      border: 1px solid rgba(52, 211, 153, 0.3);
+    }
+
+    .correction-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #34d399;
+    }
+
+    .final-message {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 600;
+      margin: 24px 0;
+      padding: 24px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+    }
+
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 640px) {
+      #app {
+        padding: 24px 16px;
+      }
+
+      .header {
+        margin-bottom: 28px;
+      }
+
+      .game-icon {
+        font-size: 40px;
+      }
+
+      .title {
+        font-size: 28px;
+      }
+
+      .subtitle {
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      .phase-card {
+        padding: 24px;
+      }
+
+      .phase-title {
+        font-size: 20px;
+      }
+
+      .quote,
+      .instruction {
+        font-size: 15px;
+        line-height: 1.6;
+      }
+
+      .check-item,
+      .option,
+      .error-item,
+      .btn {
+        width: 100%;
+      }
+
+      .final-message {
+        font-size: 18px;
+        padding: 20px;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+
+    .container,
+    .game-container,
+    .game-wrapper,
+    .app-wrapper,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .phase-container,
+    .phase-card,
+    .content,
+    .content-area,
+    .modal-content,
+    .results-card,
+    .scene,
+    .phase-content {
+      padding: 16px !important;
+    }
+
+    h1, .main-title, .game-title, .title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+
+    h2, .phase-title, .stage-title, .final-title, .section-title {
+      font-size: clamp(1.3rem, 6vw, 1.7rem) !important;
+      line-height: 1.25 !important;
+    }
+
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label {
+      font-size: clamp(1rem, 4.5vw, 1.15rem) !important;
+      line-height: 1.4 !important;
+    }
+
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text, .intro-message, .quote {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+
+    .button-group,
+    .action-buttons,
+    .final-buttons,
+    .controls-row {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+
+    button,
+    .btn,
+    .btn-primary,
+    .btn-secondary,
+    .action-button,
+    .option-btn {
+      width: 100% !important;
+    }
+
+    .zone-grid,
+    .scenario-grid,
+    .options-grid,
+    .results-stats {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    setConfig: function () {},
+    config: {}
+  };
+
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body>
+  <div id="app">
+   <div class="container">
+    <div class="header">
+     <div class="game-icon">
+      🎮🔥
+     </div>
+     <h1 class="title" id="gameTitle">Reto de Saque y Contacto Alto</h1>
+     <p class="subtitle" id="gameSubtitle">Brazo guia arriba, contacto alto y gesto completo</p>
+    </div>
+    <div id="phase0" class="phase-card">
+     <div class="quote" id="openingQuote">
+      "La mayoría falla el saque<br>
+       no por el brazo que golpea,<br>
+       sino por el brazo que abandona."
+     </div>
+     <div style="margin: 24px 0;">
+      <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">🎯 ¿Por qué este entrenamiento?</h3>
+      <p style="line-height: 1.6; margin-bottom: 16px;">El saque es el único golpe en tenis donde TU tienes el control total. No dependes de nadie. Es tu momento para definir el ritmo del juego.</p>
+      <p style="line-height: 1.6; margin-bottom: 16px;">Pero hay un secreto que pocos dominan: <strong>el brazo que lanza la pelota es más importante que el brazo que golpea.</strong></p>
+     </div>
+     <div style="background: rgba(16, 185, 129, 0.1); padding: 20px; border-radius: 8px; margin: 24px 0; border: 1px solid rgba(16, 185, 129, 0.3);">
+      <h4 style="font-weight: 600; margin-bottom: 12px;">💡 Lo que aprenderás hoy:</h4>
+      <ul style="list-style: none; padding: 0;">
+       <li style="padding: 8px 0; padding-left: 24px; position: relative;"><span style="position: absolute; left: 0;">✓</span> Por qué el brazo no dominante controla tu saque</li>
+       <li style="padding: 8px 0; padding-left: 24px; position: relative;"><span style="position: absolute; left: 0;">✓</span> La tecnica del brazo guia arriba para un contacto mas alto</li>
+       <li style="padding: 8px 0; padding-left: 24px; position: relative;"><span style="position: absolute; left: 0;">✓</span> Cómo identificar y corregir tus errores más comunes</li>
+       <li style="padding: 8px 0; padding-left: 24px; position: relative;"><span style="position: absolute; left: 0;">✓</span> Ejercicios prácticos para tu próxima sesión</li>
+      </ul>
+     </div>
+     <div style="background: rgba(251, 191, 36, 0.1); padding: 16px; border-radius: 8px; margin: 24px 0; border-left: 4px solid rgba(251, 191, 36, 0.5);">
+      <p style="font-size: 14px; line-height: 1.6;">⏱️ <strong>Duración:</strong> 10-15 minutos de entrenamiento consciente<br>
+        🎯 <strong>Nivel:</strong> Todos los niveles (principiante a avanzado)<br>
+        📍 <strong>Enfoque:</strong> Técnica sobre potencia</p>
+     </div><button class="btn" onclick="startGame()">Comenzar Entrenamiento</button>
+    </div>
+    <div id="phase1" class="phase-card hidden">
+     <div class="phase-number">
+      FASE 1
+     </div>
+     <h2 class="phase-title" id="phase1Title">Activa la intención correcta</h2>
+     <p class="instruction">Antes de mover el cuerpo, aclara tu objetivo confirmando estas 3 ideas:</p>
+     <div class="checklist">
+      <div class="check-item" onclick="toggleCheck(this)">
+       <div class="checkbox"></div><span>Mi objetivo hoy no es potencia</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+       <div class="checkbox"></div><span>Mi objetivo es altura y control</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+       <div class="checkbox"></div><span>Voy a sentir el gesto, no forzarlo</span>
+      </div>
+     </div><button class="btn" id="phase1Btn" onclick="nextPhase(1)" disabled>Entrar al ejercicio</button>
+     <div class="principle">
+      "El saque empieza antes de golpear."
+     </div>
+    </div>
+    <div id="phase2" class="phase-card hidden">
+     <div class="phase-number">
+      FASE 2
+     </div>
+     <h2 class="phase-title" id="phase2Title">Encuentra la sensación: el brazo que guía</h2>
+     <p class="instruction">Colócate en posición de saque, sin golpear la pelota todavía.</p>
+     <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 8px; margin: 20px 0;">
+      <p style="font-weight: 600; margin-bottom: 12px;">🎯 Micro-reto 1</p>
+      <p>"Levanta el brazo con la pelota y mantenlo extendido y arriba durante 2 segundos."</p>
+     </div>
+     <p style="font-weight: 600; margin-bottom: 12px;">Autoevaluación:</p>
+     <div class="options">
+      <div class="option" onclick="selectOption(this, 'phase2', '🔥 Sentí estabilidad')"><span class="option-icon">🔥</span> <span>Sentí estabilidad</span>
+      </div>
+      <div class="option" onclick="selectOption(this, 'phase2', '🙂 Me costó mantenerlo')"><span class="option-icon">🙂</span> <span>Me costó mantenerlo</span>
+      </div>
+      <div class="option" onclick="selectOption(this, 'phase2', '😕 Se me cayó rápido')"><span class="option-icon">😕</span> <span>Se me cayó rápido</span>
+      </div>
+     </div>
+     <div id="phase2Feedback" class="feedback hidden">
+      <div class="feedback-icon">
+       💬
+      </div>
+      <div class="feedback-text" id="phase2FeedbackText"></div>
+     </div><button class="btn" id="phase2Btn" onclick="nextPhase(2)" disabled>Continuar</button>
+     <div class="principle">
+      "El brazo no dominante organiza el cuerpo entero."
+     </div>
+    </div>
+    <div id="phase3" class="phase-card hidden">
+     <div class="phase-number">
+      FASE 3
+     </div>
+     <h2 class="phase-title" id="phase3Title">Brazo guia arriba: no abandones el gesto</h2>
+     <div style="background: rgba(251,191,36,0.2); padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid rgba(251,191,36,0.4);">
+      <p style="font-weight: 700; margin-bottom: 12px; font-size: 16px;">⚡ Regla única:</p>
+      <p style="font-size: 18px; line-height: 1.5;">Lanza la pelota.<br>
+       NO bajes el brazo hasta DESPUÉS del impacto.</p>
+     </div>
+     <p style="font-weight: 600; margin-bottom: 12px;">🎯 Haz 5 intentos. ¿Qué pasó?</p>
+     <div class="options">
+      <div class="option" onclick="selectOption(this, 'phase3', '🎯 Contacté más alto')"><span class="option-icon">🎯</span> <span>Contacté más alto</span>
+      </div>
+      <div class="option" onclick="selectOption(this, 'phase3', '🔄 A veces lo baje antes')"><span class="option-icon">🔄</span> <span>A veces lo baje antes</span>
+      </div>
+      <div class="option" onclick="selectOption(this, 'phase3', '❌ Bajé el brazo de inmediato')"><span class="option-icon">❌</span> <span>Lo bajé de inmediato</span>
+      </div>
+     </div>
+     <div id="phase3Feedback" class="feedback hidden">
+      <div class="feedback-icon">
+       💬
+      </div>
+      <div class="feedback-text" id="phase3FeedbackText"></div>
+     </div><button class="btn" id="phase3Btn" onclick="nextPhase(3)" disabled>Continuar</button>
+     <div class="principle">
+      💡 Brazo arriba = cuerpo arriba
+     </div>
+    </div>
+    <div id="phase4" class="phase-card hidden">
+     <div class="phase-number">
+      FASE 4
+     </div>
+     <h2 class="phase-title" id="phase4Title">Errores típicos: ¿te reconoces?</h2>
+     <p class="instruction">👉 ¿Cuál es el error que más te pasa?</p>
+     <div class="error-list">
+      <div class="error-item" onclick="selectError(this, 'error1')">
+       <div style="font-weight: 600; margin-bottom: 4px;">
+        ❌ Lanzar la pelota y bajar el brazo rápido
+       </div>
+       <div style="font-size: 14px; opacity: 0.9;">
+        El error más común en el saque
+       </div>
+      </div>
+      <div class="error-item" onclick="selectError(this, 'error2')">
+       <div style="font-weight: 600; margin-bottom: 4px;">
+        ⚡ Apurarse por querer pegar fuerte
+       </div>
+       <div style="font-size: 14px; opacity: 0.9;">
+        Sacrificar técnica por potencia
+       </div>
+      </div>
+      <div class="error-item" onclick="selectError(this, 'error3')">
+       <div style="font-weight: 600; margin-bottom: 4px;">
+        👀 Mirar al frente en lugar de arriba
+       </div>
+       <div style="font-size: 14px; opacity: 0.9;">
+        Perder el punto de contacto óptimo
+       </div>
+      </div>
+     </div>
+     <div id="correction" class="correction hidden">
+      <div class="correction-title">
+       ✅ Corrección:
+      </div>
+      <div id="correctionText"></div>
+     </div><button class="btn" id="phase4Btn" onclick="nextPhase(4)" disabled>Continuar</button>
+     <div class="principle">
+      "El saque mejora cuando te observas."
+     </div>
+    </div>
+    <div id="phase5" class="phase-card hidden">
+     <div class="phase-number">
+      FASE 5
+     </div>
+     <h2 class="phase-title" id="phase5Title">Aplicación consciente: lleva esto a la cancha</h2>
+     <div class="quote">
+      En partido:<br>
+       no pienses en todo.<br>
+       Solo en <strong>"brazo arriba"</strong>
+     </div>
+     <div style="background: rgba(52,211,153,0.1); padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid rgba(52,211,153,0.3);">
+      <p style="font-weight: 600; margin-bottom: 12px;">👉 Próximo entrenamiento:</p>
+      <ul style="list-style: none; padding: 0;">
+       <li style="padding: 8px 0;">✓ Mismo saque</li>
+       <li style="padding: 8px 0;">✓ Misma fuerza</li>
+       <li style="padding: 8px 0;">✓ Solo brazo arriba</li>
+      </ul>
+     </div>
+     <div class="final-message">
+      La consistencia = un detalle bien hecho
+     </div>
+     <div class="action-buttons"><button class="btn" onclick="resetGame()">🔄 Repetir ejercicio</button> <button class="btn btn-secondary" onclick="showExercises()">✅ Llevar al entrenamiento</button>
+     </div>
+    </div>
+    <div id="exercisesPhase" class="phase-card hidden">
+     <div class="phase-number">
+      EJERCICIOS PARA TU PRÓXIMA SESIÓN
+     </div>
+     <h2 class="phase-title">📋 Plan de entrenamiento: Saque con contacto alto</h2>
+     <p style="margin-bottom: 24px; font-size: 16px; line-height: 1.6;">Lleva estos ejercicios a tu próxima práctica. Haz cada uno durante 5 minutos antes de pasar al siguiente.</p>
+     <div style="margin-bottom: 24px;">
+      <div style="background: #16213e; padding: 20px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #10b981;">
+       <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 12px;">🏋️ Ejercicio 1: Estabilidad del brazo guía</h3>
+       <p style="margin-bottom: 12px; line-height: 1.6;"><strong>Objetivo:</strong> Desarrollar fuerza y control en el brazo no dominante</p>
+       <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 6px;">
+        <p style="margin-bottom: 8px;"><strong>Cómo hacerlo:</strong></p>
+        <ul style="padding-left: 20px; line-height: 1.8;">
+         <li>Sostén la pelota con el brazo extendido arriba durante 10 segundos</li>
+         <li>Mantén el hombro estable, sin balanceos</li>
+         <li>Repite 10 veces, descansando 5 segundos entre cada una</li>
+         <li>Incrementa a 15 segundos cuando sea fácil</li>
+        </ul>
+       </div>
+      </div>
+      <div style="background: #16213e; padding: 20px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #10b981;">
+       <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 12px;">⏱️ Ejercicio 2: Lanzamiento en cámara lenta</h3>
+       <p style="margin-bottom: 12px; line-height: 1.6;"><strong>Objetivo:</strong> Conciencia corporal del gesto completo</p>
+       <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 6px;">
+        <p style="margin-bottom: 8px;"><strong>Cómo hacerlo:</strong></p>
+        <ul style="padding-left: 20px; line-height: 1.8;">
+         <li>Realiza el saque a velocidad 50% (mitad de velocidad normal)</li>
+         <li>Cuenta mentalmente "1-2-3" mientras lanzas</li>
+         <li>Asegúrate que el brazo guía permanece arriba hasta el contacto</li>
+         <li>Haz 15 repeticiones enfocándote solo en el brazo que lanza</li>
+        </ul>
+       </div>
+      </div>
+      <div style="background: #16213e; padding: 20px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #10b981;">
+       <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 12px;">🎯 Ejercicio 3: Saque con pausa</h3>
+       <p style="margin-bottom: 12px; line-height: 1.6;"><strong>Objetivo:</strong> Aplicar el brazo guia arriba en una situacion real de saque</p>
+       <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 6px;">
+        <p style="margin-bottom: 8px;"><strong>Cómo hacerlo:</strong></p>
+        <ul style="padding-left: 20px; line-height: 1.8;">
+         <li>Lanza la pelota y mantén el brazo arriba 1 segundo ANTES de golpear</li>
+         <li>Golpea normalmente, pero mantén el brazo guía arriba medio segundo DESPUÉS del impacto</li>
+         <li>20 repeticiones con potencia al 70%</li>
+         <li>No importa si la pelota entra o no, solo importa la técnica</li>
+        </ul>
+       </div>
+      </div>
+      <div style="background: #16213e; padding: 20px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #10b981;">
+       <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 12px;">🔄 Ejercicio 4: Serie de consistencia</h3>
+       <p style="margin-bottom: 12px; line-height: 1.6;"><strong>Objetivo:</strong> Automatizar el patrón correcto</p>
+       <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 6px;">
+        <p style="margin-bottom: 8px;"><strong>Cómo hacerlo:</strong></p>
+        <ul style="padding-left: 20px; line-height: 1.8;">
+         <li>Haz 5 saques seguidos al mismo lugar de la cancha</li>
+         <li>Piensa solo en "brazo arriba" antes de cada uno</li>
+         <li>Si fallas uno, reinicia la serie desde cero</li>
+         <li>Objetivo: lograr 5 seguidos con técnica correcta</li>
+        </ul>
+       </div>
+      </div>
+      <div style="background: #16213e; padding: 20px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #10b981;">
+       <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 12px;">📹 Ejercicio 5: Grabación y análisis</h3>
+       <p style="margin-bottom: 12px; line-height: 1.6;"><strong>Objetivo:</strong> Retroalimentación visual</p>
+       <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 6px;">
+        <p style="margin-bottom: 8px;"><strong>Cómo hacerlo:</strong></p>
+        <ul style="padding-left: 20px; line-height: 1.8;">
+         <li>Graba 10 saques desde el lateral (que se vea el brazo guía)</li>
+         <li>Revisa: ¿tu brazo baja antes o después del impacto?</li>
+         <li>Marca los buenos y repite hasta que 8 de 10 sean correctos</li>
+         <li>Compara tu video de hoy con uno de dentro de 2 semanas</li>
+        </ul>
+       </div>
+      </div>
+     </div>
+     <div style="background: rgba(251, 191, 36, 0.1); padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid rgba(251, 191, 36, 0.3);">
+      <h4 style="font-weight: 600; margin-bottom: 12px;">⚡ Progresión recomendada:</h4>
+      <p style="line-height: 1.6; margin-bottom: 12px;"><strong>Semana 1-2:</strong> Ejercicios 1 y 2 (construir fundamento)<br><strong>Semana 3-4:</strong> Ejercicios 2, 3 y 4 (aplicar técnica)<br><strong>Semana 5+:</strong> Todos los ejercicios, enfocándose en el 5</p>
+     </div>
+     <div style="background: rgba(52, 211, 153, 0.1); padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid rgba(52, 211, 153, 0.3);">
+      <h4 style="font-weight: 600; margin-bottom: 12px;">💪 Recordatorio final:</h4>
+      <p style="line-height: 1.8;">• No busques potencia en las primeras semanas<br>
+        • La técnica correcta SIEMPRE viene antes que la velocidad<br>
+        • Un saque controlado vale más que uno potente e impredecible<br>
+        • Brazo guia arriba = saque mas confiable</p>
+     </div>
+     <div class="action-buttons"><button class="btn" onclick="completeTraining()">✅ He guardado los ejercicios</button> <button class="btn btn-secondary" onclick="goBackToPhase5()">← Volver atrás</button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "Reto de Saque y Contacto Alto",
+      game_subtitle: "Brazo guia arriba, contacto alto y gesto completo",
+      opening_quote: "La mayoría falla el saque no por el brazo que golpea, sino por el brazo que abandona.",
+      phase1_title: "Activa la intención correcta",
+      phase2_title: "Encuentra la sensación: el brazo que guía",
+      phase3_title: "Brazo guia arriba: no abandones el gesto",
+      phase4_title: "Errores típicos: ¿te reconoces?",
+      phase5_title: "Aplicación consciente: lleva esto a la cancha"
+    };
+
+    let selectedPhase2 = null;
+    let selectedPhase3 = null;
+    let selectedError = null;
+    let checkCount = 0;
+
+    const dataHandler = {
+      onDataChanged(data) {
+        console.log('Data updated:', data.length, 'records');
+      }
+    };
+
+    async function initializeApp() {
+      if (window.dataSdk) {
+        const initResult = await window.dataSdk.init(dataHandler);
+        if (!initResult.isOk) {
+          console.error('Failed to initialize data SDK');
+        }
+      }
+
+      if (window.elementSdk) {
+        await window.elementSdk.init({
+          defaultConfig,
+          onConfigChange: async (config) => {
+            const title = config.game_title || defaultConfig.game_title;
+            const subtitle = config.game_subtitle || defaultConfig.game_subtitle;
+            const quote = config.opening_quote || defaultConfig.opening_quote;
+            const p1Title = config.phase1_title || defaultConfig.phase1_title;
+            const p2Title = config.phase2_title || defaultConfig.phase2_title;
+            const p3Title = config.phase3_title || defaultConfig.phase3_title;
+            const p4Title = config.phase4_title || defaultConfig.phase4_title;
+            const p5Title = config.phase5_title || defaultConfig.phase5_title;
+
+            document.getElementById('gameTitle').textContent = title;
+            document.getElementById('gameSubtitle').textContent = subtitle;
+            document.getElementById('openingQuote').innerHTML = quote.replace(/\n/g, '<br>');
+            document.getElementById('phase1Title').textContent = p1Title;
+            document.getElementById('phase2Title').textContent = p2Title;
+            document.getElementById('phase3Title').textContent = p3Title;
+            document.getElementById('phase4Title').textContent = p4Title;
+            document.getElementById('phase5Title').textContent = p5Title;
+          },
+          mapToCapabilities: (config) => ({
+            recolorables: [],
+            borderables: [],
+            fontEditable: undefined,
+            fontSizeable: undefined
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ["game_title", config.game_title || defaultConfig.game_title],
+            ["game_subtitle", config.game_subtitle || defaultConfig.game_subtitle],
+            ["opening_quote", config.opening_quote || defaultConfig.opening_quote],
+            ["phase1_title", config.phase1_title || defaultConfig.phase1_title],
+            ["phase2_title", config.phase2_title || defaultConfig.phase2_title],
+            ["phase3_title", config.phase3_title || defaultConfig.phase3_title],
+            ["phase4_title", config.phase4_title || defaultConfig.phase4_title],
+            ["phase5_title", config.phase5_title || defaultConfig.phase5_title]
+          ])
+        });
+      }
+    }
+
+    function startGame() {
+      document.getElementById('phase0').classList.add('hidden');
+      document.getElementById('phase1').classList.remove('hidden');
+      acScrollToTop();
+    }
+
+    function toggleCheck(element) {
+      element.classList.toggle('checked');
+      const checkbox = element.querySelector('.checkbox');
+      
+      if (element.classList.contains('checked')) {
+        checkbox.textContent = '✓';
+        checkCount++;
+      } else {
+        checkbox.textContent = '';
+        checkCount--;
+      }
+
+      const btn = document.getElementById('phase1Btn');
+      btn.disabled = checkCount !== 3;
+    }
+
+    async function selectOption(element, phase, response) {
+      const options = element.parentElement.querySelectorAll('.option');
+      options.forEach(opt => opt.classList.remove('selected'));
+      element.classList.add('selected');
+
+      const feedbackMap = {
+        'phase2': {
+          '🔥 Sentí estabilidad': 'Perfecto. El cuerpo se organiza.',
+          '🙂 Me costó mantenerlo': 'Normal. Un segundo más cada vez.',
+          '😕 Se me cayó rápido': 'Sin prisa. El brazo guía todo.'
+        },
+        'phase3': {
+          '🎯 Contacté más alto': 'Excelente. Contacto alto = consistencia.',
+          '🔄 A veces lo bajé antes': 'Conciencia lograda. Eso es progreso.',
+          '❌ Bajé el brazo de inmediato': 'Error común. Ralentiza el gesto.'
+        }
+      };
+
+      const feedback = document.getElementById(`${phase}Feedback`);
+      const feedbackText = document.getElementById(`${phase}FeedbackText`);
+      feedbackText.textContent = feedbackMap[phase][response];
+      feedback.classList.remove('hidden');
+
+      const btn = document.getElementById(`${phase}Btn`);
+      btn.disabled = false;
+
+      if (phase === 'phase2') {
+        selectedPhase2 = response;
+      } else if (phase === 'phase3') {
+        selectedPhase3 = response;
+      }
+
+      if (window.dataSdk) {
+        await window.dataSdk.create({
+          timestamp: new Date().toISOString(),
+          phase: phase,
+          response: response
+        });
+      }
+    }
+
+    async function selectError(element, errorId) {
+      const errors = element.parentElement.querySelectorAll('.error-item');
+      errors.forEach(err => err.classList.remove('selected'));
+      element.classList.add('selected');
+
+      const corrections = {
+        'error1': 'Cuenta "uno" antes de golpear. Ese segundo extra mantiene el brazo arriba.',
+        'error2': 'Reduce velocidad, no altura. La potencia viene después.',
+        'error3': 'Mirada arriba = cuerpo arriba. Mirada al frente = cuerpo abajo.'
+      };
+
+      document.getElementById('correctionText').textContent = corrections[errorId];
+      document.getElementById('correction').classList.remove('hidden');
+      document.getElementById('phase4Btn').disabled = false;
+
+      selectedError = errorId;
+
+      if (window.dataSdk) {
+        await window.dataSdk.create({
+          timestamp: new Date().toISOString(),
+          phase: 'phase4',
+          response: errorId
+        });
+      }
+    }
+
+    function nextPhase(currentPhase) {
+      document.getElementById(`phase${currentPhase}`).classList.add('hidden');
+      document.getElementById(`phase${currentPhase + 1}`).classList.remove('hidden');
+      acScrollToTop();
+    }
+
+    function showExercises() {
+      document.getElementById('phase5').classList.add('hidden');
+      document.getElementById('exercisesPhase').classList.remove('hidden');
+      acScrollToTop();
+    }
+
+    function goBackToPhase5() {
+      document.getElementById('exercisesPhase').classList.add('hidden');
+      document.getElementById('phase5').classList.remove('hidden');
+      acScrollToTop();
+    }
+
+    function resetGame() {
+      checkCount = 0;
+      selectedPhase2 = null;
+      selectedPhase3 = null;
+      selectedError = null;
+
+      document.querySelectorAll('.check-item').forEach(item => {
+        item.classList.remove('checked');
+        item.querySelector('.checkbox').textContent = '';
+      });
+
+      document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+      document.querySelectorAll('.error-item').forEach(err => err.classList.remove('selected'));
+      document.querySelectorAll('.feedback').forEach(fb => fb.classList.add('hidden'));
+      document.getElementById('correction').classList.add('hidden');
+
+      document.querySelectorAll('.btn').forEach(btn => {
+        if (btn.id !== 'phase0Btn') btn.disabled = true;
+      });
+
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById(`phase${i}`).classList.add('hidden');
+      }
+      document.getElementById('exercisesPhase').classList.add('hidden');
+
+      document.getElementById('phase0').classList.remove('hidden');
+      acScrollToTop();
+    }
+
+    async function completeTraining() {
+      if (window.dataSdk) {
+        await window.dataSdk.create({
+          timestamp: new Date().toISOString(),
+          phase: 'complete',
+          response: 'Training completed'
+        });
+      }
+      
+      resetGame();
+    }
+
+    initializeApp();
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) {
+      acScrollToTop();
+      return;
+    }
+
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+
+    try {
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, Math.max(0, top));
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    window.scrollTo(0, 0);
+  });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>

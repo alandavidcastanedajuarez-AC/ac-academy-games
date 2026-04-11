@@ -1,0 +1,1665 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autoevaluacion de un Punto</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #050505;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    html, body, #app {
+      height: 100%;
+      width: 100%;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 0;
+      position: relative;
+    }
+
+    .background-gradient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at top, #1a1a2e 0%, #0a0a0a 50%, #000000 100%);
+      z-index: -2;
+    }
+
+    .court-lines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.03;
+      z-index: -1;
+      background-image: 
+        linear-gradient(0deg, transparent 49%, #00ff88 50%, transparent 51%),
+        linear-gradient(90deg, transparent 49%, #00ff88 50%, transparent 51%);
+      background-size: 100px 100px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 3rem 1.5rem;
+      position: relative;
+    }
+
+    .scene {
+      display: none;
+      animation: sceneEnter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .scene.active {
+      display: block;
+    }
+
+    @keyframes sceneEnter {
+      from { 
+        opacity: 0; 
+        transform: translateY(40px) scale(0.98);
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 4rem;
+      position: relative;
+    }
+
+    .game-title {
+      font-size: 3.5rem;
+      font-weight: 900;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #00ff88 0%, #00d4ff 50%, #7b2cbf 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -2px;
+      text-transform: uppercase;
+      position: relative;
+      animation: titlePulse 3s ease-in-out infinite;
+    }
+
+    @keyframes titlePulse {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.2); }
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: #888;
+      font-weight: 300;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+
+    .intro-container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .hero-message {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(123, 44, 191, 0.1));
+      border: 2px solid #00ff88;
+      border-radius: 24px;
+      padding: 3rem;
+      margin-bottom: 3rem;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(0, 255, 136, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-message::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+      animation: shimmer 4s linear infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .hero-message p {
+      font-size: 1.8rem;
+      line-height: 2;
+      font-weight: 600;
+      margin: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .concept-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .concept-card {
+      background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(15, 15, 25, 0.9));
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 20px;
+      padding: 2.5rem;
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: default;
+    }
+
+    .concept-card:hover {
+      transform: translateY(-10px);
+      border-color: #00ff88;
+      box-shadow: 0 20px 60px rgba(0, 255, 136, 0.3);
+    }
+
+    .concept-icon {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      display: block;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .concept-card:nth-child(2) .concept-icon {
+      animation-delay: 0.5s;
+    }
+
+    .concept-card:nth-child(3) .concept-icon {
+      animation-delay: 1s;
+    }
+
+    .concept-card:nth-child(4) .concept-icon {
+      animation-delay: 1.5s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .concept-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #00ff88;
+      margin-bottom: 0.75rem;
+    }
+
+    .concept-text {
+      font-size: 1rem;
+      color: #aaa;
+      line-height: 1.6;
+    }
+
+    .mental-prep-section {
+      margin: 3rem 0;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, #00ff88, #00d4ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .mental-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .mental-card {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), rgba(0, 212, 255, 0.05));
+      border: 2px solid transparent;
+      border-radius: 16px;
+      padding: 2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .mental-card:hover {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), rgba(0, 212, 255, 0.15));
+      border-color: #00ff88;
+      transform: scale(1.05);
+    }
+
+    .mental-card.selected {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.25), rgba(0, 212, 255, 0.25));
+      border-color: #00ff88;
+      box-shadow: 0 0 40px rgba(0, 255, 136, 0.5);
+    }
+
+    .mental-emoji {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    .mental-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #00ff88;
+      margin-bottom: 0.5rem;
+    }
+
+    .mental-desc {
+      font-size: 0.95rem;
+      color: #999;
+    }
+
+    .rally-stage {
+      background: linear-gradient(135deg, rgba(26, 26, 46, 0.9), rgba(15, 15, 25, 0.9));
+      border: 3px solid #00ff88;
+      border-radius: 24px;
+      padding: 3rem;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 80px rgba(0, 255, 136, 0.4);
+    }
+
+    .rally-stage::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #00ff88, #00d4ff, #7b2cbf, #00ff88);
+      background-size: 200% 100%;
+      animation: slideGradient 3s linear infinite;
+    }
+
+    @keyframes slideGradient {
+      0% { background-position: 0% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    .phase-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #00ff88, #00d4ff);
+      color: #000;
+      padding: 0.5rem 1.5rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 1.5rem;
+    }
+
+    .scenario-text {
+      font-size: 1.4rem;
+      line-height: 2;
+      margin-bottom: 2rem;
+      text-align: center;
+      color: #ddd;
+      font-weight: 500;
+    }
+
+    .emotional-hook {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #ff6b6b;
+      font-style: italic;
+      margin: 1.5rem 0;
+      padding: 1rem;
+      background: rgba(255, 107, 107, 0.1);
+      border-radius: 12px;
+      border-left: 4px solid #ff6b6b;
+    }
+
+    .question {
+      font-size: 1.8rem;
+      font-weight: 800;
+      text-align: center;
+      margin: 2.5rem 0 2rem;
+      background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .choice-btn {
+      padding: 2rem;
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.08), rgba(0, 212, 255, 0.08));
+      border: 2px solid rgba(0, 255, 136, 0.3);
+      border-radius: 16px;
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .choice-btn::before {
+      content: '→';
+      position: absolute;
+      right: 2rem;
+      opacity: 0;
+      transition: all 0.3s ease;
+      font-size: 1.5rem;
+      color: #00ff88;
+    }
+
+    .choice-btn:hover {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 212, 255, 0.2));
+      border-color: #00ff88;
+      transform: translateX(10px);
+      box-shadow: 0 10px 40px rgba(0, 255, 136, 0.4);
+    }
+
+    .choice-btn:hover::before {
+      opacity: 1;
+      right: 1.5rem;
+    }
+
+    .result-screen {
+      background: linear-gradient(135deg, rgba(15, 15, 25, 0.95), rgba(26, 26, 46, 0.95));
+      border-radius: 24px;
+      padding: 3rem;
+      text-align: center;
+      border: 2px solid;
+      box-shadow: 0 20px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .result-screen.success {
+      border-color: #00ff88;
+      box-shadow: 0 20px 80px rgba(0, 255, 136, 0.5);
+    }
+
+    .result-screen.failure {
+      border-color: #ff6b6b;
+      box-shadow: 0 20px 80px rgba(255, 107, 107, 0.5);
+    }
+
+    .result-icon {
+      font-size: 6rem;
+      margin-bottom: 1.5rem;
+      animation: resultPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    @keyframes resultPop {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    .result-title {
+      font-size: 2.5rem;
+      font-weight: 900;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .result-screen.success .result-title {
+      color: #00ff88;
+    }
+
+    .result-screen.failure .result-title {
+      color: #ff6b6b;
+    }
+
+    .result-message {
+      font-size: 1.3rem;
+      line-height: 1.8;
+      color: #ccc;
+      margin-bottom: 2rem;
+    }
+
+    .teaching-box {
+      background: rgba(0, 212, 255, 0.1);
+      border: 2px solid #00d4ff;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-top: 2rem;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #00d4ff;
+      font-style: italic;
+    }
+
+    .stats-panel {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(123, 44, 191, 0.1));
+      border: 2px solid #00ff88;
+      border-radius: 20px;
+      padding: 3rem;
+      margin: 3rem 0;
+    }
+
+    .stats-title {
+      font-size: 2rem;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 2.5rem;
+      color: #00ff88;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 2rem;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 16px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
+
+    .stat-value {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: #00ff88;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .button {
+      width: 100%;
+      padding: 1.75rem 2rem;
+      background: linear-gradient(135deg, #00ff88, #00d4ff);
+      color: #000;
+      border: none;
+      border-radius: 16px;
+      font-size: 1.3rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      box-shadow: 0 10px 40px rgba(0, 255, 136, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .button:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .button:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 60px rgba(0, 255, 136, 0.7);
+    }
+
+    .button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .button.secondary {
+      background: linear-gradient(135deg, #555, #333);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .button.secondary:hover:not(:disabled) {
+      box-shadow: 0 15px 60px rgba(0, 0, 0, 0.7);
+    }
+
+    .button-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .button-group .button {
+      margin: 0;
+    }
+
+    .reflection-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .reflection-card {
+      background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(15, 15, 25, 0.9));
+      border: 2px solid rgba(0, 255, 136, 0.2);
+      border-radius: 20px;
+      padding: 2.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .reflection-card:hover {
+      border-color: #00ff88;
+      transform: translateY(-5px);
+      box-shadow: 0 15px 50px rgba(0, 255, 136, 0.4);
+    }
+
+    .reflection-card.selected {
+      border-color: #00ff88;
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 212, 255, 0.2));
+      box-shadow: 0 15px 50px rgba(0, 255, 136, 0.5);
+    }
+
+    .reflection-emoji {
+      font-size: 3.5rem;
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    .reflection-text {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .final-insight {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), rgba(123, 44, 191, 0.15));
+      border: 3px solid #00ff88;
+      border-radius: 24px;
+      padding: 4rem 3rem;
+      text-align: center;
+      margin: 3rem 0;
+      box-shadow: 0 30px 100px rgba(0, 255, 136, 0.6);
+    }
+
+    .insight-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #7b2cbf, #ff006e);
+      color: #fff;
+      padding: 0.75rem 2rem;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 2rem;
+    }
+
+    .insight-text {
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #00ff88, #00d4ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .final-message-box {
+      background: linear-gradient(135deg, rgba(15, 15, 25, 0.95), rgba(26, 26, 46, 0.95));
+      border: 3px solid #00ff88;
+      border-radius: 24px;
+      padding: 4rem 3rem;
+      text-align: center;
+      margin-bottom: 3rem;
+      box-shadow: 0 30px 100px rgba(0, 255, 136, 0.6);
+    }
+
+    .final-message-box p {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 2;
+      background: linear-gradient(135deg, #ffffff, #00ff88);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .loading-screen {
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+
+    .spinner {
+      width: 80px;
+      height: 80px;
+      border: 6px solid rgba(0, 255, 136, 0.2);
+      border-top-color: #00ff88;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 2rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 1.3rem;
+      color: #00ff88;
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem 1rem;
+      }
+
+      .header {
+        margin-bottom: 2.5rem;
+      }
+
+      .game-title {
+        font-size: 2.5rem;
+      }
+
+      .subtitle {
+        font-size: 0.95rem;
+        letter-spacing: 1.5px;
+        line-height: 1.5;
+      }
+
+      .hero-message {
+        padding: 1.6rem 1.2rem;
+        margin-bottom: 2rem;
+        border-radius: 20px;
+      }
+
+      .hero-message p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+      }
+
+      .concept-grid {
+        grid-template-columns: 1fr;
+        gap: 1.1rem;
+      }
+
+      .rally-stage {
+        padding: 1.6rem 1.2rem;
+      }
+
+      .scenario-text {
+        font-size: 1.08rem;
+        line-height: 1.75;
+      }
+
+      .question {
+        font-size: 1.3rem;
+        margin: 1.75rem 0 1.25rem;
+      }
+
+      .choice-btn {
+        padding: 1.2rem 1rem;
+        font-size: 1rem;
+      }
+
+      .result-icon {
+        font-size: 4rem;
+      }
+
+      .result-title {
+        font-size: 1.8rem;
+      }
+
+      .result-message,
+      .teaching-box,
+      .reflection-text {
+        font-size: 1rem;
+        line-height: 1.65;
+      }
+
+      .concept-card,
+      .reflection-card,
+      .stats-panel,
+      .result-screen,
+      .final-insight,
+      .final-message-box {
+        padding: 1.5rem;
+      }
+
+      .stat-item {
+        padding: 1.25rem;
+      }
+
+      .stat-value {
+        font-size: 2.7rem;
+      }
+
+      .insight-text,
+      .final-message-box p {
+        font-size: 1.35rem;
+        line-height: 1.6;
+      }
+
+      .button {
+        padding: 1.15rem 1rem;
+        font-size: 1rem;
+        letter-spacing: 1px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .button-group {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+
+    .container,
+    .game-container,
+    .game-wrapper,
+    .app-wrapper,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .phase-container,
+    .phase-card,
+    .content,
+    .content-area,
+    .modal-content,
+    .results-card,
+    .scene,
+    .phase-content {
+      padding: 16px !important;
+    }
+
+    h1, .main-title, .game-title, .title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+
+    h2, .phase-title, .stage-title, .final-title, .section-title {
+      font-size: clamp(1.3rem, 6vw, 1.7rem) !important;
+      line-height: 1.25 !important;
+    }
+
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label {
+      font-size: clamp(1rem, 4.5vw, 1.15rem) !important;
+      line-height: 1.4 !important;
+    }
+
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text, .intro-message, .quote {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+
+    .button-group,
+    .action-buttons,
+    .final-buttons,
+    .controls-row {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+
+    button,
+    .btn,
+    .btn-primary,
+    .btn-secondary,
+    .action-button,
+    .option-btn {
+      width: 100% !important;
+    }
+
+    .zone-grid,
+    .scenario-grid,
+    .options-grid,
+    .results-stats {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    setConfig: function () {},
+    config: {}
+  };
+
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body>
+  <div class="background-gradient"></div>
+  <div class="court-lines"></div>
+  <div id="app">
+   <div class="container"><!-- Scene: Introduction -->
+    <div class="scene active" id="sceneIntro">
+     <div class="header">
+      <h1 class="game-title" id="gameTitle">El Punto que se Repite</h1>
+      <p class="subtitle" id="introSubtitle">El aprendizaje real sucede en la repetición</p>
+     </div>
+     <div class="intro-container">
+      <div class="hero-message">
+       <p>El mismo rally.<br>
+         Diferentes decisiones.<br><strong style="color: #00ff88;">El punto se repite hasta que aprendas a controlarlo.</strong></p>
+      </div>
+      <div class="concept-grid">
+       <div class="concept-card"><span class="concept-icon">🔄</span>
+        <h3 class="concept-title">Se Repite</h3>
+        <p class="concept-text">Cada error te devuelve al inicio, como en un partido real.</p>
+       </div>
+       <div class="concept-card"><span class="concept-icon">⚡</span>
+        <h3 class="concept-title">Decisiones</h3>
+        <p class="concept-text">Cada elección tiene consecuencias inmediatas.</p>
+       </div>
+       <div class="concept-card"><span class="concept-icon">🎯</span>
+        <h3 class="concept-title">Aprendes</h3>
+        <p class="concept-text">Descubres POR QUÉ pierdes el control.</p>
+       </div>
+       <div class="concept-card"><span class="concept-icon">🏆</span>
+        <h3 class="concept-title">Dominas</h3>
+        <p class="concept-text">Ganas cuando tomas las decisiones correctas.</p>
+       </div>
+      </div><button class="button" id="startBtn">Comenzar el Punto</button>
+     </div>
+    </div><!-- Scene: Mental Preparation -->
+    <div class="scene" id="sceneMental">
+     <div class="header">
+      <h1 class="game-title">Preparación Mental</h1>
+     </div>
+     <div class="mental-prep-section">
+      <h2 class="section-title">¿Con qué mentalidad entras al punto?</h2>
+      <p style="text-align: center; color: #999; font-size: 1.1rem; margin-bottom: 3rem;">Tu mindset determina tus decisiones</p>
+      <div class="mental-options">
+       <div class="mental-card" data-mental="win-fast"><span class="mental-emoji">⚡</span>
+        <h3 class="mental-title">Ganar Rápido</h3>
+        <p class="mental-desc">Quiero definir el punto ya</p>
+       </div>
+       <div class="mental-card" data-mental="control-first"><span class="mental-emoji">🎯</span>
+        <h3 class="mental-title">Controlar Primero</h3>
+        <p class="mental-desc">Domino el rally, luego ataco</p>
+       </div>
+       <div class="mental-card" data-mental="survive"><span class="mental-emoji">🛡️</span>
+        <h3 class="mental-title">Sobrevivir</h3>
+        <p class="mental-desc">Que el rival se equivoque</p>
+       </div>
+      </div><button class="button" id="mentalContinue" disabled>Iniciar Rally</button>
+     </div>
+    </div><!-- Scene: Phase 1 -->
+    <div class="scene" id="scenePhase1">
+     <div class="rally-stage"><span class="phase-badge">⚪ Fase 1 - Rally Base</span>
+      <p class="scenario-text">Estás en un rally desde el fondo.<br>
+        La pelota viene profunda, ritmo medio.<br>
+        No estás presionado... todavía.</p>
+      <div class="emotional-hook">
+       💭 "Este punto parece fácil... ¿o no?"
+      </div>
+      <h2 class="question">¿Qué haces con la siguiente pelota?</h2>
+      <div class="choices"><button class="choice-btn" data-phase="1" data-choice="accelerate"> ⚡ Acelero para ganar el punto </button> <button class="choice-btn" data-phase="1" data-choice="maintain"> 🎯 Mantengo ritmo y altura </button> <button class="choice-btn" data-phase="1" data-choice="change"> 🔄 Cambio dirección sin estar bien colocado </button>
+      </div>
+     </div>
+    </div><!-- Scene: Phase 1 Result -->
+    <div class="scene" id="scenePhase1Result">
+     <div class="result-screen" id="phase1ResultBox">
+      <div class="result-icon" id="phase1ResultIcon"></div>
+      <h2 class="result-title" id="phase1ResultTitle"></h2>
+      <p class="result-message" id="phase1ResultMessage"></p>
+      <div class="teaching-box" id="phase1Teaching"></div>
+     </div><button class="button" id="phase1NextBtn" style="margin-top: 2rem;"></button>
+    </div><!-- Scene: Phase 2 -->
+    <div class="scene" id="scenePhase2">
+     <div class="rally-stage"><span class="phase-badge">🟡 Fase 2 - Presión Moderada</span>
+      <p class="scenario-text">El rival responde más profundo.<br>
+        Te empuja un poco hacia atrás.<br>
+        Sientes que el control empieza a tensarse.</p>
+      <div class="emotional-hook">
+       😰 "Necesito salir de esta situación..."
+      </div>
+      <h2 class="question">¿Cuál es tu ajuste?</h2>
+      <div class="choices"><button class="choice-btn" data-phase="2" data-choice="force"> 💥 Forzar para salir del problema </button> <button class="choice-btn" data-phase="2" data-choice="center"> 🎯 Jugar al centro con altura </button> <button class="choice-btn" data-phase="2" data-choice="defend"> 🛡️ Defender alto y profundo </button>
+      </div>
+     </div>
+    </div><!-- Scene: Phase 2 Result -->
+    <div class="scene" id="scenePhase2Result">
+     <div class="result-screen" id="phase2ResultBox">
+      <div class="result-icon" id="phase2ResultIcon"></div>
+      <h2 class="result-title" id="phase2ResultTitle"></h2>
+      <p class="result-message" id="phase2ResultMessage"></p>
+      <div class="teaching-box" id="phase2Teaching"></div>
+     </div><button class="button" id="phase2NextBtn" style="margin-top: 2rem;"></button>
+    </div><!-- Scene: Phase 3 -->
+    <div class="scene" id="scenePhase3">
+     <div class="rally-stage"><span class="phase-badge">🟠 Fase 3 - Oportunidad</span>
+      <p class="scenario-text">Recuperaste el control.<br>
+        El rival deja una pelota más corta.<br>
+        Ahora estás mejor colocado.</p>
+      <div class="emotional-hook">
+       🔥 "¿Es el momento de atacar?"
+      </div>
+      <h2 class="question">¿Qué haces ahora?</h2>
+      <div class="choices"><button class="choice-btn" data-phase="3" data-choice="rush"> ⚡ Acelerar sin pensar </button> <button class="choice-btn" data-phase="3" data-choice="wait"> ⏸️ Mantener control un golpe más </button> <button class="choice-btn" data-phase="3" data-choice="attack"> 🎯 Cambiar dirección con equilibrio </button>
+      </div>
+     </div>
+    </div><!-- Scene: Phase 3 Result -->
+    <div class="scene" id="scenePhase3Result">
+     <div class="result-screen" id="phase3ResultBox">
+      <div class="result-icon" id="phase3ResultIcon"></div>
+      <h2 class="result-title" id="phase3ResultTitle"></h2>
+      <p class="result-message" id="phase3ResultMessage"></p>
+      <div class="teaching-box" id="phase3Teaching"></div>
+     </div><button class="button" id="phase3NextBtn" style="margin-top: 2rem;"></button>
+    </div><!-- Scene: Phase 4 -->
+    <div class="scene" id="scenePhase4">
+     <div class="rally-stage"><span class="phase-badge">🔴 Fase 4 - Presión Máxima</span>
+      <p class="scenario-text">El rival no se rinde.<br>
+        Devuelve una bola defensiva muy alta.<br>
+        Te obliga a retroceder y re-organizarte.</p>
+      <div class="emotional-hook">
+       😤 "Ya debería haber terminado este punto..."
+      </div>
+      <h2 class="question">¿Cómo manejas la frustración?</h2>
+      <div class="choices"><button class="choice-btn" data-phase="4" data-choice="smash-hard"> 💢 Smash con toda mi fuerza </button> <button class="choice-btn" data-phase="4" data-choice="reposition"> 🔄 Reposicionarme y reconstruir </button> <button class="choice-btn" data-phase="4" data-choice="push-back"> ⬇️ Devolver profundo y esperar </button>
+      </div>
+     </div>
+    </div><!-- Scene: Phase 4 Result -->
+    <div class="scene" id="scenePhase4Result">
+     <div class="result-screen" id="phase4ResultBox">
+      <div class="result-icon" id="phase4ResultIcon"></div>
+      <h2 class="result-title" id="phase4ResultTitle"></h2>
+      <p class="result-message" id="phase4ResultMessage"></p>
+      <div class="teaching-box" id="phase4Teaching"></div>
+     </div><button class="button" id="phase4NextBtn" style="margin-top: 2rem;"></button>
+    </div><!-- Scene: Phase 5 -->
+    <div class="scene" id="scenePhase5">
+     <div class="rally-stage"><span class="phase-badge">🟢 Fase 5 - Cierre del Punto</span>
+      <p class="scenario-text">Has dominado el rally.<br>
+        El rival está en posición defensiva.<br>
+        Una pelota corta aparece. Es TU momento.</p>
+      <div class="emotional-hook">
+       ✨ "Ahora sí. Este es MI punto."
+      </div>
+      <h2 class="question">¿Cómo defines el punto?</h2>
+      <div class="choices"><button class="choice-btn" data-phase="5" data-choice="winner-hard"> 🚀 Winner potente a la esquina </button> <button class="choice-btn" data-phase="5" data-choice="short-angle"> 📐 Ángulo corto con efecto </button> <button class="choice-btn" data-phase="5" data-choice="deep-safe"> 🎯 Profundo y seguro </button>
+      </div>
+     </div>
+    </div><!-- Scene: Phase 5 Result -->
+    <div class="scene" id="scenePhase5Result">
+     <div class="result-screen" id="phase5ResultBox">
+      <div class="result-icon" id="phase5ResultIcon"></div>
+      <h2 class="result-title" id="phase5ResultTitle"></h2>
+      <p class="result-message" id="phase5ResultMessage"></p>
+      <div class="teaching-box" id="phase5Teaching"></div>
+     </div><button class="button" id="phase5NextBtn" style="margin-top: 2rem;">Ver Análisis del Punto</button>
+    </div><!-- Scene: Point Analysis -->
+    <div class="scene" id="sceneAnalysis">
+     <div class="header">
+      <h1 class="game-title">Análisis del Punto</h1>
+     </div>
+     <div class="stats-panel">
+      <h2 class="stats-title">Tu Desempeño</h2>
+      <div class="stats-grid">
+       <div class="stat-item"><span class="stat-value" id="statRepeated">0</span> <span class="stat-label">Veces Repetido</span>
+       </div>
+       <div class="stat-item"><span class="stat-value" id="statCorrect">0</span> <span class="stat-label">Decisiones Correctas</span>
+       </div>
+       <div class="stat-item"><span class="stat-value" id="statErrors">0</span> <span class="stat-label">Errores</span>
+       </div>
+      </div>
+     </div><button class="button" id="analysisNextBtn">Reflexionar</button>
+    </div><!-- Scene: Reflection -->
+    <div class="scene" id="sceneReflection">
+     <div class="header">
+      <h1 class="game-title">Momento de Reflexión</h1>
+     </div>
+     <h2 class="section-title">¿Qué aprendiste de este punto?</h2>
+     <p style="text-align: center; color: #999; font-size: 1.1rem; margin-bottom: 3rem;">Elige la frase que más resuena contigo</p>
+     <div class="reflection-grid">
+      <div class="reflection-card" data-reflection="acceleration"><span class="reflection-emoji">⚡</span>
+       <p class="reflection-text">Perdí puntos por acelerar demasiado pronto</p>
+      </div>
+      <div class="reflection-card" data-reflection="positioning"><span class="reflection-emoji">👣</span>
+       <p class="reflection-text">Perdí puntos por mala colocación</p>
+      </div>
+      <div class="reflection-card" data-reflection="rhythm"><span class="reflection-emoji">🎵</span>
+       <p class="reflection-text">Gané control cuando bajé el ritmo</p>
+      </div>
+     </div><button class="button" id="reflectionNextBtn" disabled>Ver Mi Ajuste</button>
+    </div><!-- Scene: Insight -->
+    <div class="scene" id="sceneInsight">
+     <div class="final-insight"><span class="insight-badge">Tu Ajuste Principal</span>
+      <p class="insight-text" id="insightText"></p>
+     </div><button class="button" id="saveInsightBtn"> <span id="saveInsightText">Guardar y Finalizar</span> </button>
+    </div><!-- Scene: Loading -->
+    <div class="scene" id="sceneLoading">
+     <div class="loading-screen">
+      <div class="spinner"></div>
+      <p class="loading-text">Guardando tu experiencia en la cancha...</p>
+     </div>
+    </div><!-- Scene: Final -->
+    <div class="scene" id="sceneFinal">
+     <div class="header">
+      <h1 class="game-title">Punto Completado</h1>
+     </div>
+     <div class="final-message-box">
+      <p id="finalMessage">El control no aparece cuando quieres.<br>
+        Aparece cuando sabes esperar.</p>
+     </div>
+     <div class="button-group"><button class="button secondary" id="repeatBtn">🔄 Repetir Punto</button> <button class="button" id="reviewInsightBtn">📌 Revisar mi ajuste</button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "Autoevaluacion de un Punto",
+      intro_subtitle: "El aprendizaje real sucede en la repetición",
+      final_message: "El control no aparece cuando quieres.<br>Aparece cuando sabes esperar.",
+      background_color: "#050505",
+      surface_color: "#1a1a2e",
+      text_color: "#ffffff",
+      primary_action_color: "#00ff88",
+      secondary_action_color: "#555555",
+      font_family: "Poppins",
+      font_size: 16
+    };
+
+    let gameState = {
+      mentalPrep: null,
+      choices: [],
+      pointsRepeated: 0,
+      correctDecisions: 0,
+      errorsMade: 0,
+      reflection: null
+    };
+
+    let currentRecordCount = 0;
+
+    const dataHandler = {
+      onDataChanged(data) {
+        currentRecordCount = data.length;
+      }
+    };
+
+    async function initializeApp() {
+      const initResult = await window.dataSdk.init(dataHandler);
+      if (!initResult.isOk) {
+        console.error("Failed to initialize data SDK");
+      }
+
+      await window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => {
+          const customFont = config.font_family || defaultConfig.font_family;
+          const baseFontStack = '-apple-system, BlinkMacSystemFont, sans-serif';
+          const baseSize = config.font_size || defaultConfig.font_size;
+
+          document.body.style.fontFamily = `${customFont}, ${baseFontStack}`;
+          document.body.style.fontSize = `${baseSize}px`;
+
+          const bgGradient = document.querySelector('.background-gradient');
+          if (bgGradient) {
+            bgGradient.style.background = `radial-gradient(ellipse at top, ${config.surface_color || defaultConfig.surface_color} 0%, ${adjustColor(config.background_color || defaultConfig.background_color, 10)} 50%, ${config.background_color || defaultConfig.background_color} 100%)`;
+          }
+
+          document.querySelectorAll('.game-title').forEach(el => {
+            el.textContent = config.game_title || defaultConfig.game_title;
+            el.style.fontSize = `${baseSize * 3.5}px`;
+          });
+
+          const subtitle = document.getElementById('introSubtitle');
+          if (subtitle) {
+            subtitle.textContent = config.intro_subtitle || defaultConfig.intro_subtitle;
+            subtitle.style.fontSize = `${baseSize * 1.2}px`;
+          }
+
+          const finalMsg = document.getElementById('finalMessage');
+          if (finalMsg) {
+            finalMsg.innerHTML = config.final_message || defaultConfig.final_message;
+            finalMsg.style.fontSize = `${baseSize * 2}px`;
+          }
+
+          const buttons = document.querySelectorAll('.button:not(.secondary)');
+          buttons.forEach(btn => {
+            btn.style.background = `linear-gradient(135deg, ${config.primary_action_color || defaultConfig.primary_action_color}, ${adjustColor(config.primary_action_color || defaultConfig.primary_action_color, -20)})`;
+          });
+
+          const secondaryButtons = document.querySelectorAll('.button.secondary');
+          secondaryButtons.forEach(btn => {
+            btn.style.background = `linear-gradient(135deg, ${config.secondary_action_color || defaultConfig.secondary_action_color}, ${adjustColor(config.secondary_action_color || defaultConfig.secondary_action_color, -30)})`;
+          });
+        },
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                if (window.elementSdk) {
+                  window.elementSdk.config.background_color = value;
+                  window.elementSdk.setConfig({ background_color: value });
+                }
+              }
+            },
+            {
+              get: () => config.surface_color || defaultConfig.surface_color,
+              set: (value) => {
+                if (window.elementSdk) {
+                  window.elementSdk.config.surface_color = value;
+                  window.elementSdk.setConfig({ surface_color: value });
+                }
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                if (window.elementSdk) {
+                  window.elementSdk.config.text_color = value;
+                  window.elementSdk.setConfig({ text_color: value });
+                }
+              }
+            },
+            {
+              get: () => config.primary_action_color || defaultConfig.primary_action_color,
+              set: (value) => {
+                if (window.elementSdk) {
+                  window.elementSdk.config.primary_action_color = value;
+                  window.elementSdk.setConfig({ primary_action_color: value });
+                }
+              }
+            },
+            {
+              get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+              set: (value) => {
+                if (window.elementSdk) {
+                  window.elementSdk.config.secondary_action_color = value;
+                  window.elementSdk.setConfig({ secondary_action_color: value });
+                }
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              if (window.elementSdk) {
+                window.elementSdk.config.font_family = value;
+                window.elementSdk.setConfig({ font_family: value });
+              }
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              if (window.elementSdk) {
+                window.elementSdk.config.font_size = value;
+                window.elementSdk.setConfig({ font_size: value });
+              }
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["game_title", config.game_title || defaultConfig.game_title],
+          ["intro_subtitle", config.intro_subtitle || defaultConfig.intro_subtitle],
+          ["final_message", config.final_message || defaultConfig.final_message]
+        ])
+      });
+
+      setupEventListeners();
+    }
+
+    function adjustColor(hex, percent) {
+      const num = parseInt(hex.replace("#",""), 16);
+      const amt = Math.round(2.55 * percent);
+      const R = Math.max(0, Math.min(255, (num >> 16) + amt));
+      const G = Math.max(0, Math.min(255, (num >> 8 & 0x00FF) + amt));
+      const B = Math.max(0, Math.min(255, (num & 0x0000FF) + amt));
+      return "#" + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+    }
+
+    function setupEventListeners() {
+      document.getElementById('startBtn').addEventListener('click', () => {
+        switchScene('sceneMental');
+      });
+
+      document.querySelectorAll('.mental-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          document.querySelectorAll('.mental-card').forEach(c => c.classList.remove('selected'));
+          e.currentTarget.classList.add('selected');
+          gameState.mentalPrep = e.currentTarget.dataset.mental;
+          document.getElementById('mentalContinue').disabled = false;
+        });
+      });
+
+      document.getElementById('mentalContinue').addEventListener('click', () => {
+        switchScene('scenePhase1');
+      });
+
+      setupPhaseChoices(1);
+      setupPhaseChoices(2);
+      setupPhaseChoices(3);
+      setupPhaseChoices(4);
+      setupPhaseChoices(5);
+
+      document.getElementById('phase1NextBtn').addEventListener('click', () => {
+        const lastChoice = gameState.choices[gameState.choices.length - 1];
+        if (lastChoice === 'phase1_maintain') {
+          switchScene('scenePhase2');
+        } else {
+          gameState.pointsRepeated++;
+          switchScene('scenePhase1');
+        }
+      });
+
+      document.getElementById('phase2NextBtn').addEventListener('click', () => {
+        const lastChoice = gameState.choices[gameState.choices.length - 1];
+        if (lastChoice === 'phase2_force') {
+          gameState.pointsRepeated++;
+          switchScene('scenePhase1');
+        } else {
+          switchScene('scenePhase3');
+        }
+      });
+
+      document.getElementById('phase3NextBtn').addEventListener('click', () => {
+        const lastChoice = gameState.choices[gameState.choices.length - 1];
+        if (lastChoice === 'phase3_rush') {
+          gameState.pointsRepeated++;
+          switchScene('scenePhase1');
+        } else {
+          switchScene('scenePhase4');
+        }
+      });
+
+      document.getElementById('phase4NextBtn').addEventListener('click', () => {
+        const lastChoice = gameState.choices[gameState.choices.length - 1];
+        if (lastChoice === 'phase4_smash-hard') {
+          gameState.pointsRepeated++;
+          switchScene('scenePhase1');
+        } else {
+          switchScene('scenePhase5');
+        }
+      });
+
+      document.getElementById('phase5NextBtn').addEventListener('click', () => {
+        updateAnalysisStats();
+        switchScene('sceneAnalysis');
+      });
+
+      document.getElementById('analysisNextBtn').addEventListener('click', () => {
+        switchScene('sceneReflection');
+      });
+
+      document.querySelectorAll('.reflection-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          document.querySelectorAll('.reflection-card').forEach(c => c.classList.remove('selected'));
+          e.currentTarget.classList.add('selected');
+          gameState.reflection = e.currentTarget.dataset.reflection;
+          document.getElementById('reflectionNextBtn').disabled = false;
+        });
+      });
+
+      document.getElementById('reflectionNextBtn').addEventListener('click', () => {
+        showInsight();
+        switchScene('sceneInsight');
+      });
+
+      document.getElementById('saveInsightBtn').addEventListener('click', async () => {
+        if (currentRecordCount >= 999) {
+          const warning = document.createElement('p');
+          warning.style.color = '#ff6b6b';
+          warning.style.marginTop = '1.5rem';
+          warning.style.textAlign = 'center';
+          warning.textContent = 'Límite alcanzado: máximo 999 experiencias guardadas.';
+          document.querySelector('.final-insight').appendChild(warning);
+          return;
+        }
+
+        const saveBtn = document.getElementById('saveInsightBtn');
+        const saveText = document.getElementById('saveInsightText');
+        saveBtn.disabled = true;
+        saveText.textContent = 'Guardando...';
+
+        switchScene('sceneLoading');
+
+        const sessionData = {
+          id: `session_${Date.now()}`,
+          mental_preparation: gameState.mentalPrep,
+          choices_made: gameState.choices.join(','),
+          points_repeated: gameState.pointsRepeated,
+          correct_decisions: gameState.correctDecisions,
+          errors_made: gameState.errorsMade,
+          final_reflection: gameState.reflection,
+          completed_at: new Date().toISOString()
+        };
+
+        const result = await window.dataSdk.create(sessionData);
+
+        if (result.isOk) {
+          setTimeout(() => {
+            switchScene('sceneFinal');
+          }, 2000);
+        } else {
+          saveBtn.disabled = false;
+          saveText.textContent = 'Guardar y Finalizar';
+          switchScene('sceneInsight');
+          
+          const error = document.createElement('p');
+          error.style.color = '#ff6b6b';
+          error.style.marginTop = '1.5rem';
+          error.style.textAlign = 'center';
+          error.textContent = 'Error al guardar. Intenta nuevamente.';
+          document.querySelector('.final-insight').appendChild(error);
+        }
+      });
+
+      document.getElementById('repeatBtn').addEventListener('click', () => {
+        resetGame();
+        switchScene('sceneIntro');
+      });
+
+      document.getElementById('reviewInsightBtn').addEventListener('click', () => {
+        switchScene('sceneInsight');
+      });
+    }
+
+    function setupPhaseChoices(phaseNum) {
+      const choices = document.querySelectorAll(`[data-phase="${phaseNum}"]`);
+      choices.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const choice = e.target.dataset.choice;
+          gameState.choices.push(`phase${phaseNum}_${choice}`);
+          handlePhaseChoice(phaseNum, choice);
+        });
+      });
+    }
+
+    function handlePhaseChoice(phase, choice) {
+      const resultBox = document.getElementById(`phase${phase}ResultBox`);
+      const icon = document.getElementById(`phase${phase}ResultIcon`);
+      const title = document.getElementById(`phase${phase}ResultTitle`);
+      const message = document.getElementById(`phase${phase}ResultMessage`);
+      const teaching = document.getElementById(`phase${phase}Teaching`);
+      const nextBtn = document.getElementById(`phase${phase}NextBtn`);
+
+      const outcomes = {
+        1: {
+          accelerate: {
+            success: false,
+            icon: '❌',
+            title: 'Error no forzado',
+            message: 'Perdiste el control. La pelota se va fuera.',
+            teaching: 'El punto aún no estaba maduro. La prisa es el enemigo del control.'
+          },
+          maintain: {
+            success: true,
+            icon: '✓',
+            title: 'Control mantenido',
+            message: 'El punto continúa bajo tu dominio.',
+            teaching: 'Paciencia. El control se construye golpe a golpe.'
+          },
+          change: {
+            success: false,
+            icon: '⚠️',
+            title: 'Desequilibrio',
+            message: 'Llegas tarde al siguiente golpe. Pierdes equilibrio.',
+            teaching: 'La dirección sin posición cuesta caro. Primero los pies, luego la pelota.'
+          }
+        },
+        2: {
+          force: {
+            success: false,
+            icon: '❌',
+            title: 'Otro error',
+            message: 'Intentaste forzar. El control se rompe.',
+            teaching: 'Forzar no es ajustar. Cuando estás mal, primero recupera, luego ataca.'
+          },
+          center: {
+            success: true,
+            icon: '✓',
+            title: 'Equilibrio recuperado',
+            message: 'El punto se estabiliza. Vuelves al control.',
+            teaching: 'El centro es tu mejor amigo bajo presión. Te da tiempo y neutraliza.'
+          },
+          defend: {
+            success: true,
+            icon: '✓',
+            title: 'Tiempo ganado',
+            message: 'La altura te da tiempo para reorganizarte.',
+            teaching: 'Defender también es controlar. Altura = tiempo = reorganización.'
+          }
+        },
+        3: {
+          rush: {
+            success: false,
+            icon: '❌',
+            title: 'Demasiado rápido',
+            message: 'Error. El punto no estaba listo para definir.',
+            teaching: 'La ansiedad rompió el momento. Un golpe más y era tuyo.'
+          },
+          wait: {
+            success: true,
+            icon: '🏆',
+            title: 'Paciencia premiada',
+            message: 'El rival comete el error. Punto ganado.',
+            teaching: 'La consistencia gana más puntos que la potencia. Confiaste en el proceso.'
+          },
+          attack: {
+            success: true,
+            icon: '⚡',
+            title: 'Ataque controlado',
+            message: 'Cambias dirección con equilibrio. Tomas la iniciativa.',
+            teaching: 'AHORA sí era el momento. Posición + oportunidad = éxito.'
+          }
+        },
+        4: {
+          'smash-hard': {
+            success: false,
+            icon: '💥',
+            title: 'Frustración = Error',
+            message: 'El smash forzado se va fuera. La emoción mandó.',
+            teaching: 'La frustración te hizo acelerar. En el tenis, quien se frustra, pierde.'
+          },
+          reposition: {
+            success: true,
+            icon: '🔄',
+            title: 'Control mental',
+            message: 'Te reorganizas. Reconstruyes el punto con calma.',
+            teaching: 'Aceptaste la situación y ajustaste. Eso es madurez competitiva.'
+          },
+          'push-back': {
+            success: true,
+            icon: '🛡️',
+            title: 'Defensa inteligente',
+            message: 'Profundidad y altura. Esperas el próximo error del rival.',
+            teaching: 'No todos los puntos se ganan atacando. A veces, no perder es ganar.'
+          }
+        },
+        5: {
+          'winner-hard': {
+            success: false,
+            icon: '🚀',
+            title: 'Demasiado riesgo',
+            message: 'Intentaste el winner perfecto. Se fue por centímetros.',
+            teaching: 'Tenías el punto ganado. No necesitabas el golpe perfecto, solo el efectivo.'
+          },
+          'short-angle': {
+            success: true,
+            icon: '🎯',
+            title: '¡Punto ganado!',
+            message: 'Ángulo corto con efecto. El rival no llega.',
+            teaching: 'Elegiste el momento exacto y el golpe correcto. Maestría.'
+          },
+          'deep-safe': {
+            success: true,
+            icon: '✓',
+            title: '¡Punto ganado!',
+            message: 'Profundo y seguro. El rival fuerza y falla.',
+            teaching: 'La seguridad también define puntos. Presionaste sin arriesgar.'
+          }
+        }
+      };
+
+      const outcome = outcomes[phase][choice];
+      
+      if (outcome.success) {
+        resultBox.className = 'result-screen success';
+        gameState.correctDecisions++;
+      } else {
+        resultBox.className = 'result-screen failure';
+        gameState.errorsMade++;
+      }
+
+      icon.textContent = outcome.icon;
+      title.textContent = outcome.title;
+      message.textContent = outcome.message;
+      teaching.textContent = outcome.teaching;
+
+      if (phase === 1 || phase === 2) {
+        nextBtn.textContent = outcome.success ? 'Continuar Rally' : 'Repetir el Punto';
+      } else if (phase === 3) {
+        nextBtn.textContent = outcome.success ? 'Continuar Rally' : 'Repetir el Punto';
+      } else if (phase === 4) {
+        nextBtn.textContent = outcome.success ? 'Definir el Punto' : 'Repetir el Punto';
+      }
+
+      switchScene(`scenePhase${phase}Result`);
+    }
+
+    function updateAnalysisStats() {
+      document.getElementById('statRepeated').textContent = gameState.pointsRepeated;
+      document.getElementById('statCorrect').textContent = gameState.correctDecisions;
+      document.getElementById('statErrors').textContent = gameState.errorsMade;
+    }
+
+    function showInsight() {
+      const insightText = document.getElementById('insightText');
+      
+      const insights = {
+        acceleration: 'Tu ajuste principal es PACIENCIA TÉCNICA. Construye el punto antes de definirlo.',
+        positioning: 'Tu ajuste principal es MEJOR COLOCACIÓN. Primero los pies, luego la pelota.',
+        rhythm: 'Tu ajuste principal es CONFIAR EN EL PROCESO. El ritmo controlado gana partidos.'
+      };
+
+      insightText.textContent = insights[gameState.reflection] || insights.rhythm;
+    }
+
+    function switchScene(sceneId) {
+      document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+      document.getElementById(sceneId).classList.add('active');
+      acScrollToTop();
+    }
+
+    function resetGame() {
+      gameState = {
+        mentalPrep: null,
+        choices: [],
+        pointsRepeated: 0,
+        correctDecisions: 0,
+        errorsMade: 0,
+        reflection: null
+      };
+
+      document.querySelectorAll('.mental-card, .reflection-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById('mentalContinue').disabled = true;
+      document.getElementById('reflectionNextBtn').disabled = true;
+      document.getElementById('saveInsightBtn').disabled = false;
+      document.getElementById('saveInsightText').textContent = 'Guardar y Finalizar';
+    }
+
+    initializeApp();
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) {
+      acScrollToTop();
+      return;
+    }
+
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+
+    try {
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, Math.max(0, top));
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    window.scrollTo(0, 0);
+  });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>

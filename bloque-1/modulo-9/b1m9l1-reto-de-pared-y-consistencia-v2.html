@@ -1,0 +1,1078 @@
+﻿<!doctype html>
+<html lang="es" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reto de Pared y Consistencia</title>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease-out;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+
+    .container,
+    .game-container,
+    .game-wrapper,
+    .app-wrapper,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .phase-container,
+    .phase-card,
+    .content,
+    .content-area,
+    .modal-content,
+    .results-card,
+    .scene,
+    .phase-content {
+      padding: 16px !important;
+    }
+
+    h1, .main-title, .game-title, .title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+
+    h2, .phase-title, .stage-title, .final-title, .section-title {
+      font-size: clamp(1.3rem, 6vw, 1.7rem) !important;
+      line-height: 1.25 !important;
+    }
+
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label {
+      font-size: clamp(1rem, 4.5vw, 1.15rem) !important;
+      line-height: 1.4 !important;
+    }
+
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text, .intro-message, .quote {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+
+    .button-group,
+    .action-buttons,
+    .final-buttons,
+    .controls-row {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+
+    button,
+    .btn,
+    .btn-primary,
+    .btn-secondary,
+    .action-button,
+    .option-btn {
+      width: 100% !important;
+    }
+
+    .zone-grid,
+    .scenario-grid,
+    .options-grid,
+    .results-stats {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    setConfig: function () {},
+    config: {}
+  };
+
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body class="h-full overflow-auto">
+  <div id="app" class="w-full h-full"></div>
+  <script>
+    const defaultConfig = {
+      background_color: "#0f172a",
+      surface_color: "#1e293b",
+      text_color: "#f1f5f9",
+      primary_action_color: "#10b981",
+      secondary_action_color: "#6366f1",
+      font_family: "system-ui",
+      font_size: 16,
+      main_title: "Reto de Pared y Consistencia",
+      subtitle: "Ritmo, dirección y control mental",
+      intro_quote: "Quien controla la pelota, controla el punto.",
+      closing_quote: "Si puedes controlar la pelota contra la pared, puedes controlarla en un partido."
+    };
+
+    let currentPhase = 'intro';
+    let sessionData = [];
+    let playerScore = 0;
+    let completedChallenges = {
+      challenge1: null,
+      challenge2: null,
+      mental: null
+    };
+
+    const phases = {
+      intro: {
+        title: "🎾 El Reto de la Pared",
+        content: `
+          <div class="space-y-6">
+            <div class="info-box">
+              <p class="phase-text mb-3">La pared te devuelve EXACTAMENTE lo que le mandas. Control = pelota controlada. Descontrol = caos.</p>
+            </div>
+            
+            <div class="phase-quote">
+              <span class="principle-text"></span>
+            </div>
+            
+            <div class="warning-box">
+              <p class="phase-text"><strong>⚠️ Regla:</strong> Golpea al 40% de tu fuerza. Esto es control, no potencia.</p>
+            </div>
+          </div>
+        `,
+        button: "Comenzar",
+        nextPhase: 'challenge1'
+      },
+      challenge1: {
+        title: "🎯 Reto 1: Ritmo",
+        content: `
+          <div class="space-y-6">
+            <div class="challenge-box">
+              <p class="phase-text text-xl mb-4 font-semibold">"Golpea 10 veces seguidas manteniendo el mismo ritmo"</p>
+              
+              <ul class="space-y-2 phase-text">
+                <li>• Distancia: 3-4 metros de la pared</li>
+                <li>• Altura: Nivel del pecho</li>
+                <li>• Potencia: 40% de tu fuerza</li>
+                <li>• Tempo: "1... 2... 1... 2..."</li>
+              </ul>
+              
+              <div class="tip-box">
+                💡 Si pierdes control antes de 10, empieza MÁS SUAVE, no más fuerte.
+              </div>
+            </div>
+            
+            <p class="phase-text font-semibold text-lg">¿Cómo te fue?</p>
+            
+            <div class="space-y-3" id="challenge1-options">
+              <button class="evaluation-button" data-result="excellent">
+                🔥 Logré 10 con control
+              </button>
+              <button class="evaluation-button" data-result="good">
+                🙂 Logré 10 pero me costó
+              </button>
+              <button class="evaluation-button" data-result="struggling">
+                😕 Perdí control antes de 10
+              </button>
+            </div>
+            
+            <div id="feedback1" class="feedback-box hidden"></div>
+          </div>
+        `,
+        button: null,
+        nextPhase: 'challenge2'
+      },
+      challenge2: {
+        title: "🎯 Reto 2: Dirección",
+        content: `
+          <div class="space-y-6">
+            <div class="challenge-box">
+              <p class="phase-text text-xl mb-4 font-semibold">"Golpea 8 veces apuntando AL MISMO PUNTO de la pared"</p>
+              
+              <ul class="space-y-2 phase-text">
+                <li>• Escoge un punto de referencia</li>
+                <li>• Todas las pelotas deben pasar por ahí (±30cm)</li>
+                <li>• Mira el punto antes de cada golpe</li>
+                <li>• Golpea adelante del cuerpo</li>
+              </ul>
+              
+              <div class="tip-box">
+                💡 Si la pelota va a otro lado, ajusta TUS PIES, no tu brazo.
+              </div>
+            </div>
+            
+            <p class="phase-text font-semibold text-lg">¿Cómo te fue?</p>
+            
+            <div class="space-y-3" id="challenge2-options">
+              <button class="evaluation-button" data-result="accurate">
+                🎯 Mantuve dirección (6-8 golpes al punto)
+              </button>
+              <button class="evaluation-button" data-result="varied">
+                🔄 La pelota se me iba a diferentes lados
+              </button>
+              <button class="evaluation-button" data-result="lost">
+                ❌ Perdí ritmo y dirección
+              </button>
+            </div>
+            
+            <div id="feedback2" class="feedback-box hidden"></div>
+          </div>
+        `,
+        button: null,
+        nextPhase: 'mental'
+      },
+      mental: {
+        title: "🧠 Reto Mental",
+        content: `
+          <div class="space-y-6">
+            <div class="scenario-box">
+              <p class="phase-text text-xl">"Fallaste 2 golpes seguidos contra la pared."</p>
+            </div>
+            
+            <p class="phase-text font-semibold text-xl">¿Qué haces?</p>
+            
+            <div class="space-y-3" id="mental-options">
+              <button class="evaluation-button" data-result="accelerate">
+                Acelero más
+              </button>
+              <button class="evaluation-button" data-result="frustrate">
+                Me frustro
+              </button>
+              <button class="evaluation-button" data-result="change">
+                Cambio de ejercicio
+              </button>
+              <button class="evaluation-button" data-result="reorganize">
+                Bajo velocidad y me reorganizo
+              </button>
+            </div>
+            
+            <div id="feedback-mental" class="feedback-box hidden"></div>
+          </div>
+        `,
+        button: null,
+        nextPhase: 'reflection'
+      },
+      reflection: {
+        title: "💭 Reflexión",
+        content: `
+          <div class="space-y-6">
+            <div class="space-y-4">
+              <div>
+                <label class="block phase-text font-semibold mb-2">¿Qué fue más difícil: ritmo o dirección?</label>
+                <textarea id="reflect1" class="reflection-input" rows="2"></textarea>
+              </div>
+              
+              <div>
+                <label class="block phase-text font-semibold mb-2">¿Cómo reaccionaste al error?</label>
+                <textarea id="reflect2" class="reflection-input" rows="2"></textarea>
+              </div>
+            </div>
+            
+            <div class="final-message">
+              <p class="phase-text text-xl mb-4"><span class="closing-quote-text"></span></p>
+              <p class="phase-text italic">La pared entrena tu golpe, pero también entrena tu respuesta al error.</p>
+            </div>
+          </div>
+        `,
+        button: "Guardar reflexión",
+        nextPhase: 'complete'
+      },
+      complete: {
+        title: "✅ Completado",
+        content: `
+          <div class="space-y-6">
+            <div id="stats-display" class="stats-container"></div>
+            
+            <div class="completion-box">
+              <p class="phase-text text-xl">¡Excelente trabajo!</p>
+              <p class="phase-text mt-4">Has completado el Reto de la Pared.</p>
+            </div>
+            
+            <div class="principle-box">
+              💡 Recuerda: Primero ritmo, luego dirección, después potencia.
+            </div>
+            
+            <div class="flex flex-col gap-3">
+              <button id="repeat-btn" class="action-button-primary">
+                🔄 Repetir reto
+              </button>
+              <button id="court-btn" class="action-button-secondary">
+                🎾 Llevar a la cancha
+              </button>
+            </div>
+          </div>
+        `,
+        button: null,
+        nextPhase: null
+      }
+    };
+
+    const scoreValues = {
+      excellent: 100,
+      good: 70,
+      struggling: 40,
+      accurate: 100,
+      varied: 70,
+      lost: 40,
+      reorganize: 100,
+      change: 60,
+      frustrate: 40,
+      accelerate: 30
+    };
+
+    const feedback = {
+      challenge1: {
+        excellent: {
+          text: "🔥 ¡Excelente! Tu cerebro está automatizando el movimiento correcto.",
+          principle: "La pared amplifica errores y acelera aprendizaje.",
+          points: 100
+        },
+        good: {
+          text: "🙂 Bien hecho. Si te sentiste forzado, estás golpeando con tensión. Relájate más.",
+          principle: "El tenis se juega relajado, no tenso.",
+          points: 70
+        },
+        struggling: {
+          text: "😕 Estás golpeando más fuerte de lo que tu técnica puede controlar. Baja la intensidad.",
+          principle: "Control viene de suavidad, no de fuerza.",
+          points: 40
+        }
+      },
+      challenge2: {
+        accurate: {
+          text: "🎯 ¡Impresionante! Precisión real. Preparación, contacto y seguimiento alineados.",
+          principle: "Primero ritmo, luego dirección, después potencia.",
+          points: 100
+        },
+        varied: {
+          text: "🔄 Tu dirección varía porque tu cuerpo no está balanceado al golpear. Problema de pies, no de brazo.",
+          principle: "Orienta tus pies hacia el objetivo antes de golpear.",
+          points: 70
+        },
+        lost: {
+          text: "❌ Intentaste dos cosas nuevas simultáneamente. Regresa al ritmo básico hasta que sea automático.",
+          principle: "No puedes saltarte pasos. Domina ritmo primero.",
+          points: 40
+        }
+      },
+      mental: {
+        accelerate: {
+          text: "❌ Acelerar cuando fallas empeora las cosas. La velocidad viene del control.",
+          principle: "Control técnico = control emocional.",
+          points: 30
+        },
+        frustrate: {
+          text: "😕 La frustración es normal pero no ayuda. Reconocerla es el primer paso.",
+          principle: "Control técnico = control emocional.",
+          points: 40
+        },
+        change: {
+          text: "🔄 Cambiar de ejercicio puede ser escape. A veces lo mejor es insistir con paciencia.",
+          principle: "Control técnico = control emocional.",
+          points: 60
+        },
+        reorganize: {
+          text: "✅ Perfecto. Esta es la mentalidad que mejora constantemente. Inteligencia táctica.",
+          principle: "Control técnico = control emocional.",
+          points: 100
+        }
+      }
+    };
+
+    function renderStatsDisplay() {
+      const statsDisplay = document.getElementById('stats-display');
+      if (!statsDisplay) return;
+      
+      statsDisplay.innerHTML = `
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-value">${playerScore}</div>
+            <div class="stat-label">Puntos totales</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon">✅</div>
+            <div class="stat-value">${Object.values(completedChallenges).filter(v => v).length}/3</div>
+            <div class="stat-label">Retos completados</div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function render() {
+      const app = document.getElementById('app');
+      const phase = phases[currentPhase];
+      
+      app.innerHTML = `
+        <div class="app-container">
+          <header class="header-section">
+            <h1 class="main-title-text"></h1>
+            <p class="subtitle-text"></p>
+          </header>
+          
+          <main class="main-content">
+            <div class="phase-container fade-in">
+              <h2 class="phase-title">${phase.title}</h2>
+              <div class="phase-content">${phase.content}</div>
+              ${phase.button ? `<button id="next-btn" class="action-button-primary">${phase.button}</button>` : ''}
+            </div>
+          </main>
+        </div>
+      `;
+      
+      updateTextContent();
+      
+      if (currentPhase === 'complete') {
+        renderStatsDisplay();
+      }
+      
+      attachEventListeners();
+    }
+
+    function updateTextContent() {
+      const config = window.elementSdk?.config || defaultConfig;
+      
+      document.querySelector('.main-title-text').textContent = config.main_title || defaultConfig.main_title;
+      document.querySelector('.subtitle-text').textContent = config.subtitle || defaultConfig.subtitle;
+      
+      const principleText = document.querySelector('.principle-text');
+      if (principleText) {
+        principleText.textContent = config.intro_quote || defaultConfig.intro_quote;
+      }
+      
+      const closingQuoteText = document.querySelector('.closing-quote-text');
+      if (closingQuoteText) {
+        closingQuoteText.textContent = config.closing_quote || defaultConfig.closing_quote;
+      }
+    }
+
+    function applyStyles() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseFont = config.font_size || defaultConfig.font_size;
+      const baseFontStack = 'system-ui, -apple-system, sans-serif';
+      
+      const style = document.createElement('style');
+      style.textContent = `
+        .app-container {
+          background: ${config.background_color || defaultConfig.background_color};
+          color: ${config.text_color || defaultConfig.text_color};
+          font-family: ${customFont}, ${baseFontStack};
+          min-height: 100%;
+          padding: 24px;
+        }
+        
+        .header-section {
+          text-align: center;
+          margin-bottom: 32px;
+        }
+        
+        .main-title-text {
+          font-size: ${baseFont * 2.5}px;
+          font-weight: bold;
+          margin-bottom: 8px;
+        }
+        
+        .subtitle-text {
+          font-size: ${baseFont * 1.25}px;
+          opacity: 0.9;
+        }
+        
+        .main-content {
+          max-width: 700px;
+          margin: 0 auto;
+        }
+        
+        .phase-container {
+          background: ${config.surface_color || defaultConfig.surface_color};
+          border-radius: 16px;
+          padding: 32px;
+        }
+        
+        .phase-title {
+          font-size: ${baseFont * 1.75}px;
+          font-weight: bold;
+          margin-bottom: 24px;
+          color: ${config.primary_action_color || defaultConfig.primary_action_color};
+        }
+        
+        .phase-content {
+          font-size: ${baseFont}px;
+        }
+        
+        .phase-text {
+          font-size: ${baseFont}px;
+          line-height: 1.6;
+        }
+        
+        .phase-quote {
+          background: ${config.background_color || defaultConfig.background_color};
+          border-left: 4px solid ${config.primary_action_color || defaultConfig.primary_action_color};
+          padding: 20px;
+          border-radius: 8px;
+          font-size: ${baseFont * 1.125}px;
+          font-style: italic;
+          line-height: 1.6;
+        }
+        
+        .info-box {
+          background: ${config.background_color || defaultConfig.background_color};
+          border-left: 4px solid ${config.secondary_action_color || defaultConfig.secondary_action_color};
+          padding: 20px;
+          border-radius: 8px;
+        }
+        
+        .warning-box {
+          background: ${config.background_color || defaultConfig.background_color};
+          border-left: 4px solid #f59e0b;
+          padding: 20px;
+          border-radius: 8px;
+        }
+        
+        .tip-box {
+          background: ${config.primary_action_color || defaultConfig.primary_action_color};
+          color: ${config.background_color || defaultConfig.background_color};
+          padding: 16px;
+          border-radius: 8px;
+          margin: 16px 0;
+          font-weight: 500;
+        }
+        
+        .challenge-box {
+          background: ${config.background_color || defaultConfig.background_color};
+          padding: 24px;
+          border-radius: 12px;
+          border: 2px solid ${config.primary_action_color || defaultConfig.primary_action_color};
+        }
+        
+        .scenario-box {
+          background: ${config.background_color || defaultConfig.background_color};
+          padding: 24px;
+          border-radius: 12px;
+          border: 2px solid ${config.secondary_action_color || defaultConfig.secondary_action_color};
+        }
+        
+        .evaluation-button {
+          width: 100%;
+          background: ${config.surface_color || defaultConfig.surface_color};
+          border: 2px solid ${config.text_color || defaultConfig.text_color};
+          color: ${config.text_color || defaultConfig.text_color};
+          padding: 16px;
+          border-radius: 8px;
+          font-size: ${baseFont * 1.125}px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-align: left;
+        }
+        
+        .evaluation-button:hover {
+          background: ${config.primary_action_color || defaultConfig.primary_action_color};
+          border-color: ${config.primary_action_color || defaultConfig.primary_action_color};
+          transform: translateX(8px);
+        }
+        
+        .feedback-box {
+          background: ${config.background_color || defaultConfig.background_color};
+          border-left: 4px solid ${config.primary_action_color || defaultConfig.primary_action_color};
+          padding: 20px;
+          border-radius: 8px;
+          font-size: ${baseFont}px;
+          line-height: 1.6;
+        }
+        
+        .reflection-input {
+          width: 100%;
+          background: ${config.background_color || defaultConfig.background_color};
+          color: ${config.text_color || defaultConfig.text_color};
+          border: 2px solid ${config.text_color || defaultConfig.text_color};
+          padding: 12px;
+          border-radius: 8px;
+          font-size: ${baseFont}px;
+          font-family: ${customFont}, ${baseFontStack};
+          resize: vertical;
+        }
+        
+        .final-message {
+          background: ${config.background_color || defaultConfig.background_color};
+          padding: 24px;
+          border-radius: 12px;
+          border: 2px solid ${config.primary_action_color || defaultConfig.primary_action_color};
+        }
+        
+        .completion-box {
+          background: ${config.primary_action_color || defaultConfig.primary_action_color};
+          color: ${config.background_color || defaultConfig.background_color};
+          padding: 32px;
+          border-radius: 12px;
+          text-align: center;
+        }
+        
+        .principle-box {
+          background: ${config.background_color || defaultConfig.background_color};
+          border: 2px solid ${config.primary_action_color || defaultConfig.primary_action_color};
+          padding: 20px;
+          border-radius: 8px;
+          font-size: ${baseFont}px;
+          line-height: 1.6;
+        }
+        
+        .action-button-primary {
+          width: 100%;
+          background: ${config.primary_action_color || defaultConfig.primary_action_color};
+          color: ${config.background_color || defaultConfig.background_color};
+          border: none;
+          padding: 16px 32px;
+          border-radius: 8px;
+          font-size: ${baseFont * 1.125}px;
+          font-weight: bold;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          margin-top: 24px;
+        }
+        
+        .action-button-primary:hover {
+          transform: scale(1.05);
+          box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+        
+        .action-button-secondary {
+          width: 100%;
+          background: ${config.surface_color || defaultConfig.surface_color};
+          color: ${config.text_color || defaultConfig.text_color};
+          border: 2px solid ${config.secondary_action_color || defaultConfig.secondary_action_color};
+          padding: 16px 32px;
+          border-radius: 8px;
+          font-size: ${baseFont * 1.125}px;
+          font-weight: bold;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        
+        .action-button-secondary:hover {
+          background: ${config.secondary_action_color || defaultConfig.secondary_action_color};
+          transform: scale(1.05);
+        }
+        
+        .stats-container {
+          background: ${config.background_color || defaultConfig.background_color};
+          padding: 24px;
+          border-radius: 12px;
+          margin-bottom: 24px;
+        }
+        
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+          gap: 16px;
+        }
+        
+        .stat-item {
+          text-align: center;
+          padding: 16px;
+          background: ${config.surface_color || defaultConfig.surface_color};
+          border-radius: 8px;
+        }
+        
+        .stat-icon {
+          font-size: ${baseFont * 2}px;
+          margin-bottom: 8px;
+        }
+        
+        .stat-value {
+          font-size: ${baseFont * 1.5}px;
+          font-weight: bold;
+          color: ${config.primary_action_color || defaultConfig.primary_action_color};
+          margin-bottom: 4px;
+        }
+        
+        .stat-label {
+          font-size: ${baseFont * 0.875}px;
+          opacity: 0.8;
+        }
+      `;
+      
+      const existingStyle = document.querySelector('style[data-dynamic]');
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+      style.setAttribute('data-dynamic', 'true');
+      document.head.appendChild(style);
+    }
+
+    function attachEventListeners() {
+      if (currentPhase === 'challenge1') {
+        const options = document.querySelectorAll('#challenge1-options .evaluation-button');
+        options.forEach(btn => {
+          btn.addEventListener('click', () => handleChallengeResponse('challenge1', btn.dataset.result));
+        });
+      }
+      
+      if (currentPhase === 'challenge2') {
+        const options = document.querySelectorAll('#challenge2-options .evaluation-button');
+        options.forEach(btn => {
+          btn.addEventListener('click', () => handleChallengeResponse('challenge2', btn.dataset.result));
+        });
+      }
+      
+      if (currentPhase === 'mental') {
+        const options = document.querySelectorAll('#mental-options .evaluation-button');
+        options.forEach(btn => {
+          btn.addEventListener('click', () => handleChallengeResponse('mental', btn.dataset.result));
+        });
+      }
+      
+      if (currentPhase === 'complete') {
+        document.getElementById('repeat-btn')?.addEventListener('click', repeatGame);
+        document.getElementById('court-btn')?.addEventListener('click', showCourtMessage);
+      }
+      
+      const nextBtn = document.getElementById('next-btn');
+      if (nextBtn) {
+        nextBtn.addEventListener('click', handleNext);
+      }
+    }
+
+    async function handleChallengeResponse(challengeType, result) {
+      const feedbackData = feedback[challengeType][result];
+      const feedbackBoxId = challengeType === 'challenge1' ? 'feedback1' : 
+                           challengeType === 'challenge2' ? 'feedback2' :
+                           'feedback-mental';
+      const feedbackBox = document.getElementById(feedbackBoxId);
+      
+      playerScore += feedbackData.points;
+      completedChallenges[challengeType] = result;
+      
+      const nextPhaseMap = {
+        'challenge1': 'challenge2',
+        'challenge2': 'mental',
+        'mental': 'reflection'
+      };
+      
+      const buttonTextMap = {
+        'challenge1': 'Siguiente reto',
+        'challenge2': 'Reto mental',
+        'mental': 'Reflexionar'
+      };
+      
+      feedbackBox.innerHTML = `
+        <p class="phase-text mb-4">${feedbackData.text}</p>
+        <div class="principle-box mb-4">
+          💡 <strong>${feedbackData.principle}</strong>
+        </div>
+        <div style="background: ${(window.elementSdk?.config || defaultConfig).primary_action_color}; color: ${(window.elementSdk?.config || defaultConfig).background_color}; padding: 12px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 16px;">
+          +${feedbackData.points} puntos
+        </div>
+        <button id="continue-btn" class="action-button-primary">${buttonTextMap[challengeType]}</button>
+      `;
+      feedbackBox.classList.remove('hidden');
+      feedbackBox.classList.add('fade-in');
+      
+      await saveProgress(challengeType, result, '', feedbackData.points);
+      
+      document.getElementById('continue-btn').addEventListener('click', () => {
+        currentPhase = nextPhaseMap[challengeType];
+        render();
+      });
+      
+      document.querySelectorAll(`#${challengeType}-options .evaluation-button`).forEach(btn => {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+      });
+    }
+
+    async function handleNext() {
+      if (currentPhase === 'reflection') {
+        const reflect1 = document.getElementById('reflect1').value;
+        const reflect2 = document.getElementById('reflect2').value;
+        const reflectionNotes = `Dificultad: ${reflect1} | Reacción: ${reflect2}`;
+        
+        await saveProgress('reflection', 'completed', reflectionNotes);
+      }
+      
+      const phase = phases[currentPhase];
+      if (phase.nextPhase) {
+        currentPhase = phase.nextPhase;
+        render();
+      }
+    }
+
+    async function saveProgress(phase, result, notes = '', points = 0) {
+      if (!window.dataSdk) return;
+      
+      const sessionId = `session-${Date.now()}`;
+      const timestamp = new Date().toISOString();
+      
+      const record = {
+        session_id: sessionId,
+        timestamp: timestamp,
+        phase: phase,
+        challenge_result: result,
+        reflection_notes: notes,
+        score: playerScore
+      };
+      
+      const saveResult = await window.dataSdk.create(record);
+      if (!saveResult.isOk) {
+        console.error('Error saving progress');
+      }
+    }
+
+    function repeatGame() {
+      currentPhase = 'intro';
+      playerScore = 0;
+      completedChallenges = {
+        challenge1: null,
+        challenge2: null,
+        mental: null
+      };
+      render();
+    }
+
+    function showCourtMessage() {
+      const app = document.getElementById('app');
+      
+      app.innerHTML = `
+        <div class="app-container">
+          <header class="header-section">
+            <h1 class="main-title-text"></h1>
+            <p class="subtitle-text"></p>
+          </header>
+          
+          <main class="main-content">
+            <div class="phase-container fade-in">
+              <h2 class="phase-title">🎾 Ejercicios para la Cancha</h2>
+              
+              <div class="space-y-6">
+                <div class="completion-box">
+                  <p class="phase-text text-xl">Ahora lleva el control a la cancha con estos ejercicios técnicos</p>
+                </div>
+                
+                <div class="challenge-box">
+                  <h3 class="phase-text text-xl font-bold mb-4">🖐️ 1. Empuñadura y Contacto</h3>
+                  <ul class="space-y-3 phase-text">
+                    <li><strong>Prueba de empuñadura:</strong> Golpea 10 pelotas SIN mirar tu mano. ¿La empuñadura se mantiene igual? Si se mueve, estás agarrando con tensión.</li>
+                    <li><strong>Punto de impacto:</strong> Coloca una marca en la raqueta (cinta adhesiva). Intenta que TODAS las pelotas golpeen ese punto central. Control = consistencia en el impacto.</li>
+                    <li><strong>Sensibilidad:</strong> Cierra los ojos en el momento del contacto. ¿Sientes dónde golpeó la pelota en la raqueta? Desarrolla esa conciencia.</li>
+                  </ul>
+                  <div class="tip-box">
+                    💡 Una empuñadura relajada permite sentir la pelota. Tensión = pérdida de sensibilidad.
+                  </div>
+                </div>
+                
+                <div class="challenge-box">
+                  <h3 class="phase-text text-xl font-bold mb-4">⚡ 2. Preparación Temprana</h3>
+                  <ul class="space-y-3 phase-text">
+                    <li><strong>Regla del paso partido:</strong> Cada vez que tu compañero golpea, haz un pequeño salto de separación. Esto activa tu preparación.</li>
+                    <li><strong>Raqueta atrás antes:</strong> Lleva la raqueta atrás ANTES de que la pelota cruce la red. Si esperas más, llegaste tarde.</li>
+                    <li><strong>Giro de hombros:</strong> No solo muevas el brazo. Gira el hombro no dominante hacia la red. Ese giro genera el golpe, no el brazo.</li>
+                  </ul>
+                  <div class="tip-box">
+                    💡 Preparación tardía = golpes apurados. Tiempo = control.
+                  </div>
+                </div>
+                
+                <div class="challenge-box">
+                  <h3 class="phase-text text-xl font-bold mb-4">👣 3. Pies y Equilibrio</h3>
+                  <ul class="space-y-3 phase-text">
+                    <li><strong>Prueba de equilibrio:</strong> Después de cada golpe, mantén el equilibrio en un pie por 2 segundos. ¿Puedes? Si te tambaleas, tu golpe está desbalanceado.</li>
+                    <li><strong>Paso de ajuste:</strong> Antes de cada golpe, da un paso pequeño de ajuste. Nunca golpees con los pies "pegados" al suelo.</li>
+                    <li><strong>Base amplia:</strong> Tus pies deben estar separados (ancho de hombros mínimo) al golpear. Base estrecha = pérdida de control.</li>
+                  </ul>
+                  <div class="tip-box">
+                    💡 Los buenos golpes se construyen desde los pies, no desde el brazo.
+                  </div>
+                </div>
+                
+                <div class="challenge-box">
+                  <h3 class="phase-text text-xl font-bold mb-4">🎯 4. Zona de Impacto Adelante</h3>
+                  <ul class="space-y-3 phase-text">
+                    <li><strong>Línea imaginaria:</strong> Imagina una línea vertical desde tu hombro delantero al suelo. La pelota DEBE ser golpeada delante de esa línea, nunca atrás.</li>
+                    <li><strong>Brazo extendido:</strong> En el momento del impacto, tu brazo debe estar casi completamente extendido adelante del cuerpo.</li>
+                    <li><strong>Prueba visual:</strong> Pide a alguien que te grabe. ¿La pelota está adelante de tu cadera? Si está a la altura o atrás, pierdes potencia y control.</li>
+                  </ul>
+                  <div class="tip-box">
+                    💡 Golpear tarde (pelota a tu lado) = golpes débiles y sin dirección.
+                  </div>
+                </div>
+                
+                <div class="challenge-box">
+                  <h3 class="phase-text text-xl font-bold mb-4">🧘 5. Control del Acompañamiento</h3>
+                  <ul class="space-y-3 phase-text">
+                    <li><strong>Terminación alta:</strong> Tu raqueta debe terminar arriba del hombro opuesto. Si termina abajo o a un lado, el golpe se "cortó".</li>
+                    <li><strong>Congelación del golpe:</strong> Después de cada golpe, congela tu posición de terminación por 1 segundo. ¿Estás balanceado?</li>
+                    <li><strong>Mano libre:</strong> Tu mano no dominante debe apuntar hacia donde golpeaste. Esto mantiene el equilibrio del cuerpo.</li>
+                  </ul>
+                  <div class="tip-box">
+                    💡 El acompañamiento no es decorativo. Controla la dirección y profundidad de tu golpe.
+                  </div>
+                </div>
+                
+                <div class="final-message">
+                  <p class="phase-text text-xl mb-4"><span class="closing-quote-text"></span></p>
+                  <p class="phase-text italic">Cada detalle técnico es una pieza del control total. Trabaja uno a la vez.</p>
+                </div>
+                
+                <button id="restart-btn" class="action-button-primary">
+                  🔄 Volver al inicio
+                </button>
+              </div>
+            </div>
+          </main>
+        </div>
+      `;
+      
+      applyStyles();
+      updateTextContent();
+      
+      document.getElementById('restart-btn')?.addEventListener('click', () => {
+        currentPhase = 'intro';
+        playerScore = 0;
+        completedChallenges = {
+          challenge1: null,
+          challenge2: null,
+          mental: null
+        };
+        render();
+      });
+    }
+
+    const dataHandler = {
+      onDataChanged(data) {
+        sessionData = data;
+      }
+    };
+
+    async function onConfigChange(config) {
+      applyStyles();
+      updateTextContent();
+    }
+
+    async function init() {
+      if (window.dataSdk) {
+        const initResult = await window.dataSdk.init(dataHandler);
+        if (!initResult.isOk) {
+          console.error('Failed to initialize Data SDK');
+        }
+      }
+      
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities: (config) => ({
+            recolorables: [
+              {
+                get: () => config.background_color || defaultConfig.background_color,
+                set: (value) => {
+                  config.background_color = value;
+                  window.elementSdk.setConfig({ background_color: value });
+                }
+              },
+              {
+                get: () => config.surface_color || defaultConfig.surface_color,
+                set: (value) => {
+                  config.surface_color = value;
+                  window.elementSdk.setConfig({ surface_color: value });
+                }
+              },
+              {
+                get: () => config.text_color || defaultConfig.text_color,
+                set: (value) => {
+                  config.text_color = value;
+                  window.elementSdk.setConfig({ text_color: value });
+                }
+              },
+              {
+                get: () => config.primary_action_color || defaultConfig.primary_action_color,
+                set: (value) => {
+                  config.primary_action_color = value;
+                  window.elementSdk.setConfig({ primary_action_color: value });
+                }
+              },
+              {
+                get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+                set: (value) => {
+                  config.secondary_action_color = value;
+                  window.elementSdk.setConfig({ secondary_action_color: value });
+                }
+              }
+            ],
+            borderables: [],
+            fontEditable: {
+              get: () => config.font_family || defaultConfig.font_family,
+              set: (value) => {
+                config.font_family = value;
+                window.elementSdk.setConfig({ font_family: value });
+              }
+            },
+            fontSizeable: {
+              get: () => config.font_size || defaultConfig.font_size,
+              set: (value) => {
+                config.font_size = value;
+                window.elementSdk.setConfig({ font_size: value });
+              }
+            }
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ['main_title', config.main_title || defaultConfig.main_title],
+            ['subtitle', config.subtitle || defaultConfig.subtitle],
+            ['intro_quote', config.intro_quote || defaultConfig.intro_quote],
+            ['closing_quote', config.closing_quote || defaultConfig.closing_quote]
+          ])
+        });
+      }
+      
+      render();
+      applyStyles();
+    }
+
+    init();
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) {
+      acScrollToTop();
+      return;
+    }
+
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+
+    try {
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, Math.max(0, top));
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    window.scrollTo(0, 0);
+  });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>

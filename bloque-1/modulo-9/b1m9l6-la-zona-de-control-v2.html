@@ -1,0 +1,1313 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Zona de Control</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    html, body, #app {
+      height: 100%;
+      width: 100%;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .game-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+      width: 100%;
+    }
+
+    .phase-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .phase-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, #4ade80, #22d3ee);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .phase-subtitle {
+      font-size: 1rem;
+      color: #94a3b8;
+      font-weight: 400;
+    }
+
+    .intro-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    .intro-quote {
+      font-size: 1.5rem;
+      line-height: 1.6;
+      text-align: center;
+      margin-bottom: 2rem;
+      font-style: italic;
+      color: #e2e8f0;
+    }
+
+    .zone-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .zone-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border-left: 4px solid;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .zone-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .zone-card.green {
+      border-left-color: #4ade80;
+    }
+
+    .zone-card.yellow {
+      border-left-color: #fbbf24;
+    }
+
+    .zone-card.red {
+      border-left-color: #ef4444;
+    }
+
+    .zone-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .zone-name {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .zone-description {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 0.5rem;
+      line-height: 1.5;
+    }
+
+    .zone-action {
+      font-size: 0.95rem;
+      color: #e2e8f0;
+      font-weight: 500;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .key-rule {
+      background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 2rem 0;
+      color: #1a1a2e;
+    }
+
+    .situation-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .situation-text {
+      font-size: 1.25rem;
+      line-height: 1.6;
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #e2e8f0;
+    }
+
+    .question {
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #4ade80;
+    }
+
+    .options-grid {
+      display: grid;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .option-button {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.25rem;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #ffffff;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+    }
+
+    .option-button:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #4ade80;
+      transform: translateX(4px);
+    }
+
+    .option-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .option-button.correct {
+      background: rgba(74, 222, 128, 0.2);
+      border-color: #4ade80;
+    }
+
+    .option-button.incorrect {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+    }
+
+    .feedback {
+      background: rgba(74, 222, 128, 0.1);
+      border: 1px solid #4ade80;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      display: none;
+    }
+
+    .feedback.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    .feedback.error {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: #ef4444;
+    }
+
+    .feedback-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .feedback-text {
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+
+    .action-button {
+      background: linear-gradient(135deg, #4ade80, #22d3ee);
+      color: #1a1a2e;
+      border: none;
+      border-radius: 12px;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: block;
+      margin: 2rem auto;
+      min-width: 200px;
+    }
+
+    .action-button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(74, 222, 128, 0.3);
+    }
+
+    .action-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .action-button.secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .progress-bar {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      height: 8px;
+      margin: 2rem 0;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #4ade80, #22d3ee);
+      height: 100%;
+      transition: width 0.3s ease;
+      border-radius: 8px;
+    }
+
+    .score-display {
+      text-align: center;
+      margin: 2rem 0;
+      font-size: 1.25rem;
+    }
+
+    .score-number {
+      color: #4ade80;
+      font-weight: 700;
+      font-size: 2rem;
+    }
+
+    .rally-sequence {
+      margin: 2rem 0;
+    }
+
+    .rally-shot {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid;
+      opacity: 0.5;
+      transition: opacity 0.3s;
+    }
+
+    .rally-shot.active {
+      opacity: 1;
+      box-shadow: 0 4px 12px rgba(74, 222, 128, 0.2);
+    }
+
+    .rally-shot.completed {
+      opacity: 0.7;
+    }
+
+    .shot-number {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .final-message {
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+
+    .final-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, #4ade80, #22d3ee);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .final-text {
+      font-size: 1.25rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+      margin-bottom: 2rem;
+    }
+
+    .benefits-list {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem auto;
+      max-width: 500px;
+      text-align: left;
+    }
+
+    .benefit-item {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .benefit-item:last-child {
+      border-bottom: none;
+    }
+
+    .benefit-icon {
+      font-size: 1.5rem;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .game-container {
+        padding: 1rem;
+      }
+
+      .phase-title {
+        font-size: 1.5rem;
+      }
+
+      .intro-quote {
+        font-size: 1.25rem;
+      }
+
+      .zone-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+
+    .container,
+    .game-container,
+    .game-wrapper,
+    .app-wrapper,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .phase-container,
+    .phase-card,
+    .content,
+    .content-area,
+    .modal-content,
+    .results-card,
+    .scene,
+    .phase-content {
+      padding: 16px !important;
+    }
+
+    h1, .main-title, .game-title, .title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+
+    h2, .phase-title, .stage-title, .final-title, .section-title {
+      font-size: clamp(1.3rem, 6vw, 1.7rem) !important;
+      line-height: 1.25 !important;
+    }
+
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label {
+      font-size: clamp(1rem, 4.5vw, 1.15rem) !important;
+      line-height: 1.4 !important;
+    }
+
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text, .intro-message, .quote {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+
+    .button-group,
+    .action-buttons,
+    .final-buttons,
+    .controls-row {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+
+    button,
+    .btn,
+    .btn-primary,
+    .btn-secondary,
+    .action-button,
+    .option-btn {
+      width: 100% !important;
+    }
+
+    .zone-grid,
+    .scenario-grid,
+    .options-grid,
+    .results-stats {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    setConfig: function () {},
+    config: {}
+  };
+
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body>
+  <div id="app">
+   <div class="game-container">
+    <div id="content"></div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "🎮🔥 JUEGO 6 — La Zona de Control",
+      intro_text: "La consistencia no depende del golpe. Depende de desde dónde lo juegas.",
+      start_button_text: "Entrar a la experiencia",
+      continue_button_text: "Continuar",
+      background_color: "#1a1a2e",
+      surface_color: "#ffffff",
+      text_color: "#e2e8f0",
+      primary_action_color: "#4ade80",
+      secondary_action_color: "#22d3ee",
+      font_family: "Inter",
+      font_size: 16
+    };
+
+    let currentPhase = 'intro';
+    let currentQuestion = 0;
+    let score = 0;
+    let rallyShot = 0;
+    let gameData = [];
+
+    const phases = {
+      intro: {
+        zones: [
+          {
+            icon: '🟢',
+            name: 'Zona Verde',
+            color: 'green',
+            descriptions: ['Bien colocado', 'Buen equilibrio', 'Tiempo suficiente'],
+            action: '👉 Aquí puedes dirigir, variar y construir.'
+          },
+          {
+            icon: '🟡',
+            name: 'Zona Amarilla',
+            color: 'yellow',
+            descriptions: ['Llegas justo', 'Equilibrio parcial', 'Tiempo limitado'],
+            action: '👉 Aquí debes asegurar, no definir.'
+          },
+          {
+            icon: '🔴',
+            name: 'Zona Roja',
+            color: 'red',
+            descriptions: ['Llegas tarde', 'Desequilibrado', 'Sin tiempo'],
+            action: '👉 Aquí solo debes sobrevivir.'
+          }
+        ]
+      },
+      recognition: {
+        situations: [
+          {
+            text: "La pelota viene profunda. Estás un paso atrás y desequilibrado.",
+            correct: 'red',
+            feedback: "✔ Roja - Aquí no defines. Aquí ganas tiempo."
+          },
+          {
+            text: "Pelota media, bien colocado, balanceado.",
+            correct: 'green',
+            feedback: "✔ Verde - Aquí puedes construir el punto."
+          },
+          {
+            text: "La pelota te llega rápida al cuerpo. Alcanzas a responder pero sin preparación óptima.",
+            correct: 'yellow',
+            feedback: "✔ Amarilla - Aquí estabilizas. No arriesgues más de lo necesario."
+          },
+          {
+            text: "Estás en posición central, la pelota viene a media altura con buen tiempo de reacción.",
+            correct: 'green',
+            feedback: "✔ Verde - Situación ideal para tomar la iniciativa."
+          },
+          {
+            text: "Te sacan de la pista con un golpe angulado. Corres en desequilibrio total.",
+            correct: 'red',
+            feedback: "✔ Roja - Solo busca sobrevivir. Devuelve profundo y recupera posición."
+          }
+        ]
+      },
+      action: {
+        scenarios: [
+          {
+            situation: "Estás bien posicionado en el centro, la pelota viene cómoda.",
+            zone: 'green',
+            zoneName: 'Zona Verde',
+            options: [
+              { text: 'Construir con dirección', correct: true },
+              { text: 'Defender con globo alto', correct: false },
+              { text: 'Golpe sin riesgo al centro', correct: false }
+            ],
+            correctFeedback: "✔ Correcto - Aquí decides tú. Aprovecha la situación favorable.",
+            incorrectFeedback: "✘ Error - Estás en zona verde. No desperdicies la oportunidad de construir."
+          },
+          {
+            situation: "La pelota viene rápida, llegas justo pero en equilibrio parcial.",
+            zone: 'yellow',
+            zoneName: 'Zona Amarilla',
+            options: [
+              { text: 'Intentar un winner cruzado', correct: false },
+              { text: 'Asegurar profundidad', correct: true },
+              { text: 'Acelerar con efecto', correct: false }
+            ],
+            correctFeedback: "✔ Correcto - Aquí estabilizas. Mantén la solidez.",
+            incorrectFeedback: "✘ Error - En zona amarilla no arriesgues. Asegura primero."
+          },
+          {
+            situation: "Te sacan completamente de posición, llegas corriendo en desequilibrio.",
+            zone: 'red',
+            zoneName: 'Zona Roja',
+            options: [
+              { text: 'Definir con paralela', correct: false },
+              { text: 'Globo defensivo', correct: true },
+              { text: 'Golpe bajo y rápido', correct: false }
+            ],
+            correctFeedback: "✔ Correcto - Aquí sobrevives. Gana tiempo para reposicionarte.",
+            incorrectFeedback: "✘ Error - Jugaste fuera de tu zona. En rojo, solo sobrevive."
+          }
+        ]
+      },
+      myth: {
+        statements: [
+          { text: "Hay que ser agresivo todo el tiempo.", correct: false },
+          { text: "El control cambia según la situación.", correct: true },
+          { text: "No todos los golpes se juegan igual.", correct: true }
+        ],
+        feedback: "La agresividad sin contexto destruye la consistencia."
+      },
+      rally: {
+        shots: [
+          {
+            number: 1,
+            situation: "Primera pelota del rally - Zona Amarilla. Llegas justo.",
+            zone: 'yellow',
+            options: [
+              { text: 'Asegurar profundidad', correct: true },
+              { text: 'Intentar winner', correct: false },
+              { text: 'Golpe corto', correct: false }
+            ]
+          },
+          {
+            number: 2,
+            situation: "Tu rival acelera - Zona Roja. Desequilibrio total.",
+            zone: 'red',
+            options: [
+              { text: 'Defender con globo', correct: true },
+              { text: 'Contra-atacar', correct: false },
+              { text: 'Paralela arriesgada', correct: false }
+            ]
+          },
+          {
+            number: 3,
+            situation: "Recuperaste posición - Zona Amarilla. Equilibrio parcial.",
+            zone: 'yellow',
+            options: [
+              { text: 'Jugar al centro profundo', correct: true },
+              { text: 'Buscar ángulo imposible', correct: false },
+              { text: 'Acelerar sin control', correct: false }
+            ]
+          },
+          {
+            number: 4,
+            situation: "Tu rival devuelve corta - Zona Verde. Control total.",
+            zone: 'green',
+            options: [
+              { text: 'Construir con dirección', correct: true },
+              { text: 'Defender alto', correct: false },
+              { text: 'Golpe neutro', correct: false }
+            ]
+          },
+          {
+            number: 5,
+            situation: "Pelota cómoda en el centro - Zona Verde. Momento de definir.",
+            zone: 'green',
+            options: [
+              { text: 'Definir con control', correct: true },
+              { text: 'Defender', correct: false },
+              { text: 'Pelota neutra', correct: false }
+            ]
+          }
+        ]
+      }
+    };
+
+    function renderIntro() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+
+      return `
+        <div class="phase-header">
+          <h1 class="phase-title" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize * 2}px;">${config.game_title || defaultConfig.game_title}</h1>
+          <p class="phase-subtitle" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">Fase 1 — Descubre tu Zona de Control</p>
+        </div>
+        
+        <div class="intro-card">
+          <p class="intro-quote" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize * 1.5}px;">"${config.intro_text || defaultConfig.intro_text}"</p>
+          
+          <div class="zone-grid">
+            ${phases.intro.zones.map(zone => `
+              <div class="zone-card ${zone.color}">
+                <div class="zone-icon">${zone.icon}</div>
+                <h3 class="zone-name" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize * 1.25}px;">${zone.name}</h3>
+                ${zone.descriptions.map(desc => `<p class="zone-description" style="font-size: ${baseSize * 0.9}px;">${desc}</p>`).join('')}
+                <p class="zone-action" style="font-size: ${baseSize * 0.95}px;">${zone.action}</p>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div class="key-rule" style="font-size: ${baseSize * 1.1}px;">
+            💡 El error aparece cuando juegas como verde estando en rojo.
+          </div>
+          
+          <button class="action-button" onclick="startRecognition()" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">
+            ${config.start_button_text || defaultConfig.start_button_text}
+          </button>
+        </div>
+      `;
+    }
+
+    function renderRecognition() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const situation = phases.recognition.situations[currentQuestion];
+      
+      return `
+        <div class="phase-header">
+          <h1 class="phase-title" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize * 2}px;">Fase 2 — Reconoce la zona</h1>
+          <p class="phase-subtitle" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">Situación ${currentQuestion + 1} de ${phases.recognition.situations.length}</p>
+        </div>
+        
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: ${((currentQuestion + 1) / phases.recognition.situations.length) * 100}%"></div>
+        </div>
+        
+        <div class="situation-card">
+          <p class="situation-text" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize * 1.25}px;">${situation.text}</p>
+          
+          <p class="question" style="font-size: ${baseSize * 1.1}px;">👉 ¿En qué zona estás?</p>
+          
+          <div class="options-grid">
+            <button class="option-button" onclick="checkZone('green')" id="option-green" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">
+              🟢 Verde
+            </button>
+            <button class="option-button" onclick="checkZone('yellow')" id="option-yellow" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">
+              🟡 Amarilla
+            </button>
+            <button class="option-button" onclick="checkZone('red')" id="option-red" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">
+              🔴 Roja
+            </button>
+          </div>
+          
+          <div class="feedback" id="feedback">
+            <p class="feedback-text" style="font-size: ${baseSize}px;"></p>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAction() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const scenario = phases.action.scenarios[currentQuestion];
+      
+      return `
+        <div class="phase-header">
+          <h1 class="phase-title" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize * 2}px;">Fase 3 — Elige la acción correcta</h1>
+          <p class="phase-subtitle" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">Escenario ${currentQuestion + 1} de ${phases.action.scenarios.length}</p>
+        </div>
+        
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: ${((currentQuestion + 1) / phases.action.scenarios.length) * 100}%"></div>
+        </div>
+        
+        <div class="situation-card">
+          <p class="situation-text" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize * 1.25}px;">${scenario.situation}</p>
+          <p class="zone-name ${scenario.zone}" style="text-align: center; font-size: ${baseSize * 1.1}px; margin-bottom: 1.5rem;">${scenario.zoneName}</p>
+          
+          <p class="question" style="font-size: ${baseSize * 1.1}px;">👉 ¿Qué acción eliges?</p>
+          
+          <div class="options-grid">
+            ${scenario.options.map((option, index) => `
+              <button class="option-button" onclick="checkAction(${index})" id="action-option-${index}" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">
+                ${option.text}
+              </button>
+            `).join('')}
+          </div>
+          
+          <div class="feedback" id="feedback">
+            <p class="feedback-text" style="font-size: ${baseSize}px;"></p>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMyth() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      
+      return `
+        <div class="phase-header">
+          <h1 class="phase-title" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize * 2}px;">Fase 4 — Rompe el mito</h1>
+          <p class="phase-subtitle" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">Identifica la afirmación incorrecta</p>
+        </div>
+        
+        <div class="situation-card">
+          <p class="question" style="font-size: ${baseSize * 1.1}px;">¿Cuál de estas afirmaciones es incorrecta?</p>
+          
+          <div class="options-grid">
+            ${phases.myth.statements.map((statement, index) => `
+              <button class="option-button" onclick="checkMyth(${index})" id="myth-option-${index}" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">
+                ${statement.text}
+              </button>
+            `).join('')}
+          </div>
+          
+          <div class="feedback" id="feedback">
+            <p class="feedback-title" style="font-size: ${baseSize * 1.1}px;"></p>
+            <p class="feedback-text" style="font-size: ${baseSize}px;"></p>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRally() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const shot = phases.rally.shots[rallyShot];
+      
+      return `
+        <div class="phase-header">
+          <h1 class="phase-title" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize * 2}px;">Fase 5 — La Secuencia Final</h1>
+          <p class="phase-subtitle" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">5 golpes, 5 decisiones</p>
+        </div>
+        
+        <div class="rally-sequence">
+          ${phases.rally.shots.map((s, index) => `
+            <div class="rally-shot ${index === rallyShot ? 'active' : index < rallyShot ? 'completed' : ''}" style="border-left-color: ${s.zone === 'green' ? '#4ade80' : s.zone === 'yellow' ? '#fbbf24' : '#ef4444'};">
+              <p class="shot-number" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize * 1.1}px;">Golpe ${s.number}</p>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="situation-card">
+          <p class="situation-text" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize * 1.25}px;">${shot.situation}</p>
+          
+          <p class="question" style="font-size: ${baseSize * 1.1}px;">👉 ¿Qué haces?</p>
+          
+          <div class="options-grid">
+            ${shot.options.map((option, index) => `
+              <button class="option-button" onclick="checkRallyShot(${index})" id="rally-option-${index}" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">
+                ${option.text}
+              </button>
+            `).join('')}
+          </div>
+          
+          <div class="feedback" id="feedback">
+            <p class="feedback-text" style="font-size: ${baseSize}px;"></p>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderFinal() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      
+      return `
+        <div class="final-message">
+          <h1 class="final-title" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize * 2.5}px;">🏆 ¡Completado!</h1>
+          
+          <p class="final-text" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize * 1.25}px;">
+            "No ganaste por pegar mejor.<br>Ganaste por decidir mejor."
+          </p>
+          
+          <div class="key-rule" style="font-size: ${baseSize * 1.1}px;">
+            La consistencia no es rigidez. Es adaptación inteligente.
+          </div>
+          
+          <div class="benefits-list">
+            <div class="benefit-item">
+              <span class="benefit-icon">✓</span>
+              <span style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">Menos errores no forzados</span>
+            </div>
+            <div class="benefit-item">
+              <span class="benefit-icon">✓</span>
+              <span style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">Más puntos largos ganados</span>
+            </div>
+            <div class="benefit-item">
+              <span class="benefit-icon">✓</span>
+              <span style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">Más calma</span>
+            </div>
+            <div class="benefit-item">
+              <span class="benefit-icon">✓</span>
+              <span style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">Más claridad</span>
+            </div>
+          </div>
+          
+          <div class="score-display">
+            <p style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize * 1.25}px;">Tu puntuación</p>
+            <p class="score-number">${score}</p>
+          </div>
+          
+          <button class="action-button" onclick="restartGame()" style="font-family: ${customFont}, -apple-system, sans-serif; font-size: ${baseSize}px;">
+            Repetir experiencia
+          </button>
+        </div>
+      `;
+    }
+
+    function render() {
+      const content = document.getElementById('content');
+      
+      switch(currentPhase) {
+        case 'intro':
+          content.innerHTML = renderIntro();
+          break;
+        case 'recognition':
+          content.innerHTML = renderRecognition();
+          break;
+        case 'action':
+          content.innerHTML = renderAction();
+          break;
+        case 'myth':
+          content.innerHTML = renderMyth();
+          break;
+        case 'rally':
+          content.innerHTML = renderRally();
+          break;
+        case 'final':
+          content.innerHTML = renderFinal();
+          break;
+      }
+    }
+
+    function startRecognition() {
+      currentPhase = 'recognition';
+      currentQuestion = 0;
+      render();
+    }
+
+    async function checkZone(selected) {
+      const situation = phases.recognition.situations[currentQuestion];
+      const feedback = document.getElementById('feedback');
+      const buttons = document.querySelectorAll('.option-button');
+      
+      buttons.forEach(btn => btn.disabled = true);
+      
+      if (selected === situation.correct) {
+        document.getElementById(`option-${selected}`).classList.add('correct');
+        feedback.classList.remove('error');
+        feedback.querySelector('.feedback-text').textContent = situation.feedback;
+        score += 10;
+      } else {
+        document.getElementById(`option-${selected}`).classList.add('incorrect');
+        document.getElementById(`option-${situation.correct}`).classList.add('correct');
+        feedback.classList.add('error');
+        feedback.querySelector('.feedback-text').textContent = `✘ Incorrecto. ${situation.feedback}`;
+      }
+      
+      feedback.classList.add('show');
+      
+      const config = window.elementSdk?.config || defaultConfig;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      
+      const continueBtn = document.createElement('button');
+      continueBtn.className = 'action-button';
+      continueBtn.textContent = config.continue_button_text || defaultConfig.continue_button_text;
+      continueBtn.style.fontFamily = `${customFont}, -apple-system, sans-serif`;
+      continueBtn.style.fontSize = `${baseSize}px`;
+      continueBtn.onclick = nextRecognition;
+      feedback.appendChild(continueBtn);
+
+      if (window.dataSdk) {
+        const result = await window.dataSdk.create({
+          phase: 'recognition',
+          score: score,
+          correct_answers: selected === situation.correct ? 1 : 0,
+          total_attempts: 1,
+          completed_at: new Date().toISOString()
+        });
+      }
+    }
+
+    function nextRecognition() {
+      currentQuestion++;
+      if (currentQuestion >= phases.recognition.situations.length) {
+        currentPhase = 'action';
+        currentQuestion = 0;
+      }
+      render();
+    }
+
+    async function checkAction(selectedIndex) {
+      const scenario = phases.action.scenarios[currentQuestion];
+      const option = scenario.options[selectedIndex];
+      const feedback = document.getElementById('feedback');
+      const buttons = document.querySelectorAll('.option-button');
+      
+      buttons.forEach(btn => btn.disabled = true);
+      
+      if (option.correct) {
+        document.getElementById(`action-option-${selectedIndex}`).classList.add('correct');
+        feedback.classList.remove('error');
+        feedback.querySelector('.feedback-text').textContent = scenario.correctFeedback;
+        score += 15;
+      } else {
+        document.getElementById(`action-option-${selectedIndex}`).classList.add('incorrect');
+        const correctIndex = scenario.options.findIndex(opt => opt.correct);
+        document.getElementById(`action-option-${correctIndex}`).classList.add('correct');
+        feedback.classList.add('error');
+        feedback.querySelector('.feedback-text').textContent = scenario.incorrectFeedback;
+      }
+      
+      feedback.classList.add('show');
+      
+      const config = window.elementSdk?.config || defaultConfig;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      
+      const continueBtn = document.createElement('button');
+      continueBtn.className = 'action-button';
+      continueBtn.textContent = config.continue_button_text || defaultConfig.continue_button_text;
+      continueBtn.style.fontFamily = `${customFont}, -apple-system, sans-serif`;
+      continueBtn.style.fontSize = `${baseSize}px`;
+      continueBtn.onclick = nextAction;
+      feedback.appendChild(continueBtn);
+
+      if (window.dataSdk) {
+        const result = await window.dataSdk.create({
+          phase: 'action',
+          score: score,
+          correct_answers: option.correct ? 1 : 0,
+          total_attempts: 1,
+          completed_at: new Date().toISOString()
+        });
+      }
+    }
+
+    function nextAction() {
+      currentQuestion++;
+      if (currentQuestion >= phases.action.scenarios.length) {
+        currentPhase = 'myth';
+      }
+      render();
+    }
+
+    async function checkMyth(selectedIndex) {
+      const statement = phases.myth.statements[selectedIndex];
+      const feedback = document.getElementById('feedback');
+      const buttons = document.querySelectorAll('.option-button');
+      
+      buttons.forEach(btn => btn.disabled = true);
+      
+      if (!statement.correct) {
+        document.getElementById(`myth-option-${selectedIndex}`).classList.add('correct');
+        feedback.classList.remove('error');
+        feedback.querySelector('.feedback-title').textContent = '✔ Correcto';
+        feedback.querySelector('.feedback-text').textContent = phases.myth.feedback;
+        score += 20;
+      } else {
+        document.getElementById(`myth-option-${selectedIndex}`).classList.add('incorrect');
+        feedback.classList.add('error');
+        feedback.querySelector('.feedback-title').textContent = '✘ Casi';
+        feedback.querySelector('.feedback-text').textContent = `Esa opción empuja a forzar una decisión fuera de tu zona de control. Revisa la idea central del bloque y vuelve a pensar desde el criterio correcto. ${phases.myth.feedback}`;
+      }
+      
+      feedback.classList.add('show');
+      
+      const config = window.elementSdk?.config || defaultConfig;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      
+      const continueBtn = document.createElement('button');
+      continueBtn.className = 'action-button';
+      continueBtn.textContent = config.continue_button_text || defaultConfig.continue_button_text;
+      continueBtn.style.fontFamily = `${customFont}, -apple-system, sans-serif`;
+      continueBtn.style.fontSize = `${baseSize}px`;
+      continueBtn.onclick = startRally;
+      feedback.appendChild(continueBtn);
+
+      if (window.dataSdk) {
+        const result = await window.dataSdk.create({
+          phase: 'myth',
+          score: score,
+          correct_answers: !statement.correct ? 1 : 0,
+          total_attempts: 1,
+          completed_at: new Date().toISOString()
+        });
+      }
+    }
+
+    function startRally() {
+      currentPhase = 'rally';
+      rallyShot = 0;
+      render();
+    }
+
+    async function checkRallyShot(selectedIndex) {
+      const shot = phases.rally.shots[rallyShot];
+      const option = shot.options[selectedIndex];
+      const feedback = document.getElementById('feedback');
+      const buttons = document.querySelectorAll('.option-button');
+      
+      buttons.forEach(btn => btn.disabled = true);
+      
+      if (!option.correct) {
+        document.getElementById(`rally-option-${selectedIndex}`).classList.add('incorrect');
+        feedback.classList.add('error');
+        feedback.querySelector('.feedback-text').textContent = '✘ Decisión incorrecta. El punto se pierde.';
+        feedback.classList.add('show');
+        
+        const config = window.elementSdk?.config || defaultConfig;
+        const customFont = config.font_family || defaultConfig.font_family;
+        const baseSize = config.font_size || defaultConfig.font_size;
+        
+        const restartBtn = document.createElement('button');
+        restartBtn.className = 'action-button';
+        restartBtn.textContent = 'Reintentar secuencia';
+        restartBtn.style.fontFamily = `${customFont}, -apple-system, sans-serif`;
+        restartBtn.style.fontSize = `${baseSize}px`;
+        restartBtn.onclick = startRally;
+        feedback.appendChild(restartBtn);
+
+        if (window.dataSdk) {
+          const result = await window.dataSdk.create({
+            phase: 'rally',
+            score: score,
+            correct_answers: 0,
+            total_attempts: 1,
+            completed_at: new Date().toISOString()
+          });
+        }
+        
+        return;
+      }
+      
+      document.getElementById(`rally-option-${selectedIndex}`).classList.add('correct');
+      score += 20;
+
+      if (window.dataSdk) {
+        const result = await window.dataSdk.create({
+          phase: 'rally',
+          score: score,
+          correct_answers: 1,
+          total_attempts: 1,
+          completed_at: new Date().toISOString()
+        });
+      }
+      
+      rallyShot++;
+      
+      if (rallyShot >= phases.rally.shots.length) {
+        currentPhase = 'final';
+        render();
+      } else {
+        setTimeout(() => {
+          render();
+        }, 800);
+      }
+    }
+
+    function restartGame() {
+      currentPhase = 'intro';
+      currentQuestion = 0;
+      score = 0;
+      rallyShot = 0;
+      render();
+    }
+
+    async function onConfigChange(config) {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const backgroundColor = config.background_color || defaultConfig.background_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+
+      document.body.style.background = `linear-gradient(135deg, ${backgroundColor} 0%, #16213e 100%)`;
+      document.body.style.color = textColor;
+
+      const titles = document.querySelectorAll('.phase-title, .final-title');
+      titles.forEach(el => {
+        el.style.fontFamily = `${customFont}, -apple-system, sans-serif`;
+      });
+
+      const allText = document.querySelectorAll('p, button, span, h1, h2, h3');
+      allText.forEach(el => {
+        el.style.fontFamily = `${customFont}, -apple-system, sans-serif`;
+      });
+
+      render();
+    }
+
+    const dataHandler = {
+      onDataChanged(data) {
+        gameData = data;
+      }
+    };
+
+    async function initializeApp() {
+      if (window.dataSdk) {
+        const initResult = await window.dataSdk.init(dataHandler);
+        if (!initResult.isOk) {
+          console.error("Failed to initialize data SDK");
+        }
+      }
+
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities: (config) => ({
+            recolorables: [
+              {
+                get: () => config.background_color || defaultConfig.background_color,
+                set: (value) => {
+                  config.background_color = value;
+                  window.elementSdk.setConfig({ background_color: value });
+                }
+              },
+              {
+                get: () => config.surface_color || defaultConfig.surface_color,
+                set: (value) => {
+                  config.surface_color = value;
+                  window.elementSdk.setConfig({ surface_color: value });
+                }
+              },
+              {
+                get: () => config.text_color || defaultConfig.text_color,
+                set: (value) => {
+                  config.text_color = value;
+                  window.elementSdk.setConfig({ text_color: value });
+                }
+              },
+              {
+                get: () => config.primary_action_color || defaultConfig.primary_action_color,
+                set: (value) => {
+                  config.primary_action_color = value;
+                  window.elementSdk.setConfig({ primary_action_color: value });
+                }
+              },
+              {
+                get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+                set: (value) => {
+                  config.secondary_action_color = value;
+                  window.elementSdk.setConfig({ secondary_action_color: value });
+                }
+              }
+            ],
+            borderables: [],
+            fontEditable: {
+              get: () => config.font_family || defaultConfig.font_family,
+              set: (value) => {
+                config.font_family = value;
+                window.elementSdk.setConfig({ font_family: value });
+              }
+            },
+            fontSizeable: {
+              get: () => config.font_size || defaultConfig.font_size,
+              set: (value) => {
+                config.font_size = value;
+                window.elementSdk.setConfig({ font_size: value });
+              }
+            }
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ["game_title", config.game_title || defaultConfig.game_title],
+            ["intro_text", config.intro_text || defaultConfig.intro_text],
+            ["start_button_text", config.start_button_text || defaultConfig.start_button_text],
+            ["continue_button_text", config.continue_button_text || defaultConfig.continue_button_text]
+          ])
+        });
+      }
+
+      render();
+    }
+
+    initializeApp();
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) {
+      acScrollToTop();
+      return;
+    }
+
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+
+    try {
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, Math.max(0, top));
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    window.scrollTo(0, 0);
+  });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>

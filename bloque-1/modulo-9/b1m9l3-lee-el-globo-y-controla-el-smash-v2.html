@@ -1,0 +1,763 @@
+﻿<!doctype html>
+<html lang="es" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lee el Globo: Controla el Smash</title>
+  <style>
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: #0f172a;
+    }
+
+    body {
+      box-sizing: border-box;
+      color: #f8fafc;
+      font-family: Arial, sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: inherit;
+    }
+
+    #app {
+      min-height: 100vh;
+    }
+
+    .phase-card {
+      transition: all 0.3s ease;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    .option-btn {
+      display: inline-block;
+      border: 0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      line-height: 1.45;
+      text-decoration: none;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+      opacity: 0.92;
+    }
+
+    .w-full { width: 100%; }
+    .h-full { height: 100%; }
+    .min-h-full { min-height: 100%; }
+    .max-w-3xl { max-width: 48rem; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .my-8 { margin-top: 2rem; margin-bottom: 2rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mb-3 { margin-bottom: 0.75rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .mb-8 { margin-bottom: 2rem; }
+    .mt-2 { margin-top: 0.5rem; }
+    .mt-4 { margin-top: 1rem; }
+    .mt-6 { margin-top: 1.5rem; }
+    .p-4 { padding: 1rem; }
+    .p-5 { padding: 1.25rem; }
+    .p-6 { padding: 1.5rem; }
+    .p-8 { padding: 2rem; }
+    .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .px-8 { padding-left: 2rem; padding-right: 2rem; }
+    .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+    .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+    .rounded { border-radius: 0.5rem; }
+    .rounded-lg { border-radius: 0.75rem; }
+    .rounded-xl { border-radius: 1rem; }
+    .rounded-2xl { border-radius: 1.5rem; }
+    .rounded-full { border-radius: 9999px; }
+    .overflow-auto { overflow: auto; }
+    .overflow-hidden { overflow: hidden; }
+    .shadow-md { box-shadow: 0 8px 24px rgba(15, 23, 42, 0.24); }
+    .shadow-lg { box-shadow: 0 14px 34px rgba(15, 23, 42, 0.28); }
+    .shadow-2xl { box-shadow: 0 20px 56px rgba(15, 23, 42, 0.34); }
+    .text-left { text-align: left; }
+    .text-center { text-align: center; }
+    .font-bold { font-weight: 700; }
+    .font-medium { font-weight: 500; }
+    .italic { font-style: italic; }
+    .leading-relaxed { line-height: 1.7; }
+    .opacity-75 { opacity: 0.75; }
+    .opacity-90 { opacity: 0.9; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .items-start { align-items: flex-start; }
+    .justify-center { justify-content: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-3 { gap: 0.75rem; }
+    .space-y-2 > * + * { margin-top: 0.5rem; }
+    .space-y-3 > * + * { margin-top: 0.75rem; }
+    .space-y-4 > * + * { margin-top: 1rem; }
+    .space-y-6 > * + * { margin-top: 1.5rem; }
+
+    .option-btn:hover:not(:disabled) {
+      transition: all 0.2s ease;
+      transform: translateY(-2px);
+    }
+
+    .feedback-enter {
+      animation: slideIn 0.4s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .progress-bar {
+      transition: width 0.5s ease;
+    }
+
+    @media (max-width: 768px) {
+      .p-8 { padding: 1.5rem; }
+      .p-6 { padding: 1.1rem; }
+      .px-8, .px-6 { padding-left: 1rem; padding-right: 1rem; }
+      .py-4, .py-3 { padding-top: 0.9rem; padding-bottom: 0.9rem; }
+      .max-w-3xl { max-width: 100%; }
+      .shadow-2xl, .shadow-lg, .shadow-md { box-shadow: 0 14px 30px rgba(15, 23, 42, 0.28); }
+      .phase-card { border-radius: 1.25rem; }
+      .gap-3 { gap: 0.65rem; }
+      .space-y-6 > * + * { margin-top: 1rem; }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+
+    .container,
+    .game-container,
+    .game-wrapper,
+    .app-wrapper,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .phase-container,
+    .phase-card,
+    .content,
+    .content-area,
+    .modal-content,
+    .results-card,
+    .scene,
+    .phase-content {
+      padding: 16px !important;
+    }
+
+    h1, .main-title, .game-title, .title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+
+    h2, .phase-title, .stage-title, .final-title, .section-title {
+      font-size: clamp(1.3rem, 6vw, 1.7rem) !important;
+      line-height: 1.25 !important;
+    }
+
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label {
+      font-size: clamp(1rem, 4.5vw, 1.15rem) !important;
+      line-height: 1.4 !important;
+    }
+
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text, .intro-message, .quote {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+
+    .button-group,
+    .action-buttons,
+    .final-buttons,
+    .controls-row {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+
+    button,
+    .btn,
+    .btn-primary,
+    .btn-secondary,
+    .action-button,
+    .option-btn {
+      width: 100% !important;
+    }
+
+    .zone-grid,
+    .scenario-grid,
+    .options-grid,
+    .results-stats {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    setConfig: function () {},
+    config: {}
+  };
+
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body class="h-full">
+  <div id="app" class="h-full w-full overflow-auto"></div>
+  <script>
+    const defaultConfig = {
+      background_color: "#0f172a",
+      card_color: "#1e293b",
+      text_color: "#f1f5f9",
+      primary_action_color: "#10b981",
+      secondary_action_color: "#3b82f6",
+      game_title: "Lee el Globo: Controla el Smash",
+      game_subtitle: "Entrenar lectura temprana y control del smash",
+      intro_message: "El smash no se gana con fuerza. Se gana leyendo el globo antes que el rival.",
+      final_message: "El mejor smash no es el más fuerte. Es el que no fallas.",
+      font_family: "Arial",
+      font_size: 16
+    };
+
+    let currentPhase = 0;
+    let selectedAnswers = {};
+
+    const phases = [
+      {
+        id: 0,
+        emoji: "🎯",
+        title: "INTRODUCCIÓN — ¿Qué es realmente el smash?",
+        subtitle: "Desmitificando uno de los golpes mas espectaculares del tenis",
+        content: "El smash parece simple: un globo alto, saltar y golpear fuerte. Pero los mejores jugadores del mundo saben algo que la mayoría ignora.",
+        signals: [
+          "❌ MITO: 'El smash es puro poder y agresividad'",
+          "✅ REALIDAD: Es el golpe que más se falla cuando lo fuerzas",
+          "🧠 Los smashes ganadores NO son siempre los más fuertes",
+          "🎯 Son los mejor PREPARADOS, COLOCADOS y con CONTROL total",
+          "💭 Piensa: ¿Cuántos puntos perdiste por smashes fuera vs. smashes controlados del rival?"
+        ],
+        deepConcept: "Un jugador profesional prefiere un smash al 70% de potencia con control total, que uno al 100% sin control. El smash no define puntos por fuerza, sino por NO FALLAR en el momento clave.",
+        question: "¿Cuándo crees que se DECIDE realmente un buen smash?",
+        options: [
+          { text: "En el momento exacto del impacto con la pelota", correct: false },
+          { text: "Desde el momento que VES el globo venir hacia ti", correct: true },
+          { text: "Cuando saltas para alcanzar la pelota", correct: false },
+          { text: "Cuando el rival ejecuta el globo", correct: false }
+        ],
+        feedback: {
+          correct: "✅ ¡Exacto! El smash se gana ANTES de golpear: con la lectura, el movimiento y la decisión táctica. Todo lo que viene después es consecuencia de esos primeros segundos.",
+          incorrect: "El smash ya está decidido mucho antes del impacto. La clave está en los 2-3 segundos entre ver el globo y ejecutar el golpe."
+        },
+        principle: "🔑 Principio fundamental: El mejor smash del mundo no es el más fuerte. Es el que NO FALLAS cuando importa."
+      },
+      {
+        id: 1,
+        emoji: "📘",
+        title: "FASE 1 — Antes de golpear: aprende a leer",
+        subtitle: "El smash se decide ANTES del golpe",
+        content: "Ahora que entiendes QUÉ es el smash, aprende a LEER el globo. Estas 3 señales te dicen si puedes atacar:",
+        signals: ["🎯 Altura del globo", "📏 Profundidad", "⏱️ Tiempo disponible"],
+        question: "Si el globo es alto y profundo, ¿qué debes hacer primero?",
+        options: [
+          { text: "Saltar inmediatamente", correct: false },
+          { text: "Golpear lo más rápido posible", correct: false },
+          { text: "Moverte hacia atrás y colocarte bien", correct: true },
+          { text: "Forzar el smash de cualquier forma", correct: false }
+        ],
+        feedback: {
+          correct: "💡 Perfecto. Primero te colocas correctamente. Luego decides si atacas o controlas.",
+          incorrect: "Sin buena posición, cualquier golpe se vuelve forzado. La colocación es SIEMPRE lo primero."
+        }
+      },
+      {
+        id: 2,
+        emoji: "🟩",
+        title: "FASE 2 — Desplazamiento correcto: gana tiempo",
+        subtitle: "Aquí sientes el cuerpo en acción",
+        content: "Cuando lees el globo, tu primer movimiento decide si tendrás control o si llegarás forzado.",
+        gestures: ["🔄 Giro de hombros hacia atrás", "👣 Pasos cruzados (no pasos hacia atrás)", "👁️ Pecho y hombros orientados hacia la pelota"],
+        question: "Imagina el movimiento. ¿Cómo te sentiste?",
+        options: [
+          { text: "🔥 Me sentí equilibrado y con tiempo", correct: true, feedback: "¡Eso es control puro! Ahora tienes el tiempo necesario para decidir." },
+          { text: "🙂 Llegué justo a la pelota", correct: false, feedback: "Llegaste, pero justo. Mejora tu primer paso y tendrás más margen." },
+          { text: "😕 Llegué tarde y desbalanceado", correct: false, feedback: "Llegar tarde obliga a FORZAR el golpe. Eso es cuando todo falla." }
+        ],
+        principle: "💡 El smash se prepara con los PIES, no con el brazo. Si tus pies te colocan bien, el golpe sale solo."
+      },
+      {
+        id: 3,
+        emoji: "🟨",
+        title: "FASE 3 — Preparación del brazo: copia al saque",
+        subtitle: "El smash es un saque en movimiento",
+        content: "Si ya dominas el saque, ya dominas la mitad del smash. El movimiento del brazo es idéntico.",
+        instruction: "Coloca el brazo en posición de 'rasca espalda' (scratch back position) antes de impactar.",
+        question: "¿Dónde debe estar la raqueta JUSTO ANTES del impacto?",
+        options: [
+          { text: "Frente a tu cuerpo, lista para golpear", correct: false },
+          { text: "Abajo, para tomar impulso desde abajo", correct: false },
+          { text: "Detrás y arriba de tu cabeza", correct: true },
+          { text: "Rígida y tensa para más potencia", correct: false }
+        ],
+        feedback: {
+          correct: "💡 Correcto. La posición 'detrás y arriba' crea potencia natural SIN esfuerzo. Es la posición del saque.",
+          incorrect: "Esa posición genera tensión o te quita potencia. La raqueta debe estar detrás y arriba, relajada."
+        }
+      },
+      {
+        id: 4,
+        emoji: "🟧",
+        title: "FASE 4 — Impacto: decide, no fuerces",
+        subtitle: "La decisión táctica más importante",
+        content: "Llegaste perfecto. Estás bien colocado. Pero el globo NO es ideal (un poco profundo o lateral).",
+        question: "¿Qué decides hacer?",
+        options: [
+          { text: "Saltar alto y matar la pelota con todo", correct: false },
+          { text: "Forzar el smash para definir el punto", correct: false },
+          { text: "Ejecutar un smash controlado y mantener presión", correct: true },
+          { text: "Dejarla botar y perder la posición de ataque", correct: false }
+        ],
+        feedback: {
+          correct: "🎯 Perfecto. El smash controlado mantiene el punto VIVO, te da ventaja y NO regala errores.",
+          incorrect: "Forzar un smash malo es regalar el punto. El control táctico es más valioso que la potencia.",
+          principle: "💡 NO todo smash es para definir. Muchos son para NO FALLAR y seguir atacando."
+        }
+      },
+      {
+        id: 5,
+        emoji: "🟫",
+        title: "FASE 5 — Terminación y equilibrio",
+        subtitle: "El detalle que separa buenos de excelentes",
+        content: "Después del impacto, la raqueta debe seguir hacia adelante (pronación) y el cuerpo debe recuperar el equilibrio inmediatamente.",
+        question: "¿Cómo terminaste tu smash?",
+        options: [
+          { text: "🎯 Terminé estable, listo para el siguiente golpe", correct: true, feedback: "Control absoluto. Eso es un smash profesional." },
+          { text: "🔄 Perdí un poco el balance al caer", correct: false, feedback: "Ajusta la terminación. No se trata de fuerza, sino de control del cuerpo." },
+          { text: "😕 Caí desordenado o hacia adelante", correct: false, feedback: "Tu cuerpo no estaba listo. Revisa tu posición inicial." }
+        ]
+      },
+      {
+        id: 6,
+        emoji: "🟤",
+        title: "FASE 6 — Decisión final: ¿smash o no smash?",
+        subtitle: "Control emocional y táctico bajo presión",
+        content: "Situación real de partido: globo alto, pero te empuja hacia atrás. Estás en el límite de la cancha.",
+        question: "¿Debes SIEMPRE intentar el smash?",
+        options: [
+          { text: "Sí, siempre hay que atacar", correct: false },
+          { text: "Nunca, es muy arriesgado", correct: false },
+          { text: "Solo cuando estás correctamente colocado", correct: true },
+          { text: "Depende de si me siento con confianza", correct: false }
+        ],
+        feedback: {
+          correct: "🎯 Exacto. El smash no se OBLIGA. Se ejecuta cuando las condiciones son correctas. Forzarlo es regalarlo.",
+          incorrect: "La decisión no es emocional ni automática. Es técnica y táctica: ¿estoy bien colocado? Si no, controlo."
+        }
+      }
+    ];
+
+    function render() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const app = document.getElementById('app');
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const fontStack = `${customFont}, Arial, sans-serif`;
+
+      if (currentPhase === -1) {
+        app.innerHTML = `
+          <div style="background: ${config.background_color}; font-family: ${fontStack};" class="w-full min-h-full flex items-center justify-center p-6">
+            <div style="background: ${config.card_color};" class="max-w-3xl w-full rounded-2xl shadow-2xl p-8">
+              <div class="text-center space-y-6">
+                <div style="font-size: ${baseSize * 4}px;">🎮</div>
+                <h1 style="color: ${config.text_color}; font-size: ${baseSize * 2}px;" class="font-bold">${config.game_title}</h1>
+                <p style="color: ${config.text_color}; font-size: ${baseSize * 1.125}px;" class="opacity-90">${config.game_subtitle}</p>
+                <div style="background: ${config.card_color}; border: 2px solid ${config.primary_action_color};" class="rounded-xl p-6 my-8">
+                  <p style="color: ${config.text_color}; font-size: ${baseSize * 1.125}px;" class="leading-relaxed">${config.intro_message}</p>
+                </div>
+                <button onclick="startGame()" style="background: ${config.primary_action_color}; color: ${config.background_color}; font-size: ${baseSize * 1.125}px;" class="option-btn px-8 py-4 rounded-xl font-bold shadow-lg w-full">
+                  Comenzar Entrenamiento 🚀
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (currentPhase >= phases.length) {
+        app.innerHTML = `
+          <div style="background: ${config.background_color}; font-family: ${fontStack};" class="w-full min-h-full flex items-center justify-center p-6">
+            <div style="background: ${config.card_color};" class="max-w-3xl w-full rounded-2xl shadow-2xl p-8">
+              <div class="text-center space-y-6">
+                <div style="font-size: ${baseSize * 4}px;">🏁</div>
+                <h1 style="color: ${config.text_color}; font-size: ${baseSize * 2}px;" class="font-bold">¡Entrenamiento Completado!</h1>
+                <div style="background: ${config.card_color}; border: 2px solid ${config.primary_action_color};" class="rounded-xl p-6 my-8">
+                  <p style="color: ${config.text_color}; font-size: ${baseSize * 1.25}px;" class="font-bold mb-4">${config.final_message}</p>
+                  <div class="space-y-3 mt-6">
+                    <p style="color: ${config.text_color}; font-size: ${baseSize}px;" class="text-left">✅ Lee antes</p>
+                    <p style="color: ${config.text_color}; font-size: ${baseSize}px;" class="text-left">✅ Muévete primero</p>
+                    <p style="color: ${config.text_color}; font-size: ${baseSize}px;" class="text-left">✅ Golpea alto</p>
+                    <p style="color: ${config.text_color}; font-size: ${baseSize}px;" class="text-left">✅ Decide con calma</p>
+                  </div>
+                </div>
+                <div class="space-y-3">
+                  <button onclick="restartGame()" style="background: ${config.primary_action_color}; color: ${config.background_color}; font-size: ${baseSize}px;" class="option-btn px-6 py-3 rounded-xl font-bold shadow-lg w-full">
+                    🔄 Repetir Juego
+                  </button>
+                  <button onclick="toTraining()" style="background: ${config.secondary_action_color}; color: ${config.text_color}; font-size: ${baseSize}px;" class="option-btn px-6 py-3 rounded-xl font-bold shadow-lg w-full">
+                    🎾 Llevar a Entrenamiento
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        const phase = phases[currentPhase];
+        const progress = ((currentPhase + 1) / phases.length) * 100;
+        const hasAnswered = selectedAnswers[currentPhase] !== undefined;
+        const selectedOption = selectedAnswers[currentPhase];
+
+        app.innerHTML = `
+          <div style="background: ${config.background_color}; font-family: ${fontStack};" class="w-full min-h-full p-6">
+            <div class="max-w-3xl mx-auto space-y-6">
+              <div style="background: ${config.card_color};" class="rounded-xl p-4">
+                <div class="flex justify-between items-center mb-2">
+                  <span style="color: ${config.text_color}; font-size: ${baseSize * 0.875}px;" class="opacity-75">Progreso</span>
+                  <span style="color: ${config.text_color}; font-size: ${baseSize * 0.875}px;" class="opacity-75">${currentPhase + 1}/${phases.length}</span>
+                </div>
+                <div style="background: ${config.background_color};" class="w-full h-3 rounded-full overflow-hidden">
+                  <div style="width: ${progress}%; background: ${config.primary_action_color};" class="progress-bar h-full rounded-full"></div>
+                </div>
+              </div>
+
+              <div style="background: ${config.card_color};" class="phase-card rounded-2xl shadow-2xl p-8">
+                <div class="text-center mb-6">
+                  <div style="font-size: ${baseSize * 3}px;" class="mb-4">${phase.emoji}</div>
+                  <h2 style="color: ${config.text_color}; font-size: ${baseSize * 1.5}px;" class="font-bold mb-2">${phase.title}</h2>
+                  <p style="color: ${config.text_color}; font-size: ${baseSize}px;" class="opacity-75 italic">${phase.subtitle}</p>
+                </div>
+
+                <div style="background: ${config.background_color};" class="rounded-xl p-6 mb-6">
+                  <p style="color: ${config.text_color}; font-size: ${baseSize * 1.125}px;" class="mb-4">${phase.content}</p>
+                  ${phase.signals ? `
+                    <div class="space-y-2 mt-4">
+                      ${phase.signals.map(signal => `
+                        <p style="color: ${config.text_color}; font-size: ${baseSize}px;" class="opacity-90">${signal}</p>
+                      `).join('')}
+                    </div>
+                  ` : ''}
+                  ${phase.deepConcept ? `
+                    <div style="background: ${config.card_color}; border-left: 4px solid ${config.primary_action_color};" class="mt-4 p-4 rounded">
+                      <p style="color: ${config.text_color}; font-size: ${baseSize}px;" class="italic opacity-90">${phase.deepConcept}</p>
+                    </div>
+                  ` : ''}
+                  ${phase.gestures ? `
+                    <div class="space-y-2 mt-4">
+                      ${phase.gestures.map(gesture => `
+                        <p style="color: ${config.text_color}; font-size: ${baseSize}px;" class="opacity-90">${gesture}</p>
+                      `).join('')}
+                    </div>
+                  ` : ''}
+                  ${phase.instruction ? `
+                    <p style="color: ${config.primary_action_color}; font-size: ${baseSize * 1.125}px;" class="mt-4 font-bold">👉 ${phase.instruction}</p>
+                  ` : ''}
+                </div>
+
+                <div class="space-y-4">
+                  <p style="color: ${config.text_color}; font-size: ${baseSize * 1.125}px;" class="font-bold mb-4">${phase.question}</p>
+                  <div class="space-y-3">
+                    ${phase.options.map((option, idx) => {
+                      const isSelected = selectedOption === idx;
+                      const isCorrect = option.correct;
+                      let buttonStyle = `background: ${config.card_color}; border: 2px solid ${config.secondary_action_color}; color: ${config.text_color};`;
+                      
+                      if (hasAnswered && isSelected) {
+                        if (isCorrect) {
+                          buttonStyle = `background: ${config.primary_action_color}; border: 2px solid ${config.primary_action_color}; color: ${config.background_color};`;
+                        } else {
+                          buttonStyle = `background: #ef4444; border: 2px solid #ef4444; color: white;`;
+                        }
+                      }
+                      
+                      return `
+                        <button 
+                          onclick="selectOption(${idx})" 
+                          style="${buttonStyle} font-size: ${baseSize}px;" 
+                          class="option-btn w-full text-left px-6 py-4 rounded-xl font-medium shadow-md"
+                          ${hasAnswered ? 'disabled' : ''}
+                        >
+                          ${option.text}
+                        </button>
+                      `;
+                    }).join('')}
+                  </div>
+                </div>
+
+                ${hasAnswered ? `
+                  <div class="feedback-enter mt-6">
+                    <div style="background: ${phase.options[selectedOption].correct ? config.primary_action_color : '#ef4444'}20; border: 2px solid ${phase.options[selectedOption].correct ? config.primary_action_color : '#ef4444'};" class="rounded-xl p-6">
+                      <p style="color: ${config.text_color}; font-size: ${baseSize * 1.125}px;" class="font-medium mb-4">
+                        ${phase.options[selectedOption].feedback || (phase.options[selectedOption].correct ? phase.feedback?.correct : phase.feedback?.incorrect) || ''}
+                      </p>
+                      ${phase.principle ? `
+                        <p style="color: ${config.text_color}; font-size: ${baseSize}px;" class="opacity-90 italic">${phase.principle}</p>
+                      ` : ''}
+                      ${phase.feedback?.principle ? `
+                        <p style="color: ${config.text_color}; font-size: ${baseSize}px;" class="opacity-90 italic mt-2">${phase.feedback.principle}</p>
+                      ` : ''}
+                    </div>
+                    <button onclick="nextPhase()" style="background: ${config.primary_action_color}; color: ${config.background_color}; font-size: ${baseSize * 1.125}px;" class="option-btn w-full mt-6 px-6 py-4 rounded-xl font-bold shadow-lg">
+                      Continuar →
+                    </button>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function selectOption(optionIndex) {
+      selectedAnswers[currentPhase] = optionIndex;
+      render();
+    }
+
+    function nextPhase() {
+      currentPhase++;
+      render();
+      acScrollToTop();
+    }
+
+    function startGame() {
+      currentPhase = 0;
+      selectedAnswers = {};
+      render();
+      acScrollToTop();
+    }
+
+    function restartGame() {
+      currentPhase = -1;
+      selectedAnswers = {};
+      render();
+      acScrollToTop();
+    }
+
+    function toTraining() {
+      const config = window.elementSdk?.config || defaultConfig;
+      const app = document.getElementById('app');
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const fontStack = `${customFont}, Arial, sans-serif`;
+      
+      app.innerHTML = `
+        <div style="background: ${config.background_color}; font-family: ${fontStack};" class="w-full min-h-full p-6">
+          <div class="max-w-3xl mx-auto">
+            <div style="background: ${config.card_color};" class="rounded-2xl shadow-2xl p-8">
+              <div class="text-center mb-8">
+                <div style="font-size: ${baseSize * 3}px;" class="mb-4">🎾</div>
+                <h2 style="color: ${config.text_color}; font-size: ${baseSize * 1.75}px;" class="font-bold mb-3">¡Listo para la Cancha!</h2>
+                <p style="color: ${config.text_color}; font-size: ${baseSize * 1.125}px;" class="opacity-90">Ejercicios prácticos para tu próxima sesión</p>
+              </div>
+
+              <div class="space-y-6 mb-8">
+                <div style="background: ${config.background_color}; border-left: 4px solid ${config.primary_action_color};" class="p-5 rounded-lg">
+                  <div class="flex items-start gap-3">
+                    <div style="font-size: ${baseSize * 1.5}px;">📖</div>
+                    <div>
+                      <h3 style="color: ${config.primary_action_color}; font-size: ${baseSize * 1.125}px;" class="font-bold mb-2">1. Ejercicio de Lectura (5 min)</h3>
+                      <p style="color: ${config.text_color}; font-size: ${baseSize * 0.9375}px;" class="opacity-90">Tu compañero tira globos variados. TÚ SOLO LEES y dices en voz alta: "alto-corto", "bajo-profundo", etc. No golpees aún. Solo entrena el ojo.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="background: ${config.background_color}; border-left: 4px solid ${config.primary_action_color};" class="p-5 rounded-lg">
+                  <div class="flex items-start gap-3">
+                    <div style="font-size: ${baseSize * 1.5}px;">👣</div>
+                    <div>
+                      <h3 style="color: ${config.primary_action_color}; font-size: ${baseSize * 1.125}px;" class="font-bold mb-2">2. Desplazamiento sin Raqueta (5 min)</h3>
+                      <p style="color: ${config.text_color}; font-size: ${baseSize * 0.9375}px;" class="opacity-90 mb-2">Globos medios. Sin raqueta en la mano. Solo muévete hacia atrás con pasos cruzados y colócate. Siente el equilibrio.</p>
+                      <p style="color: ${config.text_color}; font-size: ${baseSize * 0.875}px;" class="opacity-75 italic">💡 Tip: Si llegas tarde o desequilibrado, ajusta tu primer paso.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="background: ${config.background_color}; border-left: 4px solid ${config.primary_action_color};" class="p-5 rounded-lg">
+                  <div class="flex items-start gap-3">
+                    <div style="font-size: ${baseSize * 1.5}px;">🎯</div>
+                    <div>
+                      <h3 style="color: ${config.primary_action_color}; font-size: ${baseSize * 1.125}px;" class="font-bold mb-2">3. Smash Controlado al 70% (10 min)</h3>
+                      <p style="color: ${config.text_color}; font-size: ${baseSize * 0.9375}px;" class="opacity-90 mb-2">Globos fáciles. Objetivo: 10 smashes seguidos SIN FALLAR. No importa la potencia. Importa NO FALLAR.</p>
+                      <p style="color: ${config.text_color}; font-size: ${baseSize * 0.875}px;" class="opacity-75 italic">💡 Regla: Si fallas, vuelves a 0. Esto entrena control mental.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="background: ${config.background_color}; border-left: 4px solid ${config.primary_action_color};" class="p-5 rounded-lg">
+                  <div class="flex items-start gap-3">
+                    <div style="font-size: ${baseSize * 1.5}px;">🧠</div>
+                    <div>
+                      <h3 style="color: ${config.primary_action_color}; font-size: ${baseSize * 1.125}px;" class="font-bold mb-2">4. Decisión Táctica (10 min)</h3>
+                      <p style="color: ${config.text_color}; font-size: ${baseSize * 0.9375}px;" class="opacity-90 mb-2">Globos mixtos: buenos y malos. Antes de golpear, DECIDE en voz alta: "ataco" o "controlo". Si el globo es malo y lo fuerzas, pierdes el punto.</p>
+                      <p style="color: ${config.text_color}; font-size: ${baseSize * 0.875}px;" class="opacity-75 italic">💡 Esto entrena la toma de decisiones bajo presión.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="background: ${config.background_color}; border-left: 4px solid ${config.primary_action_color};" class="p-5 rounded-lg">
+                  <div class="flex items-start gap-3">
+                    <div style="font-size: ${baseSize * 1.5}px;">⚡</div>
+                    <div>
+                      <h3 style="color: ${config.primary_action_color}; font-size: ${baseSize * 1.125}px;" class="font-bold mb-2">5. Juego Real con Regla (20 min)</h3>
+                      <p style="color: ${config.text_color}; font-size: ${baseSize * 0.9375}px;" class="opacity-90 mb-2">Partido normal, pero: cada smash fuera o en red = -2 puntos para ti. Cada smash controlado (aunque no mate) = punto doble.</p>
+                      <p style="color: ${config.text_color}; font-size: ${baseSize * 0.875}px;" class="opacity-75 italic">💡 Esto refuerza: controlar > forzar.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="background: ${config.primary_action_color}20; border: 2px solid ${config.primary_action_color};" class="rounded-xl p-6 mb-6">
+                <p style="color: ${config.text_color}; font-size: ${baseSize}px;" class="font-bold mb-3">🔑 Recuerda siempre:</p>
+                <div class="space-y-2">
+                  <p style="color: ${config.text_color}; font-size: ${baseSize * 0.9375}px;">✅ El smash se lee ANTES de golpear</p>
+                  <p style="color: ${config.text_color}; font-size: ${baseSize * 0.9375}px;">✅ Los pies te colocan, el brazo solo termina</p>
+                  <p style="color: ${config.text_color}; font-size: ${baseSize * 0.9375}px;">✅ Control al 70% > Potencia al 100%</p>
+                  <p style="color: ${config.text_color}; font-size: ${baseSize * 0.9375}px;">✅ No forzar = no regalar puntos</p>
+                </div>
+              </div>
+
+              <button onclick="restartGame()" style="background: ${config.primary_action_color}; color: ${config.background_color}; font-size: ${baseSize}px;" class="option-btn px-6 py-3 rounded-xl font-bold shadow-lg w-full">
+                🔄 Volver al Inicio
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      acScrollToTop();
+    }
+
+    async function onConfigChange(config) {
+      render();
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.card_color || defaultConfig.card_color,
+              set: (value) => {
+                config.card_color = value;
+                window.elementSdk.setConfig({ card_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_action_color || defaultConfig.primary_action_color,
+              set: (value) => {
+                config.primary_action_color = value;
+                window.elementSdk.setConfig({ primary_action_color: value });
+              }
+            },
+            {
+              get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+              set: (value) => {
+                config.secondary_action_color = value;
+                window.elementSdk.setConfig({ secondary_action_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["game_title", config.game_title || defaultConfig.game_title],
+          ["game_subtitle", config.game_subtitle || defaultConfig.game_subtitle],
+          ["intro_message", config.intro_message || defaultConfig.intro_message],
+          ["final_message", config.final_message || defaultConfig.final_message]
+        ])
+      });
+    }
+
+    render();
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) {
+      acScrollToTop();
+      return;
+    }
+
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+
+    try {
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, Math.max(0, top));
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    window.scrollTo(0, 0);
+  });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>

@@ -1,0 +1,1464 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domina el Espacio - Control Consciente</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      overflow: auto;
+    }
+
+    html, body, .game-container {
+      height: 100%;
+      width: 100%;
+    }
+
+    .game-container {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #1e3c72 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      min-height: 100%;
+      position: relative;
+    }
+
+    .game-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .phase-content {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 0.5s ease-out;
+      position: relative;
+      z-index: 1;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      margin: 120px 40px;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .game-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .game-title {
+      font-size: 32px;
+      font-weight: 800;
+      color: #1e3c72;
+      margin: 0 0 8px 0;
+      line-height: 1.2;
+    }
+
+    .game-subtitle {
+      font-size: 18px;
+      color: #64748b;
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .phase-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .phase-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      transition: all 0.3s ease;
+    }
+
+    .phase-dot.active {
+      background: #2a5298;
+      width: 32px;
+      border-radius: 6px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e3c72;
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .emoji-icon {
+      font-size: 28px;
+    }
+
+    .intro-message {
+      font-size: 18px;
+      color: #334155;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 12px;
+      border-left: 4px solid #2a5298;
+    }
+
+    .court-visual {
+      width: 100%;
+      max-width: 400px;
+      margin: 24px auto;
+      padding: 24px;
+      background: #065f46;
+      border-radius: 12px;
+      position: relative;
+    }
+
+    .court-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      background: white;
+      padding: 2px;
+      border-radius: 8px;
+    }
+
+    .court-zone {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #10b981;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .court-zone:hover {
+      background: #059669;
+      transform: scale(1.05);
+    }
+
+    .challenge-box {
+      background: #fef3c7;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      border-left: 4px solid #f59e0b;
+    }
+
+    .challenge-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #92400e;
+      margin: 0 0 12px 0;
+    }
+
+    .challenge-instruction {
+      font-size: 16px;
+      color: #78350f;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .options-grid {
+      display: grid;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .option-button {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .option-button:hover {
+      border-color: #2a5298;
+      background: #f8fafc;
+      transform: translateX(4px);
+      box-shadow: 0 4px 12px rgba(42, 82, 152, 0.15);
+    }
+
+    .option-button.selected {
+      background: #2a5298;
+      border-color: #2a5298;
+      color: white;
+      transform: scale(1.02);
+      box-shadow: 0 6px 16px rgba(42, 82, 152, 0.3);
+    }
+
+    .feedback-box {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.6;
+      animation: slideIn 0.4s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .feedback-excellent {
+      background: #d1fae5;
+      color: #065f46;
+      border-left: 4px solid #10b981;
+    }
+
+    .feedback-good {
+      background: #dbeafe;
+      color: #1e40af;
+      border-left: 4px solid #3b82f6;
+    }
+
+    .feedback-improve {
+      background: #fed7aa;
+      color: #92400e;
+      border-left: 4px solid #f59e0b;
+    }
+
+    .principle-box {
+      background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+      color: white;
+      padding: 24px;
+      border-radius: 12px;
+      margin: 24px 0;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.6;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      flex: 1;
+      min-width: 140px;
+      padding: 16px 28px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: #2a5298;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1e3c72;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(42, 82, 152, 0.3);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #2a5298;
+      border: 2px solid #2a5298;
+    }
+
+    .btn-secondary:hover {
+      background: #f8fafc;
+      transform: translateY(-2px);
+    }
+
+    .final-message {
+      background: #fef3c7;
+      border-radius: 12px;
+      padding: 32px;
+      text-align: center;
+      margin: 24px 0;
+    }
+
+    .final-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #92400e;
+      margin: 0 0 16px 0;
+    }
+
+    .final-subtitle {
+      font-size: 18px;
+      color: #78350f;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .benefits-list {
+      text-align: left;
+      display: inline-block;
+      margin: 20px 0;
+    }
+
+    .benefit-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 16px;
+      color: #334155;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .benefit-icon {
+      font-size: 24px;
+    }
+
+    @media (max-width: 640px) {
+      .phase-content {
+        padding: 32px;
+        margin: 80px 20px;
+      }
+
+      .game-title {
+        font-size: 24px;
+      }
+
+      .game-subtitle {
+        font-size: 16px;
+      }
+
+      .section-title {
+        font-size: 20px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px;
+    }
+
+    .container,
+    .game-container,
+    .game-wrapper,
+    .app-wrapper,
+    .app-container,
+    .main-wrapper,
+    .stage-wrapper,
+    .phase-container,
+    .phase-card,
+    .content,
+    .content-area,
+    .modal-content,
+    .results-card,
+    .scene,
+    .phase-content {
+      padding: 16px !important;
+    }
+
+    h1, .main-title, .game-title, .title {
+      font-size: clamp(1.8rem, 7vw, 2.3rem) !important;
+      line-height: 1.15 !important;
+    }
+
+    h2, .phase-title, .stage-title, .final-title, .section-title {
+      font-size: clamp(1.3rem, 6vw, 1.7rem) !important;
+      line-height: 1.25 !important;
+    }
+
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label {
+      font-size: clamp(1rem, 4.5vw, 1.15rem) !important;
+      line-height: 1.4 !important;
+    }
+
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text, .intro-message, .quote {
+      font-size: 1rem !important;
+      line-height: 1.55 !important;
+    }
+
+    .button-group,
+    .action-buttons,
+    .final-buttons,
+    .controls-row {
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+
+    button,
+    .btn,
+    .btn-primary,
+    .btn-secondary,
+    .action-button,
+    .option-btn {
+      width: 100% !important;
+    }
+
+    .zone-grid,
+    .scenario-grid,
+    .options-grid,
+    .results-stats {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    on: function () {},
+    emit: function () { return { isOk: true, value: null }; },
+    setConfig: function () {},
+    config: {}
+  };
+
+  window.dataSdk = window.dataSdk || {
+    init: async function () { return { isOk: true, value: null }; },
+    create: async function () { return { isOk: true, value: null }; },
+    list: async function () { return { isOk: true, value: [] }; },
+    update: async function () { return { isOk: true, value: null }; }
+  };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body>
+  <div class="game-container">
+   <div class="phase-content" id="content"><!-- Content will be dynamically rendered here -->
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "🎮 Domina el Espacio",
+      game_subtitle: "Ritmo, dirección y calma táctica en cancha",
+      intro_message: "La mayoría falla porque golpea sin objetivo. El control empieza cuando sabes a dónde va la pelota.",
+      control_principle: "El control no es suavidad, es dirección repetida.",
+      start_button_text: "Entrar al control",
+      next_button_text: "Continuar",
+      repeat_button_text: "Repetir juego",
+      background_color: "#1e3c72",
+      surface_color: "#ffffff",
+      text_color: "#334155",
+      primary_action_color: "#2a5298",
+      secondary_action_color: "#10b981"
+    };
+
+    let currentPhase = 0;
+    let selectedOptions = {};
+
+    const phases = [
+      {
+        id: 'intro',
+        render: () => renderIntro()
+      },
+      {
+        id: 'challenge1',
+        render: () => renderChallenge1()
+      },
+      {
+        id: 'challenge2',
+        render: () => renderChallenge2()
+      },
+      {
+        id: 'challenge3',
+        render: () => renderChallenge3()
+      },
+      {
+        id: 'challenge4',
+        render: () => renderChallenge4()
+      },
+      {
+        id: 'final',
+        render: () => renderFinal()
+      }
+    ];
+
+    function renderIntro() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      return `
+        <div class="game-header">
+          <h1 class="game-title">${config.game_title || defaultConfig.game_title}</h1>
+          <p class="game-subtitle">${config.game_subtitle || defaultConfig.game_subtitle}</p>
+        </div>
+        
+        ${renderPhaseIndicator()}
+        
+        <h2 class="section-title">
+          <span class="emoji-icon">🟦</span>
+          FASE 1 — Cambia el objetivo: deja de golpear, empieza a apuntar
+        </h2>
+        
+        <div class="intro-message">
+          ${config.intro_message || defaultConfig.intro_message}
+        </div>
+
+        <div style="background: #e0f2fe; padding: 24px; border-radius: 12px; margin: 24px 0; border-left: 4px solid #0284c7;">
+          <h3 style="margin: 0 0 12px 0; color: #075985; font-size: 18px; font-weight: 700;">👥 Este ejercicio se realiza con un compañero</h3>
+          <p style="margin: 0; color: #0c4a6e; line-height: 1.6; font-size: 15px;">
+            Necesitarás un compañero de práctica para realizar estos ejercicios. El objetivo no es jugar un partido, sino <strong>entrenar con intención específica</strong>. Tu compañero debe entender que están trabajando control y consistencia, no velocidad ni puntos ganadores.
+          </p>
+        </div>
+
+        <div style="background: #f0fdfa; padding: 24px; border-radius: 12px; margin: 24px 0; border-left: 4px solid #14b8a6;">
+          <h3 style="margin: 0 0 16px 0; color: #115e59; font-size: 18px; font-weight: 700;">🎯 ¿Por qu   dividimos la cancha en zonas?</h3>
+          <p style="margin: 0 0 16px 0; color: #134e4a; line-height: 1.6; font-size: 15px;">
+            Cada zona tiene un propósito táctico diferente. El error más común es golpear sin saber a dónde va la pelota. Los jugadores avanzados <strong>siempre tienen una intención clara</strong> antes de golpear.
+          </p>
+          <p style="margin: 0; color: #134e4a; line-height: 1.6; font-size: 15px;">
+            En este ejercicio aprenderás a <strong>controlar cada zona conscientemente</strong>, eligiendo la dirección según tu posición y objetivo táctico.
+          </p>
+        </div>
+        
+        <div class="court-visual">
+          <div class="court-grid">
+            <div class="court-zone">Zona<br>Cruzada<br><span style="font-size: 11px; opacity: 0.9;">🔹 Mayor margen</span></div>
+            <div class="court-zone">Zona<br>Paralela<br><span style="font-size: 11px; opacity: 0.9;">⚡ Mayor riesgo</span></div>
+            <div class="court-zone">Zona<br>Central<br><span style="font-size: 11px; opacity: 0.9;">🛡️ Control seguro</span></div>
+            <div class="court-zone">Esquinas<br><span style="font-size: 11px; opacity: 0.9;">🎯 Precisión</span></div>
+          </div>
+        </div>
+        
+        <div class="principle-box">
+          💡 ${config.control_principle || defaultConfig.control_principle}
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn btn-primary" onclick="nextPhase()">${config.start_button_text || defaultConfig.start_button_text}</button>
+        </div>
+      `;
+    }
+
+    function renderChallenge1() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const selected = selectedOptions['challenge1'];
+      
+      let feedbackHtml = '';
+      if (selected) {
+        const feedbacks = {
+          'excellent': { 
+            class: 'feedback-excellent', 
+            text: `🔥 <strong>Excelente trabajo.</strong><br><br>
+                   Lograste mantener 10 golpes cruzados con control. Esto significa que:<br>
+                   • Tu equilibrio fue consistente<br>
+                   • Tu timing estuvo sincronizado<br>
+                   • Priorizaste dirección sobre potencia<br><br>
+                   <strong>En partido:</strong> Esta habilidad te permite construir puntos sólidos, forzar errores del rival sin arriesgar, y mantener el control del rally. El cruzado bien ejecutado es la base del tenis de alto nivel.` 
+          },
+          'good': { 
+            class: 'feedback-good', 
+            text: `🙂 <strong>Vas por buen camino.</strong><br><br>
+                   Lograste entre 6 y 9 golpes. Estás desarrollando el patrón, pero aún hay inconsistencias.<br><br>
+                   <strong>Ajustes recomendados:</strong><br>
+                   • Baja el ritmo de golpeo (menos velocidad = más control)<br>
+                   • Asegúrate de terminar cada golpe mirando hacia donde apuntas<br>
+                   • Respira entre golpes para mantener la calma<br><br>
+                   <strong>Consejo:</strong> No te frustres. La consistencia se construye con repetición consciente, no con esfuerzo. Repite este ejercicio hasta sentir que puedes hacerlo con los ojos cerrados.` 
+          },
+          'improve': { 
+            class: 'feedback-improve', 
+            text: `😕 <strong>Necesitas ajustar tu enfoque.</strong><br><br>
+                   Si lograste menos de 6 golpes, probablemente estás:<br>
+                   • Golpeando más fuerte de lo necesario<br>
+                   • Perdiendo el equilibrio entre golpes<br>
+                   • No ajustando bien la posición de tus pies<br><br>
+                   <strong>Solución inmediata:</strong><br>
+                   Reduce la velocidad a la mitad. Literalmente. El objetivo es <strong>dirección repetida</strong>, no potencia. Concéntrate en que cada pelota cruce la red con 1 metro de altura y caiga en la zona cruzada. Olvídate de "golpear fuerte".<br><br>
+                   <strong>Repite el ejercicio</strong> con esta mentalidad: "Suave, profundo, cruzado". Verás resultados inmediatos.` 
+          }
+        };
+        const feedback = feedbacks[selected];
+        feedbackHtml = `<div class="feedback-box ${feedback.class}">${feedback.text}</div>`;
+      }
+      
+      return `
+        <div class="game-header">
+          <h1 class="game-title">${config.game_title || defaultConfig.game_title}</h1>
+        </div>
+        
+        ${renderPhaseIndicator()}
+        
+        <h2 class="section-title">
+          <span class="emoji-icon">🟩</span>
+          FASE 2 — Reto Cruzado: consistencia antes que todo
+        </h2>
+
+        <div style="background: #fef3c7; padding: 20px; border-radius: 12px; margin-bottom: 24px; border-left: 4px solid #f59e0b;">
+          <h4 style="margin: 0 0 12px 0; color: #92400e; font-size: 16px; font-weight: 700;">📋 Instrucciones para el ejercicio</h4>
+          <p style="margin: 0 0 12px 0; color: #78350f; line-height: 1.6; font-size: 14px;">
+            <strong>Posición inicial:</strong> Ambos jugadores desde el fondo de la cancha, en el centro.<br>
+            <strong>Objetivo:</strong> Mantener un rally de 10 golpes consecutivos, todos cruzados (derecha a derecha, o revés a revés).<br>
+            <strong>Regla clave:</strong> Si la pelota sale fuera de la zona cruzada, reinician el conteo.
+          </p>
+          <p style="margin: 0; color: #78350f; line-height: 1.6; font-size: 14px;">
+                ️ <strong>No busques velocidad.</strong> Busca que cada pelota caiga en zona cruzada con altura segura sobre la red.
+          </p>
+        </div>
+        
+        <div class="challenge-box">
+          <h3 class="challenge-title">🎯 Reto 1 – Cruzado controlado</h3>
+          <div class="challenge-instruction">
+            Mantén <strong>10 golpes cruzados consecutivos</strong><br>
+            con tu compañero, sin buscar velocidad.
+          </div>
+          
+          <div style="text-align: center; margin: 20px 0; font-size: 40px; line-height: 1.4;">
+            🎾 ➡️ 🎾 ➡️ 🎾 ➡️ 🎾
+          </div>
+          
+          <p style="font-weight: 700; color: #92400e; margin: 20px 0 12px 0; font-size: 15px;">¿Cómo te fue?</p>
+          
+          <div class="options-grid">
+            <button class="option-button ${selected === 'excellent' ? 'selected' : ''}" 
+                    onclick="selectOption('challenge1', 'excellent')">
+                  Logré los 10 golpes
+            </button>
+            <button class="option-button ${selected === 'good' ? 'selected' : ''}" 
+                    onclick="selectOption('challenge1', 'good')">
+              🙂 Llegué entre 6 y 9
+            </button>
+            <button class="option-button ${selected === 'improve' ? 'selected' : ''}" 
+                    onclick="selectOption('challenge1', 'improve')">
+              😕 Menos de 6 golpes
+            </button>
+          </div>
+          
+          ${feedbackHtml}
+        </div>
+        
+        <div class="principle-box">
+          💡 <strong>Principio fundamental:</strong> El cruzado estable construye el punto.<br>
+          <span style="font-size: 15px; opacity: 0.95; display: block; margin-top: 8px;">
+            El 70% de los golpes en un partido profesional son cruzados. Domina esto y tendrás la base del tenis ganador.
+          </span>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn btn-secondary" onclick="previousPhase()">Volver</button>
+          <button class="btn btn-primary" onclick="nextPhase()" ${!selected ? 'style="opacity: 0.5; cursor: not-allowed;"' : ''}>${config.next_button_text || defaultConfig.next_button_text}</button>
+        </div>
+      `;
+    }
+
+    function renderChallenge2() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const selectedDecision = selectedOptions['challenge2-decision'];
+      const selectedEval = selectedOptions['challenge2-eval'];
+      
+      let decisionFeedback = '';
+      if (selectedDecision) {
+        const feedbacks = {
+          'correct': {
+            class: 'feedback-excellent',
+            text: `<strong>Exacto. Esta es la clave táctica.</strong><br><br>
+                   El paralelo es un golpe de <strong>oportunidad</strong>, no de rutina. Solo debe ejecutarse cuando:<br>
+                   • Estás bien posicionado y equilibrado<br>
+                   • Tienes tiempo suficiente para preparar el golpe<br>
+                   • La pelota viene a una altura cómoda<br><br>
+                   Forzar el paralelo desde mala posición es el error #1 que genera puntos perdidos en jugadores intermedios.`
+          },
+          'always': {
+            class: 'feedback-improve',
+            text: `<strong>Cuidado con esta mentalidad.</strong><br><br>
+                   Golpear paralelo "siempre" es una receta para acumular errores no forzados. El paralelo:<br>
+                   • Cruza menos distancia sobre la red<br>
+                   • Tiene menor margen de error lateral<br>
+                   • Requiere mayor precisión<br><br>
+                   Úsalo como un <strong>golpe táctico</strong>, no como patrón por defecto.`
+          },
+          'define': {
+            class: 'feedback-good',
+            text: `<strong>Parcialmente correcto, pero incompleto.</strong><br><br>
+                   Sí, el paralelo puede ser un golpe definitorio, pero <strong>solo si estás en posición</strong>. Muchos jugadores intentan "definir" desde posiciones comprometidas y terminan regalando el punto.<br><br>
+                   La pregunta correcta es: "¿Estoy en posición para ejecutarlo con control?" Si la respuesta es no, vuelve al cruzado.`
+          },
+          'never': {
+            class: 'feedback-improve',
+            text: `<strong>No tan rápido.</strong><br><br>
+                   Nunca usar el paralelo te limita tácticamente. El paralelo bien ejecutado:<br>
+                   • Sorprende al rival<br>
+                   • Cambia el ritmo del punto<br>
+                   • Crea espacios abiertos<br><br>
+                   El secreto no es "nunca usarlo", sino <strong>elegir el momento correcto</strong>: cuando estás equilibrado y preparado.`
+          }
+        };
+        const feedback = feedbacks[selectedDecision];
+        decisionFeedback = `<div class="feedback-box ${feedback.class}">${feedback.text}</div>`;
+      }
+      
+      let evalFeedback = '';
+      if (selectedEval) {
+        const feedbacks = {
+          'control': { 
+            class: 'feedback-excellent', 
+            text: `🎯 <strong>Perfecto. Esto es control real.</strong><br><br>
+                   Sentiste que el golpe salió limpio, que tuviste tiempo, que la pelota fue donde querías. Esa sensación es oro puro. Guárdala en tu memoria muscular.<br><br>
+                   <strong>En partido:</strong> Cuando sientas esa misma sensación, ejecuta el paralelo con confianza. Tu cuerpo ya sabe cómo hacerlo.` 
+          },
+          'doubt': { 
+            class: 'feedback-good', 
+            text: `🔄 <strong>Dudar es parte del aprendizaje.</strong><br><br>
+                   La duda significa que tu cerebro está procesando información. Eso es bueno. Con más repeticiones, la decisión se volverá automática.<br><br>
+                   <strong>Práctica recomendada:</strong> Haz 20 repeticiones más del ejercicio, y cada vez que estés equilibrado, di en voz alta "ahora sí" antes de golpear paralelo. Esto entrena la decisión consciente.` 
+          },
+          'forced': { 
+            class: 'feedback-improve', 
+            text: `😕 <strong>Identificaste el problema. Eso ya es progreso.</strong><br><br>
+                   Forzar el paralelo genera errores. Si sentiste que "forzaste" el golpe, probablemente:<br>
+                   • Estabas fuera de posición<br>
+                   • No terminaste el movimiento<br>
+                   • Quisiste "hacer más" de lo que la situación permitía<br><br>
+                   <strong>Ajuste mental:</strong> Cuando dudes si golpear paralelo, la respuesta es NO. Vuelve al cruzado seguro. El paralelo solo se ejecuta cuando estás 100% seguro.` 
+          }
+        };
+        const feedback = feedbacks[selectedEval];
+        evalFeedback = `<div class="feedback-box ${feedback.class}">${feedback.text}</div>`;
+      }
+      
+      return `
+        <div class="game-header">
+          <h1 class="game-title">${config.game_title || defaultConfig.game_title}</h1>
+        </div>
+        
+        ${renderPhaseIndicator()}
+        
+        <h2 class="section-title">
+          <span class="emoji-icon">🟨</span>
+          FASE 3 — Reto Paralelo: precisión bajo control
+        </h2>
+
+        <div style="background: #fef3c7; padding: 20px; border-radius: 12px; margin-bottom: 24px; border-left: 4px solid #f59e0b;">
+          <h4 style="margin: 0 0 12px 0; color: #92400e; font-size: 16px; font-weight: 700;">📋 Instrucciones para el ejercicio</h4>
+          <p style="margin: 0 0 12px 0; color: #78350f; line-height: 1.6; font-size: 14px;">
+            <strong>Dinámica:</strong> Comienzan jugando cruzado. Cuando te sientas equilibrado y bien posicionado, intenta un golpe paralelo.<br>
+            <strong>Señal clave:</strong> Solo golpea paralelo si sientes que tienes "tiempo de sobra" para preparar.<br>
+            <strong>Tu compañero:</strong> Debe devolver la pelota hacia donde tú estás, facilitando el control.
+          </p>
+          <p style="margin: 0; color: #78350f; line-height: 1.6; font-size: 14px;">
+            ⚠️ <strong>No fuerces.</strong> Si dudas, vuelve al cruzado.
+          </p>
+        </div>
+        
+        <div class="challenge-box">
+          <h3 class="challenge-title">🎯 Reto 2 – Paralelo controlado</h3>
+          <div class="challenge-instruction">
+            Realiza el ejercicio con tu compañero.<br>
+            Golpea paralelo <strong>solo cuando estés equilibrado.</strong>
+          </div>
+          
+          <p style="font-weight: 700; color: #92400e; margin-top: 20px; font-size: 15px;">👉 Primero: ¿Cuándo debe ejecutarse el paralelo?</p>
+          
+          <div class="options-grid">
+            <button class="option-button ${selectedDecision === 'always' ? 'selected' : ''}" 
+                    onclick="selectOption('challenge2-decision', 'always')">
+              Siempre que pueda
+            </button>
+            <button class="option-button ${selectedDecision === 'define' ? 'selected' : ''}" 
+                    onclick="selectOption('challenge2-decision', 'define')">
+              Cuando quiero definir el punto
+            </button>
+            <button class="option-button ${selectedDecision === 'correct' ? 'selected' : ''}" 
+                    onclick="selectOption('challenge2-decision', 'correct')">
+              Cuando estoy bien colocado y equilibrado
+            </button>
+            <button class="option-button ${selectedDecision === 'never' ? 'selected' : ''}" 
+                    onclick="selectOption('challenge2-decision', 'never')">
+              Nunca, es muy arriesgado
+            </button>
+          </div>
+          
+          ${decisionFeedback}
+          
+          ${selectedDecision ? `
+            <div style="margin-top: 32px; padding: 20px; background: #f0fdfa; border-radius: 12px; border-left: 4px solid #14b8a6;">
+              <p style="font-weight: 700; color: #115e59; margin: 0 0 12px 0; font-size: 15px;">Ahora practica y autoevalúate:</p>
+              <p style="margin: 0 0 16px 0; color: #134e4a; font-size: 14px;">Intenta 5 golpes paralelos durante el rally. ¿Cómo te sentiste?</p>
+              <div class="options-grid">
+                <button class="option-button ${selectedEval === 'control' ? 'selected' : ''}" 
+                        onclick="selectOption('challenge2-eval', 'control')">
+                  🎯 Sentí control y confianza
+                </button>
+                <button class="option-button ${selectedEval === 'doubt' ? 'selected' : ''}" 
+                        onclick="selectOption('challenge2-eval', 'doubt')">
+                  🔄 Dudé en el momento
+                </button>
+                <button class="option-button ${selectedEval === 'forced' ? 'selected' : ''}" 
+                        onclick="selectOption('challenge2-eval', 'forced')">
+                  😕 Sentí que forcé el golpe
+                </button>
+              </div>
+              ${evalFeedback}
+            </div>
+          ` : ''}
+        </div>
+
+        <div class="principle-box">
+          💡 <strong>Principio táctico:</strong> El paralelo no se fuerza. Se gana con equilibrio.<br>
+          <span style="font-size: 15px; opacity: 0.95; display: block; margin-top: 8px;">
+            Un paralelo bien ejecutado desde buena posición vale más que tres intentos forzados desde mala posición.
+          </span>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn btn-secondary" onclick="previousPhase()">Volver</button>
+          <button class="btn btn-primary" onclick="nextPhase()" ${!selectedEval ? 'style="opacity: 0.5; cursor: not-allowed;"' : ''}>${config.next_button_text || defaultConfig.next_button_text}</button>
+        </div>
+      `;
+    }
+
+    function renderChallenge3() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const selected = selectedOptions['challenge3'];
+      
+      let feedbackHtml = '';
+      if (selected) {
+        const feedbacks = {
+          'excellent': { 
+            class: 'feedback-excellent', 
+            text: `🔥 <strong>Precisión real. Estás dirigiendo la pelota.</strong><br><br>
+                   Lograr 6 de 10 (o más) demuestra que no solo golpeas, sino que <strong>apuntas</strong>. Esto es control avanzado. Significa que:<br>
+                   • Tu swing está automatizado<br>
+                   • Tu concentración está en el objetivo, no en la técnica<br>
+                   • Puedes repetir el patrón bajo presión<br><br>
+                   <strong>En competencia:</strong> Esta habilidad te permite explotar espacios vacíos, mover al rival con precisión y atacar debilidades específicas. Los jugadores con precisión consistente ganan más puntos con menos esfuerzo.` 
+          },
+          'good': { 
+            class: 'feedback-good', 
+            text: `🙂 <strong>Buen inicio. Estás en el camino correcto.</strong><br><br>
+                   Lograste entre 3 y 5 aciertos. Eso significa que la dirección general está bien, pero falta refinamiento.<br><br>
+                   <strong>Ajustes específicos:</strong><br>
+                   • <strong>Altura sobre la red:</strong> Si fallas hacia la red, sube la trayectoria. Si fallas largo, baja la altura.<br>
+                   • <strong>Punto de contacto:</strong> Golpea la pelota un poco más adelante para direcciones cruzadas, más atrás para paralelas.<br>
+                   • <strong>Follow-through:</strong> Tu brazo debe terminar apuntando exactamente donde quieres que vaya la pelota.<br><br>
+                   Repite el ejercicio 3 veces más. La precisión mejora dramáticamente con repetición consciente.` 
+          },
+          'improve': { 
+            class: 'feedback-improve', 
+            text: `😕 <strong>No busques fuerza. Busca espacio y altura.</strong><br><br>
+                   Si lograste menos de 3 aciertos, el problema probablemente no es técnico, es mental. Estás pensando en "golpear fuerte" en lugar de "colocar la pelota".<br><br>
+                   <strong>Cambio de enfoque inmediato:</strong><br>
+                   • Olvida la velocidad por completo<br>
+                   • Reduce tu swing a 50% de potencia<br>
+                   • Mira el objetivo (el cono) 2 segundos antes de golpear<br>
+                   • Golpea pensando "alto, suave, preciso"<br><br>
+                   <strong>Ejercicio correctivo:</strong> Haz 10 tiros a medio ritmo, concentrándote solo en que la pelota caiga dentro de 2 metros del cono. Olvídate de contar aciertos, solo siente la dirección. Después vuelve a intentar.` 
+          }
+        };
+        const feedback = feedbacks[selected];
+        feedbackHtml = `<div class="feedback-box ${feedback.class}">${feedback.text}</div>`;
+      }
+      
+      return `
+        <div class="game-header">
+          <h1 class="game-title">${config.game_title || defaultConfig.game_title}</h1>
+        </div>
+        
+        ${renderPhaseIndicator()}
+        
+        <h2 class="section-title">
+          <span class="emoji-icon">🟧</span>
+          FASE 4 — Tiros a objetivo: manda la pelota
+        </h2>
+
+        <div style="background: #fef3c7; padding: 20px; border-radius: 12px; margin-bottom: 24px; border-left: 4px solid #f59e0b;">
+          <h4 style="margin: 0 0 12px 0; color: #92400e; font-size: 16px; font-weight: 700;">📋 Instrucciones para el ejercicio</h4>
+          <p style="margin: 0 0 12px 0; color: #78350f; line-height: 1.6; font-size: 14px;">
+            <strong>Preparación:</strong> Coloca 4 conos (o botellas, bolsas, cualquier marcador) en las cuatro esquinas de la cancha, a 1 metro de las líneas.<br>
+            <strong>Dinámica:</strong> Tu compañero te envía pelotas cómodas desde el otro lado. Tú intentas que tus golpes pasen cerca de los conos.<br>
+            <strong>Meta:</strong> 6 de 10 pelotas deben caer dentro de 2 metros del cono objetivo.
+          </p>
+          <p style="margin: 0; color: #78350f; line-height: 1.6; font-size: 14px;">
+            ⚠️ <strong>Importante:</strong> Alterna esquinas (no golpees 10 veces al mismo lugar). Esto entrena adaptación.
+          </p>
+        </div>
+        
+        <div class="challenge-box">
+          <h3 class="challenge-title">🎯 Reto 3 – Tiros a conos (precisión real)</h3>
+          <div class="challenge-instruction">
+            Realiza <strong>10 intentos</strong> hacia diferentes esquinas.<br>
+            ¿Cuántas pelotas pasaron cerca del objetivo?
+          </div>
+          
+          <div style="text-align: center; margin: 24px 0;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 300px; margin: 0 auto;">
+              <div style="background: #10b981; color: white; padding: 20px; border-radius: 12px; font-size: 32px;">🎯</div>
+              <div style="background: #10b981; color: white; padding: 20px; border-radius: 12px; font-size: 32px;">🎯</div>
+              <div style="background: #10b981; color: white; padding: 20px; border-radius: 12px; font-size: 32px;">🎯</div>
+              <div style="background: #10b981; color: white; padding: 20px; border-radius: 12px; font-size: 32px;">🎯</div>
+            </div>
+            <p style="margin: 12px 0 0 0; color: #64748b; font-size: 13px; font-style: italic;">Las 4 esquinas de la cancha</p>
+          </div>
+          
+          <p style="font-weight: 700; color: #92400e; margin: 20px 0 12px 0; font-size: 15px;">¿Cuántos aciertos lograste?</p>
+          
+          <div class="options-grid">
+            <button class="option-button ${selected === 'excellent' ? 'selected' : ''}" 
+                    onclick="selectOption('challenge3', 'excellent')">
+              🔥 6 o más aciertos
+            </button>
+            <button class="option-button ${selected === 'good' ? 'selected' : ''}" 
+                    onclick="selectOption('challenge3', 'good')">
+              🙂 Entre 3 y 5 aciertos
+            </button>
+            <button class="option-button ${selected === 'improve' ? 'selected' : ''}" 
+                    onclick="selectOption('challenge3', 'improve')">
+              😕 Menos de 3 aciertos
+            </button>
+          </div>
+          
+          ${feedbackHtml}
+        </div>
+        
+        <div class="principle-box">
+          💡 <strong>Principio de precisión:</strong> Apuntar educa tu brazo.<br>
+          <span style="font-size: 15px; opacity: 0.95; display: block; margin-top: 8px;">
+            Cada vez que golpeas con un objetivo claro en mente, tu sistema neuromuscular aprende y ajusta. La precisión no se logra "tratando más fuerte", se logra repitiendo con intención.
+          </span>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn btn-secondary" onclick="previousPhase()">Volver</button>
+          <button class="btn btn-primary" onclick="nextPhase()" ${!selected ? 'style="opacity: 0.5; cursor: not-allowed;"' : ''}>${config.next_button_text || defaultConfig.next_button_text}</button>
+        </div>
+      `;
+    }
+
+    function renderChallenge4() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const selected = selectedOptions['challenge4'];
+      
+      let feedbackHtml = '';
+      if (selected) {
+        const feedbacks = {
+          'all': {
+            class: 'feedback-excellent',
+            text: `<strong>¡Exacto! Todas las anteriores.</strong><br><br>
+                   Jugar al centro es una de las herramientas tácticas más poderosas y menos comprendidas del tenis. Sirve para:<br><br>
+                   <strong>1. No fallar:</strong> El centro es la zona más segura. La red es más baja en el medio y tienes más margen lateral.<br><br>
+                   <strong>2. Recuperar equilibrio:</strong> Cuando estás corriendo o comprometido, el centro te da tiempo para volver a posición.<br><br>
+                   <strong>3. Quitar ángulos al rival:</strong> Una pelota central limita las opciones ofensivas del oponente. No puede crear ángulos agudos desde ahí.<br><br>
+                   Los profesionales usan el centro estratégicamente en momentos clave. No es "jugar defensivo", es <strong>jugar inteligente</strong>.`
+          },
+          'nofail': {
+            class: 'feedback-good',
+            text: `<strong>Correcto, pero es solo una parte.</strong><br><br>
+                   Sí, jugar al centro reduce errores porque:<br>
+                   • La red está más baja (0.91m vs 1.07m en los lados)<br>
+                   • Tienes más margen de error lateral<br><br>
+                   Pero el centro hace mucho más que eso. Tambi  n te ayuda a <strong>recuperar equilibrio</strong> cuando estás corriendo, y <strong>quita ángulos</strong> al rival, limitando sus opciones ofensivas.<br><br>
+                   Piensa en el centro como una herramienta táctica completa, no solo como un "golpe seguro".`
+          },
+          'recover': {
+            class: 'feedback-good',
+            text: `<strong>Correcto, pero hay más beneficios.</strong><br><br>
+                   Sí, el centro te da tiempo para recuperar posición. Cuando golpeas al centro:<br>
+                   • El rival no puede alejarte con ángulos<br>
+                   • Tienes más tiempo para volver al centro de la cancha<br><br>
+                   Pero también sirve para <strong>no fallar</strong> (mayor margen de seguridad) y para <strong>quitar ángulos</strong> al rival (limitas sus opciones ofensivas).<br><br>
+                   El centro es una jugada táctica completa. Úsalo estratégicamente, no solo como respuesta defensiva.`
+          },
+          'angles': {
+            class: 'feedback-good',
+            text: `<strong>Correcto, pero es una visión incompleta.</strong><br><br>
+                   Sí, el centro neutraliza los ángulos del rival. Una pelota central:<br>
+                   • Limita las opciones ofensivas del oponente<br>
+                   • Le impide crear geometrías complicadas<br><br>
+                   Pero también sirve para <strong>no fallar</strong> (mayor margen de seguridad en la red más baja) y para <strong>recuperar equilibrio</strong> (te da tiempo para reposicionarte).<br><br>
+                   El centro es tu botón de "reset" táctico. Úsalo conscientemente en momentos clave.`
+          }
+        };
+        const feedback = feedbacks[selected] || feedbacks['all'];
+        feedbackHtml = `<div class="feedback-box ${feedback.class}">${feedback.text}</div>`;
+      }
+      
+      return `
+        <div class="game-header">
+          <h1 class="game-title">${config.game_title || defaultConfig.game_title}</h1>
+        </div>
+        
+        ${renderPhaseIndicator()}
+        
+        <h2 class="section-title">
+          <span class="emoji-icon">🟫</span>
+          FASE 5 — Centro consciente: controla el ritmo del punto
+        </h2>
+
+        <div style="background: #fef3c7; padding: 20px; border-radius: 12px; margin-bottom: 24px; border-left: 4px solid #f59e0b;">
+          <h4 style="margin: 0 0 12px 0; color: #92400e; font-size: 16px; font-weight: 700;">📋 Instrucciones para el ejercicio</h4>
+          <p style="margin: 0 0 12px 0; color: #78350f; line-height: 1.6; font-size: 14px;">
+            <strong>Dinámica:</strong> Juega un rally libre con tu compañero, pero intenta dirigir al menos 5 de cada 10 pelotas hacia el centro de su cancha (entre las líneas de servicio).<br>
+            <strong>Observación clave:</strong> Fíjate cómo cambia el ritmo del punto cuando juegas al centro vs cuando juegas a los lados.<br>
+            <strong>Duración:</strong> 3-5 minutos de rally continuo.
+          </p>
+          <p style="margin: 0; color: #78350f; line-height: 1.6; font-size: 14px;">
+            💡 <strong>Consejo:</strong> Alterna entre centro y lados. No juegues SOLO al centro (eso sería predecible). Úsalo estratégicamente.
+          </p>
+        </div>
+        
+        <div class="challenge-box">
+          <h3 class="challenge-title">🎯 Reto 4 – Rallies al centro (táctica avanzada)</h3>
+          <div class="challenge-instruction">
+            Antes de practicar, responde:<br>
+            <strong>¿Para qué sirve jugar al centro de la cancha?</strong>
+          </div>
+
+          <div style="text-align: center; margin: 24px 0; padding: 20px; background: #f0fdfa; border-radius: 12px;">
+            <div style="font-size: 48px; margin-bottom: 12px;">🎾</div>
+            <div style="color: #115e59; font-weight: 600; font-size: 14px;">La zona central: tu herramienta táctica más infravalorada</div>
+          </div>
+          
+          <p style="font-weight: 700; color: #92400e; margin-top: 20px; font-size: 15px;">👉 Selecciona tu respuesta:</p>
+          
+          <div class="options-grid">
+            <button class="option-button ${selected === 'nofail' ? 'selected' : ''}" 
+                    onclick="selectOption('challenge4', 'nofail')">
+              Para no fallar (mayor margen)
+            </button>
+            <button class="option-button ${selected === 'recover' ? 'selected' : ''}" 
+                    onclick="selectOption('challenge4', 'recover')">
+              Para recuperar equilibrio y posición
+            </button>
+            <button class="option-button ${selected === 'angles' ? 'selected' : ''}" 
+                    onclick="selectOption('challenge4', 'angles')">
+              Para quitar ángulos al rival
+            </button>
+            <button class="option-button ${selected === 'all' ? 'selected' : ''}" 
+                    onclick="selectOption('challenge4', 'all')">
+              Todas las anteriores
+            </button>
+          </div>
+          
+          ${feedbackHtml}
+        </div>
+
+        <div class="principle-box">
+          💡 <strong>Principio estratégico:</strong> El centro calma el punto y te devuelve el control.<br>
+          <span style="font-size: 15px; opacity: 0.95; display: block; margin-top: 8px;">
+            Federer, Djokovic y Nadal usan el centro constantemente. No es pasividad, es control táctico. Cuando pierdes el ritmo del punto, vuelve al centro.
+          </span>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn btn-secondary" onclick="previousPhase()">Volver</button>
+          <button class="btn btn-primary" onclick="nextPhase()" ${!selected ? 'style="opacity: 0.5; cursor: not-allowed;"' : ''}>${config.next_button_text || defaultConfig.next_button_text}</button>
+        </div>
+      `;
+    }
+
+    function renderFinal() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const selected = selectedOptions['final'];
+      
+      const messages = {
+        'rhythm': {
+          title: 'Ritmo consistente',
+          description: `<strong>El ritmo elimina errores y construye confianza.</strong><br><br>
+                       Cuando entrenas ritmo, estás educando tu cuerpo a mantener un tempo constante, independiente de la presión. Esto te ayuda a:<br>
+                       • Reducir errores no forzados<br>
+                       • Mantener la calma en momentos clave<br>
+                       • Dictar el tempo del partido<br><br>
+                       <strong>Ejercicio recomendado:</strong> Repite el Reto 1 (cruzado) hasta lograr 20 golpes consecutivos sin fallar. Entrena 15 minutos diarios.`,
+          icon: '🎵'
+        },
+        'direction': {
+          title: 'Dirección clara',
+          description: `<strong>La dirección intencional gana puntos.</strong><br><br>
+                       Cuando entrenas dirección, dejas de "reaccionar" y empiezas a "construir" puntos. Esto te permite:<br>
+                       • Explotar espacios abiertos<br>
+                       • Mover al rival con propósito<br>
+                       • Ejecutar patrones tácticos<br><br>
+                       <strong>Ejercicio recomendado:</strong> Repite el Reto 2 (paralelo) y practica el cambio consciente de dirección. Alterna cruzado-paralelo 30 veces. Foco en decisión, no velocidad.`,
+          icon: '🎯'
+        },
+        'precision': {
+          title: 'Precisión bajo presión',
+          description: `<strong>La precisión construye confianza y define partidos.</strong><br><br>
+                       Cuando entrenas precisión, desarrollas la capacidad de colocar la pelota exactamente donde quieres, incluso bajo presión. Esto te da:<br>
+                       • Confianza en momentos decisivos<br>
+                           Capacidad para atacar debilidades específicas<br>
+                       • Control real del resultado del punto<br><br>
+                       <strong>Ejercicio recomendado:</strong> Repite el Reto 3 (conos) hasta lograr 8 de 10 aciertos consistentes. Practica 20 minutos, 3 veces por semana.`,
+          icon: '🔍'
+        },
+        'calm': {
+          title: 'Calma táctica',
+          description: `<strong>La calma te devuelve el control del partido.</strong><br><br>
+                       Cuando entrenas calma, aprendes a resetear el punto, recuperar el equilibrio emocional y tomar decisiones lúcidas bajo presión. Esto te permite:<br>
+                       • No acelerar innecesariamente cuando estás nervioso<br>
+                       • Recuperar el control después de perder puntos difíciles<br>
+                       • Jugar tu mejor tenis en los momentos importantes<br><br>
+                       <strong>Ejercicio recomendado:</strong> Repite el Reto 4 (centro) y practica respiración consciente entre golpes. Exhala antes de cada golpe. Juega 10 minutos enfocado solo en mantener la calma.`,
+          icon: '🧘'
+        }
+      };
+      
+      return `
+        <div class="game-header">
+          <h1 class="game-title">${config.game_title || defaultConfig.game_title}</h1>
+        </div>
+        
+        ${renderPhaseIndicator()}
+        
+        <h2 class="section-title">
+          <span class="emoji-icon">🟤</span>
+          FASE 6 — Decisión final: ¿qué ejercicio necesitas hoy?
+        </h2>
+
+        <div style="background: #e0f2fe; padding: 24px; border-radius: 12px; margin-bottom: 24px; border-left: 4px solid #0284c7;">
+          <h3 style="margin: 0 0 12px 0; color: #075985; font-size: 18px; font-weight: 700;">🧠 Autoconocimiento aplicado</h3>
+          <p style="margin: 0; color: #0c4a6e; line-height: 1.6; font-size: 15px;">
+            Completaste los 4 retos fundamentales. Ahora es momento de identificar <strong>tu área de mayor oportunidad</strong>. No se trata de lo que hiciste "peor", sino de lo que, si mejoraras, tendría el <strong>mayor impacto en tu juego</strong>.
+          </p>
+        </div>
+        
+        <div class="challenge-box">
+          <h3 class="challenge-title">     Basándote en lo que sentiste hoy, ¿qué necesitas entrenar más?</h3>
+          
+          <div class="options-grid">
+            <button class="option-button ${selected === 'rhythm' ? 'selected' : ''}" 
+                    onclick="selectOption('final', 'rhythm')">
+              🎵 Ritmo y consistencia
+            </button>
+            <button class="option-button ${selected === 'direction' ? 'selected' : ''}" 
+                    onclick="selectOption('final', 'direction')">
+              🎯 Dirección intencional
+            </button>
+            <button class="option-button ${selected === 'precision' ? 'selected' : ''}" 
+                    onclick="selectOption('final', 'precision')">
+              🔍 Precisión en objetivos
+            </button>
+            <button class="option-button ${selected === 'calm' ? 'selected' : ''}" 
+                    onclick="selectOption('final', 'calm')">
+              🧘 Calma y control mental
+            </button>
+          </div>
+          
+          ${selected ? `
+            <div class="feedback-box feedback-excellent">
+              <div style="font-size: 32px; margin-bottom: 16px;">${messages[selected].icon}</div>
+              <div style="font-size: 20px; font-weight: 800; margin-bottom: 12px; color: #065f46;">${messages[selected].title}</div>
+              <div style="line-height: 1.7; font-size: 15px; font-weight: 500; color: #064e3b;">${messages[selected].description}</div>
+            </div>
+          ` : ''}
+        </div>
+        
+        ${selected ? `
+          <div class="final-message">
+            <h2 class="final-title">🏁 El control no se improvisa.<br>Se entrena con intención.</h2>
+            <p class="final-subtitle">Si entrenas esto conscientemente durante las próximas semanas, verás resultados tangibles en partido:</p>
+            
+            <div class="benefits-list">
+              <div class="benefit-item">
+                <span class="benefit-icon">   </span>
+                <strong>Más pelotas dentro:</strong> Menos errores no forzados, más consistencia
+              </div>
+              <div class="benefit-item">
+                <span class="benefit-icon">✅</span>
+                <strong>Más puntos construidos:</strong> Ganas puntos sin arriesgar innecesariamente
+              </div>
+              <div class="benefit-item">
+                <span class="benefit-icon">✅</span>
+                <strong>Más confianza:</strong> Sabes que puedes controlar el resultado con tu técnica
+              </div>
+            </div>
+
+            <div style="margin-top: 24px; padding: 20px; background: #fef3c7; border-radius: 12px; border-left: 4px solid #f59e0b;">
+              <p style="margin: 0; color: #78350f; line-height: 1.6; font-size: 15px; font-weight: 600;">
+                💡 <strong>Recuerda:</strong> El control no se logra golpeando más fuerte. Se logra <strong>dirigiendo con intención</strong>. Cada golpe debe tener un propósito claro. Esa es la diferencia entre jugadores intermedios y avanzados.
+              </p>
+            </div>
+          </div>
+          
+          <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="resetGame()">${config.repeat_button_text || defaultConfig.repeat_button_text}</button>
+            <button class="btn btn-primary" onclick="showFinalMessage()">Ver plan de acción 🎾</button>
+          </div>
+        ` : `
+          <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="previousPhase()">Volver</button>
+          </div>
+        `}
+      `;
+    }
+
+    function showFinalMessage() {
+      const selected = selectedOptions['final'];
+      const plans = {
+        'rhythm': `📋 Plan de acción para RITMO:\n\n1. Practica el Reto 1 (cruzado) 15 minutos cada entrenamiento\n2. Meta: 20 golpes consecutivos sin error\n3. Cuando lo logres, aumenta a 30\n4. Nunca aceleres, busca tempo constante\n\n¡Lleva esto a la cancha hoy mismo!`,
+        'direction': `📋 Plan de acción para DIRECCIÓN:\n\n1. Practica el Reto 2 (paralelo) 3 veces por semana\n2. Alterna: 5 cruzados → 1 paralelo → 5 cruzados\n3. Foco en cambio consciente de dirección\n4. Pregunta antes de cada golpe: "¿Dónde quiero que vaya?"\n\n¡Lleva esto a la cancha hoy mismo!`,
+        'precision': `📋 Plan de acción para PRECISIÓN:\n\n1. Practica el Reto 3 (conos) 20 minutos, 3x/semana\n2. Meta inicial: 6 de 10 aciertos\n3. Meta avanzada: 8 de 10 aciertos\n4. Visualiza el objetivo 2 segundos antes de golpear\n\n¡Lleva esto a la cancha hoy mismo!`,
+        'calm': `📋 Plan de acción para CALMA:\n\n1. Practica el Reto 4 (centro) con respiración consciente\n2. Exhala antes de cada golpe\n3. Cuenta hasta 3 entre golpes\n4. Cuando sientas presión, vuelve al centro\n\n¡Lleva esto a la cancha hoy mismo!`
+      };
+      
+      const messageBox = document.createElement('div');
+      messageBox.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 32px;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        max-width: 500px;
+        width: 90%;
+        z-index: 1000;
+        animation: fadeIn 0.3s ease-out;
+      `;
+      
+      messageBox.innerHTML = `
+        <h3 style="margin: 0 0 20px 0; color: #1e3c72; font-size: 22px; font-weight: 800;">📋 Tu Plan de Acción Personalizado</h3>
+        <div style="background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 24px; white-space: pre-line; line-height: 1.8; color: #334155; font-size: 15px;">
+          ${plans[selected]}
+        </div>
+        <button onclick="this.parentElement.remove()" style="width: 100%; padding: 16px; background: #2a5298; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer;">
+          ¡Entendido! 🎾
+        </button>
+      `;
+      
+      document.body.appendChild(messageBox);
+    }
+
+    function renderPhaseIndicator() {
+      return `
+        <div class="phase-indicator">
+          ${phases.map((_, index) => `
+            <div class="phase-dot ${index === currentPhase ? 'active' : ''}"></div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function selectOption(challenge, value) {
+      selectedOptions[challenge] = value;
+      render();
+    }
+
+    function nextPhase() {
+      if (currentPhase === 1 && !selectedOptions['challenge1']) return;
+      if (currentPhase === 2 && !selectedOptions['challenge2-eval']) return;
+      if (currentPhase === 3 && !selectedOptions['challenge3']) return;
+      if (currentPhase === 4 && !selectedOptions['challenge4']) return;
+      
+      if (currentPhase < phases.length - 1) {
+        currentPhase++;
+        render();
+        window.scrollTo(0, 0);
+      }
+    }
+
+    function previousPhase() {
+      if (currentPhase > 0) {
+        currentPhase--;
+        render();
+        window.scrollTo(0, 0);
+      }
+    }
+
+    function resetGame() {
+      currentPhase = 0;
+      selectedOptions = {};
+      render();
+      window.scrollTo(0, 0);
+    }
+
+    function render() {
+      const content = document.getElementById('content');
+      content.innerHTML = phases[currentPhase].render();
+    }
+
+    async function onConfigChange(config) {
+      const container = document.querySelector('.game-container');
+      const title = document.querySelector('.game-title');
+      const subtitle = document.querySelector('.game-subtitle');
+      
+      if (container) {
+        container.style.background = `linear-gradient(135deg, ${config.background_color || defaultConfig.background_color} 0%, ${config.primary_action_color || defaultConfig.primary_action_color} 100%)`;
+      }
+      
+      if (title) {
+        title.textContent = config.game_title || defaultConfig.game_title;
+        title.style.color = config.primary_action_color || defaultConfig.primary_action_color;
+      }
+      
+      if (subtitle) {
+        subtitle.textContent = config.game_subtitle || defaultConfig.game_subtitle;
+      }
+      
+      const phaseContent = document.querySelector('.phase-content');
+      if (phaseContent) {
+        phaseContent.style.background = config.surface_color || defaultConfig.surface_color;
+      }
+      
+      const allText = document.querySelectorAll('.intro-message, .challenge-instruction, .benefit-item');
+      allText.forEach(el => {
+        el.style.color = config.text_color || defaultConfig.text_color;
+      });
+      
+      const primaryButtons = document.querySelectorAll('.btn-primary');
+      primaryButtons.forEach(btn => {
+        btn.style.background = config.primary_action_color || defaultConfig.primary_action_color;
+      });
+      
+      const secondaryButtons = document.querySelectorAll('.btn-secondary');
+      secondaryButtons.forEach(btn => {
+        btn.style.color = config.primary_action_color || defaultConfig.primary_action_color;
+        btn.style.borderColor = config.primary_action_color || defaultConfig.primary_action_color;
+      });
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.surface_color || defaultConfig.surface_color,
+              set: (value) => {
+                config.surface_color = value;
+                window.elementSdk.setConfig({ surface_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_action_color || defaultConfig.primary_action_color,
+              set: (value) => {
+                config.primary_action_color = value;
+                window.elementSdk.setConfig({ primary_action_color: value });
+              }
+            },
+            {
+              get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+              set: (value) => {
+                config.secondary_action_color = value;
+                window.elementSdk.setConfig({ secondary_action_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["game_title", config.game_title || defaultConfig.game_title],
+          ["game_subtitle", config.game_subtitle || defaultConfig.game_subtitle],
+          ["intro_message", config.intro_message || defaultConfig.intro_message],
+          ["control_principle", config.control_principle || defaultConfig.control_principle],
+          ["start_button_text", config.start_button_text || defaultConfig.start_button_text],
+          ["next_button_text", config.next_button_text || defaultConfig.next_button_text],
+          ["repeat_button_text", config.repeat_button_text || defaultConfig.repeat_button_text]
+        ])
+      });
+    }
+
+    render();
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) {
+      acScrollToTop();
+      return;
+    }
+
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+
+    try {
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, Math.max(0, top));
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    window.scrollTo(0, 0);
+  });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>
