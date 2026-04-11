@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Domina el Espacio - Control Consciente</title>
+  <title>Domina el Espacio: Control y Precision</title>
   <style>
     body {
       box-sizing: border-box;
@@ -23,9 +23,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 32px 24px;
-      min-height: 100%;
+      justify-content: flex-start;
+      padding: 48px 24px;
+      min-height: 100vh;
       position: relative;
     }
 
@@ -53,7 +53,7 @@
       position: relative;
       z-index: 1;
       border: 1px solid rgba(255, 255, 255, 0.2);
-      margin: 120px 40px;
+      margin: 0;
     }
 
     @keyframes fadeIn {
@@ -70,6 +70,22 @@
     .game-header {
       text-align: center;
       margin-bottom: 32px;
+    }
+
+    .game-kicker {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 14px;
+      margin-bottom: 14px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
     .game-title {
@@ -131,6 +147,19 @@
       background: #f8fafc;
       border-radius: 12px;
       border-left: 4px solid #2a5298;
+    }
+
+    .intro-summary {
+      margin: 0 0 24px 0;
+      padding: 18px 20px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #eff6ff, #ecfeff);
+      color: #0f172a;
+      border: 1px solid #bfdbfe;
+    }
+
+    .intro-summary strong {
+      color: #1e3c72;
     }
 
     .court-visual {
@@ -366,9 +395,14 @@
     }
 
     @media (max-width: 640px) {
+      .game-container {
+        padding: 24px 16px 40px;
+        min-height: 100vh;
+      }
+
       .phase-content {
         padding: 32px;
-        margin: 80px 20px;
+        margin: 0;
       }
 
       .game-title {
@@ -377,6 +411,15 @@
 
       .game-subtitle {
         font-size: 16px;
+      }
+
+      .game-kicker {
+        font-size: 12px;
+        letter-spacing: 0.06em;
+      }
+
+      .intro-summary {
+        padding: 16px;
       }
 
       .section-title {
@@ -492,11 +535,11 @@
   </div>
   <script>
     const defaultConfig = {
-      game_title: "🎮 Domina el Espacio",
-      game_subtitle: "Ritmo, dirección y calma táctica en cancha",
-      intro_message: "La mayoría falla porque golpea sin objetivo. El control empieza cuando sabes a dónde va la pelota.",
-      control_principle: "El control no es suavidad, es dirección repetida.",
-      start_button_text: "Entrar al control",
+      game_title: "Domina el Espacio",
+      game_subtitle: "Aprende a elegir zonas, sostener dirección y jugar con calma táctica",
+      intro_message: "La mayoría falla porque golpea sin intención. Este juego te entrena para reconocer zonas, elegir objetivos claros y sostener el control incluso cuando sube la presión.",
+      control_principle: "El control no es suavidad: es dirección repetida con intención clara.",
+      start_button_text: "Comenzar entrenamiento",
       next_button_text: "Continuar",
       repeat_button_text: "Repetir juego",
       background_color: "#1e3c72",
@@ -540,6 +583,7 @@
       const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
       return `
         <div class="game-header">
+          <div class="game-kicker">Modulo 9 · Control Consciente</div>
           <h1 class="game-title">${config.game_title || defaultConfig.game_title}</h1>
           <p class="game-subtitle">${config.game_subtitle || defaultConfig.game_subtitle}</p>
         </div>
@@ -555,6 +599,10 @@
           ${config.intro_message || defaultConfig.intro_message}
         </div>
 
+        <div class="intro-summary">
+          <strong>Que vas a entrenar aqui:</strong> leer el espacio disponible, decidir si conviene cruzar, paralela o jugar al centro, y repetir esa eleccion con consistencia en vez de golpear por impulso.
+        </div>
+
         <div style="background: #e0f2fe; padding: 24px; border-radius: 12px; margin: 24px 0; border-left: 4px solid #0284c7;">
           <h3 style="margin: 0 0 12px 0; color: #075985; font-size: 18px; font-weight: 700;">👥 Este ejercicio se realiza con un compañero</h3>
           <p style="margin: 0; color: #0c4a6e; line-height: 1.6; font-size: 15px;">
@@ -563,7 +611,7 @@
         </div>
 
         <div style="background: #f0fdfa; padding: 24px; border-radius: 12px; margin: 24px 0; border-left: 4px solid #14b8a6;">
-          <h3 style="margin: 0 0 16px 0; color: #115e59; font-size: 18px; font-weight: 700;">🎯 ¿Por qu   dividimos la cancha en zonas?</h3>
+          <h3 style="margin: 0 0 16px 0; color: #115e59; font-size: 18px; font-weight: 700;">🎯 ¿Por que dividimos la cancha en zonas?</h3>
           <p style="margin: 0 0 16px 0; color: #134e4a; line-height: 1.6; font-size: 15px;">
             Cada zona tiene un propósito táctico diferente. El error más común es golpear sin saber a dónde va la pelota. Los jugadores avanzados <strong>siempre tienen una intención clara</strong> antes de golpear.
           </p>
@@ -653,7 +701,7 @@
             <strong>Regla clave:</strong> Si la pelota sale fuera de la zona cruzada, reinician el conteo.
           </p>
           <p style="margin: 0; color: #78350f; line-height: 1.6; font-size: 14px;">
-                ️ <strong>No busques velocidad.</strong> Busca que cada pelota caiga en zona cruzada con altura segura sobre la red.
+            <strong>No busques velocidad.</strong> Busca que cada pelota caiga en zona cruzada con altura segura sobre la red.
           </p>
         </div>
         
