@@ -1,0 +1,2482 @@
+﻿<!doctype html>
+<html lang="es" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analiza tu Partido</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1729 100%);
+      color: #e2e8f0;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    html, body, #app {
+      height: 100%;
+      width: 100%;
+    }
+
+    .bg-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: rgba(59, 130, 246, 0.3);
+      border-radius: 50%;
+      animation: float 20s infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100%) translateX(50px); opacity: 0; }
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 2rem;
+      overflow-y: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .main-container {
+      max-width: 900px;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border-radius: 32px;
+      padding: 3.5rem 3rem;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), 0 0 100px rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      margin-bottom: 2rem;
+      position: relative;
+      animation: slideIn 0.6s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { 
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .progress-bar-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: rgba(148, 163, 184, 0.1);
+      border-radius: 32px 32px 0 0;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+    }
+
+    .phase-tracker {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .phase-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(100, 116, 139, 0.3);
+      transition: all 0.4s ease;
+      position: relative;
+    }
+
+    .phase-dot.completed {
+      background: linear-gradient(135deg, #10b981, #059669);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+    }
+
+    .phase-dot.active {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+      transform: scale(1.5);
+    }
+
+    .phase-counter {
+      font-size: 0.9rem;
+      color: #64748b;
+      font-weight: 600;
+      margin-left: 12px;
+    }
+
+    .phase-counter.active {
+      color: #3b82f6;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 900;
+      margin: 0 0 1rem 0;
+      background: linear-gradient(135deg, #f1f5f9, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .hero-emoji {
+      font-size: 5rem;
+      margin-bottom: 1.5rem;
+      display: block;
+      text-align: center;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .subtitle {
+      font-size: 1.35rem;
+      color: #94a3b8;
+      text-align: center;
+      margin: 0 0 2.5rem 0;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    .intro-philosophy {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.1));
+      border-left: 5px solid #3b82f6;
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin: 2.5rem 0;
+    }
+
+    .intro-philosophy h3 {
+      margin: 0 0 1.5rem 0;
+      color: #60a5fa;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .philosophy-points {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .philosophy-point {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .philosophy-icon {
+      font-size: 1.75rem;
+      flex-shrink: 0;
+    }
+
+    .philosophy-text {
+      flex: 1;
+    }
+
+    .philosophy-text strong {
+      color: #f1f5f9;
+      font-size: 1.1rem;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .philosophy-text p {
+      margin: 0;
+      color: #cbd5e1;
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    .phase-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    .phase-number {
+      font-size: 0.85rem;
+      color: #3b82f6;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.75rem;
+    }
+
+    .phase-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin: 0 0 1.25rem 0;
+      color: #f1f5f9;
+      line-height: 1.2;
+    }
+
+    .phase-description {
+      font-size: 1.2rem;
+      color: #94a3b8;
+      line-height: 1.7;
+      max-width: 700px;
+      margin: 0 auto 1rem auto;
+    }
+
+    .phase-why {
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem auto;
+      max-width: 700px;
+      text-align: left;
+    }
+
+    .phase-why strong {
+      color: #c4b5fd;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .phase-why p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    .question-section {
+      margin: 2.5rem 0;
+    }
+
+    .question {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 2rem;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .sub-question {
+      font-size: 1.15rem;
+      color: #94a3b8;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-weight: 400;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .input-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .input-label {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .input-label-icon {
+      font-size: 1.2rem;
+    }
+
+    .text-input, .textarea-input, .select-input {
+      width: 100%;
+      background: rgba(30, 41, 59, 0.6);
+      border: 2px solid rgba(148, 163, 184, 0.2);
+      border-radius: 12px;
+      padding: 1rem;
+      color: #e2e8f0;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: all 0.3s ease;
+    }
+
+    .textarea-input {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .text-input:focus, .textarea-input:focus, .select-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background: rgba(30, 41, 59, 0.9);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .text-input::placeholder, .textarea-input::placeholder {
+      color: #64748b;
+    }
+
+    .options-grid {
+      display: grid;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .options-grid.two-columns {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .options-grid.three-columns {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .option-card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 2px solid rgba(148, 163, 184, 0.15);
+      border-radius: 16px;
+      padding: 1.75rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .option-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .option-card:hover {
+      background: rgba(30, 41, 59, 0.9);
+      border-color: #3b82f6;
+      transform: translateX(8px);
+    }
+
+    .option-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .option-card.selected {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: #3b82f6;
+      box-shadow: 0 8px 30px rgba(59, 130, 246, 0.25);
+    }
+
+    .option-card.selected::before {
+      transform: scaleX(1);
+    }
+
+    .option-icon {
+      font-size: 2.5rem;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .option-content {
+      flex: 1;
+    }
+
+    .option-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .option-description {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .compact-card {
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .compact-card .option-icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .compact-card .option-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .compact-card .option-title {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .intensity-section, .rating-section {
+      background: rgba(51, 65, 85, 0.4);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+
+    .section-label {
+      font-size: 1.05rem;
+      color: #cbd5e1;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    .slider-input {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(148, 163, 184, 0.2);
+      outline: none;
+      margin-bottom: 1rem;
+      -webkit-appearance: none;
+    }
+
+    .slider-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(59, 130, 246, 0.5);
+    }
+
+    .slider-input::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 10px rgba(59, 130, 246, 0.5);
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 0.5rem;
+    }
+
+    .slider-value {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #3b82f6;
+      margin-top: 1rem;
+    }
+
+    .multi-rating-grid {
+      display: grid;
+      gap: 2rem;
+    }
+
+    .rating-item {
+      background: rgba(30, 41, 59, 0.6);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .rating-label {
+      font-size: 1rem;
+      color: #cbd5e1;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .insight-box {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1));
+      border-left: 5px solid #10b981;
+      padding: 2rem;
+      border-radius: 12px;
+      margin: 2.5rem 0;
+      position: relative;
+    }
+
+    .insight-box::before {
+      content: '💡';
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      font-size: 1.75rem;
+      opacity: 0.5;
+    }
+
+    .insight-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #6ee7b7;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin: 0 0 1rem 0;
+    }
+
+    .insight-text {
+      font-size: 1.15rem;
+      line-height: 1.8;
+      color: #d1fae5;
+      margin: 0;
+    }
+
+    .principle-box {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.1));
+      border-left: 5px solid #8b5cf6;
+      padding: 2rem;
+      border-radius: 12px;
+      margin: 2.5rem 0;
+      position: relative;
+    }
+
+    .principle-box::before {
+      content: '🎯';
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      font-size: 1.75rem;
+      opacity: 0.5;
+    }
+
+    .principle-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #c4b5fd;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin: 0 0 1rem 0;
+    }
+
+    .principle-text {
+      font-size: 1.15rem;
+      line-height: 1.8;
+      color: #e9d5ff;
+      margin: 0;
+    }
+
+    .actionable-box {
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(219, 39, 119, 0.1));
+      border-left: 5px solid #ec4899;
+      padding: 2rem;
+      border-radius: 12px;
+      margin: 2.5rem 0;
+      position: relative;
+    }
+
+    .actionable-box::before {
+      content: '⚡';
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      font-size: 1.75rem;
+      opacity: 0.5;
+    }
+
+    .actionable-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #fbcfe8;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin: 0 0 1rem 0;
+    }
+
+    .actionable-text {
+      font-size: 1.15rem;
+      line-height: 1.8;
+      color: #fce7f3;
+      margin: 0;
+    }
+
+    .drill-card {
+      background: rgba(30, 41, 59, 0.8);
+      border: 2px solid #3b82f6;
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 1.5rem 0;
+    }
+
+    .drill-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .drill-icon {
+      font-size: 2.25rem;
+    }
+
+    .drill-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #60a5fa;
+      margin: 0;
+    }
+
+    .drill-content {
+      color: #cbd5e1;
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .drill-content strong {
+      color: #f1f5f9;
+      display: block;
+      margin-top: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 3rem;
+    }
+
+    .primary-btn {
+      flex: 1;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      border: none;
+      padding: 1.35rem 2.5rem;
+      border-radius: 14px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .primary-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .primary-btn:hover:not(:disabled)::before {
+      left: 100%;
+    }
+
+    .primary-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(59, 130, 246, 0.5);
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .secondary-btn {
+      background: transparent;
+      color: #94a3b8;
+      border: 2px solid rgba(148, 163, 184, 0.3);
+      padding: 1.35rem 2rem;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .secondary-btn:hover {
+      border-color: #3b82f6;
+      color: #3b82f6;
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    .summary-section {
+      margin-top: 3rem;
+    }
+
+    .summary-hero {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .summary-hero-emoji {
+      font-size: 5rem;
+      display: block;
+      margin-bottom: 1rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .summary-title {
+      font-size: 2.75rem;
+      font-weight: 900;
+      margin: 0 0 1rem 0;
+      background: linear-gradient(135deg, #10b981, #3b82f6, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+    }
+
+    .evolution-grid {
+      display: grid;
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .evolution-category {
+      background: rgba(30, 41, 59, 0.6);
+      border-radius: 20px;
+      padding: 2.5rem;
+      border: 2px solid rgba(148, 163, 184, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .evolution-category::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+    }
+
+    .evolution-category-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .evolution-category-icon {
+      font-size: 2.5rem;
+    }
+
+    .evolution-category-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin: 0;
+    }
+
+    .evolution-items {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .evolution-item {
+      background: rgba(51, 65, 85, 0.4);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .evolution-item-label {
+      font-size: 0.85rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.75rem;
+      font-weight: 700;
+    }
+
+    .evolution-item-value {
+      font-size: 1.15rem;
+      color: #f1f5f9;
+      font-weight: 600;
+      line-height: 1.5;
+      margin-bottom: 0.5rem;
+    }
+
+    .evolution-item-context {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    .action-plan-section {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.15));
+      border: 3px solid rgba(59, 130, 246, 0.4);
+      border-radius: 24px;
+      padding: 3rem;
+      margin: 3rem 0;
+    }
+
+    .action-plan-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #60a5fa;
+      text-align: center;
+      margin: 0 0 2.5rem 0;
+    }
+
+    .commitment-box {
+      background: rgba(30, 41, 59, 0.8);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-top: 2.5rem;
+      border: 2px solid #ec4899;
+    }
+
+    .commitment-label {
+      font-size: 1.1rem;
+      color: #fbcfe8;
+      margin-bottom: 1rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .final-message-box {
+      text-align: center;
+      font-size: 1.4rem;
+      line-height: 1.9;
+      color: #cbd5e1;
+      margin: 3rem 0;
+      padding: 3rem;
+      background: rgba(59, 130, 246, 0.05);
+      border-radius: 24px;
+      border: 2px solid rgba(59, 130, 246, 0.2);
+      font-weight: 300;
+    }
+
+    .final-cta {
+      font-weight: 800;
+      color: #60a5fa;
+      display: block;
+      margin-top: 1.5rem;
+      font-size: 1.25rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+      margin: 2.5rem 0;
+    }
+
+    .stat-card {
+      background: rgba(51, 65, 85, 0.4);
+      border-radius: 14px;
+      padding: 1.75rem 1.25rem;
+      text-align: center;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-value {
+      font-size: 2.25rem;
+      font-weight: 900;
+      color: #3b82f6;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      line-height: 1.3;
+    }
+
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 1.5rem 1rem 2rem;
+        border-radius: 22px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .phase-title {
+        font-size: 1.6rem;
+      }
+
+      .hero-emoji,
+      .summary-hero-emoji {
+        font-size: 3.2rem;
+        margin-bottom: 0.85rem;
+      }
+
+      .subtitle,
+      .phase-description {
+        font-size: 1rem;
+      }
+
+      .intro-philosophy,
+      .phase-why,
+      .question-section {
+        margin: 1.4rem 0;
+      }
+
+      .intro-philosophy,
+      .phase-why,
+      .question-section,
+      .input-group,
+      .summary-card,
+      .stat-card {
+        padding: 1rem;
+      }
+
+      .phase-header {
+        margin-bottom: 1.5rem;
+      }
+
+      .phase-number,
+      .phase-counter {
+        font-size: 0.82rem;
+      }
+
+      .philosophy-point {
+        gap: 0.75rem;
+        align-items: flex-start;
+      }
+
+      .philosophy-icon {
+        font-size: 1.2rem;
+      }
+
+      .input-grid, .options-grid.two-columns, .options-grid.three-columns {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body { font-size: 16px; }
+    .container, .game-container, .game-wrapper, .app-wrapper, .app-container, .main-wrapper, .stage-wrapper, .phase-container, .phase-card, .content, .content-area, .modal-content, .results-card, .scene, .phase-content { padding: 16px !important; }
+    h1, .main-title, .game-title, .title { font-size: clamp(1.8rem, 7vw, 2.3rem) !important; line-height: 1.15 !important; }
+    h2, .phase-title, .stage-title, .final-title, .section-title { font-size: clamp(1.3rem, 6vw, 1.7rem) !important; line-height: 1.25 !important; }
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label { font-size: clamp(1rem, 4.5vw, 1.15rem) !important; line-height: 1.4 !important; }
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text, .intro-message, .quote { font-size: 1rem !important; line-height: 1.55 !important; }
+    .button-group, .action-buttons, .final-buttons, .controls-row { flex-direction: column !important; gap: 12px !important; }
+    button, .btn, .btn-primary, .btn-secondary, .action-button, .option-btn { width: 100% !important; }
+    .zone-grid, .scenario-grid, .options-grid, .results-stats { grid-template-columns: 1fr !important; }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || { init: async function () { return { isOk: true, value: null }; }, on: function () {}, emit: function () { return { isOk: true, value: null }; }, setConfig: function () {}, config: {} };
+  window.dataSdk = window.dataSdk || { init: async function () { return { isOk: true, value: null }; }, create: async function () { return { isOk: true, value: null }; }, list: async function () { return { isOk: true, value: [] }; }, update: async function () { return { isOk: true, value: null }; } };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body class="h-full">
+  <div class="bg-particles" id="particles"></div>
+  <div id="app">
+   <div class="main-container">
+    <div class="progress-bar-container">
+     <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="phase-tracker" id="phaseTracker"></div>
+    <div id="content"></div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "Analiza tu Partido",
+      welcome_subtitle: "Convierte lo vivido en ajustes concretos",
+      phase1_title: "Contexto y estado base",
+      phase2_title: "Claves del partido",
+      phase3_title: "Patrones y lectura",
+      phase4_title: "Números y balance",
+      phase5_title: "Próximo ajuste",
+      final_message: "Este análisis es tu mapa de evolución. Cada respuesta es un punto de referencia para medir tu crecimiento.",
+      commitment_prompt: "¿Qué compromiso específico adquieres para tu próximo partido o entrenamiento?",
+      background_color: "#0a0e27",
+      surface_color: "#1e293b",
+      text_color: "#e2e8f0",
+      primary_action_color: "#3b82f6",
+      accent_color: "#10b981",
+      font_family: "Inter",
+      font_size: 16
+    };
+
+    let currentPhase = 0;
+    let sessionData = {
+      match_date: '',
+      opponent_level: '',
+      match_result: '',
+      score: '',
+      surface: '',
+      pre_match_emotion: '',
+      pre_match_intensity: 5,
+      pre_match_plan: '',
+      dominant_emotion: '',
+      emotion_intensity: 5,
+      emotion_trigger: '',
+      mental_strength: '',
+      mental_strength_context: '',
+      technical_strength: '',
+      technical_strength_context: '',
+      tactical_strength: '',
+      tactical_strength_context: '',
+      turning_point_moment: '',
+      turning_point_decision: '',
+      turning_point_why: '',
+      turning_point_learning: '',
+      error_pattern: '',
+      error_pattern_frequency: 5,
+      error_pattern_situation: '',
+      error_pattern_cause: '',
+      success_pattern: '',
+      success_pattern_frequency: 5,
+      success_pattern_setup: '',
+      opponent_weakness: '',
+      opponent_weakness_exploitation: '',
+      missed_opportunity: '',
+      key_stat_winners: 0,
+      key_stat_unforced: 0,
+      key_stat_first_serve: 0,
+      key_stat_break_points: '',
+      energy_level_start: 5,
+      energy_level_end: 5,
+      focus_quality: 5,
+      decision_quality: 5,
+      emotional_control: 5,
+      physical_readiness: 5,
+      technical_focus: '',
+      technical_drill: '',
+      tactical_focus: '',
+      tactical_scenario: '',
+      mental_focus: '',
+      mental_exercise: '',
+      physical_focus: '',
+      physical_work: '',
+      main_strength: '',
+      main_strength_context: '',
+      main_priority_area: '',
+      main_priority_label: '',
+      main_priority_plan: '',
+      support_priority_label: '',
+      support_priority_plan: '',
+      next_match_goal: '',
+      success_metric: '',
+      commitment: ''
+    };
+
+    let allAnalyses = [];
+    const totalPhases = 5;
+
+    const phaseConfigs = [
+      {
+        id: 'context',
+        number: 'FASE 1',
+        getTitle: (config) => config.phase1_title || defaultConfig.phase1_title,
+        description: 'Arrancamos con lo mínimo que sí cambia la lectura del partido: contexto, estado y emoción dominante.',
+        why: 'Si ubicas bien el escenario y cómo entraste al partido, el resto del análisis se vuelve más claro y menos pesado.',
+        render: renderContextPhase
+      },
+      {
+        id: 'turning',
+        number: 'FASE 2',
+        getTitle: (config) => config.phase2_title || defaultConfig.phase2_title,
+        description: 'Aquí condensamos lo mejor que sí apareció en tu juego y el momento que más lo puso a prueba.',
+        why: 'Encontrar una fortaleza real y una lección clave te da más valor que repasar cada punto del partido.',
+        render: renderTurningPhase
+      },
+      {
+        id: 'patterns',
+        number: 'FASE 3',
+        getTitle: (config) => config.phase3_title || defaultConfig.phase3_title,
+        description: 'Elegimos el obstáculo que más se repitió, lo que sí funcionó y la lectura más útil sobre el rival.',
+        why: 'No necesitas veinte hallazgos. Necesitas dos o tres patrones que sí te den una dirección de entrenamiento.',
+        render: renderPatternsPhase
+      },
+      {
+        id: 'stats',
+        number: 'FASE 4',
+        getTitle: (config) => config.phase4_title || defaultConfig.phase4_title,
+        description: 'Unas cuantas métricas y una autoevaluación honesta te dicen dónde está el cuello de botella real.',
+        why: 'Cuando juntas datos básicos con percepción honesta, ya puedes priorizar sin sobreanalizar.',
+        render: renderStatsPhase
+      },
+      {
+        id: 'action',
+        number: 'FASE 5',
+        getTitle: (config) => config.phase5_title || defaultConfig.phase5_title,
+        description: 'Cerramos con una prioridad principal, un hábito de apoyo y una meta medible para tu siguiente partido.',
+        why: 'Si el plan cabe en tu cabeza y en tu semana, es mucho más probable que lo ejecutes de verdad.',
+        render: renderActionPhase
+      }
+    ];
+
+    function createParticles() {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 20 + 's';
+        particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+        container.appendChild(particle);
+      }
+    }
+
+    function updateProgressBar() {
+      const progress = ((currentPhase + 1) / (totalPhases + 1)) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+    }
+
+    function updatePhaseTracker() {
+      const tracker = document.getElementById('phaseTracker');
+      tracker.innerHTML = '';
+      
+      for (let i = 0; i < totalPhases; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'phase-dot';
+        if (i < currentPhase) dot.classList.add('completed');
+        if (i === currentPhase) dot.classList.add('active');
+        tracker.appendChild(dot);
+      }
+
+      const counter = document.createElement('div');
+      counter.className = 'phase-counter';
+      if (currentPhase < totalPhases) counter.classList.add('active');
+      counter.textContent = `${currentPhase + 1} / ${totalPhases}`;
+      tracker.appendChild(counter);
+    }
+
+    function renderWelcome() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const content = document.getElementById('content');
+      
+      content.innerHTML = `
+        <div style="text-align: center;">
+          <span class="hero-emoji">🎾</span>
+          <h1>${config.game_title || defaultConfig.game_title}</h1>
+          <p class="subtitle">${config.welcome_subtitle || defaultConfig.welcome_subtitle}</p>
+          
+          <div class="intro-philosophy">
+            <h3>Qué vas a sacar de este análisis</h3>
+            <div class="philosophy-points">
+              <div class="philosophy-point">
+                <div class="philosophy-icon">🧠</div>
+                <div class="philosophy-text">
+                  <strong>Lectura completa con foco</strong>
+                  <p>Vas a ordenar lo que pasó para detectar un ajuste de verdad, no para llenar casillas.</p>
+                </div>
+              </div>
+              <div class="philosophy-point">
+                <div class="philosophy-icon">🎯</div>
+                <div class="philosophy-text">
+                  <strong>Cierre accionable</strong>
+                  <p>Cada bloque te acerca a una decisión concreta para tu siguiente entrenamiento o partido.</p>
+                </div>
+              </div>
+              <div class="philosophy-point">
+                <div class="philosophy-icon">⚡</div>
+                <div class="philosophy-text">
+                  <strong>Sin vueltas innecesarias</strong>
+                  <p>La idea es terminar con claridad y energía, no con una reflexión eterna.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button class="primary-btn" id="startBtn">🚀 Comenzar análisis</button>
+        </div>
+      `;
+
+      document.getElementById('startBtn').onclick = () => {
+        currentPhase = 0;
+        updatePhaseTracker();
+        updateProgressBar();
+        renderPhase(currentPhase);
+      };
+    }
+
+    function renderPhase(phaseIndex) {
+      const phase = phaseConfigs[phaseIndex];
+      phase.render();
+      acScrollToTop();
+    }
+
+    function createPhaseHeader(phaseConfig) {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      return `
+        <div class="phase-header">
+          <div class="phase-number">${phaseConfig.number}</div>
+          <h2 class="phase-title">${phaseConfig.getTitle(config)}</h2>
+          <p class="phase-description">${phaseConfig.description}</p>
+          <div class="phase-why">
+            <strong>💭 Por qué importa</strong>
+            <p>${phaseConfig.why}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderContextPhase() {
+      const content = document.getElementById('content');
+      const emotions = [
+        { value: 'Confianza', icon: '💪', desc: 'Sentías claridad y decisión.' },
+        { value: 'Ansiedad', icon: '😰', desc: 'Los nervios sí entraron al partido.' },
+        { value: 'Frustración', icon: '😤', desc: 'Algo te sacó del plan con frecuencia.' },
+        { value: 'Calma', icon: '😌', desc: 'Te sostuviste bastante estable.' },
+        { value: 'Urgencia', icon: '⚡', desc: 'Quisiste resolver más rápido de la cuenta.' },
+        { value: 'Duda', icon: '🤔', desc: 'Costó confiar en lo que tocaba hacer.' }
+      ];
+
+      content.innerHTML = `
+        ${createPhaseHeader(phaseConfigs[0])}
+        
+        <div class="question-section">
+          <div class="input-grid">
+            <div class="input-group">
+              <label class="input-label">
+                <span class="input-label-icon">📅</span>
+                Fecha del partido
+              </label>
+              <input type="date" class="text-input" id="matchDate" value="${sessionData.match_date}">
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">
+                <span class="input-label-icon">🎾</span>
+                Superficie
+              </label>
+              <select class="select-input" id="surface">
+                <option value="">Seleccionar...</option>
+                <option value="Dura" ${sessionData.surface === 'Dura' ? 'selected' : ''}>Dura</option>
+                <option value="Tierra batida" ${sessionData.surface === 'Tierra batida' ? 'selected' : ''}>Tierra batida</option>
+                <option value="Hierba" ${sessionData.surface === 'Hierba' ? 'selected' : ''}>Hierba</option>
+                <option value="Indoor" ${sessionData.surface === 'Indoor' ? 'selected' : ''}>Indoor</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">
+                <span class="input-label-icon">🎯</span>
+                Nivel del rival
+              </label>
+              <select class="select-input" id="opponentLevel">
+                <option value="">Seleccionar...</option>
+                <option value="Muy superior" ${sessionData.opponent_level === 'Muy superior' ? 'selected' : ''}>Muy superior a mí</option>
+                <option value="Superior" ${sessionData.opponent_level === 'Superior' ? 'selected' : ''}>Superior a mí</option>
+                <option value="Similar" ${sessionData.opponent_level === 'Similar' ? 'selected' : ''}>Similar a mí</option>
+                <option value="Inferior" ${sessionData.opponent_level === 'Inferior' ? 'selected' : ''}>Inferior a mí</option>
+                <option value="Muy inferior" ${sessionData.opponent_level === 'Muy inferior' ? 'selected' : ''}>Muy inferior a mí</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">
+                <span class="input-label-icon">🏆</span>
+                Resultado
+              </label>
+              <select class="select-input" id="matchResult">
+                <option value="">Seleccionar...</option>
+                <option value="Victoria" ${sessionData.match_result === 'Victoria' ? 'selected' : ''}>Victoria</option>
+                <option value="Derrota" ${sessionData.match_result === 'Derrota' ? 'selected' : ''}>Derrota</option>
+              </select>
+            </div>
+
+            <div class="input-group full-width">
+              <label class="input-label">
+                <span class="input-label-icon">📊</span>
+                Marcador final
+              </label>
+              <input type="text" class="text-input" id="score" placeholder="6-4, 3-6, 7-5" value="${sessionData.score}">
+            </div>
+          </div>
+        </div>
+
+        <div class="question-section">
+          <p class="question">¿Qué emoción marcó más tu partido?</p>
+          <p class="sub-question">No buscamos una lista completa, solo la emoción que más influyó en tus decisiones.</p>
+          <div class="options-grid two-columns">
+            ${emotions.map(e => `
+              <div class="option-card" data-emotion="${e.value}">
+                <div class="option-icon">${e.icon}</div>
+                <div class="option-content">
+                  <h4 class="option-title">${e.value}</h4>
+                  <p class="option-description">${e.desc}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="input-grid" style="margin-top: 1.5rem;">
+            <div class="input-group full-width">
+              <label class="input-label">
+                <span class="input-label-icon">🧭</span>
+                ¿Con qué plan o intención entraste al partido?
+              </label>
+              <textarea class="textarea-input" id="prePlan" placeholder="Ej: jugar profundo al revés, competir punto a punto y evitar apresurarme...">${sessionData.pre_match_plan}</textarea>
+            </div>
+
+            <div class="input-group full-width">
+              <label class="input-label">
+                <span class="input-label-icon">⚠️</span>
+                ¿Qué momento o detalle te sacó del plan?
+              </label>
+              <textarea class="textarea-input" id="emotionTrigger" placeholder="Ej: después de fallar una devolución fácil empecé a jugar con demasiada urgencia...">${sessionData.emotion_trigger}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="insight-box">
+          <div class="insight-title">💡 Punto de partida</div>
+          <p class="insight-text">Con esto ya tienes el contexto suficiente para leer el partido con sentido: escenario, resultado, emoción dominante y quiebre del plan.</p>
+        </div>
+
+        <div class="button-group">
+          <button class="primary-btn" id="nextBtn" disabled>Continuar →</button>
+        </div>
+      `;
+
+      let emotionSelected = false;
+      document.querySelectorAll('[data-emotion]').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('[data-emotion]').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          sessionData.dominant_emotion = card.dataset.emotion;
+          emotionSelected = true;
+          document.getElementById('nextBtn').disabled = false;
+        });
+      });
+
+      document.getElementById('nextBtn').onclick = () => {
+        if (!emotionSelected) {
+          return;
+        }
+        sessionData.match_date = document.getElementById('matchDate').value;
+        sessionData.surface = document.getElementById('surface').value;
+        sessionData.opponent_level = document.getElementById('opponentLevel').value;
+        sessionData.match_result = document.getElementById('matchResult').value;
+        sessionData.score = document.getElementById('score').value;
+        sessionData.pre_match_plan = document.getElementById('prePlan').value;
+        sessionData.emotion_trigger = document.getElementById('emotionTrigger').value;
+
+        currentPhase++;
+        updatePhaseTracker();
+        updateProgressBar();
+        renderPhase(currentPhase);
+      };
+    }
+
+    function renderTurningPhase() {
+      const content = document.getElementById('content');
+
+      const strengths = [
+        { value: 'Calma para competir bajo presión', icon: '🧠', desc: 'Aunque hubo tensión, seguiste compitiendo con criterio.' },
+        { value: 'Saque o inicio de punto confiable', icon: '🎾', desc: 'Tu arranque de punto te sostuvo más de una vez.' },
+        { value: 'Consistencia desde el fondo', icon: '🔁', desc: 'Pudiste sostener intercambios y no regalar tanto.' },
+        { value: 'Lectura táctica del rival', icon: '🔍', desc: 'Viste algo del rival y lo usaste a tu favor.' },
+        { value: 'Capacidad de adaptarte', icon: '🔄', desc: 'Cuando algo no funcionó, lograste ajustar.' },
+        { value: 'Valentía para atacar con sentido', icon: '⚡', desc: 'Tomaste la iniciativa en buenos momentos.' }
+      ];
+
+      content.innerHTML = `
+        ${createPhaseHeader(phaseConfigs[1])}
+        
+        <div class="question-section">
+          <p class="question">¿Qué sí apareció a tu favor en este partido?</p>
+          <p class="sub-question">Elige la fortaleza más real, no la más bonita.</p>
+          <div class="options-grid">
+            ${strengths.map(s => `
+              <div class="option-card" data-strength="${s.value}">
+                <div class="option-icon">${s.icon}</div>
+                <div class="option-content">
+                  <h4 class="option-title">${s.value}</h4>
+                  <p class="option-description">${s.desc}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="question-section">
+          <p class="question">¿Cuál fue el momento que más te enseñó?</p>
+          <p class="sub-question">No hace falta narrar todo el partido; basta con el punto o game que sí te dejó una lección.</p>
+
+          <div class="input-grid">
+            <div class="input-group full-width">
+              <label class="input-label">
+                <span class="input-label-icon">⏰</span>
+                Momento clave
+              </label>
+              <textarea class="textarea-input" id="turningMoment" placeholder="Ej: 4-4, 30-30 del segundo set; dudé con una bola corta y regalé el punto...">${sessionData.turning_point_moment}</textarea>
+            </div>
+
+            <div class="input-group full-width">
+              <label class="input-label">
+                <span class="input-label-icon">📚</span>
+                Aprendizaje concreto
+              </label>
+              <textarea class="textarea-input" id="turningLearning" placeholder="Ej: cuando la oportunidad aparece, necesito decidir antes y no entrar tarde al golpe...">${sessionData.turning_point_learning}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="insight-box">
+          <div class="insight-title">💡 Clave de esta fase</div>
+          <p class="insight-text">Si rescatas una fortaleza útil y una lección concreta, ya tienes un centro de gravedad para mejorar sin perderte en detalles.</p>
+        </div>
+
+        <div class="button-group">
+          <button class="primary-btn" id="nextBtn" disabled>Continuar →</button>
+        </div>
+      `;
+
+      let strengthSelected = false;
+      document.querySelectorAll('[data-strength]').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('[data-strength]').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          sessionData.main_strength = card.dataset.strength;
+          strengthSelected = true;
+          document.getElementById('nextBtn').disabled = false;
+        });
+      });
+
+      document.getElementById('nextBtn').onclick = () => {
+        if (!strengthSelected) {
+          return;
+        }
+        sessionData.main_strength_context = sessionData.main_strength;
+        sessionData.turning_point_moment = document.getElementById('turningMoment').value;
+        sessionData.turning_point_learning = document.getElementById('turningLearning').value;
+        currentPhase++;
+        updatePhaseTracker();
+        updateProgressBar();
+        renderPhase(currentPhase);
+      };
+    }
+
+    function renderPatternsPhase() {
+      const content = document.getElementById('content');
+      
+      const errorPatterns = [
+        { value: 'Errores no forzados en bolas normales', icon: '❌', desc: 'El partido se te fue en pelotas que debían entrar.' },
+        { value: 'Urgencia en momentos de presión', icon: '😰', desc: 'Quisiste resolver demasiado pronto.' },
+        { value: 'Pocas alturas o poca profundidad', icon: '📉', desc: 'El rival recibió demasiado cómodo.' },
+        { value: 'Decisiones tácticas repetidas que no daban ventaja', icon: '🌀', desc: 'Insististe en algo que ya no estaba funcionando.' }
+      ];
+
+      const weaknesses = [
+        { value: 'Revés frágil o inconsistente', icon: '🎾', desc: 'Había una zona donde el rival sufría más.' },
+        { value: 'Mala gestión de pelotas altas o profundas', icon: '⬆️', desc: 'Se incomodaba cuando lo sacabas de su altura ideal.' },
+        { value: 'Poca paciencia en puntos largos', icon: '⏱️', desc: 'Se apuraba y regalaba errores.' },
+        { value: 'Bajo nivel en puntos importantes', icon: '🎯', desc: 'En presión, su nivel bajaba.' }
+      ];
+
+      content.innerHTML = `
+        ${createPhaseHeader(phaseConfigs[2])}
+        
+        <div class="question-section">
+          <p class="question">¿Qué patrón te frenó más?</p>
+          <p class="sub-question">Elige el error o traba que más se repitió.</p>
+          
+          <div class="options-grid">
+            ${errorPatterns.map(p => `
+              <div class="option-card" data-pattern="${p.value}" data-type="error">
+                <div class="option-icon">${p.icon}</div>
+                <div class="option-content">
+                  <h4 class="option-title">${p.value}</h4>
+                  <p class="option-description">${p.desc}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="input-grid" id="errorContext" style="display: none; margin-top: 2rem;">
+            <div class="input-group full-width">
+              <label class="input-label">
+                <span class="input-label-icon">📍</span>
+                ¿Cuándo aparecía más este patrón?
+              </label>
+              <textarea class="textarea-input" id="errorSituation" placeholder="Ej: cuando iba igualado, cuando jugaba desde defensa o cuando buscaba cerrar rápido...">${sessionData.error_pattern_situation}</textarea>
+            </div>
+
+            <div class="input-group full-width">
+              <label class="input-label">
+                <span class="input-label-icon">🔍</span>
+                ¿Qué crees que lo alimentó?
+              </label>
+              <textarea class="textarea-input" id="errorCause" placeholder="Ej: urgencia, mala preparación, falta de margen, lectura tarde...">${sessionData.error_pattern_cause}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="question-section" style="margin-top: 3rem;">
+          <p class="question">¿Qué lectura del rival sí valía oro?</p>
+          <p class="sub-question">No hace falta una lista completa: basta con la más útil.</p>
+          
+          <div class="options-grid two-columns">
+            ${weaknesses.map(w => `
+              <div class="option-card" data-weakness="${w.value}" data-type="weakness">
+                <div class="option-icon">${w.icon}</div>
+                <div class="option-content">
+                  <h4 class="option-title">${w.value}</h4>
+                  <p class="option-description">${w.desc}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="input-grid" id="successContext" style="display: none; margin-top: 2rem;">
+            <div class="input-group full-width">
+              <label class="input-label">
+                <span class="input-label-icon">🧩</span>
+                ¿Qué sí te funcionó y conviene repetir?
+              </label>
+              <textarea class="textarea-input" id="successSetup" placeholder="Ej: profundidad al revés y paciencia antes de cambiar dirección...">${sessionData.success_pattern_setup}</textarea>
+            </div>
+
+            <div class="input-group full-width">
+              <label class="input-label">
+                <span class="input-label-icon">🎯</span>
+                ¿Cómo podrías explotar mejor esa debilidad la próxima vez?
+              </label>
+              <textarea class="textarea-input" id="weaknessPlan" placeholder="Ej: insistir más tiempo en esa zona antes de buscar el winner...">${sessionData.opponent_weakness_exploitation}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="principle-box">
+          <div class="principle-title">🎯 Ley de claridad competitiva</div>
+          <p class="principle-text">Un patrón que te frena, una lectura del rival y una secuencia que sí funcionó ya te dan dirección suficiente para entrenar mejor.</p>
+        </div>
+
+        <div class="button-group">
+          <button class="primary-btn" id="nextBtn" disabled>Continuar →</button>
+        </div>
+      `;
+
+      let errorSelected = false;
+      let weaknessSelected = false;
+
+      document.querySelectorAll('[data-type="error"]').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('[data-type="error"]').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          sessionData.error_pattern = card.dataset.pattern;
+          document.getElementById('errorContext').style.display = 'grid';
+          errorSelected = true;
+          checkCompletion();
+        });
+      });
+
+      document.querySelectorAll('[data-type="weakness"]').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('[data-type="weakness"]').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          sessionData.opponent_weakness = card.dataset.weakness;
+          document.getElementById('successContext').style.display = 'grid';
+          weaknessSelected = true;
+          checkCompletion();
+        });
+      });
+
+      function checkCompletion() {
+        document.getElementById('nextBtn').disabled = !(errorSelected && weaknessSelected);
+      }
+
+      document.getElementById('nextBtn').onclick = () => {
+        sessionData.error_pattern_situation = document.getElementById('errorSituation').value;
+        sessionData.error_pattern_cause = document.getElementById('errorCause').value;
+        sessionData.success_pattern_setup = document.getElementById('successSetup').value;
+        sessionData.success_pattern = document.getElementById('successSetup').value;
+        sessionData.opponent_weakness_exploitation = document.getElementById('weaknessPlan').value;
+        currentPhase++;
+        updatePhaseTracker();
+        updateProgressBar();
+        renderPhase(currentPhase);
+      };
+    }
+
+    function renderStatsPhase() {
+      const content = document.getElementById('content');
+      
+      content.innerHTML = `
+        ${createPhaseHeader(phaseConfigs[3])}
+        
+        <div class="question-section">
+          <p class="question">Números mínimos que sí ayudan</p>
+          <p class="sub-question">No buscamos precisión de ATP. Solo datos suficientes para no decidir a ciegas.</p>
+          
+          <div class="input-grid">
+            <div class="input-group">
+              <label class="input-label">
+                <span class="input-label-icon">🎯</span>
+                Winners (golpes ganadores)
+              </label>
+              <input type="number" class="text-input" id="winners" min="0" placeholder="Ej: 15" value="${sessionData.key_stat_winners || ''}">
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">
+                <span class="input-label-icon">❌</span>
+                Errores no forzados
+              </label>
+              <input type="number" class="text-input" id="unforced" min="0" placeholder="Ej: 28" value="${sessionData.key_stat_unforced || ''}">
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">
+                <span class="input-label-icon">⚡</span>
+                % primer servicio (estimado)
+              </label>
+              <input type="number" class="text-input" id="firstServe" min="0" max="100" placeholder="Ej: 65" value="${sessionData.key_stat_first_serve || ''}">
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">
+                <span class="input-label-icon">🎾</span>
+                Break points (convertidos/totales)
+              </label>
+              <input type="text" class="text-input" id="breakPoints" placeholder="Ej: 3/8" value="${sessionData.key_stat_break_points}">
+            </div>
+          </div>
+        </div>
+
+        <div class="question-section">
+          <p class="question">Balance honesto del partido</p>
+          <p class="sub-question">Califica solo lo que más movió tu rendimiento.</p>
+          
+          <div class="multi-rating-grid">
+            <div class="rating-item">
+              <div class="rating-label">
+                <span>🎯</span>
+                Calidad de tu concentración
+              </div>
+              <div class="slider-labels">
+                <span>Distraído</span>
+                <span>Aceptable</span>
+                <span>Muy sólido</span>
+              </div>
+              <input type="range" min="1" max="10" value="5" class="slider-input" id="focus">
+              <div class="slider-value" id="focusValue">5/10</div>
+            </div>
+
+            <div class="rating-item">
+              <div class="rating-label">
+                <span>🧠</span>
+                Calidad de tus decisiones
+              </div>
+              <div class="slider-labels">
+                <span>Apresuradas</span>
+                <span>Mixtas</span>
+                <span>Muy buenas</span>
+              </div>
+              <input type="range" min="1" max="10" value="5" class="slider-input" id="decisions">
+              <div class="slider-value" id="decisionsValue">5/10</div>
+            </div>
+
+            <div class="rating-item">
+              <div class="rating-label">
+                <span>😌</span>
+                Control emocional
+              </div>
+              <div class="slider-labels">
+                <span>Inestable</span>
+                <span>Variable</span>
+                <span>Muy estable</span>
+              </div>
+              <input type="range" min="1" max="10" value="5" class="slider-input" id="emotional">
+              <div class="slider-value" id="emotionalValue">5/10</div>
+            </div>
+
+            <div class="rating-item">
+              <div class="rating-label">
+                <span>💪</span>
+                Respuesta física al partido
+              </div>
+              <div class="slider-labels">
+                <span>Se cayó</span>
+                <span>Cumplió</span>
+                <span>Sostuvo mucho</span>
+              </div>
+              <input type="range" min="1" max="10" value="5" class="slider-input" id="physical">
+              <div class="slider-value" id="physicalValue">5/10</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="statsInsight" style="display: none;">
+          <div class="insight-box">
+            <div class="insight-title">💡 Interpretación de tus números</div>
+            <p class="insight-text" id="statsAnalysis"></p>
+          </div>
+        </div>
+
+        <div class="principle-box">
+          <div class="principle-title">🎯 Lo importante aquí</div>
+          <p class="principle-text">Con tres números y cuatro notas honestas ya puedes detectar si tu mayor freno fue ejecución, decisión, emoción o físico.</p>
+        </div>
+
+        <div class="button-group">
+          <button class="primary-btn" id="nextBtn">Continuar →</button>
+        </div>
+      `;
+
+      function analyzeStats() {
+        const winners = parseInt(document.getElementById('winners').value) || 0;
+        const unforced = parseInt(document.getElementById('unforced').value) || 0;
+        const firstServe = parseInt(document.getElementById('firstServe').value) || 0;
+
+        if (winners === 0 && unforced === 0) return;
+
+        let analysis = '';
+        const ratio = unforced > 0 ? (winners / unforced).toFixed(2) : 'N/A';
+
+        if (winners > unforced) {
+          analysis = `Excelente. Tu relación Winners/Errores (${winners}/${unforced} = ${ratio}) es positiva. Jugaste con agresividad controlada. `;
+        } else if (winners < unforced * 0.5) {
+          analysis = `Tu relación Winners/Errores (${winners}/${unforced} = ${ratio}) indica que cometiste muchos errores no forzados. Prioriza CONSISTENCIA sobre agresión en entrenamientos. `;
+        } else {
+          analysis = `Tu relación Winners/Errores (${winners}/${unforced} = ${ratio}) es aceptable pero mejorable. Busca reducir errores o aumentar winners. `;
+        }
+
+        if (firstServe < 50) {
+          analysis += `Tu % de primer servicio (${firstServe}%) es bajo. Un saque más confiable te daría muchos más puntos fáciles.`;
+        } else if (firstServe >= 65) {
+          analysis += `Tu % de primer servicio (${firstServe}%) es sólido. Eso te da control de puntos.`;
+        }
+
+        document.getElementById('statsAnalysis').textContent = analysis;
+        document.getElementById('statsInsight').style.display = 'block';
+      }
+
+      document.getElementById('winners').addEventListener('input', analyzeStats);
+      document.getElementById('unforced').addEventListener('input', analyzeStats);
+      document.getElementById('firstServe').addEventListener('input', analyzeStats);
+
+      const sliders = [
+        { id: 'focus', valueId: 'focusValue', key: 'focus_quality' },
+        { id: 'decisions', valueId: 'decisionsValue', key: 'decision_quality' },
+        { id: 'emotional', valueId: 'emotionalValue', key: 'emotional_control' },
+        { id: 'physical', valueId: 'physicalValue', key: 'physical_readiness' }
+      ];
+
+      sliders.forEach(slider => {
+        const input = document.getElementById(slider.id);
+        const display = document.getElementById(slider.valueId);
+        input.value = sessionData[slider.key] || 5;
+        display.textContent = `${input.value}/10`;
+        input.oninput = (e) => {
+          sessionData[slider.key] = parseInt(e.target.value, 10);
+          display.textContent = `${e.target.value}/10`;
+        };
+      });
+
+      document.getElementById('nextBtn').onclick = () => {
+        sessionData.key_stat_winners = parseInt(document.getElementById('winners').value) || 0;
+        sessionData.key_stat_unforced = parseInt(document.getElementById('unforced').value) || 0;
+        sessionData.key_stat_first_serve = parseInt(document.getElementById('firstServe').value) || 0;
+        sessionData.key_stat_break_points = document.getElementById('breakPoints').value;
+        currentPhase++;
+        updatePhaseTracker();
+        updateProgressBar();
+        renderPhase(currentPhase);
+      };
+    }
+
+    function renderActionPhase() {
+      const content = document.getElementById('content');
+      
+      const mainPriorities = [
+        { area: 'Técnica', value: 'Más margen y consistencia', plan: 'Dedica 2 sesiones cortas a profundidad y altura antes de buscar velocidad.' },
+        { area: 'Táctica', value: 'Tomar mejores decisiones en puntos clave', plan: 'Entrena una secuencia clara para momentos de presión y repítela sin cambiarla cada game.' },
+        { area: 'Mental', value: 'Recuperarme mejor entre puntos', plan: 'Usa una rutina fija: respiración, frase corta y mirada al encordado antes del siguiente punto.' },
+        { area: 'Físico', value: 'Sostener mejor el nivel durante el partido', plan: 'Prioriza movilidad, activación y recuperación para que el final del partido no te saque del plan.' }
+      ];
+
+      const supportHabits = [
+        { value: 'Registrar un aprendizaje al terminar', plan: 'Al cerrar el partido, escribe una línea: qué repetir y qué cortar.' },
+        { value: 'Entrar con un plan visible', plan: 'Antes de competir, deja por escrito una intención táctica simple y una frase de foco.' },
+        { value: 'Cuidar el ritmo entre puntos', plan: 'No regales energía con gestos extra. Baja pulsaciones y vuelve al punto siguiente.' },
+        { value: 'Proteger sueño e hidratación', plan: 'En la semana de partido, cuida dos básicos: dormir mejor y llegar bien hidratado.' }
+      ];
+
+      content.innerHTML = `
+        ${createPhaseHeader(phaseConfigs[4])}
+        
+        <div class="question-section">
+          <p class="question">Define tu plan corto para los próximos 7 días</p>
+          <p class="sub-question">Solo una prioridad principal y un hábito de apoyo. Si cabe en tu semana, lo vas a ejecutar.</p>
+          
+          <div style="margin: 2rem 0;">
+            <h3 style="color: #60a5fa; font-size: 1.35rem; margin-bottom: 1.2rem; font-weight: 700;">🎯 Prioridad principal</h3>
+            <div class="options-grid two-columns">
+              ${mainPriorities.map(f => `
+                <div class="option-card compact-card" data-main-priority="${f.value}" data-main-area="${f.area}" data-main-plan="${f.plan}">
+                  <div class="option-icon">${f.area === 'Técnica' ? '🎾' : f.area === 'Táctica' ? '🧩' : f.area === 'Mental' ? '🧠' : '💪'}</div>
+                  <div class="option-content">
+                    <h4 class="option-title">${f.value}</h4>
+                    <p class="option-description">${f.plan}</p>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            <div class="drill-card" id="mainPriorityCard" style="display: none;">
+              <div class="drill-header">
+                <div class="drill-icon">✅</div>
+                <h4 class="drill-title">Tu prioridad dominante</h4>
+              </div>
+              <div class="drill-content" id="mainPriorityContent"></div>
+            </div>
+          </div>
+
+          <div style="margin: 2rem 0;">
+            <h3 style="color: #60a5fa; font-size: 1.35rem; margin-bottom: 1.2rem; font-weight: 700;">🧩 Hábito de apoyo</h3>
+            <div class="options-grid two-columns">
+              ${supportHabits.map(f => `
+                <div class="option-card compact-card" data-support-label="${f.value}" data-support-plan="${f.plan}">
+                  <div class="option-icon">🔁</div>
+                  <div class="option-content">
+                    <h4 class="option-title">${f.value}</h4>
+                    <p class="option-description">${f.plan}</p>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            <div class="drill-card" id="supportHabitCard" style="display: none;">
+              <div class="drill-header">
+                <div class="drill-icon">🛠️</div>
+                <h4 class="drill-title">El hábito que lo sostiene</h4>
+              </div>
+              <div class="drill-content" id="supportHabitContent"></div>
+            </div>
+          </div>
+
+          <div class="input-grid" style="margin: 2.2rem 0;">
+            <div class="input-group full-width">
+              <label class="input-label">
+                <span class="input-label-icon">🎯</span>
+                Objetivo específico para tu próximo partido
+              </label>
+              <textarea class="textarea-input" id="nextGoal" placeholder="Ej: competir con más margen en puntos apretados y sostener mejor mi plan de saque + primer golpe">${sessionData.next_match_goal}</textarea>
+            </div>
+
+            <div class="input-group full-width">
+              <label class="input-label">
+                <span class="input-label-icon">📊</span>
+                ¿Cómo medirás el éxito de este objetivo?
+              </label>
+              <textarea class="textarea-input" id="successMetric" placeholder="Ej: al terminar el partido revisar si sostuve mi prioridad y si el patrón negativo apareció menos">${sessionData.success_metric}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button class="primary-btn" id="nextBtn" disabled>✨ Generar Mi Plan</button>
+        </div>
+      `;
+
+      let mainSelected = false;
+      let supportSelected = false;
+
+      document.querySelectorAll('[data-main-priority]').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('[data-main-priority]').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          sessionData.main_priority_area = card.dataset.mainArea;
+          sessionData.main_priority_label = card.dataset.mainPriority;
+          sessionData.main_priority_plan = card.dataset.mainPlan;
+          document.getElementById('mainPriorityContent').textContent = `${card.dataset.mainArea}: ${card.dataset.mainPlan}`;
+          document.getElementById('mainPriorityCard').style.display = 'block';
+          mainSelected = true;
+          checkCompletion();
+        });
+      });
+
+      document.querySelectorAll('[data-support-label]').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('[data-support-label]').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          sessionData.support_priority_label = card.dataset.supportLabel;
+          sessionData.support_priority_plan = card.dataset.supportPlan;
+          document.getElementById('supportHabitContent').textContent = card.dataset.supportPlan;
+          document.getElementById('supportHabitCard').style.display = 'block';
+          supportSelected = true;
+          checkCompletion();
+        });
+      });
+
+      function checkCompletion() {
+        document.getElementById('nextBtn').disabled = !(mainSelected && supportSelected);
+      }
+
+      document.getElementById('nextBtn').onclick = async () => {
+        sessionData.next_match_goal = document.getElementById('nextGoal').value;
+        sessionData.success_metric = document.getElementById('successMetric').value;
+        
+        const nextBtn = document.getElementById('nextBtn');
+        nextBtn.disabled = true;
+        nextBtn.textContent = '⚡ Guardando tu plan...';
+
+        if (window.dataSdk) {
+          if (allAnalyses.length >= 999) {
+            const confirmBox = document.createElement('div');
+            confirmBox.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(15, 23, 42, 0.98); border: 2px solid #ef4444; border-radius: 16px; padding: 2rem; max-width: 500px; z-index: 1000; box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8);';
+            confirmBox.innerHTML = `
+              <h3 style="color: #f87171; margin: 0 0 1rem 0; font-size: 1.25rem;">⚠️ Límite Alcanzado</h3>
+              <p style="color: #cbd5e1; margin: 0 0 1.5rem 0; line-height: 1.6;">Has alcanzado el límite de 999 análisis guardados. Para continuar, necesitas eliminar algunos análisis anteriores.</p>
+              <button onclick="this.parentElement.remove()" style="width: 100%; background: #ef4444; color: white; border: none; padding: 0.75rem; border-radius: 8px; font-weight: 600; cursor: pointer;">Entendido</button>
+            `;
+            document.body.appendChild(confirmBox);
+            nextBtn.disabled = false;
+            nextBtn.textContent = '✨ Generar Mi Plan';
+            return;
+          }
+
+          const result = await window.dataSdk.create(sessionData);
+          if (!result.isOk) {
+            console.error('Error al guardar análisis');
+          }
+        }
+
+        showSummary();
+      };
+    }
+
+    function showSummary() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const content = document.getElementById('content');
+      document.getElementById('phaseTracker').style.display = 'none';
+      document.getElementById('progressBar').style.width = '100%';
+
+      content.innerHTML = `
+        <div class="summary-section">
+          <div class="summary-hero">
+            <span class="summary-hero-emoji">🏆</span>
+            <h1 class="summary-title">Tu lectura del partido está lista</h1>
+            <p class="subtitle">Corta, clara y accionable para los próximos 7 días</p>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value">${allAnalyses.length}</div>
+              <div class="stat-label">Análisis Completados</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">${allAnalyses.filter(a => a.match_result === 'Victoria').length}</div>
+              <div class="stat-label">Victorias Analizadas</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">${allAnalyses.filter(a => a.match_result === 'Derrota').length}</div>
+              <div class="stat-label">Derrotas Estudiadas</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">${sessionData.key_stat_winners}/${sessionData.key_stat_unforced}</div>
+              <div class="stat-label">Winners/Errores</div>
+            </div>
+          </div>
+
+          <div class="evolution-grid">
+            <div class="evolution-category">
+              <div class="evolution-category-header">
+                <div class="evolution-category-icon">🧭</div>
+                <h3 class="evolution-category-title">Lo que detectaste</h3>
+              </div>
+              <div class="evolution-items">
+                <div class="evolution-item">
+                  <div class="evolution-item-label">Fortaleza más útil</div>
+                  <div class="evolution-item-value">${sessionData.main_strength || 'Sin especificar'}</div>
+                </div>
+                <div class="evolution-item">
+                  <div class="evolution-item-label">Momento que más enseñó</div>
+                  <div class="evolution-item-value">${sessionData.turning_point_moment || 'Sin especificar'}</div>
+                  <div class="evolution-item-context">${sessionData.turning_point_learning || 'Sin aprendizaje adicional'}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="evolution-category">
+              <div class="evolution-category-header">
+                <div class="evolution-category-icon">🧩</div>
+                <h3 class="evolution-category-title">Patrones que mandan</h3>
+              </div>
+              <div class="evolution-items">
+                <div class="evolution-item">
+                  <div class="evolution-item-label">Patrón que te frenó</div>
+                  <div class="evolution-item-value">${sessionData.error_pattern || 'Sin especificar'}</div>
+                  <div class="evolution-item-context">${sessionData.error_pattern_cause || 'Sin causa adicional'}</div>
+                </div>
+                <div class="evolution-item">
+                  <div class="evolution-item-label">Lectura útil del rival</div>
+                  <div class="evolution-item-value">${sessionData.opponent_weakness}</div>
+                  <div class="evolution-item-context">${sessionData.opponent_weakness_exploitation || sessionData.success_pattern_setup || 'Sin contexto adicional'}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="evolution-category">
+              <div class="evolution-category-header">
+                <div class="evolution-category-icon">🎯</div>
+                <h3 class="evolution-category-title">Tu plan de 7 días</h3>
+              </div>
+              <div class="evolution-items">
+                <div class="evolution-item">
+                  <div class="evolution-item-label">Prioridad principal</div>
+                  <div class="evolution-item-value">${sessionData.main_priority_label || 'Sin especificar'}</div>
+                  <div class="evolution-item-context">${sessionData.main_priority_plan || 'Sin plan adicional'}</div>
+                </div>
+                <div class="evolution-item">
+                  <div class="evolution-item-label">Hábito de apoyo</div>
+                  <div class="evolution-item-value">${sessionData.support_priority_label || 'Sin especificar'}</div>
+                  <div class="evolution-item-context">${sessionData.support_priority_plan || 'Sin hábito adicional'}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="evolution-category">
+              <div class="evolution-category-header">
+                <div class="evolution-category-icon">📉</div>
+                <h3 class="evolution-category-title">Balance rápido</h3>
+              </div>
+              <div class="evolution-items">
+                <div class="evolution-item">
+                  <div class="evolution-item-label">Concentración / Decisión</div>
+                  <div class="evolution-item-value">${sessionData.focus_quality}/10 · ${sessionData.decision_quality}/10</div>
+                </div>
+                <div class="evolution-item">
+                  <div class="evolution-item-label">Emoción / Físico</div>
+                  <div class="evolution-item-value">${sessionData.emotional_control}/10 · ${sessionData.physical_readiness}/10</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="action-plan-section">
+            <h2 class="action-plan-title">🎯 Tu Objetivo Para el Próximo Partido</h2>
+            <div class="evolution-item">
+              <div class="evolution-item-label">Objetivo Específico</div>
+              <div class="evolution-item-value">${sessionData.next_match_goal || 'No especificado'}</div>
+            </div>
+            <div class="evolution-item" style="margin-top: 1.5rem;">
+              <div class="evolution-item-label">Métrica de Éxito</div>
+              <div class="evolution-item-value">${sessionData.success_metric || 'No especificado'}</div>
+            </div>
+
+            <div class="commitment-box">
+              <div class="commitment-label">${config.commitment_prompt || defaultConfig.commitment_prompt}</div>
+              <textarea class="textarea-input" id="commitmentInput" placeholder="Escribe tu compromiso específico aquí...">${sessionData.commitment}</textarea>
+            </div>
+          </div>
+
+          <div class="final-message-box">
+            ${(config.final_message || defaultConfig.final_message).replace(/\n/g, '<br>')}
+            <span class="final-cta">Ahora, a ejecutar. 🔥</span>
+          </div>
+
+          <div class="button-group">
+            <button class="primary-btn" id="newAnalysis">🔄 Nuevo Análisis</button>
+            <button class="secondary-btn" id="viewHistory">📚 Ver Historial</button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('commitmentInput').addEventListener('blur', (e) => {
+        sessionData.commitment = e.target.value;
+      });
+
+      document.getElementById('newAnalysis').onclick = () => {
+        sessionData = {
+          match_date: '',
+          opponent_level: '',
+          match_result: '',
+          score: '',
+          surface: '',
+          pre_match_emotion: '',
+          pre_match_intensity: 5,
+          pre_match_plan: '',
+          dominant_emotion: '',
+          emotion_intensity: 5,
+          emotion_trigger: '',
+          mental_strength: '',
+          mental_strength_context: '',
+          technical_strength: '',
+          technical_strength_context: '',
+          tactical_strength: '',
+          tactical_strength_context: '',
+          turning_point_moment: '',
+          turning_point_decision: '',
+          turning_point_why: '',
+          turning_point_learning: '',
+          error_pattern: '',
+          error_pattern_frequency: 5,
+          error_pattern_situation: '',
+          error_pattern_cause: '',
+          success_pattern: '',
+          success_pattern_frequency: 5,
+          success_pattern_setup: '',
+          opponent_weakness: '',
+          opponent_weakness_exploitation: '',
+          missed_opportunity: '',
+          key_stat_winners: 0,
+          key_stat_unforced: 0,
+          key_stat_first_serve: 0,
+          key_stat_break_points: '',
+          energy_level_start: 5,
+          energy_level_end: 5,
+          focus_quality: 5,
+          decision_quality: 5,
+          emotional_control: 5,
+          physical_readiness: 5,
+          technical_focus: '',
+          technical_drill: '',
+          tactical_focus: '',
+          tactical_scenario: '',
+          mental_focus: '',
+          mental_exercise: '',
+          physical_focus: '',
+          physical_work: '',
+          main_strength: '',
+          main_strength_context: '',
+          main_priority_area: '',
+          main_priority_label: '',
+          main_priority_plan: '',
+          support_priority_label: '',
+          support_priority_plan: '',
+          next_match_goal: '',
+          success_metric: '',
+          commitment: ''
+        };
+        document.getElementById('progressBar').style.width = '0%';
+        document.getElementById('phaseTracker').style.display = 'flex';
+        renderWelcome();
+        acScrollToTop();
+      };
+
+      document.getElementById('viewHistory').onclick = () => {
+        showHistory();
+        acScrollToTop();
+      };
+
+      acScrollToTop();
+    }
+
+    function showHistory() {
+      const content = document.getElementById('content');
+      const sortedAnalyses = [...allAnalyses].sort((a, b) => new Date(b.match_date) - new Date(a.match_date));
+
+      if (sortedAnalyses.length === 0) {
+        content.innerHTML = `
+          <div style="text-align: center; padding: 3rem;">
+            <span style="font-size: 4rem; display: block; margin-bottom: 1rem;">📊</span>
+            <h2 style="color: #f1f5f9; margin-bottom: 1rem;">Aún no tienes análisis guardados</h2>
+            <p class="subtitle">Completa tu primer análisis para empezar a rastrear tu evolución</p>
+            <button class="primary-btn" onclick="location.reload()" style="margin-top: 2rem;">Comenzar Primer Análisis</button>
+          </div>
+        `;
+        return;
+      }
+
+      let historyHTML = `
+        <div style="margin-bottom: 3rem;">
+          <h2 style="font-size: 2.25rem; font-weight: 800; color: #f1f5f9; margin-bottom: 0.5rem;">📚 Tu Historial de Evolución</h2>
+          <p class="subtitle">Cada análisis es un paso hacia tu mejor versión</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">${sortedAnalyses.length}</div>
+            <div class="stat-label">Total Análisis</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${sortedAnalyses.filter(a => a.match_result === 'Victoria').length}</div>
+            <div class="stat-label">Victorias</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${sortedAnalyses.filter(a => a.match_result === 'Derrota').length}</div>
+            <div class="stat-label">Derrotas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${(sortedAnalyses.reduce((sum, a) => sum + (a.focus_quality || 0), 0) / sortedAnalyses.length).toFixed(1)}</div>
+            <div class="stat-label">Promedio Enfoque</div>
+          </div>
+        </div>
+
+        <div style="display: grid; gap: 1.5rem; margin-top: 3rem;">
+      `;
+
+      sortedAnalyses.forEach((analysis) => {
+        const date = new Date(analysis.match_date);
+        const formattedDate = date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+        const resultColor = analysis.match_result === 'Victoria' ? '#10b981' : '#ef4444';
+        const resultIcon = analysis.match_result === 'Victoria' ? '🏆' : '💪';
+
+        historyHTML += `
+          <div style="background: rgba(30, 41, 59, 0.6); border-radius: 20px; padding: 2rem; border-left: 5px solid ${resultColor}; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.background='rgba(30, 41, 59, 0.9)'" onmouseout="this.style.background='rgba(30, 41, 59, 0.6)'">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+              <div>
+                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">${resultIcon}</div>
+                <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.5rem;">📅 ${formattedDate}</div>
+                <div style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9;">${analysis.match_result}: ${analysis.score}</div>
+                <div style="font-size: 0.9rem; color: #94a3b8; margin-top: 0.25rem;">🎾 ${analysis.surface} · Rival ${analysis.opponent_level}</div>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
+              <div>
+                <div style="font-size: 0.8rem; color: #64748b; text-transform: uppercase; margin-bottom: 0.25rem;">Enfoque Mental</div>
+                <div style="color: #cbd5e1; font-size: 0.95rem;">${analysis.main_priority_label || analysis.mental_focus || 'Sin foco guardado'}</div>
+              </div>
+              <div>
+                <div style="font-size: 0.8rem; color: #64748b; text-transform: uppercase; margin-bottom: 0.25rem;">Enfoque Técnico</div>
+                <div style="color: #cbd5e1; font-size: 0.95rem;">${analysis.main_strength || analysis.technical_focus || 'Sin lectura guardada'}</div>
+              </div>
+              <div>
+                <div style="font-size: 0.8rem; color: #64748b; text-transform: uppercase; margin-bottom: 0.25rem;">Patrón de Éxito</div>
+                <div style="color: #cbd5e1; font-size: 0.95rem;">${analysis.support_priority_label || analysis.success_pattern || 'Sin apoyo guardado'}</div>
+              </div>
+              <div>
+                <div style="font-size: 0.8rem; color: #64748b; text-transform: uppercase; margin-bottom: 0.25rem;">Objetivo Próximo Partido</div>
+                <div style="color: #cbd5e1; font-size: 0.95rem;">${analysis.next_match_goal || 'No especificado'}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      historyHTML += `
+        </div>
+        <div class="button-group" style="margin-top: 3rem;">
+          <button class="primary-btn" id="backBtn">← Volver</button>
+        </div>
+      `;
+
+      content.innerHTML = historyHTML;
+      document.getElementById('backBtn').onclick = () => {
+        showSummary();
+        acScrollToTop();
+      };
+      acScrollToTop();
+    }
+
+    const dataHandler = {
+      onDataChanged(data) {
+        allAnalyses = data;
+      }
+    };
+
+    async function onConfigChange(config) {
+      const baseFont = config.font_family || defaultConfig.font_family;
+      const baseFontStack = 'Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+      const baseSize = config.font_size || defaultConfig.font_size;
+
+      document.body.style.fontFamily = `${baseFont}, ${baseFontStack}`;
+      document.body.style.fontSize = `${baseSize}px`;
+
+      const gradient = `linear-gradient(135deg, ${config.background_color || defaultConfig.background_color} 0%, ${config.surface_color || defaultConfig.surface_color} 50%, ${config.background_color || defaultConfig.background_color} 100%)`;
+      document.body.style.background = gradient;
+
+      const h1Elements = document.querySelectorAll('h1, .summary-title');
+      h1Elements.forEach(h1 => {
+        h1.style.fontSize = `${baseSize * 2.75}px`;
+      });
+
+      const h2Elements = document.querySelectorAll('h2, .phase-title');
+      h2Elements.forEach(h2 => {
+        h2.style.fontSize = `${baseSize * 2.5}px`;
+      });
+
+      const buttons = document.querySelectorAll('.primary-btn');
+      buttons.forEach(btn => {
+        btn.style.background = `linear-gradient(135deg, ${config.primary_action_color || defaultConfig.primary_action_color}, ${config.primary_action_color || defaultConfig.primary_action_color})`;
+      });
+
+      const progressBar = document.getElementById('progressBar');
+      if (progressBar) {
+        progressBar.style.background = `linear-gradient(90deg, ${config.primary_action_color || defaultConfig.primary_action_color}, #8b5cf6, #ec4899)`;
+      }
+    }
+
+    async function init() {
+      createParticles();
+
+      if (window.dataSdk) {
+        const initResult = await window.dataSdk.init(dataHandler);
+        if (!initResult.isOk) {
+          console.error('Error al inicializar Data SDK');
+        }
+      }
+
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities: (config) => ({
+            recolorables: [
+              {
+                get: () => config.background_color || defaultConfig.background_color,
+                set: (value) => {
+                  config.background_color = value;
+                  window.elementSdk.setConfig({ background_color: value });
+                }
+              },
+              {
+                get: () => config.surface_color || defaultConfig.surface_color,
+                set: (value) => {
+                  config.surface_color = value;
+                  window.elementSdk.setConfig({ surface_color: value });
+                }
+              },
+              {
+                get: () => config.text_color || defaultConfig.text_color,
+                set: (value) => {
+                  config.text_color = value;
+                  window.elementSdk.setConfig({ text_color: value });
+                }
+              },
+              {
+                get: () => config.primary_action_color || defaultConfig.primary_action_color,
+                set: (value) => {
+                  config.primary_action_color = value;
+                  window.elementSdk.setConfig({ primary_action_color: value });
+                }
+              },
+              {
+                get: () => config.accent_color || defaultConfig.accent_color,
+                set: (value) => {
+                  config.accent_color = value;
+                  window.elementSdk.setConfig({ accent_color: value });
+                }
+              }
+            ],
+            borderables: [],
+            fontEditable: {
+              get: () => config.font_family || defaultConfig.font_family,
+              set: (value) => {
+                config.font_family = value;
+                window.elementSdk.setConfig({ font_family: value });
+              }
+            },
+            fontSizeable: {
+              get: () => config.font_size || defaultConfig.font_size,
+              set: (value) => {
+                config.font_size = value;
+                window.elementSdk.setConfig({ font_size: value });
+              }
+            }
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ["game_title", config.game_title || defaultConfig.game_title],
+            ["welcome_subtitle", config.welcome_subtitle || defaultConfig.welcome_subtitle],
+            ["phase1_title", config.phase1_title || defaultConfig.phase1_title],
+            ["phase2_title", config.phase2_title || defaultConfig.phase2_title],
+            ["phase3_title", config.phase3_title || defaultConfig.phase3_title],
+            ["phase4_title", config.phase4_title || defaultConfig.phase4_title],
+            ["phase5_title", config.phase5_title || defaultConfig.phase5_title],
+            ["final_message", config.final_message || defaultConfig.final_message],
+            ["commitment_prompt", config.commitment_prompt || defaultConfig.commitment_prompt]
+          ])
+        });
+      }
+
+      renderWelcome();
+    }
+
+    init();
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) { acScrollToTop(); return; }
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+    try { window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' }); } catch (e) { window.scrollTo(0, Math.max(0, top)); }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () { window.scrollTo(0, 0); });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>

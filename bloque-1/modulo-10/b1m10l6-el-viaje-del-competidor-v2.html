@@ -1,0 +1,997 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Viaje del Competidor</title>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      color: #ffffff;
+      overflow: hidden;
+    }
+
+    #app-container {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 3rem 2rem 3rem 2rem;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .content-wrapper {
+      max-width: 850px;
+      width: 100%;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 1s ease-out, transform 1s ease-out;
+      margin-top: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .content-wrapper.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .content-wrapper.fade-out {
+      opacity: 0;
+      transform: translateY(-30px);
+      transition: opacity 0.6s ease-in, transform 0.6s ease-in;
+    }
+
+    h1 {
+      font-size: 3.2rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(to right, #f093fb 0%, #f5576c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 1.6rem;
+      color: #b8b8c3;
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    .intro-text {
+      font-size: 1.4rem;
+      line-height: 1.9;
+      color: #d1d1d6;
+      margin-bottom: 3rem;
+      font-weight: 300;
+      letter-spacing: 0.3px;
+    }
+
+    .message-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 3rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .message-text {
+      font-size: 1.35rem;
+      line-height: 1.9;
+      color: #e1e1e6;
+      margin-bottom: 1.5rem;
+      font-weight: 300;
+    }
+
+    .areas-container {
+      display: grid;
+      gap: 1.2rem;
+      margin: 2.5rem 0;
+    }
+
+    .area-item {
+      background: rgba(240, 147, 251, 0.08);
+      border: 1px solid rgba(240, 147, 251, 0.25);
+      border-radius: 14px;
+      padding: 1.8rem;
+      opacity: 0;
+      transform: translateX(-30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .area-item.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .area-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #f093fb;
+      margin-bottom: 0.7rem;
+      letter-spacing: 0.3px;
+    }
+
+    .area-reflection {
+      font-size: 1.15rem;
+      color: #c4c4cc;
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    .section-intro {
+      font-size: 1.3rem;
+      color: #a8a8b3;
+      margin-bottom: 2rem;
+      font-style: italic;
+      line-height: 1.7;
+    }
+
+    .options-container {
+      display: grid;
+      gap: 1.2rem;
+      margin: 2.5rem 0;
+    }
+
+    .option-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      padding: 1.6rem 1.8rem;
+      font-size: 1.15rem;
+      color: #ffffff;
+      cursor: pointer;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: inherit;
+      width: 100%;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .option-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(240, 147, 251, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .option-btn:hover::before {
+      left: 100%;
+    }
+
+    .option-btn:hover {
+      background: rgba(240, 147, 251, 0.15);
+      border-color: #f093fb;
+      transform: translateX(10px);
+      box-shadow: 0 4px 20px rgba(240, 147, 251, 0.2);
+    }
+
+    .option-btn.selected {
+      background: rgba(240, 147, 251, 0.25);
+      border-color: #f093fb;
+      box-shadow: 0 6px 24px rgba(240, 147, 251, 0.3);
+    }
+
+    .option-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .response-box {
+      background: linear-gradient(135deg, rgba(240, 147, 251, 0.15) 0%, rgba(245, 87, 108, 0.15) 100%);
+      border: 1px solid rgba(240, 147, 251, 0.4);
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin: 2.5rem 0;
+      font-size: 1.3rem;
+      line-height: 1.9;
+      opacity: 0;
+      transform: scale(0.9) translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      box-shadow: 0 8px 32px rgba(240, 147, 251, 0.2);
+      font-weight: 300;
+      font-style: italic;
+    }
+
+    .response-box.visible {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(to right, #f093fb 0%, #f5576c 100%);
+      border: none;
+      border-radius: 50px;
+      padding: 1.2rem 3.5rem;
+      font-size: 1.15rem;
+      color: #ffffff;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      margin: 1rem 0.5rem;
+      font-family: inherit;
+      box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(240, 147, 251, 0.5);
+    }
+
+    .btn-primary:active {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      border-radius: 50px;
+      padding: 1.2rem 3.5rem;
+      font-size: 1.15rem;
+      color: #ffffff;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      margin: 1rem 0.5rem;
+      font-family: inherit;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-secondary:active {
+      transform: translateY(-1px);
+    }
+
+    .buttons-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 2.5rem;
+      gap: 0.5rem;
+    }
+
+    .final-message {
+      font-size: 1.5rem;
+      line-height: 2.1;
+      margin: 2.5rem 0;
+      color: #e1e1e6;
+      font-weight: 300;
+    }
+
+    .final-message strong {
+      color: #f093fb;
+      font-weight: 600;
+    }
+
+    .progress-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+    }
+
+    .progress-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transition: all 0.4s ease;
+    }
+
+    .progress-dot.active {
+      background: linear-gradient(to right, #f093fb 0%, #f5576c 100%);
+      width: 40px;
+      border-radius: 6px;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.6;
+      }
+    }
+
+    .ceremonial-pause {
+      animation: pulse 2s ease-in-out;
+    }
+
+    @keyframes bounce-glow {
+      0%, 100% {
+        transform: translateY(0);
+        box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+      }
+      25% {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 35px rgba(240, 147, 251, 0.6), 0 0 20px rgba(240, 147, 251, 0.4);
+      }
+      50% {
+        transform: translateY(0);
+        box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+      }
+      75% {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(240, 147, 251, 0.5), 0 0 15px rgba(240, 147, 251, 0.3);
+      }
+    }
+
+    .btn-bounce-glow {
+      animation: bounce-glow 2s ease-in-out infinite;
+      position: relative;
+      overflow: visible;
+    }
+
+    .btn-bounce-glow::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #f093fb, #f5576c, #f093fb);
+      border-radius: 52px;
+      z-index: -1;
+      animation: glow-rotate 3s linear infinite;
+      opacity: 0.7;
+    }
+
+    @keyframes glow-rotate {
+      0% {
+        filter: hue-rotate(0deg) brightness(1.2);
+      }
+      50% {
+        filter: hue-rotate(30deg) brightness(1.5);
+      }
+      100% {
+        filter: hue-rotate(0deg) brightness(1.2);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .section-intro {
+        font-size: 1rem;
+        line-height: 1.55;
+        margin-bottom: 1rem;
+      }
+
+      h1 {
+        font-size: 2.2rem;
+      }
+
+      .subtitle, .message-text {
+        font-size: 1.15rem;
+      }
+
+      .intro-text {
+        font-size: 1.2rem;
+      }
+
+      .message-box {
+        padding: 2rem;
+      }
+
+      #app-container {
+        padding: 2.5rem 1.5rem 2.5rem 1.5rem;
+      }
+
+      .content-wrapper {
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .option-btn {
+        padding: 1.3rem 1.5rem;
+      }
+
+      .btn-primary, .btn-secondary {
+        padding: 1rem 2.5rem;
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .message-box {
+        padding: 1.5rem;
+      }
+
+      #app-container {
+        padding: 2rem 1rem 2rem 1rem;
+      }
+
+      .content-wrapper {
+        margin-top: 0.5rem;
+        margin-bottom: 1.5rem;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body { font-size: 16px; }
+    .container, .game-container, .game-wrapper, .app-wrapper, .app-container, .main-wrapper, .stage-wrapper, .phase-container, .phase-card, .content, .content-area, .modal-content, .results-card, .scene, .phase-content { padding: 16px !important; }
+    h1, .main-title, .game-title, .title { font-size: clamp(1.8rem, 7vw, 2.3rem) !important; line-height: 1.15 !important; }
+    h2, .phase-title, .stage-title, .final-title, .section-title { font-size: clamp(1.3rem, 6vw, 1.7rem) !important; line-height: 1.25 !important; }
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label { font-size: clamp(1rem, 4.5vw, 1.15rem) !important; line-height: 1.4 !important; }
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text, .intro-message, .quote { font-size: 1rem !important; line-height: 1.55 !important; }
+    .button-group, .action-buttons, .final-buttons, .controls-row { flex-direction: column !important; gap: 12px !important; }
+    button, .btn, .btn-primary, .btn-secondary, .action-button, .option-btn { width: 100% !important; }
+    .zone-grid, .scenario-grid, .options-grid, .results-stats { grid-template-columns: 1fr !important; }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || { init: async function () { return { isOk: true, value: null }; }, on: function () {}, emit: function () { return { isOk: true, value: null }; }, setConfig: function () {}, config: {} };
+  window.dataSdk = window.dataSdk || { init: async function () { return { isOk: true, value: null }; }, create: async function () { return { isOk: true, value: null }; }, list: async function () { return { isOk: true, value: [] }; }, update: async function () { return { isOk: true, value: null }; } };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body>
+  <main id="app-container">
+   <div class="content-wrapper" id="content"></div>
+  </main>
+  <script>
+    const defaultConfig = {
+      main_title: "El Viaje del Competidor",
+      act1_intro: "Cuando empezaste este camino, no sabías todo lo que ahora sabes.",
+      act2_question: "¿Qué fue lo más importante que cambió en ti?",
+      act3_question: "Hoy, esa voz se parece más a:",
+      act4_question: "¿Qué representa el siguiente bloque para ti?",
+      final_message: "No eres el mismo jugador que cuando empezaste."
+    };
+
+    let currentAct = 1;
+    let userChoices = {};
+
+    const areas = [
+      { title: "Técnica", reflection: "Antes jugabas. Ahora decides." },
+      { title: "Táctica", reflection: "Antes reaccionabas. Ahora eliges." },
+      { title: "Control emocional", reflection: "Antes forzabas. Ahora construyes." },
+      { title: "Preparación física y hábitos", reflection: "Antes dependías. Ahora sostienes." },
+      { title: "Claridad competitiva", reflection: "Antes dudabas. Ahora confías." }
+    ];
+
+    const act2Options = [
+      { value: "entrenar", label: "Mi forma de entrenar", response: "Ese cambio no es técnico. Es estructural. Y no se pierde.<br><br>Ya no entrenas por rutina. Entrenas con propósito. Cada sesión construye algo que permanece.<br><br><strong>Eso es lo que separa a quien practica de quien se transforma.</strong>" },
+      { value: "competir", label: "Mi manera de competir", response: "Ahora compites desde la intención, no desde la reacción. Eso es madurez competitiva.<br><br>Antes el partido te llevaba. Ahora tú llevas el partido.<br><br><strong>Cuando un jugador elige en lugar de reaccionar, el juego cambia por completo.</strong>" },
+      { value: "error", label: "Mi relación con el error", response: "Cuando el error deja de ser amenaza, se convierte en información. Ya lo sabes.<br><br>El error ya no te paraliza. Te ajusta.<br><br><strong>Los mejores competidores no cometen menos errores. Simplemente no les tienen miedo.</strong>" },
+      { value: "puntos", label: "Mi forma de pensar los puntos", response: "Pensar los puntos es dominar el juego antes de jugarlo. Ahí está tu ventaja.<br><br>Ya no juegas punto por punto esperando que funcione. Diseñas cada uno.<br><br><strong>Cuando puedes pensar el punto, puedes construirlo. Y cuando puedes construirlo, puedes ganarlo.</strong>" },
+      { value: "disciplina", label: "Mi disciplina diaria", response: "La disciplina no es fuerza de voluntad. Es identidad. Y ya la construiste.<br><br>Ya no te cuesta hacer lo que tienes que hacer. Es simplemente lo que haces.<br><br><strong>Cuando la disciplina se vuelve identidad, la constancia deja de ser un esfuerzo.</strong>" }
+    ];
+
+    const act3Options = [
+      { value: "critica", label: "Crítica", response: "Reconocerla ya es un paso. Ahora puedes elegir no seguirla.<br><br>Esa voz crítica seguirá apareciendo. Pero ahora sabes que no tienes que obedecerla.<br><br><strong>No se trata de eliminarla. Se trata de no dejarla decidir por ti.</strong>" },
+      { value: "apurada", label: "Apurada", response: "La urgencia no es velocidad. Es falta de confianza. Ya no la necesitas.<br><br>Cuando juegas apurado, juegas desde el miedo. Cuando juegas rápido con calma, juegas desde el control.<br><br><strong>La velocidad sin urgencia es poder. La urgencia sin velocidad es desesperación.</strong>" },
+      { value: "clara", label: "Clara", response: "Sabes qué hacer incluso en el caos. Eso es dominio interno.<br><br>Cuando el partido se rompe, cuando todo se acelera, tu mente sigue ahí. Presente. Clara.<br><br><strong>La claridad bajo presión no se entrena solo técnicamente. Se construye mentalmente.</strong>" },
+      { value: "tranquila", label: "Tranquila", response: "La calma bajo presión es el arma más poderosa de un competidor.<br><br>No es que no sientas la presión. Es que ya no te controla. Jugar tranquilo no es jugar sin intensidad. Es jugar sin ansiedad.<br><br><strong>Cuando tu voz interna está en calma, tu juego puede ser feroz.</strong>" },
+      { value: "determinada", label: "Determinada", response: "No necesitas dominar, necesitas sostener. Y eso ya lo sabes hacer.<br><br>Determinación no es forzar cada punto. Es sostener tu juego sin importar el marcador.<br><br><strong>Un competidor determinado no es el que gana siempre. Es el que vuelve siempre.</strong>" }
+    ];
+
+    const act4Options = [
+      { value: "nivel", label: "Subir el nivel", response: "Subir el nivel no es hacer más. Es hacer mejor lo que ya sabes.<br><br>El siguiente nivel no está en golpes nuevos. Está en ejecutar con más precisión lo que ya tienes.<br><br><strong>La maestría no es acumular. Es refinar.</strong>" },
+      { value: "consolidar", label: "Consolidar lo aprendido", response: "Consolidar es inteligencia competitiva. No todo es más, a veces es mejor.<br><br>Antes de construir más, asegura los cimientos. Antes de agregar, domina lo esencial.<br><br><strong>Un jugador sólido siempre vencerá a uno disperso.</strong>" },
+      { value: "intencion", label: "Competir con más intención", response: "La intención transforma el juego. Cada punto tiene propósito ahora.<br><br>Ya no juegas a ver qué pasa. Juegas sabiendo qué quieres que pase. Esa claridad cambia todo.<br><br><strong>Cuando sabes lo que buscas, es mucho más fácil encontrarlo.</strong>" },
+      { value: "mentalidad", label: "Fortalecer mi mentalidad", response: "La mentalidad no se construye en un día. Se refuerza cada vez que vuelves.<br><br>Cada sesión donde eliges volver, cada partido donde sostienes, cada error donde ajustas... todo eso es mentalidad.<br><br><strong>La fortaleza mental no es un destino. Es un músculo que entrenas todos los días.</strong>" },
+      { value: "constancia", label: "Construir constancia", response: "La constancia no es motivación. Es estructura. Y ya la tienes.<br><br>La motivación va y viene. La estructura permanece. Ya no dependes de ganas. Dependes de sistema.<br><br><strong>La constancia es lo que convierte talento en resultados.</strong>" }
+    ];
+
+    function createProgressIndicator(activeAct) {
+      return `
+        <div class="progress-indicator">
+          ${[1, 2, 3, 4, 5].map(act => `
+            <div class="progress-dot ${act === activeAct ? 'active' : ''}"></div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    async function renderAct1() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const content = document.getElementById('content');
+      
+      content.innerHTML = `
+        ${createProgressIndicator(1)}
+        <h1>${config.main_title || defaultConfig.main_title}</h1>
+        <div class="message-box ceremonial-pause">
+          <div class="intro-text">${config.act1_intro || defaultConfig.act1_intro}</div>
+          <div class="subtitle">Vas a recorrer 5 áreas clave, una por una, para ver qué sostiene de verdad tu progreso.</div>
+          <div class="areas-container" id="areas"></div>
+        </div>
+        <div class="buttons-container">
+          <button class="btn-primary" id="nextBtn" style="opacity: 0; pointer-events: none;">Seguir</button>
+        </div>
+      `;
+
+      setTimeout(() => {
+        document.querySelector('.content-wrapper').classList.add('visible');
+      }, 100);
+
+      const areasContainer = document.getElementById('areas');
+      
+      areas.forEach((area, index) => {
+        setTimeout(() => {
+          const areaEl = document.createElement('div');
+          areaEl.className = 'area-item';
+          areaEl.innerHTML = `
+            <div class="area-title">${area.title}</div>
+            <div class="area-reflection">"${area.reflection}"</div>
+          `;
+          areasContainer.appendChild(areaEl);
+          
+          setTimeout(() => {
+            areaEl.classList.add('visible');
+          }, 100);
+
+          if (index === areas.length - 1) {
+            setTimeout(() => {
+              const btn = document.getElementById('nextBtn');
+              btn.style.opacity = '1';
+              btn.style.pointerEvents = 'auto';
+              btn.style.transition = 'opacity 0.8s ease';
+            }, 800);
+          }
+        }, index * 600);
+      });
+
+      document.getElementById('nextBtn').onclick = () => {
+        currentAct = 2;
+        transitionToAct(renderAct2);
+      };
+    }
+
+    async function renderAct2() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const content = document.getElementById('content');
+      
+      content.innerHTML = `
+        ${createProgressIndicator(2)}
+        <h1>El momento que te cambió</h1>
+        <div class="message-box">
+          <div class="section-intro">Todo proceso tiene un momento donde algo hace clic.</div>
+          <div class="subtitle">${config.act2_question || defaultConfig.act2_question}</div>
+          <div class="options-container" id="options"></div>
+          <div id="response"></div>
+        </div>
+        <div class="buttons-container">
+          <button class="btn-primary" id="nextBtn" style="display: none;" disabled>Continuar</button>
+        </div>
+      `;
+
+      setTimeout(() => {
+        document.querySelector('.content-wrapper').classList.add('visible');
+      }, 100);
+
+      const optionsContainer = document.getElementById('options');
+      
+      act2Options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = option.label;
+        btn.onclick = () => handleChoice('act2', option, act2Options);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    async function renderAct3() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const content = document.getElementById('content');
+      
+      content.innerHTML = `
+        ${createProgressIndicator(3)}
+        <h1>La voz que te acompaña ahora</h1>
+        <div class="message-box">
+          <div class="section-intro">Cuando juegas bajo presión, siempre hay una voz interna.</div>
+          <div class="subtitle">${config.act3_question || defaultConfig.act3_question}</div>
+          <div class="options-container" id="options"></div>
+          <div id="response"></div>
+        </div>
+        <div class="buttons-container">
+          <button class="btn-primary" id="nextBtn" style="display: none;" disabled>Continuar</button>
+        </div>
+      `;
+
+      setTimeout(() => {
+        document.querySelector('.content-wrapper').classList.add('visible');
+      }, 100);
+
+      const optionsContainer = document.getElementById('options');
+      
+      act3Options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = option.label;
+        btn.onclick = () => handleChoice('act3', option, act3Options);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    async function renderAct4() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const content = document.getElementById('content');
+      
+      content.innerHTML = `
+        ${createProgressIndicator(4)}
+        <h1>El siguiente paso</h1>
+        <div class="message-box">
+          <div class="section-intro">Todo competidor real tiene claro su próximo paso.</div>
+          <div class="subtitle">${config.act4_question || defaultConfig.act4_question}</div>
+          <div class="options-container" id="options"></div>
+          <div id="response"></div>
+        </div>
+        <div class="buttons-container">
+          <button class="btn-primary" id="nextBtn" style="display: none;" disabled>Ver mensaje final</button>
+        </div>
+      `;
+
+      setTimeout(() => {
+        document.querySelector('.content-wrapper').classList.add('visible');
+      }, 100);
+
+      const optionsContainer = document.getElementById('options');
+      
+      act4Options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = option.label;
+        btn.onclick = () => handleChoice('act4', option, act4Options);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    async function renderAct5() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const content = document.getElementById('content');
+      
+      content.innerHTML = `
+        ${createProgressIndicator(5)}
+        <h1>Lo que te llevas de aquí</h1>
+        <div class="message-box ceremonial-pause">
+          <div class="final-message">
+            <strong>${config.final_message || defaultConfig.final_message}</strong>
+          </div>
+          <div class="final-message">
+            Y lo más importante: <strong>ya no dependes de motivación, dependes de estructura.</strong>
+          </div>
+          <div class="final-message" style="margin-top: 2.5rem; padding: 2rem; background: rgba(240, 147, 251, 0.1); border-radius: 15px; border-left: 4px solid #f093fb;">
+            Este camino no termina aquí. <strong>Aquí apenas se vuelve serio.</strong><br><br>
+            Porque ahora tienes algo que no se puede comprar, robar o copiar:<br>
+            <strong style="color: #f5576c; font-size: 1.7rem;">Un sistema que sostiene.</strong>
+          </div>
+          <div class="subtitle" style="margin-top: 2rem; font-size: 1.55rem; color: #f093fb; font-weight: 600; letter-spacing: 0.3px; line-height: 1.35;">
+            Bienvenido al siguiente bloque.
+          </div>
+        </div>
+        <div class="buttons-container">
+          <button class="btn-primary" onclick="location.reload()">Repetir el viaje</button>
+          <button class="btn-secondary btn-bounce-glow" onclick="showFinalClosure()">✨ Gracias por este viaje ✨</button>
+        </div>
+      `;
+
+      setTimeout(() => {
+        document.querySelector('.content-wrapper').classList.add('visible');
+      }, 100);
+    }
+
+    async function renderFinalClosure() {
+      const content = document.getElementById('content');
+      
+      content.innerHTML = `
+        ${createProgressIndicator(5)}
+        <h1 style="font-size: 2.8rem; margin-bottom: 2rem;">Gracias por este viaje</h1>
+        <div class="message-box" style="text-align: left;">
+          <div class="final-message" style="text-align: center; font-size: 1.4rem; margin-bottom: 3rem;">
+            Este bloque no fue un curso. <strong>Fue un proceso de transformación.</strong>
+          </div>
+
+          <div class="area-item visible" style="margin-bottom: 2rem;">
+            <div class="area-title" style="font-size: 1.4rem; text-align: center; margin-bottom: 1.5rem;">📊 Tu crecimiento en números</div>
+            <div style="display: grid; gap: 1.2rem; margin-top: 1.5rem;">
+              <div style="background: rgba(240, 147, 251, 0.1); padding: 1.2rem; border-radius: 10px;">
+                <div style="color: #f093fb; font-weight: 600; font-size: 1.1rem;">5 áreas transformadas</div>
+                <div style="color: #c4c4cc; margin-top: 0.3rem;">Técnica, táctica, mentalidad, físico y claridad competitiva</div>
+              </div>
+              <div style="background: rgba(240, 147, 251, 0.1); padding: 1.2rem; border-radius: 10px;">
+                <div style="color: #f093fb; font-weight: 600; font-size: 1.1rem;">8-12 semanas de trabajo</div>
+                <div style="color: #c4c4cc; margin-top: 0.3rem;">De entrenamiento sostenido, constante y con propósito</div>
+              </div>
+              <div style="background: rgba(240, 147, 251, 0.1); padding: 1.2rem; border-radius: 10px;">
+                <div style="color: #f093fb; font-weight: 600; font-size: 1.1rem;">100% de compromiso</div>
+                <div style="color: #c4c4cc; margin-top: 0.3rem;">Llegaste hasta aquí porque decidiste no rendirte</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="area-item visible" style="margin-bottom: 2rem;">
+            <div class="area-title" style="font-size: 1.4rem; text-align: center; margin-bottom: 1.5rem;">🎯 Las etapas que atravesaste</div>
+            <div style="display: grid; gap: 1rem; margin-top: 1.5rem;">
+              <div style="border-left: 3px solid #f093fb; padding-left: 1.2rem;">
+                <div style="color: #f093fb; font-weight: 600;">Etapa 1: El despertar</div>
+                <div style="color: #c4c4cc; font-size: 0.95rem; margin-top: 0.3rem;">Reconociste que había otra forma de entrenar y competir</div>
+              </div>
+              <div style="border-left: 3px solid #f093fb; padding-left: 1.2rem;">
+                <div style="color: #f093fb; font-weight: 600;">Etapa 2: La incomodidad</div>
+                <div style="color: #c4c4cc; font-size: 0.95rem; margin-top: 0.3rem;">Saliste de tu zona de confort y enfrentaste tus límites</div>
+              </div>
+              <div style="border-left: 3px solid #f093fb; padding-left: 1.2rem;">
+                <div style="color: #f093fb; font-weight: 600;">Etapa 3: La construcción</div>
+                <div style="color: #c4c4cc; font-size: 0.95rem; margin-top: 0.3rem;">Cada sesión sumó. Cada error te enseñó. Cada punto tuvo sentido.</div>
+              </div>
+              <div style="border-left: 3px solid #f093fb; padding-left: 1.2rem;">
+                <div style="color: #f093fb; font-weight: 600;">Etapa 4: La integración</div>
+                <div style="color: #c4c4cc; font-size: 0.95rem; margin-top: 0.3rem;">Ya no piensas en cada golpe. Ahora fluyes con intención.</div>
+              </div>
+              <div style="border-left: 3px solid #f5576c; padding-left: 1.2rem;">
+                <div style="color: #f5576c; font-weight: 600;">Etapa 5: La identidad</div>
+                <div style="color: #c4c4cc; font-size: 0.95rem; margin-top: 0.3rem;">Ya no entrenas para ser mejor. Eres mejor porque así entrenas.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="response-box visible" style="margin-top: 2.5rem; text-align: center;">
+            <div style="font-size: 1.5rem; line-height: 2; color: #e1e1e6;">
+              <strong style="color: #f093fb; font-size: 1.7rem;">Lo que lograste no se mide en puntos ganados.</strong>
+            </div>
+            <div style="font-size: 1.3rem; line-height: 1.9; margin-top: 1.5rem; color: #d1d1d6;">
+              Se mide en cómo piensas antes de jugar.<br>
+              En cómo reaccionas cuando pierdes.<br>
+              En cómo entrenas cuando nadie te ve.<br>
+              En cómo sostienes tu juego bajo presión.
+            </div>
+          </div>
+
+          <div class="final-message" style="text-align: center; margin-top: 3rem; font-size: 1.4rem;">
+            <strong>Gracias por confiar en este proceso.</strong><br>
+            <span style="color: #b8b8c3;">Gracias por no rendirte cuando fue difícil.</span><br>
+            <span style="color: #b8b8c3;">Gracias por elegir la constancia sobre la intensidad.</span><br>
+            <span style="color: #b8b8c3;">Gracias por creer que eras capaz antes de serlo.</span>
+          </div>
+
+          <div class="area-item visible" style="margin-top: 3rem; background: linear-gradient(135deg, rgba(240, 147, 251, 0.2) 0%, rgba(245, 87, 108, 0.2) 100%); border: 2px solid rgba(240, 147, 251, 0.5);">
+            <div class="area-title" style="font-size: 1.8rem; text-align: center; margin-bottom: 1.5rem;">💎 El mensaje que te llevas</div>
+            <div style="font-size: 1.3rem; line-height: 2.2; color: #e1e1e6; text-align: center; padding: 0 1rem;">
+              <strong style="color: #f093fb; font-size: 1.5rem; display: block; margin-bottom: 1.5rem;">Este bloque termina. Tu transformación no.</strong>
+              
+              <div style="margin: 2rem 0; padding: 1.5rem; background: rgba(0, 0, 0, 0.2); border-radius: 12px;">
+                Lo que construiste aquí no es temporal.<br>
+                <strong style="color: #f5576c;">Es permanente.</strong>
+              </div>
+
+              <div style="text-align: left; max-width: 600px; margin: 2rem auto; line-height: 2;">
+                <div style="margin-bottom: 1.2rem; padding-left: 1rem; border-left: 3px solid #f093fb;">
+                  Cuando el siguiente bloque te ponga a prueba...<br>
+                  <strong style="color: #f093fb;">Recuerda esto.</strong>
+                </div>
+                <div style="margin-bottom: 1.2rem; padding-left: 1rem; border-left: 3px solid #f5576c;">
+                  Cuando alguien cuestione tu proceso...<br>
+                  <strong style="color: #f5576c;">No lo sueltes.</strong>
+                </div>
+                <div style="padding-left: 1rem; border-left: 3px solid #f093fb;">
+                  Cuando el juego se ponga difícil...<br>
+                  <strong style="color: #f093fb;">Sostén lo que aprendiste.</strong>
+                </div>
+              </div>
+
+              <div style="margin: 2.5rem 0; font-size: 1.4rem; line-height: 2.2; color: #ffffff;">
+                Porque ahora ya sabes algo que muy pocos descubren:
+              </div>
+
+              <div style="background: linear-gradient(135deg, rgba(240, 147, 251, 0.3) 0%, rgba(245, 87, 108, 0.3) 100%); padding: 2rem; border-radius: 15px; margin: 2rem 0;">
+                <strong style="font-size: 1.7rem; color: #f093fb; display: block; margin-bottom: 0.8rem;">No eres quien eras.</strong>
+                <strong style="font-size: 1.7rem; color: #f5576c; display: block; margin-bottom: 1.5rem;">Eres un competidor que sostiene.</strong>
+                <div style="font-size: 1.2rem; color: #d1d1d6; margin-top: 1.5rem; font-style: italic;">
+                  Y eso, en el largo plazo, es lo que define a los grandes.
+                </div>
+              </div>
+
+              <div style="margin-top: 2.5rem; font-size: 1.35rem; color: #b8b8c3;">
+                Gracias por confiar.<br>
+                Gracias por sostener.<br>
+                <strong style="color: #f093fb; font-size: 1.5rem;">Gracias por transformarte.</strong>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="buttons-container" style="margin-top: 3rem;">
+          <button class="btn-primary" onclick="location.reload()" style="font-size: 1.2rem; padding: 1.3rem 4rem;">Volver al inicio</button>
+        </div>
+      `;
+
+      setTimeout(() => {
+        document.querySelector('.content-wrapper').classList.add('visible');
+      }, 100);
+    }
+
+    function showFinalClosure() {
+      transitionToAct(renderFinalClosure);
+    }
+
+    function handleChoice(act, option, allOptions) {
+      userChoices[act] = option;
+      
+      const buttons = document.querySelectorAll('.option-btn');
+      buttons.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.remove('selected');
+        if (btn.textContent === option.label) {
+          btn.classList.add('selected');
+        }
+      });
+
+      const responseDiv = document.getElementById('response');
+      responseDiv.innerHTML = `<div class="response-box">${option.response}</div>`;
+      
+      setTimeout(() => {
+        const responseBox = responseDiv.querySelector('.response-box');
+        if (responseBox) {
+          responseBox.classList.add('visible');
+        }
+      }, 200);
+
+      setTimeout(() => {
+        const nextBtn = document.getElementById('nextBtn');
+        nextBtn.style.display = 'inline-block';
+        nextBtn.disabled = false;
+        
+        if (act === 'act2') {
+          nextBtn.onclick = () => {
+            currentAct = 3;
+            transitionToAct(renderAct3);
+          };
+        } else if (act === 'act3') {
+          nextBtn.onclick = () => {
+            currentAct = 4;
+            transitionToAct(renderAct4);
+          };
+        } else if (act === 'act4') {
+          nextBtn.onclick = () => {
+            currentAct = 5;
+            transitionToAct(renderAct5);
+          };
+        }
+      }, 1000);
+    }
+
+    function transitionToAct(renderFunction) {
+      const wrapper = document.querySelector('.content-wrapper');
+      wrapper.classList.remove('visible');
+      wrapper.classList.add('fade-out');
+      
+      setTimeout(() => {
+        wrapper.classList.remove('fade-out');
+        renderFunction();
+        acScrollToTop();
+      }, 700);
+    }
+
+    function resetJourney() {
+      currentAct = 1;
+      userChoices = {};
+      transitionToAct(renderAct1);
+    }
+
+    async function onConfigChange(config) {
+      const titleElement = document.querySelector('h1');
+      if (titleElement && currentAct === 1) {
+        titleElement.textContent = config.main_title || defaultConfig.main_title;
+      }
+
+      const subtitles = document.querySelectorAll('.subtitle');
+      subtitles.forEach(subtitle => {
+        const hasOptions = subtitle.parentElement && subtitle.parentElement.querySelector('.options-container');
+        if (currentAct === 2 && hasOptions) {
+          subtitle.textContent = config.act2_question || defaultConfig.act2_question;
+        } else if (currentAct === 3 && hasOptions) {
+          subtitle.textContent = config.act3_question || defaultConfig.act3_question;
+        } else if (currentAct === 4 && hasOptions) {
+          subtitle.textContent = config.act4_question || defaultConfig.act4_question;
+        }
+      });
+
+      const introTexts = document.querySelectorAll('.intro-text');
+      if (introTexts.length > 0 && currentAct === 1) {
+        introTexts[0].textContent = config.act1_intro || defaultConfig.act1_intro;
+      }
+
+      const finalMessages = document.querySelectorAll('.final-message strong');
+      if (finalMessages.length > 0 && currentAct === 5) {
+        finalMessages[0].textContent = config.final_message || defaultConfig.final_message;
+      }
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["main_title", config.main_title || defaultConfig.main_title],
+          ["act1_intro", config.act1_intro || defaultConfig.act1_intro],
+          ["act2_question", config.act2_question || defaultConfig.act2_question],
+          ["act3_question", config.act3_question || defaultConfig.act3_question],
+          ["act4_question", config.act4_question || defaultConfig.act4_question],
+          ["final_message", config.final_message || defaultConfig.final_message]
+        ])
+      });
+    }
+
+    // Inicialización cuando el DOM está listo
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', renderAct1);
+    } else {
+      renderAct1();
+    }
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) { acScrollToTop(); return; }
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+    try { window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' }); } catch (e) { window.scrollTo(0, Math.max(0, top)); }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () { window.scrollTo(0, 0); });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>

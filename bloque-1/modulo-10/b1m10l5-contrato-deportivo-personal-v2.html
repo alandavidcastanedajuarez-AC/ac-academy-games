@@ -1,0 +1,1183 @@
+﻿<!doctype html>
+<html lang="es" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contrato Deportivo Personal</title>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+    
+    .slide-in {
+      animation: slideIn 0.5s ease-out forwards;
+    }
+    
+    .option-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .option-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    }
+    
+    .option-card.selected {
+      border-width: 3px;
+    }
+    
+    .contract-signature {
+      font-family: 'Brush Script MT', cursive;
+      font-size: 2rem;
+    }
+
+    .mobile-screen {
+      min-height: 100vh;
+      display: block;
+      padding: 1.25rem 1rem 2rem;
+      background: linear-gradient(135deg, var(--bg-color, #0f172a) 0%, #1e293b 100%);
+    }
+
+    .mobile-shell {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .mobile-card {
+      border-radius: 24px;
+      padding: 1.25rem;
+    }
+
+    .mobile-stack > * + * {
+      margin-top: 1rem;
+    }
+
+    .phase-options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .mobile-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      justify-content: center;
+    }
+
+    .mobile-note {
+      font-size: 0.95rem;
+      opacity: 0.78;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-screen {
+        padding: 1rem 0.85rem 1.6rem;
+      }
+
+      .mobile-card {
+        border-radius: 20px;
+        padding: 1rem;
+      }
+
+      .phase-options-grid,
+      .contract-grid,
+      .date-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .mobile-actions {
+        flex-direction: column;
+      }
+
+      .mobile-actions button {
+        width: 100%;
+      }
+
+      .compact-copy {
+        font-size: 0.98rem !important;
+        line-height: 1.55 !important;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body { font-size: 16px; }
+    .container, .game-container, .game-wrapper, .app-wrapper, .app-container, .main-wrapper, .stage-wrapper, .phase-container, .phase-card, .content, .content-area, .modal-content, .results-card, .scene, .phase-content { padding: 16px !important; }
+    h1, .main-title, .game-title, .title { font-size: clamp(1.8rem, 7vw, 2.3rem) !important; line-height: 1.15 !important; }
+    h2, .phase-title, .stage-title, .final-title, .section-title { font-size: clamp(1.3rem, 6vw, 1.7rem) !important; line-height: 1.25 !important; }
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label { font-size: clamp(1rem, 4.5vw, 1.15rem) !important; line-height: 1.4 !important; }
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text, .intro-message, .quote { font-size: 1rem !important; line-height: 1.55 !important; }
+    .button-group, .action-buttons, .final-buttons, .controls-row { flex-direction: column !important; gap: 12px !important; }
+    button, .btn, .btn-primary, .btn-secondary, .action-button, .option-btn { width: 100% !important; }
+    .zone-grid, .scenario-grid, .options-grid, .results-stats { grid-template-columns: 1fr !important; }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || { init: async function () { return { isOk: true, value: null }; }, on: function () {}, emit: function () { return { isOk: true, value: null }; }, setConfig: function () {}, config: {} };
+  window.dataSdk = window.dataSdk || { init: async function () { return { isOk: true, value: null }; }, create: async function () { return { isOk: true, value: null }; }, list: async function () { return { isOk: true, value: [] }; }, update: async function () { return { isOk: true, value: null }; } };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body class="h-full">
+  <div id="app-wrapper" class="h-full w-full overflow-auto">
+   <div id="game-container" class="min-h-full w-full"></div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "Contrato Deportivo Personal",
+      welcome_message: "Define tu camino y deja por escrito el compromiso que sí vas a sostener.",
+      background_color: "#0f172a",
+      card_color: "#1e293b",
+      primary_color: "#3b82f6",
+      text_color: "#f1f5f9",
+      accent_color: "#10b981"
+    };
+
+    let gameState = {
+      phase: 'welcome',
+      playerName: '',
+      currentStage: '',
+      mainFocus: '',
+      technicalCommitment: '',
+      mentalCommitment: '',
+      physicalCommitment: '',
+      duration: ''
+    };
+
+    const phases = {
+      welcome: {
+        title: "Contrato Deportivo Personal",
+        subtitle: "Un competidor mejora cuando elige un rumbo claro y decide sostenerlo.",
+        principle: "Este contrato baja tus ideas a decisiones y compromisos concretos."
+      },
+      phase1: {
+        title: "🟦 FASE 1: Reconoce dónde estás",
+        subtitle: "Un contrato empieza aceptando la realidad, no idealizándola.",
+        instruction: "Elige la opción que mejor representa tu situación actual como deportista:",
+        principle: "Aceptar dónde estás te ahorra años de confusión.",
+        options: [
+          { 
+            value: "base", 
+            label: "Estoy construyendo mi base", 
+            emoji: "🌱",
+            description: "Estás en fase de aprendizaje fundamental, desarrollando técnica básica y comprendiendo los fundamentos del deporte."
+          },
+          { 
+            value: "regular", 
+            label: "Estoy compitiendo con regularidad", 
+            emoji: "⚡",
+            description: "Ya compites de forma consistente, tienes experiencia en torneos y buscas mejorar tu rendimiento competitivo."
+          },
+          { 
+            value: "nivel", 
+            label: "Quiero subir de nivel competitivo", 
+            emoji: "🚀",
+            description: "Tienes experiencia consolidada y buscas dar el salto a un nivel superior de competición o excelencia."
+          }
+        ]
+      },
+      phase2: {
+        title: "🟩 FASE 2: Define tu enfoque principal",
+        subtitle: "Los competidores que progresan tienen un foco dominante por etapa.",
+        instruction: "Elige tu prioridad principal para los próximos meses. Un solo enfoque, ejecutado con excelencia:",
+        principle: "Cuando todo es prioridad, nada lo es.",
+        options: [
+          { 
+            value: "tecnica", 
+            label: "Técnica y control", 
+            emoji: "🎯",
+            description: "Perfeccionar la ejecución de golpes, mejorar consistencia, reducir errores no forzados y dominar fundamentos técnicos."
+          },
+          { 
+            value: "tactica", 
+            label: "Decisión táctica", 
+            emoji: "🧠",
+            description: "Leer el juego, tomar mejores decisiones bajo presión, desarrollar patrones ganadores y estrategia de partido."
+          },
+          { 
+            value: "mental", 
+            label: "Fortaleza mental", 
+            emoji: "💪",
+            description: "Control emocional, resiliencia en momentos clave, manejo de presión y desarrollo de mentalidad ganadora."
+          },
+          { 
+            value: "fisica", 
+            label: "Preparación física y hábitos", 
+            emoji: "🏃",
+            description: "Condición física, velocidad, resistencia, fuerza, y hábitos de recuperación, nutrición y descanso."
+          }
+        ]
+      },
+      phase3_technical: {
+        title: "🟨 FASE 3A: Compromiso Técnico",
+        subtitle: "Un compromiso no es una intención. Es una acción repetible.",
+        instruction: "Elige UN compromiso técnico específico que sostendrás durante todo el período:",
+        principle: "Pocos compromisos bien elegidos vencen a muchos mal definidos.",
+        options: [
+          { 
+            value: "margen", 
+            label: "Jugar con más margen", 
+            emoji: "📏",
+            description: "Aumentar altura y profundidad en los golpes, reducir riesgos innecesarios, priorizar consistencia sobre agresividad."
+          },
+          { 
+            value: "ritmo", 
+            label: "Mantener ritmo", 
+            emoji: "🎵",
+            description: "Controlar el tempo del juego, establecer un patrón constante, no dejarse acelerar ni desacelerar por el rival."
+          },
+          { 
+            value: "saque", 
+            label: "Mejorar control del saque", 
+            emoji: "🎾",
+            description: "Aumentar porcentaje de primeros saques, variar colocaciones, convertir el saque en un arma táctica confiable."
+          },
+          { 
+            value: "red", 
+            label: "Subir a la red con criterio", 
+            emoji: "⬆️",
+            description: "Identificar momentos correctos para avanzar, mejorar volea y remate, acortar puntos con inteligencia."
+          }
+        ]
+      },
+      phase3_mental: {
+        title: "🟨 FASE 3B: Compromiso Mental",
+        subtitle: "La fortaleza mental se construye con acciones concretas.",
+        instruction: "Elige UN compromiso mental que aplicarás consistentemente:",
+        principle: "Tu mente es tu ventaja competitiva más importante.",
+        options: [
+          { 
+            value: "respirar", 
+            label: "Respirar antes de puntos clave", 
+            emoji: "🌬️",
+            description: "Practicar respiración consciente antes de saques, restos importantes y situaciones de presión."
+          },
+          { 
+            value: "aceptar", 
+            label: "Aceptar errores sin reaccionar", 
+            emoji: "🧘",
+            description: "Eliminar reacciones negativas, mantener lenguaje corporal positivo, soltar puntos perdidos inmediatamente."
+          },
+          { 
+            value: "punto", 
+            label: "Jugar punto a punto", 
+            emoji: "🎯",
+            description: "Enfoque total en el punto presente, sin pensar en marcador ni resultado, concentración momento a momento."
+          },
+          { 
+            value: "confiar", 
+            label: "Confiar en mi plan", 
+            emoji: "✨",
+            description: "Ejecutar estrategia preparada sin dudar, evitar cambios reactivos, mantener identidad de juego bajo presión."
+          }
+        ]
+      },
+      phase3_physical: {
+        title: "🟨 FASE 3C: Compromiso Físico / Hábitos",
+        subtitle: "Tu cuerpo es tu herramienta de trabajo.",
+        instruction: "Elige UN hábito físico que implementarás diariamente:",
+        principle: "Los pequeños hábitos crean grandes resultados.",
+        options: [
+          { 
+            value: "dormir", 
+            label: "Dormir mejor", 
+            emoji: "😴",
+            description: "Establecer horario fijo de sueño, 7-8 horas diarias, crear rutina pre-sueño, priorizar recuperación nocturna."
+          },
+          { 
+            value: "hidratar", 
+            label: "Hidratarme conscientemente", 
+            emoji: "💧",
+            description: "Beber agua constantemente, antes/durante/después del entrenamiento, monitorear hidratación, evitar deshidratación."
+          },
+          { 
+            value: "calentar", 
+            label: "Calentar siempre", 
+            emoji: "🔥",
+            description: "Realizar calentamiento completo antes de cada sesión, movilidad articular, activación muscular, preparación específica."
+          },
+          { 
+            value: "recuperar", 
+            label: "Recuperarme activamente", 
+            emoji: "🔄",
+            description: "Estiramientos post-entrenamiento, rodillo de espuma, descanso activo, cuidado muscular y prevención de lesiones."
+          }
+        ]
+      },
+      phase4: {
+        title: "🟧 FASE 4: El plazo y la responsabilidad",
+        subtitle: "Un compromiso sin plazo se convierte en excusa.",
+        instruction: "Elige la duración de tu contrato. Sé realista pero ambicioso:",
+        principle: "El tiempo da seriedad al proceso.",
+        options: [
+          { 
+            value: "2weeks", 
+            label: "2 semanas", 
+            emoji: "📅",
+            description: "Período corto ideal para probar nuevos hábitos o corregir aspectos específicos con feedback rápido."
+          },
+          { 
+            value: "1month", 
+            label: "1 mes", 
+            emoji: "📆",
+            description: "Tiempo suficiente para consolidar cambios técnicos o mentales y ver resultados medibles."
+          },
+          { 
+            value: "6weeks", 
+            label: "6 semanas", 
+            emoji: "🗓️",
+            description: "Período óptimo para transformaciones físicas y cambios profundos en patrones de juego."
+          },
+          { 
+            value: "3months", 
+            label: "3 meses", 
+            emoji: "📊",
+            description: "Compromiso serio para saltos de nivel, preparación de temporada o cambios estructurales completos."
+          }
+        ]
+      }
+    };
+
+    function render() {
+      const container = document.getElementById('game-container');
+      const config = window.elementSdk?.config || defaultConfig;
+      
+      if (gameState.phase === 'welcome') {
+        container.innerHTML = renderWelcome(config);
+      } else if (gameState.phase === 'name') {
+        container.innerHTML = renderNameInput(config);
+      } else if (gameState.phase === 'contract') {
+        container.innerHTML = renderContract(config);
+      } else if (gameState.phase === 'final') {
+        container.innerHTML = renderFinalMessage(config);
+      } else if (gameState.phase === 'recommendations') {
+        container.innerHTML = renderRecommendations(config);
+      } else if (gameState.phase.startsWith('phase')) {
+        container.innerHTML = renderPhase(config);
+      }
+      
+      attachEventListeners();
+    }
+
+    function renderWelcome(config) {
+      const phase = phases.welcome;
+      return `
+        <div class="mobile-screen" style="--bg-color: ${config.background_color};">
+          <div class="mobile-shell fade-in">
+            <div class="text-center" style="margin-bottom: 1.5rem;">
+              <div class="text-6xl mb-4">📝</div>
+              <h1 class="text-5xl font-bold mb-3" style="color: ${config.text_color}; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                ${config.game_title}
+              </h1>
+              <p class="text-xl compact-copy" style="color: ${config.text_color}; opacity: 0.9; margin-bottom: 0;">
+                ${config.welcome_message}
+              </p>
+            </div>
+            
+            <div class="mobile-card mb-6" style="background-color: ${config.card_color};">
+              <p class="text-lg compact-copy" style="color: ${config.text_color}; margin-bottom: 0.9rem;">
+                ${phase.subtitle}
+              </p>
+              <div class="border-l-4 pl-4 py-2" style="border-color: ${config.primary_color};">
+                <p class="text-lg italic compact-copy" style="color: ${config.accent_color}; margin: 0;">
+                  ${phase.principle}
+                </p>
+              </div>
+            </div>
+            
+            <div class="mobile-actions">
+              <button id="start-btn" class="px-12 py-4 rounded-xl text-xl font-bold transition-all transform hover:scale-105" style="background-color: ${config.primary_color}; color: white;">
+                Comenzar contrato
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderNameInput(config) {
+      return `
+        <div class="mobile-screen" style="--bg-color: ${config.background_color};">
+          <div class="mobile-shell fade-in" style="max-width: 640px;">
+            <div class="text-center" style="margin-bottom: 1.25rem;">
+              <div class="text-5xl mb-4">✍️</div>
+              <h2 class="text-4xl font-bold mb-4" style="color: ${config.text_color};">
+                ¿Cuál es tu nombre?
+              </h2>
+              <p class="text-lg compact-copy" style="color: ${config.text_color}; opacity: 0.8;">
+                Este contrato será personal, concreto y fácil de revisar.
+              </p>
+            </div>
+            
+            <div class="mobile-card" style="background-color: ${config.card_color};">
+              <label for="player-name" class="block text-lg font-semibold mb-3" style="color: ${config.text_color};">
+                Tu nombre completo
+              </label>
+              <input 
+                type="text" 
+                id="player-name" 
+                placeholder="Escribe tu nombre aquí"
+                class="w-full px-6 py-4 rounded-xl text-lg mb-2"
+                style="background-color: ${config.background_color}; color: ${config.text_color}; border: 2px solid ${config.primary_color};"
+              />
+              <p id="name-error" class="text-sm mb-4 hidden" style="color: #ef4444;">
+                Por favor, ingresa un nombre válido (mínimo 3 caracteres)
+              </p>
+              <button id="continue-name-btn" class="w-full px-8 py-4 rounded-xl text-xl font-bold transition-all" style="background-color: ${config.primary_color}; color: white;">
+                Continuar
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPhase(config) {
+      let phaseKey = gameState.phase;
+      const phase = phases[phaseKey];
+      
+      return `
+        <div class="mobile-screen" style="--bg-color: ${config.background_color};">
+          <div class="mobile-shell" style="max-width: 920px;">
+            <div class="text-center fade-in" style="margin-bottom: 1.25rem;">
+              <h2 class="text-4xl font-bold mb-4" style="color: ${config.text_color};">
+                ${phase.title}
+              </h2>
+              <p class="text-xl compact-copy" style="color: ${config.text_color}; opacity: 0.9; margin-bottom: 0.75rem;">
+                ${phase.subtitle}
+              </p>
+              <p class="text-lg compact-copy" style="color: ${config.text_color}; opacity: 0.8; margin-bottom: 0.85rem;">
+                ${phase.instruction}
+              </p>
+              <div class="inline-block rounded-xl px-4 py-3" style="background-color: ${config.card_color};">
+                <p class="text-lg italic compact-copy" style="color: ${config.accent_color};">
+                  💡 ${phase.principle}
+                </p>
+              </div>
+            </div>
+            
+            <div class="phase-options-grid mb-8">
+              ${phase.options.map((option, index) => `
+                <div class="option-card mobile-card border-2 slide-in" 
+                     style="background-color: ${config.card_color}; border-color: ${config.primary_color}; animation-delay: ${index * 0.1}s;"
+                     data-value="${option.value}">
+                  <div class="text-4xl mb-3 text-center">${option.emoji}</div>
+                  <h3 class="text-xl font-bold mb-2 text-center" style="color: ${config.text_color};">
+                    ${option.label}
+                  </h3>
+                  <p class="text-sm leading-relaxed compact-copy" style="color: ${config.text_color}; opacity: 0.8; margin: 0;">
+                    ${option.description}
+                  </p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderContract(config) {
+      const startDate = new Date();
+      const durationDays = {
+        '2weeks': 14,
+        '1month': 30,
+        '6weeks': 42,
+        '3months': 90
+      };
+      
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + durationDays[gameState.duration]);
+      
+      const formatDate = (date) => date.toLocaleDateString('es-ES', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      
+      return `
+        <div class="mobile-screen" style="--bg-color: ${config.background_color};">
+          <div class="mobile-shell" style="max-width: 820px;">
+            <div class="rounded-3xl shadow-2xl fade-in mobile-card" style="background-color: ${config.card_color}; border: 4px solid ${config.accent_color};">
+              
+              <div class="text-center mb-8 pb-6 border-b-2" style="border-color: ${config.primary_color};">
+                <div class="text-6xl mb-4">🏆</div>
+                <h2 class="text-4xl font-bold mb-3" style="color: ${config.text_color};">
+                  CONTRATO DEPORTIVO PERSONAL
+                </h2>
+                <p class="text-lg" style="color: ${config.text_color}; opacity: 0.7;">
+                  Documento de Compromiso Deportivo
+                </p>
+              </div>
+              
+              <div class="mobile-stack mb-8">
+                
+                <div class="rounded-xl p-5" style="background-color: ${config.background_color};">
+                  <p class="text-sm uppercase tracking-wide mb-3" style="color: ${config.accent_color}; font-weight: 600;">
+                    📋 DATOS DEL DEPORTISTA
+                  </p>
+                  <div class="space-y-2">
+                    <p class="text-2xl font-bold" style="color: ${config.text_color};">
+                      ${gameState.playerName}
+                    </p>
+                    <p class="text-md" style="color: ${config.text_color}; opacity: 0.8;">
+                      Etapa: ${getLabelForValue('phase1', gameState.currentStage)}
+                    </p>
+                  </div>
+                </div>
+                
+                <div class="rounded-xl p-5" style="background-color: ${config.background_color};">
+                  <p class="text-sm uppercase tracking-wide mb-3" style="color: ${config.accent_color}; font-weight: 600;">
+                    🎯 ENFOQUE PRINCIPAL
+                  </p>
+                  <p class="text-xl font-semibold" style="color: ${config.text_color};">
+                    ${getLabelForValue('phase2', gameState.mainFocus)}
+                  </p>
+                  <p class="text-sm mt-2" style="color: ${config.text_color}; opacity: 0.7;">
+                    ${getDescriptionForValue('phase2', gameState.mainFocus)}
+                  </p>
+                </div>
+                
+                <div class="rounded-xl p-5" style="background-color: ${config.background_color};">
+                  <p class="text-sm uppercase tracking-wide mb-4" style="color: ${config.accent_color}; font-weight: 600;">
+                    ✅ MIS TRES COMPROMISOS
+                  </p>
+                  <div class="space-y-4">
+                    <div class="flex items-start border-l-4 pl-4" style="border-color: ${config.primary_color};">
+                      <span class="text-3xl mr-3">🎯</span>
+                      <div>
+                        <p class="font-bold text-lg" style="color: ${config.text_color};">Compromiso Técnico</p>
+                        <p class="text-md" style="color: ${config.text_color}; opacity: 0.9;">
+                          ${getLabelForValue('phase3_technical', gameState.technicalCommitment)}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex items-start border-l-4 pl-4" style="border-color: ${config.primary_color};">
+                      <span class="text-3xl mr-3">🧠</span>
+                      <div>
+                        <p class="font-bold text-lg" style="color: ${config.text_color};">Compromiso Mental</p>
+                        <p class="text-md" style="color: ${config.text_color}; opacity: 0.9;">
+                          ${getLabelForValue('phase3_mental', gameState.mentalCommitment)}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex items-start border-l-4 pl-4" style="border-color: ${config.primary_color};">
+                      <span class="text-3xl mr-3">💪</span>
+                      <div>
+                        <p class="font-bold text-lg" style="color: ${config.text_color};">Compromiso Físico</p>
+                        <p class="text-md" style="color: ${config.text_color}; opacity: 0.9;">
+                          ${getLabelForValue('phase3_physical', gameState.physicalCommitment)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="rounded-xl p-5" style="background-color: ${config.background_color};">
+                  <p class="text-sm uppercase tracking-wide mb-3" style="color: ${config.accent_color}; font-weight: 600;">
+                    📅 PLAZO DE CUMPLIMIENTO
+                  </p>
+                  <div class="grid grid-cols-2 gap-4 date-grid">
+                    <div>
+                      <p class="text-sm" style="color: ${config.text_color}; opacity: 0.7;">Inicio</p>
+                      <p class="text-lg font-semibold" style="color: ${config.text_color};">
+                        ${formatDate(startDate)}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm" style="color: ${config.text_color}; opacity: 0.7;">Finalización</p>
+                      <p class="text-lg font-semibold" style="color: ${config.text_color};">
+                        ${formatDate(endDate)}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="mt-3 pt-3 border-t" style="border-color: ${config.primary_color};">
+                    <p class="text-md font-bold" style="color: ${config.text_color};">
+                      Duración total: ${getLabelForValue('phase4', gameState.duration)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="border-t-2 pt-6 mb-6" style="border-color: ${config.primary_color};">
+                <p class="text-center text-xl mb-2 font-semibold" style="color: ${config.accent_color};">
+                  "Este contrato no es con un entrenador."
+                </p>
+                <p class="text-center text-xl font-semibold" style="color: ${config.accent_color};">
+                  "Es contigo."
+                </p>
+              </div>
+              
+              <div class="mobile-actions">
+                <button id="sign-btn" class="px-12 py-5 rounded-xl text-xl font-bold transition-all transform hover:scale-105 shadow-lg" style="background-color: ${config.accent_color}; color: white;">
+                  ✍️ Firmar mi contrato
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderFinalMessage(config) {
+      return `
+        <div class="mobile-screen" style="--bg-color: ${config.background_color};">
+          <div class="mobile-shell text-center fade-in" style="max-width: 720px;">
+            <div class="text-7xl mb-6">✅</div>
+            <h2 class="text-5xl font-bold mb-6" style="color: ${config.text_color};">
+              ¡Contrato firmado!
+            </h2>
+            <div class="mobile-card mb-6" style="background-color: ${config.card_color};">
+              <p class="text-2xl leading-relaxed compact-copy" style="color: ${config.accent_color};">
+                "El verdadero cambio no ocurre cuando entiendes más,<br>
+                sino cuando te comprometes mejor."
+              </p>
+            </div>
+            <p class="text-xl compact-copy mb-6" style="color: ${config.text_color};">
+              Has cerrado una etapa de aprendizaje.<br>
+              Ahora comienza la etapa de aplicación.
+            </p>
+            <div class="mobile-actions">
+              <button id="recommendations-btn" class="w-full px-10 py-5 rounded-xl text-xl font-bold transition-all transform hover:scale-105 shadow-lg" style="background-color: ${config.accent_color}; color: white;">
+                📋 Ver recomendaciones clave
+              </button>
+              <button id="reset-btn" class="px-10 py-4 rounded-xl text-lg font-bold transition-all" style="background-color: ${config.primary_color}; color: white;">
+                Crear nuevo contrato
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRecommendations(config) {
+      const recommendations = generateRecommendations();
+      
+      return `
+        <div class="mobile-screen" style="--bg-color: ${config.background_color};">
+          <div class="mobile-shell" style="max-width: 900px;">
+            <div class="text-center mb-8 fade-in">
+              <div class="text-6xl mb-4">🎯</div>
+              <h2 class="text-4xl font-bold mb-4" style="color: ${config.text_color};">
+                Recomendaciones Personalizadas
+              </h2>
+              <p class="text-xl compact-copy" style="color: ${config.text_color}; opacity: 0.9;">
+                Te dejo lo esencial para que tu contrato sí se sostenga en cancha y fuera de ella.
+              </p>
+            </div>
+
+            <div class="mobile-card mb-6" style="background-color: ${config.card_color};">
+              <div class="flex items-center mb-6">
+                <div class="text-4xl mr-4">👤</div>
+                <div>
+                  <h3 class="text-2xl font-bold" style="color: ${config.text_color};">${gameState.playerName}</h3>
+                  <p style="color: ${config.text_color}; opacity: 0.7;">${getLabelForValue('phase1', gameState.currentStage)}</p>
+                </div>
+              </div>
+              <div class="inline-block px-4 py-2 rounded-lg" style="background-color: ${config.accent_color};">
+                <p class="font-bold" style="color: white;">Enfoque: ${getLabelForValue('phase2', gameState.mainFocus)}</p>
+              </div>
+            </div>
+
+            ${recommendations.map((section, index) => `
+              <div class="mobile-card mb-6 slide-in" style="background-color: ${config.card_color}; animation-delay: ${index * 0.15}s;">
+                <div class="flex items-center mb-6">
+                  <div class="text-4xl mr-4">${section.icon}</div>
+                  <h3 class="text-2xl font-bold" style="color: ${config.accent_color};">
+                    ${section.title}
+                  </h3>
+                </div>
+                <div class="space-y-4">
+                  ${section.items.slice(0, 3).map(item => `
+                    <div class="border-l-4 pl-6 py-3" style="border-color: ${config.primary_color};">
+                      <p class="text-lg leading-relaxed compact-copy" style="color: ${config.text_color};">
+                        ${item}
+                      </p>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `).join('')}
+
+            <div class="mobile-card mb-8" style="background-color: ${config.card_color}; border: 3px solid ${config.accent_color};">
+              <div class="text-center">
+                <div class="text-5xl mb-6">💡</div>
+                <h3 class="text-3xl font-bold mb-6" style="color: ${config.accent_color};">
+                  Tu Principio Clave
+                </h3>
+                <p class="text-2xl leading-relaxed italic font-semibold" style="color: ${config.text_color};">
+                  "${recommendations.keyPrinciple}"
+                </p>
+              </div>
+            </div>
+
+            <div class="mobile-actions">
+              <button id="back-to-summary-btn" class="px-10 py-4 rounded-xl text-lg font-bold transition-all" style="background-color: ${config.primary_color}; color: white;">
+                ← Volver al resumen
+              </button>
+              <button id="reset-from-rec-btn" class="px-10 py-4 rounded-xl text-lg font-bold transition-all" style="background-color: ${config.card_color}; color: ${config.text_color}; border: 2px solid ${config.primary_color};">
+                Crear nuevo contrato
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function generateRecommendations() {
+      const recommendations = [];
+      
+      // Recomendaciones según etapa actual
+      const stageRecommendations = {
+        base: {
+          icon: "🌱",
+          title: "Para construir una base sólida",
+          items: [
+            "Prioriza la consistencia sobre la intensidad. Es mejor entrenar 4 días moderadamente que 1 día intensamente.",
+            "Graba tus entrenamientos si es posible. Ver tu técnica desde afuera acelera tu aprendizaje exponencialmente.",
+            "Busca un compañero de entrenamiento con nivel similar. El progreso es más sostenible cuando se comparte.",
+            "Celebra pequeñas victorias técnicas, no solo resultados. Cada golpe bien ejecutado cuenta."
+          ]
+        },
+        regular: {
+          icon: "⚡",
+          title: "Para quien compite regularmente",
+          items: [
+            "Lleva un diario de partidos: qué funcionó, qué no, y por qué. Los patrones se revelan con el tiempo.",
+            "Dedica el 70% del entrenamiento a tus fortalezas y 30% a tus debilidades. Ganas partidos con lo que dominas.",
+            "Analiza a tus rivales habituales. Conocer sus patrones vale más que mil ejercicios genéricos.",
+            "Establece rituales pre-partido. La rutina reduce la ansiedad y aumenta la confianza."
+          ]
+        },
+        nivel: {
+          icon: "🚀",
+          title: "Para subir al siguiente nivel",
+          items: [
+            "Identifica tu limitante principal: ¿es técnico, táctico, físico o mental? Sé brutalmente honesto.",
+            "Busca competir contra jugadores superiores al menos una vez por semana. El roce hace el jugador.",
+            "Invierte en evaluación profesional (entrenador, preparador físico o psicólogo deportivo). El diagnóstico externo es oro.",
+            "Define métricas específicas de mejora. 'Jugar mejor' no es suficiente; '80% de primeros saques' sí lo es."
+          ]
+        }
+      };
+      
+      recommendations.push(stageRecommendations[gameState.currentStage]);
+
+      // Recomendaciones según enfoque principal
+      const focusRecommendations = {
+        tecnica: {
+          icon: "🎯",
+          title: "Trabajo técnico efectivo",
+          items: [
+            "Practica cada golpe en tres zonas: zona de confort (80%), zona de desafío (15%), zona de error (5%).",
+            "Graba tu técnica semanalmente. La autopercepción engaña; la cámara no miente.",
+            "Trabaja la técnica bajo presión simulada: cansancio, puntuación, rival. La técnica solo sirve si resiste el estrés.",
+            "Identifica tu golpe ancla: ese en el que confías cuando todo falla. Fortalécelo hasta la maestría."
+          ]
+        },
+        tactica: {
+          icon: "🧠",
+          title: "Desarrollo táctico inteligente",
+          items: [
+            "Estudia partidos profesionales pero busca patrones, no golpes espectaculares. La táctica está en las repeticiones.",
+            "Juega con intención explícita: 'hoy ataco al revés', 'hoy subo cada vez que puedo'. Un objetivo por partido.",
+            "Analiza tus 5 últimos partidos: ¿dónde ganaste puntos? ¿dónde los perdiste? Los datos revelan tu verdadera táctica.",
+            "Practica la lectura anticipada: predice el siguiente golpe del rival antes de que lo ejecute."
+          ]
+        },
+        mental: {
+          icon: "💪",
+          title: "Fortaleza mental competitiva",
+          items: [
+            "Crea un ritual de reseteo entre puntos: 15 segundos para soltar el punto anterior y preparar el siguiente.",
+            "Practica la incomodidad deliberada: entrena cansado, con distracción, con desventaja. El músculo mental crece bajo presión.",
+            "Define 3 frases ancla para momentos clave: una para empezar puntos, una para momentos difíciles, una para cerrar.",
+            "Registra tu diálogo interno en partidos: ¿qué te dices cuando pierdes? Cambia crítica por instrucción."
+          ]
+        },
+        fisica: {
+          icon: "🏃",
+          title: "Preparación física y hábitos",
+          items: [
+            "El rendimiento deportivo empieza en la cama: 7-8 horas de sueño no negociables. Todo lo demás es secundario.",
+            "Hidratación constante, no reactiva: bebe antes de tener sed, durante y después de cada sesión.",
+            "Trabajo de movilidad 10 minutos diarios > estiramiento intenso 1 hora semanal. La frecuencia vence a la intensidad.",
+            "Mide tu recuperación: frecuencia cardíaca en reposo, calidad de sueño, nivel de energía. Ajusta la carga según datos."
+          ]
+        }
+      };
+      
+      recommendations.push(focusRecommendations[gameState.mainFocus]);
+
+      // Recomendaciones específicas según compromisos
+      const commitmentRecs = {
+        icon: "✅",
+        title: "Cómo cumplir tus compromisos específicos",
+        items: []
+      };
+
+      // Técnico
+      const technicalAdvice = {
+        margen: "Practica golpes con altura y profundidad: apunta 1 metro dentro de la línea de fondo. El margen reduce errores forzados un 40%.",
+        ritmo: "Usa un metrónomo mental: cuenta 1-2-3 entre golpes. El ritmo controlado frustra a rivales agresivos.",
+        saque: "Dedica 15 minutos al final de cada sesión solo a saques. 100 saques diarios en un mes transforman tu servicio.",
+        red: "Sube cuando el rival está en posición defensiva (detrás de línea de fondo). La red no es valentía; es geometría."
+      };
+      commitmentRecs.items.push(technicalAdvice[gameState.technicalCommitment]);
+
+      // Mental
+      const mentalAdvice = {
+        respirar: "Respira 3 veces profundo antes de sacar o restar: inhala 4 segundos, exhala 6. Activa el sistema parasimpático.",
+        aceptar: "Usa la regla de los 3 segundos: tienes 3 segundos para frustarte, luego foco total en el siguiente punto.",
+        punto: "Crea una frase mantra: 'solo este punto' o 'punto a punto'. Repítela entre juegos hasta que sea automática.",
+        confiar: "Escribe tu plan de juego antes del partido. Durante el partido, ejecútalo sin cuestionarlo. Análisis es para después."
+      };
+      commitmentRecs.items.push(mentalAdvice[gameState.mentalCommitment]);
+
+      // Físico
+      const physicalAdvice = {
+        dormir: "Establece horario fijo: misma hora de dormir y despertar, incluso fines de semana. La consistencia regula el ritmo circadiano.",
+        hidratar: "Lleva botella siempre contigo. Meta: 35ml por kg de peso corporal diario + 500ml extra por hora de entrenamiento.",
+        calentar: "Calentamiento mínimo 12 minutos: movilidad articular (4min), activación cardiovascular (4min), golpes progresivos (4min).",
+        recuperar: "Después de entrenar: 10 min de trote suave + estiramientos + rodillo de espuma en zonas tensas. La recuperación es entrenamiento."
+      };
+      commitmentRecs.items.push(physicalAdvice[gameState.physicalCommitment]);
+
+      recommendations.push(commitmentRecs);
+
+      // Principio clave personalizado
+      const keyPrinciples = {
+        base_tecnica: "Tu éxito está en la repetición perfecta. Cada golpe es una inversión en tu futuro competitivo.",
+        base_tactica: "Primero domina los fundamentos, luego añade creatividad. La táctica sin base técnica es fantasía.",
+        base_mental: "La fortaleza mental en etapa inicial es confiar en el proceso. No busques resultados inmediatos.",
+        base_fisica: "Los hábitos que construyas ahora determinarán tu techo competitivo. Elige la excelencia diaria.",
+        
+        regular_tecnica: "Afina lo que ya funciona antes de agregar cosas nuevas. La consistencia vence a la novedad.",
+        regular_tactica: "Compites lo suficiente para tener datos. Úsalos. La intuición sin análisis te mantiene estancado.",
+        regular_mental: "Tu siguiente nivel está en dominar tus picos emocionales. Estabilidad > Intensidad.",
+        regular_fisica: "La regularidad competitiva exige mantenimiento constante. Prevención > Recuperación.",
+        
+        nivel_tecnica: "Para subir de nivel, tu golpe promedio debe ser el golpe excelente del nivel anterior.",
+        nivel_tactica: "El siguiente nivel no acepta indecisión. Juega con autoridad, equivócate con convicción.",
+        nivel_mental: "Aquí todos tienen técnica. Gana quien mejor maneja la presión en momentos clave.",
+        nivel_fisica: "El salto de nivel exige preparación de atleta, no de aficionado. Profesionalízate."
+      };
+      
+      const principleKey = `${gameState.currentStage}_${gameState.mainFocus}`;
+      recommendations.keyPrinciple = keyPrinciples[principleKey];
+
+      return recommendations;
+    }
+
+    function getLabelForValue(phaseKey, value) {
+      const phase = phases[phaseKey];
+      if (!phase || !phase.options) return value;
+      const option = phase.options.find(opt => opt.value === value);
+      return option ? option.label : value;
+    }
+
+    function getDescriptionForValue(phaseKey, value) {
+      const phase = phases[phaseKey];
+      if (!phase || !phase.options) return '';
+      const option = phase.options.find(opt => opt.value === value);
+      return option ? option.description : '';
+    }
+
+    function attachEventListeners() {
+      const startBtn = document.getElementById('start-btn');
+      if (startBtn) {
+        startBtn.onclick = () => {
+          gameState.phase = 'name';
+          render();
+          acScrollToTop();
+        };
+      }
+      
+      const continueNameBtn = document.getElementById('continue-name-btn');
+      if (continueNameBtn) {
+        continueNameBtn.onclick = handleNameSubmit;
+      }
+      
+      const nameInput = document.getElementById('player-name');
+      if (nameInput) {
+        nameInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            handleNameSubmit();
+          }
+        });
+      }
+      
+      const optionCards = document.querySelectorAll('.option-card');
+      optionCards.forEach(card => {
+        card.onclick = () => handleOptionSelect(card.dataset.value);
+      });
+      
+      const signBtn = document.getElementById('sign-btn');
+      if (signBtn) {
+        signBtn.onclick = handleSign;
+      }
+      
+      const resetBtn = document.getElementById('reset-btn');
+      if (resetBtn) {
+        resetBtn.onclick = resetGame;
+      }
+      
+      const recommendationsBtn = document.getElementById('recommendations-btn');
+      if (recommendationsBtn) {
+        recommendationsBtn.onclick = () => {
+          gameState.phase = 'recommendations';
+          render();
+          acScrollToTop();
+        };
+      }
+      
+      const backToSummaryBtn = document.getElementById('back-to-summary-btn');
+      if (backToSummaryBtn) {
+        backToSummaryBtn.onclick = () => {
+          gameState.phase = 'final';
+          render();
+          acScrollToTop();
+        };
+      }
+      
+      const resetFromRecBtn = document.getElementById('reset-from-rec-btn');
+      if (resetFromRecBtn) {
+        resetFromRecBtn.onclick = resetGame;
+      }
+    }
+
+    function handleNameSubmit() {
+      const input = document.getElementById('player-name');
+      const errorMsg = document.getElementById('name-error');
+      
+      if (input && input.value.trim().length >= 3) {
+        gameState.playerName = input.value.trim();
+        gameState.phase = 'phase1';
+        render();
+        acScrollToTop();
+      } else {
+        if (errorMsg) {
+          errorMsg.classList.remove('hidden');
+        }
+        if (input) {
+          input.style.borderColor = '#ef4444';
+        }
+      }
+    }
+
+    function handleOptionSelect(value) {
+      const currentPhase = gameState.phase;
+      
+      if (currentPhase === 'phase1') {
+        gameState.currentStage = value;
+        setTimeout(() => {
+          gameState.phase = 'phase2';
+          render();
+          acScrollToTop();
+        }, 300);
+      } else if (currentPhase === 'phase2') {
+        gameState.mainFocus = value;
+        setTimeout(() => {
+          gameState.phase = 'phase3_technical';
+          render();
+          acScrollToTop();
+        }, 300);
+      } else if (currentPhase === 'phase3_technical') {
+        gameState.technicalCommitment = value;
+        setTimeout(() => {
+          gameState.phase = 'phase3_mental';
+          render();
+          acScrollToTop();
+        }, 300);
+      } else if (currentPhase === 'phase3_mental') {
+        gameState.mentalCommitment = value;
+        setTimeout(() => {
+          gameState.phase = 'phase3_physical';
+          render();
+          acScrollToTop();
+        }, 300);
+      } else if (currentPhase === 'phase3_physical') {
+        gameState.physicalCommitment = value;
+        setTimeout(() => {
+          gameState.phase = 'phase4';
+          render();
+          acScrollToTop();
+        }, 300);
+      } else if (currentPhase === 'phase4') {
+        gameState.duration = value;
+        setTimeout(() => {
+          gameState.phase = 'contract';
+          render();
+          acScrollToTop();
+        }, 300);
+      }
+    }
+
+    async function handleSign() {
+      const btn = document.getElementById('sign-btn');
+      if (!btn) return;
+      
+      btn.disabled = true;
+      btn.textContent = 'Guardando contrato...';
+      btn.style.opacity = '0.6';
+      
+      const contractData = {
+        player_name: gameState.playerName,
+        current_stage: gameState.currentStage,
+        main_focus: gameState.mainFocus,
+        technical_commitment: gameState.technicalCommitment,
+        mental_commitment: gameState.mentalCommitment,
+        physical_commitment: gameState.physicalCommitment,
+        duration: gameState.duration,
+        signed_date: new Date().toISOString()
+      };
+      
+      const result = await window.dataSdk.create(contractData);
+      
+      if (result.isOk) {
+        gameState.phase = 'final';
+        render();
+        acScrollToTop();
+      } else {
+        btn.disabled = false;
+        btn.textContent = '✍️ Firmar mi contrato';
+        btn.style.opacity = '1';
+        
+        const container = document.getElementById('game-container');
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-4 rounded-lg shadow-lg';
+        errorDiv.textContent = 'Error al guardar. Intenta nuevamente.';
+        container.appendChild(errorDiv);
+        setTimeout(() => errorDiv.remove(), 3000);
+      }
+    }
+
+    function resetGame() {
+      gameState = {
+        phase: 'welcome',
+        playerName: '',
+        currentStage: '',
+        mainFocus: '',
+        technicalCommitment: '',
+        mentalCommitment: '',
+        physicalCommitment: '',
+        duration: ''
+      };
+      render();
+      acScrollToTop();
+    }
+
+    const dataHandler = {
+      onDataChanged(data) {
+        console.log('Contratos guardados:', data.length);
+      }
+    };
+
+    async function initializeApp() {
+      if (window.dataSdk) {
+        const initResult = await window.dataSdk.init(dataHandler);
+        if (!initResult.isOk) {
+          console.error('Error initializing data SDK');
+        }
+      }
+      
+      if (window.elementSdk) {
+        await window.elementSdk.init({
+          defaultConfig,
+          onConfigChange: async (config) => {
+            render();
+          },
+          mapToCapabilities: (config) => ({
+            recolorables: [
+              {
+                get: () => config.background_color || defaultConfig.background_color,
+                set: (value) => {
+                  config.background_color = value;
+                  window.elementSdk.setConfig({ background_color: value });
+                }
+              },
+              {
+                get: () => config.card_color || defaultConfig.card_color,
+                set: (value) => {
+                  config.card_color = value;
+                  window.elementSdk.setConfig({ card_color: value });
+                }
+              },
+              {
+                get: () => config.primary_color || defaultConfig.primary_color,
+                set: (value) => {
+                  config.primary_color = value;
+                  window.elementSdk.setConfig({ primary_color: value });
+                }
+              },
+              {
+                get: () => config.text_color || defaultConfig.text_color,
+                set: (value) => {
+                  config.text_color = value;
+                  window.elementSdk.setConfig({ text_color: value });
+                }
+              },
+              {
+                get: () => config.accent_color || defaultConfig.accent_color,
+                set: (value) => {
+                  config.accent_color = value;
+                  window.elementSdk.setConfig({ accent_color: value });
+                }
+              }
+            ],
+            borderables: [],
+            fontEditable: undefined,
+            fontSizeable: undefined
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ["game_title", config.game_title || defaultConfig.game_title],
+            ["welcome_message", config.welcome_message || defaultConfig.welcome_message]
+          ])
+        });
+      }
+      
+      render();
+    }
+
+    initializeApp();
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) { acScrollToTop(); return; }
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+    try { window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' }); } catch (e) { window.scrollTo(0, Math.max(0, top)); }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () { window.scrollTo(0, 0); });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>

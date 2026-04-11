@@ -1,0 +1,733 @@
+﻿<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Tiebreak de la Verdad</title>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(16, 185, 129, 0.6); }
+    }
+    
+    @keyframes slide-up {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes score-flash {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); color: #10b981; }
+      100% { transform: scale(1); }
+    }
+    
+    .animate-slide-up {
+      animation: slide-up 0.5s ease-out;
+    }
+    
+    .pulse-glow {
+      animation: pulse-glow 2s infinite;
+    }
+    
+    .score-flash {
+      animation: score-flash 0.6s ease-out;
+    }
+
+    #app {
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    #scoreboard {
+      margin-bottom: 1.25rem;
+    }
+
+    #score-a,
+    #score-b {
+      font-size: clamp(2.6rem, 10vw, 4.25rem);
+      line-height: 1;
+    }
+
+    #phase-title {
+      font-size: clamp(1.8rem, 6vw, 2.6rem);
+    }
+
+    #phase-emoji {
+      font-size: clamp(2.2rem, 8vw, 3.5rem);
+      margin-bottom: 0.75rem;
+    }
+
+    #phase-message {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    #final-actions {
+      margin-top: 1.25rem;
+    }
+
+    @media (max-width: 768px) {
+      #scoreboard,
+      #content,
+      #feedback {
+        padding: 1rem !important;
+      }
+
+      #phase-message > div:first-child {
+        font-size: 1.7rem !important;
+        margin-bottom: 0.85rem !important;
+      }
+
+      #phase-message > div:last-child {
+        font-size: 1rem !important;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body { font-size: 16px; }
+    .container, .game-container, .game-wrapper, .app-wrapper, .app-container, .main-wrapper, .stage-wrapper, .phase-container, .phase-card, .content, .content-area, .modal-content, .results-card, .scene, .phase-content { padding: 16px !important; }
+    h1, .main-title, .game-title, .title { font-size: clamp(1.8rem, 7vw, 2.3rem) !important; line-height: 1.15 !important; }
+    h2, .phase-title, .stage-title, .final-title, .section-title { font-size: clamp(1.3rem, 6vw, 1.7rem) !important; line-height: 1.25 !important; }
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label { font-size: clamp(1rem, 4.5vw, 1.15rem) !important; line-height: 1.4 !important; }
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text, .intro-message, .quote { font-size: 1rem !important; line-height: 1.55 !important; }
+    .button-group, .action-buttons, .final-buttons, .controls-row { flex-direction: column !important; gap: 12px !important; }
+    button, .btn, .btn-primary, .btn-secondary, .action-button, .option-btn { width: 100% !important; }
+    .zone-grid, .scenario-grid, .options-grid, .results-stats { grid-template-columns: 1fr !important; }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || { init: async function () { return { isOk: true, value: null }; }, on: function () {}, emit: function () { return { isOk: true, value: null }; }, setConfig: function () {}, config: {} };
+  window.dataSdk = window.dataSdk || { init: async function () { return { isOk: true, value: null }; }, create: async function () { return { isOk: true, value: null }; }, list: async function () { return { isOk: true, value: [] }; }, update: async function () { return { isOk: true, value: null }; } };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body class="h-full m-0 p-0 font-sans">
+  <div id="app" class="h-full w-full flex flex-col items-center justify-center p-4 overflow-auto" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);"><!-- Court Lines Background Effect -->
+   <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; opacity: 0.05;">
+    <div style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: white;"></div>
+    <div style="position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: white;"></div>
+   </div><!-- Game Container -->
+   <div class="w-full max-w-4xl relative z-10"><!-- Scoreboard -->
+    <div id="scoreboard" class="bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-md rounded-2xl p-8 mb-8 text-center hidden border-2 border-emerald-500/30 shadow-2xl">
+     <div class="flex items-center justify-center gap-4 mb-4">
+      <div class="h-3 w-3 rounded-full bg-red-500 animate-pulse"></div>
+      <div class="text-white/80 text-base uppercase tracking-widest font-bold">
+       EN VIVO • TIEBREAK
+      </div>
+      <div class="h-3 w-3 rounded-full bg-red-500 animate-pulse"></div>
+     </div>
+     <div class="flex items-center justify-center gap-8 mb-6">
+      <div class="text-center">
+       <div class="text-white/60 text-sm uppercase tracking-wider mb-2">
+        Jugador A
+       </div>
+       <div class="text-7xl font-black text-white" id="score-a">
+        0
+       </div>
+       <div id="server-a" class="mt-2 h-6"></div>
+      </div>
+      <div class="text-5xl text-white/40 font-thin">
+       —
+      </div>
+      <div class="text-center">
+       <div class="text-white/60 text-sm uppercase tracking-wider mb-2">
+        Jugador B
+       </div>
+       <div class="text-7xl font-black text-white" id="score-b">
+        0
+       </div>
+       <div id="server-b" class="mt-2 h-6"></div>
+      </div>
+     </div>
+     <div id="points-played" class="text-emerald-400 text-sm font-semibold tracking-wide"></div>
+     <div id="tension-meter" class="mt-4 h-2 bg-slate-700 rounded-full overflow-hidden">
+      <div id="tension-bar" class="h-full bg-gradient-to-r from-yellow-500 via-orange-500 to-red-600 transition-all duration-700" style="width: 0%"></div>
+     </div>
+     <div class="text-white/50 text-xs mt-2 uppercase tracking-wider">
+      Medidor de Presión
+     </div>
+    </div><!-- Main Content Card -->
+    <div class="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl overflow-hidden border-2 border-gray-200 animate-slide-up"><!-- Phase Content -->
+     <div id="content" class="p-10"><!-- Title -->
+      <div class="mb-8 text-center">
+       <h1 id="phase-title" class="text-4xl font-black mb-3 text-gray-900 tracking-tight"></h1>
+       <div id="phase-emoji" class="text-6xl mb-4"></div>
+      </div><!-- Message -->
+      <div id="phase-message" class="text-xl text-gray-800 mb-10 leading-relaxed text-center font-medium px-4"></div><!-- Visual Context (Court Diagram for specific phases) -->
+      <div id="visual-context" class="hidden mb-8"></div><!-- Question -->
+      <div id="question-container" class="mb-8 hidden">
+       <div class="bg-gradient-to-r from-emerald-50 to-teal-50 p-6 rounded-xl border-2 border-emerald-200">
+        <p id="question-text" class="text-2xl font-bold text-gray-900 text-center"></p>
+       </div>
+      </div><!-- Options -->
+      <div id="options-container" class="space-y-4 mb-8"></div><!-- Feedback -->
+      <div id="feedback" class="hidden p-6 rounded-xl mb-8 animate-slide-up"></div><!-- Continue Button --> <button id="continue-btn" class="hidden w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-5 px-8 rounded-xl transition-all duration-300 text-lg shadow-lg hover:shadow-xl transform hover:scale-105"> Continuar → </button>
+     </div><!-- Progress Bar -->
+     <div class="bg-gray-200 h-3 relative overflow-hidden">
+      <div id="progress-bar" class="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 h-full transition-all duration-700 ease-out" style="width: 0%"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+     </div>
+    </div><!-- Final Action Buttons -->
+    <div id="final-actions" class="hidden mt-8 flex flex-col sm:flex-row gap-4 justify-center animate-slide-up"><button id="restart-btn" class="bg-white hover:bg-gray-50 text-gray-800 font-bold py-4 px-10 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-gray-300"> 🔄 Repetir tiebreak </button> <button id="practice-btn" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-4 px-10 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"> 🎾 Llevarlo a cancha </button>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      title_intro: "No es un set.\nNo es un game.\nEs un tiebreak.",
+      intro_subtitle: "Respira, decide y juega el momento.",
+      phase1_message: "Estás en el tiebreak.\nMarcador: 0-0\n\nTú sacas el primer punto.",
+      phase2_message: "Acabas de sacar el primer punto desde la derecha.\n\nMarcador: 1-0\n\nAhora tu rival tiene la raqueta en la mano.",
+      phase3_message: "El tiebreak está intenso.\n\nMarcador: 4-2\n\nHan jugado 6 puntos.",
+      phase4_message: "Situación límite.\n\nMarcador: 6-6\n\nEl siguiente punto te da ventaja.",
+      phase5_message: "Has llegado primero a 7 puntos.\n\nMarcador: 7-6\n\nTu rival sigue luchando.",
+      final_message: "El tiebreak no premia el golpe más bonito.\nPremia la decisión más clara.",
+      final_wisdom: "Quien domina las reglas y sus emociones\njuega con ventaja.",
+      background_color: "#0f172a",
+      card_color: "#ffffff",
+      text_color: "#111827",
+      primary_action_color: "#059669",
+      secondary_action_color: "#6b7280"
+    };
+
+    let currentPhase = 0;
+    let scoreA = 0;
+    let scoreB = 0;
+    let currentServer = 'A';
+    let pointsPlayed = 0;
+
+    const phases = [
+      {
+        title: "EL TIEBREAK DE LA VERDAD",
+        emoji: "🎾",
+        message: "",
+        question: "",
+        options: [],
+        showScore: false,
+        isIntro: true
+      },
+      {
+        title: "FASE 1 — Todo empieza aquí",
+        emoji: "🎯",
+        message: "Estás en el tiebreak.\nMarcador: 0-0\n\nTú sacas el primer punto.",
+        question: "¿Desde qué lado de la cancha sacas?",
+        options: [
+          { text: "🔵 Desde la izquierda", correct: false, feedback: "En un tiebreak, el primer servicio siempre es desde el lado derecho." },
+          { text: "🟢 Desde la derecha", correct: true },
+          { text: "🟡 Desde el centro", correct: false, feedback: "No existe servicio desde el centro. Repasa las zonas de saque." }
+        ],
+        correctFeedback: "Exacto. Siempre se empieza por la derecha.\n\n💡 El orden importa. En presión, el detalle manda.",
+        showScore: true,
+        tensionLevel: 20
+      },
+      {
+        title: "FASE 2 — El ritmo del tiebreak",
+        emoji: "⚡",
+        message: "Acabas de sacar el primer punto desde la derecha.\n\nMarcador: 1-0\n\nAhora tu rival tiene la raqueta en la mano.",
+        question: "¿Cuántos puntos va a sacar tu rival?",
+        options: [
+          { text: "1 punto (y luego vuelves tú)", correct: false, feedback: "Después del primer punto, los saques van de DOS en DOS." },
+          { text: "2 puntos seguidos", correct: true },
+          { text: "3 puntos seguidos", correct: false, feedback: "Nunca se sacan 3 puntos seguidos en un tiebreak." }
+        ],
+        correctFeedback: "Correcto. Después del primer punto, el saque va de DOS en DOS.\n\n💡 Este ritmo cambia la presión: tienes dos oportunidades... o dos errores.",
+        showScore: true,
+        tensionLevel: 35
+      },
+      {
+        title: "FASE 3 — El cambio de lado",
+        emoji: "🔄",
+        message: "El tiebreak está intenso.\n\nMarcador: 4-2\n\nHan jugado 6 puntos.",
+        question: "¿Qué sucede ahora?",
+        options: [
+          { text: "Nada, se sigue jugando", correct: false, feedback: "Cada 6 puntos hay un cambio clave en el tiebreak." },
+          { text: "Cambio de lado", correct: true },
+          { text: "Cambio de bolas", correct: false, feedback: "Las bolas no se cambian en medio de un tiebreak." }
+        ],
+        correctFeedback: "Sí. Cada 6 puntos se cambia de lado.\n\n💡 No es pausa, es reajuste.\nLos cambios también se usan para respirar y resetear la mente.",
+        showScore: true,
+        tensionLevel: 55
+      },
+      {
+        title: "FASE 4 — Decisión bajo presión",
+        emoji: "🔥",
+        message: "Situación límite.\n\nMarcador: 6-6\n\nEl siguiente punto te da ventaja.",
+        question: "¿Qué mentalidad adoptas en este momento?",
+        options: [
+          { text: "Ir a por el golpe ganador", correct: false, feedback: "Arriesgar en puntos críticos suele salir mal. La presión aumenta el error." },
+          { text: "Forzar al rival a fallar", correct: false, feedback: "Forzar no es lo mismo que ser sólido. El rival puede resistir." },
+          { text: "Jugar con margen y consistencia", correct: true },
+          { text: "Arriesgar todo, es ahora o nunca", correct: false, feedback: "La impulsividad es la enemiga del tiebreak. Quien pierde la cabeza, pierde el punto." }
+        ],
+        correctFeedback: "Perfecto. En tiebreaks se gana NO FALLANDO.\n\n💡 La presión hace que el rival falle. Tú solo debes aguantar.",
+        showScore: true,
+        tensionLevel: 85
+      },
+      {
+        title: "FASE 5 — El cierre definitivo",
+        emoji: "🏆",
+        message: "Has llegado primero a 7 puntos.\n\nMarcador: 7-6\n\nTu rival sigue luchando.",
+        question: "¿Ya ganaste el tiebreak?",
+        options: [
+          { text: "Sí, llegué a 7 primero", correct: false, feedback: "No basta con llegar a 7. Debes tener 2 puntos de ventaja." },
+          { text: "No, necesito 2 de diferencia", correct: true }
+        ],
+        correctFeedback: "Exacto. Hay que ganar con diferencia de 2.\n\n💡 Cerrar bien es parte del control.\nEl que gana el tiebreak no es quien anota, sino quien cierra.",
+        showScore: true,
+        tensionLevel: 100
+      },
+      {
+        title: "TIEBREAK COMPLETADO",
+        emoji: "✨",
+        message: "",
+        question: "",
+        options: [],
+        showScore: false,
+        isFinal: true
+      }
+    ];
+
+    function updateScoreboard() {
+      const scoreboardEl = document.getElementById('scoreboard');
+      const scoreAEl = document.getElementById('score-a');
+      const scoreBEl = document.getElementById('score-b');
+      const serverAEl = document.getElementById('server-a');
+      const serverBEl = document.getElementById('server-b');
+      const pointsPlayedEl = document.getElementById('points-played');
+      const tensionBar = document.getElementById('tension-bar');
+      
+      if (phases[currentPhase].showScore) {
+        scoreboardEl.classList.remove('hidden');
+        
+        // Animate score change
+        scoreAEl.classList.add('score-flash');
+        scoreBEl.classList.add('score-flash');
+        setTimeout(() => {
+          scoreAEl.classList.remove('score-flash');
+          scoreBEl.classList.remove('score-flash');
+        }, 600);
+        
+        scoreAEl.textContent = scoreA;
+        scoreBEl.textContent = scoreB;
+        
+        // Show server indicator
+        if (currentServer === 'A') {
+          serverAEl.innerHTML = '<div class="inline-block px-3 py-1 bg-emerald-500 text-white text-xs font-bold rounded-full">SAQUE</div>';
+          serverBEl.innerHTML = '';
+        } else {
+          serverBEl.innerHTML = '<div class="inline-block px-3 py-1 bg-emerald-500 text-white text-xs font-bold rounded-full">SAQUE</div>';
+          serverAEl.innerHTML = '';
+        }
+        
+        // Update points played
+        pointsPlayedEl.textContent = `${pointsPlayed} ${pointsPlayed === 1 ? 'punto jugado' : 'puntos jugados'}`;
+        
+        // Update tension meter
+        const phase = phases[currentPhase];
+        if (phase.tensionLevel) {
+          tensionBar.style.width = phase.tensionLevel + '%';
+        }
+      } else {
+        scoreboardEl.classList.add('hidden');
+      }
+    }
+
+    function simulatePoint() {
+      pointsPlayed++;
+      
+      if (Math.random() > 0.5) {
+        scoreA++;
+      } else {
+        scoreB++;
+      }
+      
+      if (pointsPlayed === 1) {
+        currentServer = 'B';
+      } else if (pointsPlayed % 2 === 1) {
+        currentServer = currentServer === 'A' ? 'B' : 'A';
+      }
+    }
+
+    function renderPhase() {
+      const phase = phases[currentPhase];
+      const titleEl = document.getElementById('phase-title');
+      const emojiEl = document.getElementById('phase-emoji');
+      const messageEl = document.getElementById('phase-message');
+      const questionContainer = document.getElementById('question-container');
+      const questionEl = document.getElementById('question-text');
+      const optionsContainer = document.getElementById('options-container');
+      const feedbackEl = document.getElementById('feedback');
+      const continueBtn = document.getElementById('continue-btn');
+      const finalActions = document.getElementById('final-actions');
+      const progressBar = document.getElementById('progress-bar');
+
+      titleEl.textContent = phase.title;
+      emojiEl.textContent = phase.emoji || '';
+      
+      if (phase.isIntro) {
+        messageEl.innerHTML = '<div class="text-3xl font-bold mb-6">' + window.elementSdk.config.title_intro.replace(/\n/g, '<br>') + '</div><div class="text-xl text-gray-600 mt-4">' + window.elementSdk.config.intro_subtitle + '</div>';
+        questionContainer.classList.add('hidden');
+        optionsContainer.innerHTML = '';
+        feedbackEl.classList.add('hidden');
+        continueBtn.classList.remove('hidden');
+        continueBtn.innerHTML = '¡Empezar el Tiebreak! 🎾';
+      } else if (phase.isFinal) {
+        messageEl.innerHTML = '<div class="text-3xl font-bold mb-6 text-emerald-700">' + window.elementSdk.config.final_message.replace(/\n/g, '<br>') + '</div><div class="text-2xl text-gray-700 mt-6 font-semibold">' + window.elementSdk.config.final_wisdom.replace(/\n/g, '<br>') + '</div>';
+        questionContainer.classList.add('hidden');
+        optionsContainer.innerHTML = '';
+        feedbackEl.classList.add('hidden');
+        continueBtn.classList.add('hidden');
+        finalActions.classList.remove('hidden');
+      } else {
+        const configKeys = {
+          1: 'phase1_message',
+          2: 'phase2_message',
+          3: 'phase3_message',
+          4: 'phase4_message',
+          5: 'phase5_message'
+        };
+        
+        const messageKey = configKeys[currentPhase];
+        const messageText = window.elementSdk.config[messageKey] || phase.message;
+        
+        messageEl.innerHTML = messageText.replace(/\n/g, '<br>');
+        
+        if (phase.question) {
+          questionContainer.classList.remove('hidden');
+          questionEl.textContent = phase.question;
+        } else {
+          questionContainer.classList.add('hidden');
+        }
+        
+        optionsContainer.innerHTML = '';
+        phase.options.forEach((option, index) => {
+          const btn = document.createElement('button');
+          btn.className = 'w-full text-left p-5 rounded-xl border-3 border-gray-300 hover:border-emerald-500 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50 transition-all duration-300 font-bold text-lg text-gray-900 shadow-md hover:shadow-xl transform hover:scale-105 hover:-translate-y-1';
+          btn.innerHTML = `<div class="flex items-center justify-between"><span>${option.text}</span><span class="text-2xl" style="opacity:0.55;">→</span></div>`;
+          btn.onclick = () => selectOption(index);
+          optionsContainer.appendChild(btn);
+        });
+        
+        feedbackEl.classList.add('hidden');
+        continueBtn.classList.add('hidden');
+        finalActions.classList.add('hidden');
+      }
+      
+      const progress = ((currentPhase) / (phases.length - 1)) * 100;
+      progressBar.style.width = progress + '%';
+      
+      updateScoreboard();
+      applyColors();
+    }
+
+    function selectOption(index) {
+      const phase = phases[currentPhase];
+      const option = phase.options[index];
+      const optionsContainer = document.getElementById('options-container');
+      const buttons = optionsContainer.querySelectorAll('button');
+      const feedbackEl = document.getElementById('feedback');
+      const continueBtn = document.getElementById('continue-btn');
+      
+      buttons.forEach((btn, i) => {
+        btn.disabled = true;
+        btn.classList.remove('hover:border-emerald-500', 'hover:bg-gradient-to-r', 'hover:from-emerald-50', 'hover:to-teal-50', 'hover:scale-105', 'hover:-translate-y-1');
+        if (i === index) {
+          if (option.correct) {
+            btn.style.borderColor = window.elementSdk.config.primary_action_color;
+            btn.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
+            btn.style.transform = 'scale(1.02)';
+          } else {
+            btn.style.borderColor = '#dc2626';
+            btn.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
+            btn.style.transform = 'scale(0.98)';
+          }
+        } else {
+          btn.style.opacity = '0.4';
+        }
+      });
+      
+      if (option.correct) {
+        feedbackEl.className = 'p-6 rounded-xl mb-8 bg-gradient-to-br from-emerald-50 to-teal-50 border-3 border-emerald-500 shadow-lg animate-slide-up';
+        feedbackEl.innerHTML = '<div class="flex items-center gap-3 mb-3"><div class="text-3xl">✓</div><div class="font-black text-2xl text-emerald-800">¡CORRECTO!</div></div><div class="text-lg text-gray-800 leading-relaxed font-medium">' + phase.correctFeedback.replace(/\n/g, '<br>') + '</div>';
+        feedbackEl.classList.remove('hidden');
+        
+        if (currentPhase === 1 || currentPhase === 2) {
+          simulatePoint();
+          if (currentPhase === 2) {
+            simulatePoint();
+            scoreA = 2;
+            scoreB = 1;
+          }
+          updateScoreboard();
+        } else if (currentPhase === 3) {
+          scoreA = 4;
+          scoreB = 2;
+          updateScoreboard();
+        } else if (currentPhase === 4) {
+          scoreA = 6;
+          scoreB = 6;
+          updateScoreboard();
+        } else if (currentPhase === 5) {
+          scoreA = 7;
+          scoreB = 6;
+          updateScoreboard();
+        }
+        
+        continueBtn.classList.remove('hidden');
+        continueBtn.textContent = 'Continuar';
+      } else {
+        const incorrectFeedback = option.feedback || 'Piensa en la situación y elige otra opción.';
+        feedbackEl.className = 'p-6 rounded-xl mb-8 bg-gradient-to-br from-red-50 to-orange-50 border-3 border-red-500 shadow-lg animate-slide-up';
+        feedbackEl.innerHTML = '<div class="flex items-center gap-3 mb-3"><div class="text-3xl">✗</div><div class="font-black text-2xl text-red-800">Incorrecto</div></div><div class="text-lg text-gray-800 leading-relaxed font-medium">' + incorrectFeedback + '</div><div class="mt-4 text-sm text-gray-600 font-semibold">Piensa de nuevo...</div>';
+        feedbackEl.classList.remove('hidden');
+        
+        setTimeout(() => {
+          buttons.forEach((btn, i) => {
+            btn.disabled = false;
+            btn.style.borderColor = '';
+            btn.style.background = '';
+            btn.style.opacity = '';
+            btn.style.transform = '';
+            btn.classList.add('hover:border-emerald-500', 'hover:bg-gradient-to-r', 'hover:from-emerald-50', 'hover:to-teal-50', 'hover:scale-105', 'hover:-translate-y-1');
+          });
+          feedbackEl.classList.add('hidden');
+        }, 3000);
+      }
+    }
+
+    function nextPhase() {
+      if (currentPhase < phases.length - 1) {
+        currentPhase++;
+        renderPhase();
+        acScrollToTop();
+      }
+    }
+
+    function restart() {
+      currentPhase = 0;
+      scoreA = 0;
+      scoreB = 0;
+      currentServer = 'A';
+      pointsPlayed = 0;
+      renderPhase();
+      acScrollToTop();
+    }
+
+    function applyColors() {
+      const app = document.getElementById('app');
+      const content = document.getElementById('content');
+      const titleEl = document.getElementById('phase-title');
+      const messageEl = document.getElementById('phase-message');
+      const continueBtn = document.getElementById('continue-btn');
+      const restartBtn = document.getElementById('restart-btn');
+      const practiceBtn = document.getElementById('practice-btn');
+      
+      app.style.background = `linear-gradient(135deg, ${window.elementSdk.config.background_color} 0%, ${window.elementSdk.config.background_color}dd 100%)`;
+      content.parentElement.style.backgroundColor = window.elementSdk.config.card_color;
+      titleEl.style.color = window.elementSdk.config.text_color;
+      messageEl.style.color = window.elementSdk.config.text_color;
+      continueBtn.style.backgroundColor = window.elementSdk.config.primary_action_color;
+      practiceBtn.style.backgroundColor = window.elementSdk.config.primary_action_color;
+      restartBtn.style.backgroundColor = window.elementSdk.config.card_color;
+      restartBtn.style.color = window.elementSdk.config.text_color;
+    }
+
+    async function onConfigChange(config) {
+      applyColors();
+      renderPhase();
+    }
+
+    document.getElementById('continue-btn').addEventListener('click', nextPhase);
+    document.getElementById('restart-btn').addEventListener('click', restart);
+    document.getElementById('practice-btn').addEventListener('click', () => {
+      showTipsModal();
+    });
+
+    function showTipsModal() {
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 animate-slide-up';
+      modal.style.background = 'rgba(0, 0, 0, 0.8)';
+      modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+      };
+      
+      modal.innerHTML = `
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 max-w-3xl w-full max-h-[90%] overflow-auto border-2 border-emerald-500" onclick="event.stopPropagation()">
+          <div class="text-center mb-8">
+            <div class="text-6xl mb-4">🎾</div>
+            <h2 class="text-4xl font-black text-white mb-2">TIPS MAGISTRALES</h2>
+            <p class="text-emerald-400 text-lg font-semibold">Para dominar cualquier tiebreak</p>
+          </div>
+          
+          <div class="space-y-6 mb-8">
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border-l-4 border-emerald-500">
+              <div class="flex items-start gap-4">
+                <div class="text-3xl">🎯</div>
+                <div>
+                  <h3 class="text-xl font-bold text-white mb-2">1. Los dos primeros puntos son oro</h3>
+                  <p class="text-gray-300 leading-relaxed">Si sacas primero, esos dos puntos iniciales marcan el tono. Juega seguro, busca la consistencia. Empezar 2-0 o 1-1 es ENORME psicológicamente.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border-l-4 border-yellow-500">
+              <div class="flex items-start gap-4">
+                <div class="text-3xl">🧠</div>
+                <div>
+                  <h3 class="text-xl font-bold text-white mb-2">2. El mini-break es tu objetivo</h3>
+                  <p class="text-gray-300 leading-relaxed">Ganar un punto con el saque del rival es un "mini-break". Vale ORO. No necesitas hacer winners, solo NO fallar. Haz que tu rival juegue una bola más.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border-l-4 border-orange-500">
+              <div class="flex items-start gap-4">
+                <div class="text-3xl">🎲</div>
+                <div>
+                  <h3 class="text-xl font-bold text-white mb-2">3. Maneja los "puntos par"</h3>
+                  <p class="text-gray-300 leading-relaxed">En 2-2, 4-4, 6-6... el que gana el punto PAR suele llevarse el tiebreak. Son momentos de máxima tensión. Respira, juega con margen, fuerza al rival a decidir.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border-l-4 border-red-500">
+              <div class="flex items-start gap-4">
+                <div class="text-3xl">🔥</div>
+                <div>
+                  <h3 class="text-xl font-bold text-white mb-2">4. Controla el cambio de lado</h3>
+                  <p class="text-gray-300 leading-relaxed">Cada 6 puntos tienes 90 segundos para resetear. Usa ese tiempo: respira profundo 3 veces, seca la raqueta, piensa en tu plan para los próximos dos puntos.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border-l-4 border-purple-500">
+              <div class="flex items-start gap-4">
+                <div class="text-3xl">⚡</div>
+                <div>
+                  <h3 class="text-xl font-bold text-white mb-2">5. Saca con intención, no con potencia</h3>
+                  <p class="text-gray-300 leading-relaxed">En tiebreak, un primer saque al 70% bien colocado vale más que uno al 100% sin control. Busca abrir la cancha, no el ace. La presión ya está: no la aumentes tú.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border-l-4 border-cyan-500">
+              <div class="flex items-start gap-4">
+                <div class="text-3xl">🛡️</div>
+                <div>
+                  <h3 class="text-xl font-bold text-white mb-2">6. Defiende como si fuera match point</h3>
+                  <p class="text-gray-300 leading-relaxed">Cada punto en tiebreak vale como un game completo. No regales nada. Corre cada bola. Tu rival sentirá que no puede contigo... y empezará a dudar.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border-l-4 border-emerald-500">
+              <div class="flex items-start gap-4">
+                <div class="text-3xl">🏆</div>
+                <div>
+                  <h3 class="text-xl font-bold text-white mb-2">7. El 6-5 o 5-6 es el momento clave</h3>
+                  <p class="text-gray-300 leading-relaxed">Si vas 6-5 arriba: juega como si empataras 0-0. Si vas 5-6 abajo: tienes TODO por ganar, nada que perder. Libera el golpe, pero con cabeza.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-6 mt-8 border-2 border-emerald-400">
+              <div class="text-center">
+                <div class="text-3xl mb-3">💎</div>
+                <p class="text-xl font-bold text-white mb-2">La regla de oro:</p>
+                <p class="text-lg text-emerald-100 italic">"En un tiebreak, el que mantiene la calma más tiempo, gana."</p>
+              </div>
+            </div>
+          </div>
+
+          <button onclick="this.closest('.fixed').remove()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-bold py-4 px-6 rounded-xl transition-all duration-300 text-lg shadow-lg">
+            ¡Entendido! 💪
+          </button>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+    }
+
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange,
+      mapToCapabilities: (config) => ({
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.card_color || defaultConfig.card_color,
+            set: (value) => {
+              config.card_color = value;
+              window.elementSdk.setConfig({ card_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.primary_action_color || defaultConfig.primary_action_color,
+            set: (value) => {
+              config.primary_action_color = value;
+              window.elementSdk.setConfig({ primary_action_color: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ["title_intro", config.title_intro || defaultConfig.title_intro],
+        ["intro_subtitle", config.intro_subtitle || defaultConfig.intro_subtitle],
+        ["phase1_message", config.phase1_message || defaultConfig.phase1_message],
+        ["phase2_message", config.phase2_message || defaultConfig.phase2_message],
+        ["phase3_message", config.phase3_message || defaultConfig.phase3_message],
+        ["phase4_message", config.phase4_message || defaultConfig.phase4_message],
+        ["phase5_message", config.phase5_message || defaultConfig.phase5_message],
+        ["final_message", config.final_message || defaultConfig.final_message],
+        ["final_wisdom", config.final_wisdom || defaultConfig.final_wisdom]
+      ])
+    });
+
+    renderPhase();
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) { acScrollToTop(); return; }
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+    try { window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' }); } catch (e) { window.scrollTo(0, Math.max(0, top)); }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () { window.scrollTo(0, 0); });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>

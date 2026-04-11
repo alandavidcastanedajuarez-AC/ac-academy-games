@@ -1,0 +1,891 @@
+﻿
+
+<!doctype html>
+<html lang="es" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Espejo del Jugador</title>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+    
+    .pulse-anim {
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .option-card {
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    
+    .option-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+    
+    .progress-dot {
+      transition: all 0.3s ease;
+    }
+    
+    .profile-badge {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+      backdrop-filter: blur(10px);
+    }
+
+    #welcome-screen,
+    #game-screen,
+    #profile-screen {
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    #welcome-screen {
+      align-items: flex-start !important;
+      justify-content: center !important;
+    }
+
+    #scenario-card,
+    #reading-panel,
+    #profile-screen .rounded-3xl,
+    #profile-screen .rounded-2xl {
+      padding: 1.25rem;
+    }
+
+    @media (max-width: 768px) {
+      #welcome-screen,
+      #game-screen,
+      #profile-screen {
+        padding: 0.85rem;
+      }
+
+      #welcome-screen .max-w-3xl,
+      #game-screen .max-w-4xl,
+      #profile-screen .max-w-4xl {
+        width: 100%;
+      }
+
+      #scenario-question {
+        font-size: 1.35rem !important;
+        line-height: 1.35;
+      }
+
+      #scenario-situation {
+        font-size: 1rem !important;
+      }
+
+      #options-container,
+      #profile-screen .flex.flex-wrap.justify-center.gap-4 {
+        gap: 0.85rem !important;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body { font-size: 16px; }
+    .container, .game-container, .game-wrapper, .app-wrapper, .app-container, .main-wrapper, .stage-wrapper, .phase-container, .phase-card, .content, .content-area, .modal-content, .results-card, .scene, .phase-content { padding: 16px !important; }
+    h1, .main-title, .game-title, .title { font-size: clamp(1.8rem, 7vw, 2.3rem) !important; line-height: 1.15 !important; }
+    h2, .phase-title, .stage-title, .final-title, .section-title { font-size: clamp(1.3rem, 6vw, 1.7rem) !important; line-height: 1.25 !important; }
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label { font-size: clamp(1rem, 4.5vw, 1.15rem) !important; line-height: 1.4 !important; }
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text, .intro-message, .quote { font-size: 1rem !important; line-height: 1.55 !important; }
+    .button-group, .action-buttons, .final-buttons, .controls-row { flex-direction: column !important; gap: 12px !important; }
+    button, .btn, .btn-primary, .btn-secondary, .action-button, .option-btn { width: 100% !important; }
+    .zone-grid, .scenario-grid, .options-grid, .results-stats { grid-template-columns: 1fr !important; }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || { init: async function () { return { isOk: true, value: null }; }, on: function () {}, emit: function () { return { isOk: true, value: null }; }, setConfig: function () {}, config: {} };
+  window.dataSdk = window.dataSdk || { init: async function () { return { isOk: true, value: null }; }, create: async function () { return { isOk: true, value: null }; }, list: async function () { return { isOk: true, value: [] }; }, update: async function () { return { isOk: true, value: null }; } };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body class="h-full">
+  <div id="app-container" class="h-full w-full overflow-auto"><!-- Welcome Screen -->
+   <div id="welcome-screen" class="min-h-full flex items-center justify-center p-6">
+    <div class="max-w-3xl w-full text-center fade-in">
+     <div class="mb-8">
+      <div class="text-6xl mb-4">
+       🎾
+      </div>
+      <h1 id="main-title" class="text-5xl font-bold mb-4">El Espejo del Jugador</h1>
+      <p id="subtitle" class="text-xl opacity-90 mb-6">No se trata solo de lo que sabes. Se trata de lo que eliges cuando compites.</p>
+     </div>
+     <div class="mb-12 p-8 rounded-2xl">
+      <p class="text-lg mb-5">Este juego funciona como un espejo: te devuelve patrones reales, no la versión ideal que te cuentas.</p>
+      <p class="text-lg font-semibold">Aquí no vienes a acertar.<br>
+       Vienes a verte con claridad para competir mejor.</p>
+     </div><button id="start-button" class="px-10 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl"> Comenzar reflexión </button>
+    </div>
+   </div><!-- Game Screen -->
+   <div id="game-screen" class="hidden min-h-full p-6">
+    <div class="max-w-4xl mx-auto"><!-- Progress Indicator -->
+     <div class="flex justify-center items-center gap-3 mb-8">
+      <div id="progress-0" class="progress-dot w-3 h-3 rounded-full"></div>
+      <div id="progress-1" class="progress-dot w-3 h-3 rounded-full"></div>
+      <div id="progress-2" class="progress-dot w-3 h-3 rounded-full"></div>
+      <div id="progress-3" class="progress-dot w-3 h-3 rounded-full"></div>
+      <div id="progress-4" class="progress-dot w-3 h-3 rounded-full"></div>
+     </div><!-- Scenario Card -->
+     <div id="scenario-card" class="rounded-3xl p-8 mb-8 shadow-2xl fade-in">
+      <div class="text-4xl mb-4 text-center" id="scenario-emoji">
+       🎮
+      </div>
+      <h2 class="text-3xl font-bold mb-4 text-center" id="scenario-title"></h2>
+      <div class="mb-6 p-6 rounded-xl" id="scenario-situation-container">
+       <p class="text-lg mb-2 font-semibold opacity-70">Situación:</p>
+       <p class="text-xl" id="scenario-situation"></p>
+      </div>
+      <p class="text-2xl font-bold mb-6 text-center" id="scenario-question"></p>
+     </div><!-- Options -->
+     <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+     </div><!-- Reading Panel -->
+     <div id="reading-panel" class="hidden rounded-3xl p-8 shadow-2xl fade-in">
+      <div class="text-center mb-6">
+       <div class="text-5xl mb-4">
+        💭
+       </div>
+       <h3 class="text-2xl font-bold mb-4">Tu reflejo</h3>
+       <p class="text-xl mb-4" id="reading-text"></p>
+       <div class="mt-6 p-6 rounded-xl">
+        <p class="text-lg font-semibold" id="teaching-text"></p>
+       </div>
+      </div><!-- Tool Box -->
+      <div id="tool-box" class="mt-8 rounded-2xl p-6 border-2">
+       <div class="flex items-center gap-3 mb-4">
+        <div class="text-3xl">
+         🧰
+        </div>
+        <h4 class="text-xl font-bold" id="tool-title"></h4>
+       </div>
+       <p class="text-lg mb-4 opacity-90" id="tool-description"></p>
+       <div class="p-4 rounded-xl mt-4">
+        <div class="flex items-start gap-3">
+         <div class="text-2xl">
+          📋
+         </div>
+         <div>
+          <p class="font-semibold mb-2">Para llevar a cancha:</p>
+          <p class="text-lg" id="tool-action"></p>
+         </div>
+        </div>
+       </div>
+      </div>
+      <div class="text-center mt-8"><button id="next-button" class="px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105"> Siguiente escenario </button>
+      </div>
+     </div>
+    </div>
+   </div><!-- Profile Screen -->
+   <div id="profile-screen" class="hidden min-h-full p-6">
+    <div class="max-w-4xl mx-auto fade-in">
+     <div class="text-center mb-12">
+      <div class="text-6xl mb-6">
+       🪞
+      </div>
+      <h2 class="text-4xl font-bold mb-4">Tu identidad como competidor</h2>
+      <p class="text-xl opacity-90">Este no es un diagnóstico. Es un mapa.</p>
+     </div>
+     <div class="rounded-3xl p-8 shadow-2xl mb-8">
+      <h3 class="text-2xl font-bold mb-6 text-center">Eres un jugador que:</h3>
+      <div id="profile-traits" class="space-y-4">
+      </div>
+     </div><!-- Tools Summary -->
+     <div class="rounded-3xl p-8 shadow-2xl mb-8">
+      <div class="flex items-center gap-3 mb-6 justify-center">
+       <div class="text-4xl">
+        🧰
+       </div>
+       <h3 class="text-2xl font-bold">Tu caja de herramientas para el próximo partido</h3>
+      </div>
+      <div id="tools-summary" class="space-y-4">
+      </div>
+     </div>
+     <div class="rounded-2xl p-8 text-center mb-8">
+      <p class="text-2xl font-bold mb-2">Cuando te ves con claridad,</p>
+      <p class="text-2xl font-bold mb-6">juegas con libertad.</p>
+      <p class="text-lg opacity-75 mt-4">Estas herramientas no son teoría. Son acciones concretas que puedes aplicar en tu próximo partido.</p>
+     </div>
+     <div class="flex flex-wrap justify-center gap-4"><button id="repeat-button" class="px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105"> 🔄 Repetir espejo </button> <button id="save-button" class="px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105"> 💾 Guardar herramientas </button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      background_color: "#0f172a",
+      card_color: "#1e293b",
+      text_color: "#f8fafc",
+      primary_action_color: "#3b82f6",
+      secondary_action_color: "#64748b",
+      font_family: "system-ui",
+      font_size: 16,
+      main_title: "El Espejo del Jugador",
+      subtitle: "No importa solo lo que sabes. Importa lo que eliges cuando juegas.",
+      start_button: "Comenzar reflexión"
+    };
+
+    const scenarios = [
+      {
+        emoji: "🎾",
+        title: "Empieza el partido",
+        situation: "Primeros games del partido. El ritmo es medio. Ninguno domina todavía.",
+        question: "¿Cómo juegas estos primeros puntos?",
+        options: [
+          { 
+            text: "Aceleras para marcar presencia", 
+            reading: "Buscas control desde la intensidad.", 
+            teaching: "Aquí se revela tu identidad inicial.",
+            tool: {
+              title: "🔧 Herramienta: El Ritual de Inicio",
+              description: "Antes del primer punto, define TU señal de inicio. Puede ser tocar las cuerdas 3 veces, respirar profundo mirando tu lado, o decir mentalmente 'aquí estoy'.",
+              action: "En tu próximo partido: crea tu ritual de 5 segundos y úsalo antes del primer punto."
+            }
+          },
+          { 
+            text: "Juegas sólido y observas", 
+            reading: "Lees al rival antes de imponerte.", 
+            teaching: "Aquí se revela tu identidad inicial.",
+            tool: {
+              title: "🔧 Herramienta: Los 3 Datos",
+              description: "En los primeros 3 games, busca 3 datos: ¿Qué hace bajo presión? ¿Cuál es su golpe de escape? ¿Cómo respira en puntos largos?",
+              action: "En tu próximo partido: anota mentalmente estos 3 datos antes del game 4."
+            }
+          },
+          { 
+            text: "Arriesgas para probar", 
+            reading: "Exploras antes de decidir tu juego.", 
+            teaching: "Aquí se revela tu identidad inicial.",
+            tool: {
+              title: "🔧 Herramienta: La Zona de Prueba",
+              description: "Los primeros games son tu laboratorio. Pero define QUÉ pruebas: ¿su revés cortado? ¿su reacción a bolas altas? Explora con propósito.",
+              action: "En tu próximo partido: elige 2 cosas específicas para probar en los primeros 3 games."
+            }
+          },
+          { 
+            text: "Esperas errores", 
+            reading: "Confías en la paciencia como estrategia.", 
+            teaching: "Aquí se revela tu identidad inicial.",
+            tool: {
+              title: "🔧 Herramienta: El Contador de Pelota",
+              description: "Si juegas paciente, cuenta mentalmente '1-2-3' en cada golpe. Te mantiene en el presente y evita que anticipes el error del rival.",
+              action: "En tu próximo partido: practica el conteo en el calentamiento y úsalo en los primeros games."
+            }
+          }
+        ]
+      },
+      {
+        emoji: "❌",
+        title: "El primer error importante",
+        situation: "Fallaste una pelota clara. El rival te mira. Tú sabes que era tuya.",
+        question: "¿Qué ocurre en el punto siguiente?",
+        options: [
+          { 
+            text: "Te apresuras", 
+            reading: "El error aún manda.", 
+            teaching: "El punto después del error define al competidor.",
+            tool: {
+              title: "🔧 Herramienta: La Pausa de 3 Segundos",
+              description: "Después de un error, date 3 segundos antes de coger la pelota. Mira tus cuerdas, respira, y di mentalmente 'siguiente'.",
+              action: "En tu próximo partido: cuando falles, cuenta hasta 3 antes de continuar. Siempre."
+            }
+          },
+          { 
+            text: "Bajas ritmo conscientemente", 
+            reading: "Tienes control emocional.", 
+            teaching: "El punto después del error define al competidor.",
+            tool: {
+              title: "🔧 Herramienta: El Reset Físico",
+              description: "Tras un error, sacude tus manos, ajusta tus cordones o toca la red. Un gesto físico resetea tu estado mental.",
+              action: "En tu próximo partido: elige TU gesto de reset y úsalo tras cada error."
+            }
+          },
+          { 
+            text: "Cambias de golpe", 
+            reading: "Ajustas tu patrón rápidamente.", 
+            teaching: "El punto después del error define al competidor.",
+            tool: {
+              title: "🔧 Herramienta: El Plan B Preparado",
+              description: "Antes del partido, decide tu Plan B para cada golpe. Si falla tu derecha cruzada, ¿qué haces? Tener el plan evita improvisar en caliente.",
+              action: "En tu próximo partido: define tu Plan B para derecha, revés y servicio antes de entrar."
+            }
+          },
+          { 
+            text: "Te frustras", 
+            reading: "La emoción está presente y visible.", 
+            teaching: "El punto después del error define al competidor.",
+            tool: {
+              title: "🔧 Herramienta: La Válvula de Escape",
+              description: "Tienes derecho a frustrarte 3 segundos. Aprieta tu puño, di 'vamos', descarga. Pero después, se acabó. 3 segundos, no más.",
+              action: "En tu próximo partido: cuando te frustres, permite 3 segundos de descarga y luego corta."
+            }
+          }
+        ]
+      },
+      {
+        emoji: "🔥",
+        title: "Momento de presión",
+        situation: "El marcador se aprieta. Break point. Todos lo saben. Punto importante.",
+        question: "¿Qué haces justo antes de sacar o devolver?",
+        options: [
+          { 
+            text: "Nada", 
+            reading: "Juegas desde el automatismo.", 
+            teaching: "Aquí aparece todo lo entrenado.",
+            tool: {
+              title: "🔧 Herramienta: La Frase Ancla",
+              description: "Automatismo es bueno, pero necesita un ancla. Elige una palabra que active tu mejor versión: 'aquí', 'vamos', 'esto'. Úsala antes de puntos clave.",
+              action: "En tu próximo partido: elige tu palabra ancla y repítela mentalmente antes de cada punto importante."
+            }
+          },
+          { 
+            text: "Apuras", 
+            reading: "La urgencia te acelera.", 
+            teaching: "Aquí aparece todo lo entrenado.",
+            tool: {
+              title: "🔧 Herramienta: El Botón de Slow Motion",
+              description: "Cuando sientas prisa, haz TODO más lento: camina más lento hacia la línea, bota la pelota más despacio, respira más profundo. El control externo crea control interno.",
+              action: "En tu próximo partido: cuando te apures, activa tu slow motion en tus movimientos."
+            }
+          },
+          { 
+            text: "Respiras y te enfocas", 
+            reading: "Usas tus herramientas mentales.", 
+            teaching: "Aquí aparece todo lo entrenado.",
+            tool: {
+              title: "🔧 Herramienta: La Respiración 4-2-4",
+              description: "Inspira 4 segundos, mantén 2, expira 4. Una sola vez antes de punto importante. Calma tu sistema sin perder activación.",
+              action: "En tu próximo partido: practica 4-2-4 en el calentamiento y úsala en break points."
+            }
+          },
+          { 
+            text: "Piensas en el resultado", 
+            reading: "Tu mente está en el marcador.", 
+            teaching: "Aquí aparece todo lo entrenado.",
+            tool: {
+              title: "🔧 Herramienta: El Foco Micro",
+              description: "Cuando tu mente vaya al resultado, enfócate en algo MUY pequeño: 'voy a ver el logo de la pelota', 'voy a sentir mis pies', 'voy a seguir mi golpe'. Un foco micro saca el macro.",
+              action: "En tu próximo partido: cuando pienses en el resultado, elige un foco micro físico."
+            }
+          }
+        ]
+      },
+      {
+        emoji: "🎯",
+        title: "Decisión táctica clave",
+        situation: "La pelota viene profunda. Llegas justo. Es esa pelota que puede ser ganadora del rival... o tu oportunidad.",
+        question: "¿Qué eliges?",
+        options: [
+          { 
+            text: "Forzar", 
+            reading: "Priorizas la ofensiva sobre el equilibrio.", 
+            teaching: "No todas las pelotas piden lo mismo.",
+            tool: {
+              title: "🔧 Herramienta: El Semáforo Táctico",
+              description: "Divide la cancha mentalmente: Verde (adelante, ataco), Amarillo (construyo), Rojo (defensivo). Decide ANTES de golpear en qué zona estás.",
+              action: "En tu próximo partido: visualiza tu semáforo antes de entrar y respétalo durante el juego."
+            }
+          },
+          { 
+            text: "Asegurar", 
+            reading: "Reconoces tu zona.", 
+            teaching: "No todas las pelotas piden lo mismo.",
+            tool: {
+              title: "🔧 Herramienta: El Golpe de Supervivencia",
+              description: "Define TU golpe para cuando llegues justo: liftado alto cruzado, slice profundo, globo de calidad. Practica ese golpe hasta que sea automático en crisis.",
+              action: "En tu próximo partido: elige tu golpe de supervivencia y úsalo cuando no llegues cómodo."
+            }
+          },
+          { 
+            text: "Cambiar dirección", 
+            reading: "Buscas desequilibrar desde la táctica.", 
+            teaching: "No todas las pelotas piden lo mismo.",
+            tool: {
+              title: "🔧 Herramienta: La Pelota Sorpresa",
+              description: "Una pelota por game puede ser 'sorpresa': cambio inesperado, dejada, bola al cuerpo. Solo una, pero consciente. Mantiene al rival alerta.",
+              action: "En tu próximo partido: decide usar una sorpresa por game, eligiendo el momento adecuado."
+            }
+          },
+          { 
+            text: "Subir a la red", 
+            reading: "Asumes el riesgo de cerrar.", 
+            teaching: "No todas las pelotas piden lo mismo.",
+            tool: {
+              title: "🔧 Herramienta: La Subida con Propósito",
+              description: "Si subes, hazlo con intención: golpe de aproximación profundo, split step en el momento exacto, y decisión de volea. No improvises en la red.",
+              action: "En tu próximo partido: cuando subas, verbaliza mentalmente 'profundo-split-decido'."
+            }
+          }
+        ]
+      },
+      {
+        emoji: "🏆",
+        title: "Cerrar el partido",
+        situation: "Estás cerca de cerrar el partido. El rival pelea. Tú lo sabes. Todos lo saben.",
+        question: "¿Qué priorizas?",
+        options: [
+          { 
+            text: "Golpe ganador", 
+            reading: "Buscas el brillo en el cierre.", 
+            teaching: "Cerrar no es cambiar. Es sostener.",
+            tool: {
+              title: "🔧 Herramienta: La Regla del 80%",
+              description: "En cierre, juega al 80% de potencia. Prioriza dirección y profundidad sobre velocidad. El ganador llegará solo si sostienes tu patrón.",
+              action: "En tu próximo partido: cuando estés cerca de cerrar, activa mentalmente tu 80%."
+            }
+          },
+          { 
+            text: "Jugar seguro", 
+            reading: "Confías en tu solidez.", 
+            teaching: "Cerrar no es cambiar. Es sostener.",
+            tool: {
+              title: "🔧 Herramienta: El Patrón de Oro",
+              description: "Define tu 'patrón de oro': la combinación que mejor te funciona. En cierre, vuelve a ese patrón. Es tu zona de confianza probada.",
+              action: "En tu próximo partido: identifica tu patrón de oro y úsalo conscientemente en el cierre."
+            }
+          },
+          { 
+            text: "Mantener tu patrón", 
+            reading: "Confías en lo que te trajo hasta aquí.", 
+            teaching: "Cerrar no es cambiar. Es sostener.",
+            tool: {
+              title: "🔧 Herramienta: El Mantra de Cierre",
+              description: "Crea tu mantra para cerrar: 'Esto que hice funciona', 'Confío en mi juego', 'Ya gané estos puntos'. Repítelo entre puntos.",
+              action: "En tu próximo partido: elige tu mantra de cierre y úsalo en los últimos games."
+            }
+          },
+          { 
+            text: "Cambiar todo", 
+            reading: "Sientes la necesidad de variar.", 
+            teaching: "Cerrar no es cambiar. Es sostener.",
+            tool: {
+              title: "🔧 Herramienta: El Cambio Mínimo",
+              description: "Si necesitas cambiar, hazlo micro: cambia solo el ritmo, o solo la profundidad, o solo la dirección. Nunca cambies todo. Un ajuste, no una revolución.",
+              action: "En tu próximo partido: si cambias en el cierre, elige solo UN elemento para ajustar."
+            }
+          }
+        ]
+      }
+    ];
+
+    let currentScenario = 0;
+    let userChoices = [];
+
+    function applyConfig(config) {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseFontStack = 'system-ui, -apple-system, sans-serif';
+      const baseSize = config.font_size || defaultConfig.font_size;
+      
+      const appContainer = document.getElementById('app-container');
+      appContainer.style.background = config.background_color || defaultConfig.background_color;
+      appContainer.style.color = config.text_color || defaultConfig.text_color;
+      appContainer.style.fontFamily = `${customFont}, ${baseFontStack}`;
+      
+      document.getElementById('main-title').textContent = config.main_title || defaultConfig.main_title;
+      document.getElementById('main-title').style.fontSize = `${baseSize * 3}px`;
+      document.getElementById('main-title').style.color = config.text_color || defaultConfig.text_color;
+      
+      document.getElementById('subtitle').textContent = config.subtitle || defaultConfig.subtitle;
+      document.getElementById('subtitle').style.fontSize = `${baseSize * 1.25}px`;
+      document.getElementById('subtitle').style.color = config.text_color || defaultConfig.text_color;
+      
+      const startBtn = document.getElementById('start-button');
+      startBtn.textContent = config.start_button || defaultConfig.start_button;
+      startBtn.style.background = config.primary_action_color || defaultConfig.primary_action_color;
+      startBtn.style.color = config.card_color || defaultConfig.card_color;
+      startBtn.style.fontSize = `${baseSize * 1.125}px`;
+      
+      const scenarioCard = document.getElementById('scenario-card');
+      scenarioCard.style.background = config.card_color || defaultConfig.card_color;
+      
+      const situationContainer = document.getElementById('scenario-situation-container');
+      situationContainer.style.background = config.background_color || defaultConfig.background_color;
+      
+      const readingPanel = document.getElementById('reading-panel');
+      readingPanel.style.background = config.card_color || defaultConfig.card_color;
+      
+      const nextBtn = document.getElementById('next-button');
+      nextBtn.style.background = config.primary_action_color || defaultConfig.primary_action_color;
+      nextBtn.style.color = config.card_color || defaultConfig.card_color;
+      
+      const progressDots = document.querySelectorAll('.progress-dot');
+      progressDots.forEach(dot => {
+        dot.style.background = config.secondary_action_color || defaultConfig.secondary_action_color;
+      });
+      
+      updateProgressDots(config);
+      updateOptionCards(config);
+      updateProfileScreen(config);
+    }
+
+    function updateProgressDots(config) {
+      const progressDots = document.querySelectorAll('.progress-dot');
+      progressDots.forEach((dot, index) => {
+        if (index < currentScenario) {
+          dot.style.background = config.primary_action_color || defaultConfig.primary_action_color;
+        } else if (index === currentScenario) {
+          dot.style.background = config.primary_action_color || defaultConfig.primary_action_color;
+          dot.style.transform = 'scale(1.5)';
+        } else {
+          dot.style.background = config.secondary_action_color || defaultConfig.secondary_action_color;
+          dot.style.transform = 'scale(1)';
+        }
+      });
+    }
+
+    function updateOptionCards(config) {
+      const cards = document.querySelectorAll('.option-card');
+      cards.forEach(card => {
+        card.style.background = config.card_color || defaultConfig.card_color;
+        card.style.color = config.text_color || defaultConfig.text_color;
+      });
+    }
+
+    function updateProfileScreen(config) {
+      const profileScreen = document.getElementById('profile-screen');
+      const profileCard = profileScreen.querySelector('.rounded-3xl');
+      if (profileCard) {
+        profileCard.style.background = config.card_color || defaultConfig.card_color;
+      }
+
+      const toolsCard = profileScreen.querySelectorAll('.rounded-3xl')[1];
+      if (toolsCard) {
+        toolsCard.style.background = config.card_color || defaultConfig.card_color;
+      }
+      
+      const highlightBox = profileScreen.querySelector('.rounded-2xl');
+      if (highlightBox) {
+        highlightBox.style.background = config.background_color || defaultConfig.background_color;
+      }
+      
+      const repeatBtn = document.getElementById('repeat-button');
+      if (repeatBtn) {
+        repeatBtn.style.background = config.secondary_action_color || defaultConfig.secondary_action_color;
+        repeatBtn.style.color = config.text_color || defaultConfig.text_color;
+      }
+      
+      const saveBtn = document.getElementById('save-button');
+      if (saveBtn) {
+        saveBtn.style.background = config.primary_action_color || defaultConfig.primary_action_color;
+        saveBtn.style.color = config.card_color || defaultConfig.card_color;
+      }
+    }
+
+    function showScreen(screenId) {
+      document.getElementById('welcome-screen').classList.add('hidden');
+      document.getElementById('game-screen').classList.add('hidden');
+      document.getElementById('profile-screen').classList.add('hidden');
+      document.getElementById(screenId).classList.remove('hidden');
+      acScrollToTop();
+    }
+
+    function loadScenario(index) {
+      const scenario = scenarios[index];
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      
+      document.getElementById('scenario-emoji').textContent = scenario.emoji;
+      document.getElementById('scenario-title').textContent = scenario.title;
+      document.getElementById('scenario-situation').textContent = scenario.situation;
+      document.getElementById('scenario-question').textContent = scenario.question;
+      
+      const optionsContainer = document.getElementById('options-container');
+      optionsContainer.innerHTML = '';
+      
+      scenario.options.forEach((option, optIndex) => {
+        const card = document.createElement('button');
+        card.className = 'option-card p-6 rounded-2xl text-left transition-all duration-300';
+        card.style.background = config.card_color || defaultConfig.card_color;
+        card.style.color = config.text_color || defaultConfig.text_color;
+        card.innerHTML = `
+          <div class="flex items-center gap-4">
+            <div class="text-3xl">🎯</div>
+            <p class="text-lg font-semibold">${option.text}</p>
+          </div>
+        `;
+        card.onclick = () => selectOption(index, optIndex);
+        optionsContainer.appendChild(card);
+      });
+      
+      document.getElementById('reading-panel').classList.add('hidden');
+      updateProgressDots(config);
+    }
+
+    function selectOption(scenarioIndex, optionIndex) {
+      const scenario = scenarios[scenarioIndex];
+      const option = scenario.options[optionIndex];
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      
+      userChoices.push({
+        scenario: scenario.title,
+        choice: option.text,
+        reading: option.reading,
+        tool: option.tool
+      });
+      
+      document.getElementById('reading-text').textContent = option.reading;
+      document.getElementById('teaching-text').textContent = option.teaching;
+      
+      // Show tool box
+      const toolBox = document.getElementById('tool-box');
+      toolBox.style.borderColor = config.primary_action_color || defaultConfig.primary_action_color;
+      toolBox.style.background = `${config.background_color || defaultConfig.background_color}cc`;
+      
+      document.getElementById('tool-title').textContent = option.tool.title;
+      document.getElementById('tool-description').textContent = option.tool.description;
+      document.getElementById('tool-action').textContent = option.tool.action;
+      
+      const actionContainer = toolBox.querySelector('.p-4.rounded-xl');
+      actionContainer.style.background = config.card_color || defaultConfig.card_color;
+      
+      document.getElementById('options-container').classList.add('hidden');
+      document.getElementById('reading-panel').classList.remove('hidden');
+    }
+
+    function nextScenario() {
+      currentScenario++;
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      
+      if (currentScenario < scenarios.length) {
+        document.getElementById('options-container').classList.remove('hidden');
+        document.getElementById('reading-panel').classList.add('hidden');
+        loadScenario(currentScenario);
+      } else {
+        showProfile();
+      }
+    }
+
+    function showProfile() {
+      showScreen('profile-screen');
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      
+      const traitsContainer = document.getElementById('profile-traits');
+      traitsContainer.innerHTML = '';
+      
+      userChoices.forEach((choice, index) => {
+        const trait = document.createElement('div');
+        trait.className = 'profile-badge p-6 rounded-xl';
+        trait.innerHTML = `
+          <div class="flex items-start gap-4">
+            <div class="text-3xl">✓</div>
+            <div>
+              <p class="font-semibold text-lg mb-2">${choice.scenario}:</p>
+              <p class="text-lg opacity-90">${choice.reading}</p>
+            </div>
+          </div>
+        `;
+        traitsContainer.appendChild(trait);
+      });
+
+      // Show tools summary
+      const toolsSummary = document.getElementById('tools-summary');
+      toolsSummary.innerHTML = '';
+      
+      userChoices.forEach((choice, index) => {
+        const toolCard = document.createElement('div');
+        toolCard.className = 'p-6 rounded-2xl';
+        toolCard.style.background = config.card_color || defaultConfig.card_color;
+        toolCard.innerHTML = `
+          <div class="flex items-start gap-4">
+            <div class="text-2xl flex-shrink-0">${index + 1}️⃣</div>
+            <div class="flex-grow">
+              <h4 class="font-bold text-lg mb-2">${choice.tool.title}</h4>
+              <p class="mb-3 opacity-90">${choice.tool.description}</p>
+              <div class="p-4 rounded-xl" style="background: ${config.background_color || defaultConfig.background_color};">
+                <div class="flex items-start gap-2">
+                  <div class="text-lg">✅</div>
+                  <p class="font-semibold">${choice.tool.action}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        toolsSummary.appendChild(toolCard);
+      });
+      
+      updateProfileScreen(config);
+    }
+
+    function resetGame() {
+      currentScenario = 0;
+      userChoices = [];
+      showScreen('welcome-screen');
+    }
+
+    document.getElementById('start-button').onclick = () => {
+      showScreen('game-screen');
+      loadScenario(0);
+    };
+
+    document.getElementById('next-button').onclick = nextScenario;
+    document.getElementById('repeat-button').onclick = resetGame;
+    
+    document.getElementById('save-button').onclick = () => {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      
+      // Create overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'fixed inset-0 flex items-center justify-center p-6 z-50';
+      overlay.style.background = 'rgba(0, 0, 0, 0.8)';
+      overlay.style.backdropFilter = 'blur(8px)';
+      
+      const modal = document.createElement('div');
+      modal.className = 'rounded-3xl p-8 max-w-2xl w-full shadow-2xl fade-in';
+      modal.style.background = config.card_color || defaultConfig.card_color;
+      
+      let toolsText = '🧰 TUS HERRAMIENTAS PARA EL PRÓXIMO PARTIDO\n\n';
+      userChoices.forEach((choice, index) => {
+        toolsText += `${index + 1}. ${choice.tool.title}\n`;
+        toolsText += `${choice.tool.description}\n`;
+        toolsText += `✅ ${choice.tool.action}\n\n`;
+      });
+      
+      modal.innerHTML = `
+        <div class="text-center mb-6">
+          <div class="text-5xl mb-4">💾</div>
+          <h3 class="text-2xl font-bold mb-4">Herramientas guardadas</h3>
+          <p class="text-lg opacity-90 mb-6">Copia este texto y guárdalo en tu teléfono. Léelo antes de tu próximo partido.</p>
+        </div>
+        <textarea readonly class="w-full h-64 p-4 rounded-xl text-sm font-mono resize-none mb-6" style="background: ${config.background_color || defaultConfig.background_color}; color: ${config.text_color || defaultConfig.text_color}; border: 2px solid ${config.primary_action_color || defaultConfig.primary_action_color};">${toolsText}</textarea>
+        <div class="flex gap-4 justify-center">
+          <button id="copy-btn" class="px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105" style="background: ${config.primary_action_color || defaultConfig.primary_action_color}; color: ${config.card_color || defaultConfig.card_color};">
+            📋 Copiar texto
+          </button>
+          <button id="close-modal-btn" class="px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105" style="background: ${config.secondary_action_color || defaultConfig.secondary_action_color}; color: ${config.text_color || defaultConfig.text_color};">
+            Cerrar
+          </button>
+        </div>
+      `;
+      
+      overlay.appendChild(modal);
+      document.getElementById('app-container').appendChild(overlay);
+      
+      document.getElementById('copy-btn').onclick = () => {
+        const textarea = modal.querySelector('textarea');
+        textarea.select();
+        document.execCommand('copy');
+        
+        const copyBtn = document.getElementById('copy-btn');
+        copyBtn.textContent = '✓ Copiado';
+        setTimeout(() => {
+          copyBtn.textContent = '📋 Copiar texto';
+        }, 2000);
+      };
+      
+      document.getElementById('close-modal-btn').onclick = () => {
+        overlay.remove();
+      };
+      
+      overlay.onclick = (e) => {
+        if (e.target === overlay) {
+          overlay.remove();
+        }
+      };
+    };
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => {
+          applyConfig(config);
+        },
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.card_color || defaultConfig.card_color,
+              set: (value) => {
+                config.card_color = value;
+                window.elementSdk.setConfig({ card_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_action_color || defaultConfig.primary_action_color,
+              set: (value) => {
+                config.primary_action_color = value;
+                window.elementSdk.setConfig({ primary_action_color: value });
+              }
+            },
+            {
+              get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+              set: (value) => {
+                config.secondary_action_color = value;
+                window.elementSdk.setConfig({ secondary_action_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["main_title", config.main_title || defaultConfig.main_title],
+          ["subtitle", config.subtitle || defaultConfig.subtitle],
+          ["start_button", config.start_button || defaultConfig.start_button]
+        ])
+      });
+    } else {
+      applyConfig(defaultConfig);
+    }
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) { acScrollToTop(); return; }
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+    try { window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' }); } catch (e) { window.scrollTo(0, Math.max(0, top)); }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () { window.scrollTo(0, 0); });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>

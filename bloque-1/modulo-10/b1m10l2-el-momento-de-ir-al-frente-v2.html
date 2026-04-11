@@ -1,0 +1,1176 @@
+﻿<!doctype html>
+<html lang="es" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Momento de Ir al Frente</title>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    .app-wrapper {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.6s ease-in;
+    }
+    
+    .slide-up {
+      animation: slideUp 0.8s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .tennis-court-bg {
+      background: linear-gradient(135deg, rgba(21, 128, 61, 0.1) 0%, rgba(5, 46, 22, 0.2) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .tennis-court-bg::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-50%);
+    }
+    
+    .option-card {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .option-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s;
+    }
+    
+    .option-card:hover::before {
+      left: 100%;
+    }
+    
+    .option-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .option-card.correct {
+      animation: correctPulse 0.8s ease;
+    }
+    
+    .option-card.incorrect {
+      animation: incorrectShake 0.6s ease;
+    }
+    
+    @keyframes correctPulse {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.08); }
+      50% { transform: scale(0.98); }
+      75% { transform: scale(1.05); }
+    }
+    
+    @keyframes incorrectShake {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      25% { transform: translateX(-12px) rotate(-2deg); }
+      50% { transform: translateX(12px) rotate(2deg); }
+      75% { transform: translateX(-8px) rotate(-1deg); }
+    }
+    
+    .progress-bar {
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .story-box {
+      position: relative;
+      padding: 2rem;
+      border-left: 4px solid;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+    }
+    
+    .quote-mark {
+      font-size: 4rem;
+      line-height: 0;
+      opacity: 0.3;
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+    }
+    
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      animation: float 3s infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateY(-100px) translateX(20px); opacity: 0; }
+    }
+    
+    .score-badge {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-weight: bold;
+      animation: badgePop 0.5s ease;
+    }
+    
+    @keyframes badgePop {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    
+    .net-line {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, white, transparent);
+      margin: 2rem 0;
+      animation: netShimmer 2s infinite;
+    }
+    
+    @keyframes netShimmer {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.8; }
+    }
+    
+    .court-corner {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .corner-tl { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+    .corner-tr { top: 20px; right: 20px; border-left: none; border-bottom: none; }
+    .corner-bl { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+    .corner-br { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+    
+    .tennis-ball {
+      width: 20px;
+      height: 20px;
+      background: radial-gradient(circle at 30% 30%, #d4ff00, #9acd32);
+      border-radius: 50%;
+      position: absolute;
+      animation: ballBounce 2s ease-in-out infinite;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    @keyframes ballBounce {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(0.95); }
+    }
+    
+    .glow-text {
+      text-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+    }
+    
+    .tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    
+    .option-card:hover .tooltip {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-5px);
+    }
+
+    .mobile-kpis {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .mobile-kpi {
+      padding: 0.8rem 1rem;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      background: rgba(15, 23, 42, 0.45);
+      color: #e2e8f0;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+    
+    .intensity-meter {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+    
+    .intensity-bar {
+      width: 40px;
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      transition: background 0.3s;
+    }
+    
+    .intensity-bar.active {
+      background: currentColor;
+    }
+
+    @media (max-width: 768px) {
+      .tennis-court-bg {
+        min-height: 100vh !important;
+      }
+
+      .story-box,
+      .option-card,
+      #feedbackContainer > div {
+        padding: 1rem !important;
+      }
+
+      .quote-mark {
+        font-size: 2.6rem;
+      }
+
+      .score-badge {
+        padding: 0.55rem 0.8rem;
+        font-size: 0.82rem;
+      }
+
+      .tooltip {
+        display: none !important;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ 
+<!-- AC_PHASE1_HELPERS_START -->
+<style>
+  .hidden { display: none !important; }
+  .text-center, .center { text-align: center !important; }
+
+  @media (max-width: 768px) {
+    body { font-size: 16px; }
+    .container, .game-container, .game-wrapper, .app-wrapper, .app-container, .main-wrapper, .stage-wrapper, .phase-container, .phase-card, .content, .content-area, .modal-content, .results-card, .scene, .phase-content { padding: 16px !important; }
+    h1, .main-title, .game-title, .title { font-size: clamp(1.8rem, 7vw, 2.3rem) !important; line-height: 1.15 !important; }
+    h2, .phase-title, .stage-title, .final-title, .section-title { font-size: clamp(1.3rem, 6vw, 1.7rem) !important; line-height: 1.25 !important; }
+    h3, .subtitle, .game-subtitle, .phase-subtitle, .question-label { font-size: clamp(1rem, 4.5vw, 1.15rem) !important; line-height: 1.4 !important; }
+    p, li, .instruction, .phase-description, .phase-instruction, .scenario-description, .principle-text, .intro-message, .quote { font-size: 1rem !important; line-height: 1.55 !important; }
+    .button-group, .action-buttons, .final-buttons, .controls-row { flex-direction: column !important; gap: 12px !important; }
+    button, .btn, .btn-primary, .btn-secondary, .action-button, .option-btn { width: 100% !important; }
+    .zone-grid, .scenario-grid, .options-grid, .results-stats { grid-template-columns: 1fr !important; }
+  }
+</style>
+<script>
+  window.elementSdk = window.elementSdk || { init: async function () { return { isOk: true, value: null }; }, on: function () {}, emit: function () { return { isOk: true, value: null }; }, setConfig: function () {}, config: {} };
+  window.dataSdk = window.dataSdk || { init: async function () { return { isOk: true, value: null }; }, create: async function () { return { isOk: true, value: null }; }, list: async function () { return { isOk: true, value: [] }; }, update: async function () { return { isOk: true, value: null }; } };
+</script>
+<!-- AC_PHASE1_HELPERS_END -->
+</head>
+ <body class="h-full">
+  <main id="app" class="app-wrapper w-full h-full"></main>
+  <script>
+    const defaultConfig = {
+      background_color: "#0a1628",
+      surface_color: "#1a2942",
+      text_color: "#f0f4f8",
+      primary_action_color: "#10b981",
+      secondary_action_color: "#6366f1",
+      game_title: "El Momento de Ir al Frente",
+      coach_name: "Coach Alan",
+      player_name: "David",
+      start_button_text: "Comenzar entrenamiento",
+      continue_button_text: "Continuar",
+      repeat_button_text: "Entrenar de nuevo",
+      font_family: "Inter",
+      font_size: 16
+    };
+
+    let config = { ...defaultConfig };
+    let currentPhase = 0;
+    let selectedAnswer = null;
+    let correctAnswers = 0;
+    let phaseStartTime = 0;
+
+    const storyPhases = [
+      {
+        phase: "intro",
+        icon: "🎾",
+        title: "Tu Momento Ha Llegado",
+        story: `Has estado entrenando durante meses. Golpes de fondo, resistencia, técnica... todo eso ya lo dominas.
+
+Pero hay algo que separa a los jugadores buenos de los excepcionales:
+
+<strong>Saber cuándo atacar.</strong>
+
+Hoy, tu entrenador ${defaultConfig.coach_name} te va a enseñar el secreto que los profesionales usan en cada punto decisivo.`,
+        atmosphere: "expectation"
+      },
+      {
+        phase: 1,
+        icon: "🟦",
+        title: "LECCIÓN 1 — El Error de los Impacientes",
+        story: `"${defaultConfig.player_name}, ¿ves a ese jugador?" - ${defaultConfig.coach_name} señala la cancha de al lado.
+
+"Acaba de subir a la red... otra vez. Y otra vez lo pasaron."
+
+Pausa. Te mira directamente.
+
+"¿Sabes por qué perdió ese punto antes de llegar a la red?"`,
+        coachTip: "El 73% de los puntos perdidos en la red se pierden por UNA razón: subir en el momento equivocado.",
+        question: "Acabas de jugar tres tipos de golpes:\n\n🎾 <strong>Golpe A:</strong> Bola profunda y pesada (tu rival retrocede)\n🎾 <strong>Golpe B:</strong> Bola media sin peso (tu rival está cómodo)\n🎾 <strong>Golpe C:</strong> Bola corta y lenta (tu rival corre hacia adelante)\n\n💭 El entrenador pregunta: <em>\"¿Después de cuál de estos golpes TÚ avanzarías?\"</em>",
+        options: [
+          { 
+            text: "Solo después del Golpe A", 
+            correct: false,
+            feedback: "Casi... pero piensa: si tu bola es corta, ¿tu rival está cómodo o corriendo?"
+          },
+          { 
+            text: "Solo después del Golpe C", 
+            correct: false,
+            feedback: "Bien pensado, pero hay otro momento igual de bueno..."
+          },
+          { 
+            text: "Después del A y del C", 
+            correct: true,
+            feedback: "¡EXACTO! Avanzas cuando el rival está INCÓMODO, ya sea defendiendo profundo o corriendo hacia la bola corta."
+          },
+          { 
+            text: "Después de los tres", 
+            correct: false,
+            feedback: "No... El golpe B deja al rival cómodo. Nunca avances cuando tu rival puede atacarte fácilmente."
+          }
+        ],
+        principle: "💎 <strong>PRINCIPIO FUNDAMENTAL:</strong> \"El golpe previo decide si avanzas o te quedas. Subir a la red no es valentía, es lectura.\"",
+        intensity: 2,
+        atmosphere: "learning"
+      },
+      {
+        phase: 2,
+        icon: "🟩",
+        title: "LECCIÓN 2 — Geometría: Donde Tiras, Donde Te Plantas",
+        story: `${defaultConfig.coach_name} dibuja líneas imaginarias en la cancha con su raqueta.
+
+"La red no se trata solo de 'llegar'. Es matemática. Es geometría."
+
+Te señala tres zonas: derecha, centro, izquierda.
+
+"Acabas de tirar cruzado profundo a su revés. ¿Dónde te posicionas para la volea?"
+
+Pausa dramática. "La mayoría corre al centro. Error fatal."`,
+        visualCue: "📐 Situación: Tiraste paralelo a su drive. Él devuelve corto. Tú avanzas.",
+        coachTip: "Federer se posiciona ANTES de que el rival golpee. No reacciona, anticipa basado en geometría.",
+        question: "Tiraste cruzado profundo a su revés (lado izquierdo de la cancha).\n\nÉl devuelve defensivo.\n\n💭 <em>\"¿Hacia dónde avanzas para volear?\"</em>",
+        options: [
+          { 
+            text: "Centro de la cancha (red)", 
+            correct: false,
+            feedback: "Error común. Si te vas al centro, dejas abierto el passing paralelo. Te pasan fácil."
+          },
+          { 
+            text: "Diagonal hacia MI derecha", 
+            correct: true,
+            feedback: "¡EXACTO! Avanzas en diagonal cubriendo el cruzado (su mejor opción). Si tira paralelo, es un tiro difícil para él."
+          },
+          { 
+            text: "Recto hacia adelante", 
+            correct: false,
+            feedback: "Muy predecible. No estás cubriendo ángulos, solo avanzando. La geometría no está de tu lado."
+          },
+          { 
+            text: "Hacia MI izquierda", 
+            correct: false,
+            feedback: "Te alejas del ángulo natural de respuesta. Estás regalando toda la cancha abierta."
+          }
+        ],
+        principle: "💎 <strong>PRINCIPIO GEOMÉTRICO:</strong> \"No avanzas 'a la red'. Avanzas hacia EL ÁNGULO que cubres. Donde tiras, determina dónde te plantas.\"",
+        intensity: 4,
+        atmosphere: "strategic"
+      },
+      {
+        phase: 3,
+        icon: "🟨",
+        title: "LECCIÓN 3 — Distancia y Zonas: Dónde Estar en la Red",
+        story: `${defaultConfig.coach_name} traza tres líneas imaginarias con su pie.
+
+"Línea de servicio. Dos metros adelante. Un metro de la red."
+
+Te mira fijamente. "La mayoría llega 'a la red' sin saber a QUÉ distancia exacta."
+
+Golpea una bola. "Demasiado cerca: te globan. Demasiado lejos: te pasan. Existe una zona de oro."`,
+        visualCue: "📏 Estás avanzando. Tu golpe previo fue bueno, pero no excelente.",
+        coachTip: "Djokovic no llega a 1 metro de la red en la primera volea. Se planta a 2.5-3 metros. Zona de control.",
+        question: "Tu golpe previo fue decente (no perfecto). Estás avanzando.\n\n💭 <em>\"¿Hasta dónde llegas para hacer la primera volea?\"</em>",
+        options: [
+          { 
+            text: "Lo más cerca posible de la red (1m)", 
+            correct: false,
+            feedback: "Muy arriesgado. Si el rival globea o hace un passing bajo, no tienes tiempo de reaccionar."
+          },
+          { 
+            text: "Zona de servicio (3-3.5m de la red)", 
+            correct: true,
+            feedback: "¡PERFECTO! Zona de control. Desde aquí cubres globos, tienes ángulo, y no te pasan fácil. Primera volea = posicionarse, no definir."
+          },
+          { 
+            text: "Justo pasando línea de servicio (4m)", 
+            correct: false,
+            feedback: "Demasiado lejos. Ya no intimidas, pierdes ángulo. Es como no haber avanzado."
+          },
+          { 
+            text: "Pegado a la red para definir rápido", 
+            correct: false,
+            feedback: "Error de principiante. La primera volea casi nunca es ganadora. Es para ganar posición y cerrar después."
+          }
+        ],
+        principle: "💎 <strong>PRINCIPIO DE ZONA:</strong> \"Primera volea = posicionarse (3m de red). Segunda volea = presionar (2m). Tercera volea = definir (1m). Cada golpe te acerca, no llegas de golpe.\"",
+        intensity: 4,
+        atmosphere: "strategic"
+      },
+      {
+        phase: 4,
+        icon: "🟧",
+        title: "LECCIÓN 4 — Control de Dirección: Dónde Colocar la Volea",
+        story: `${defaultConfig.coach_name} coloca tres conos en la cancha rival: uno a cada lado, uno en el centro.
+
+"La volea no es 'pegarle a la bola'. Es colocarla donde el rival NO está."
+
+Te mira con intensidad. "Situación real: estás en la red, posición de control. Tu rival está recuperando hacia el centro."
+
+Señala los conos. "¿Dónde la pones?"`,
+        coachTip: "Nadal volea cruzado el 68% de las veces en primeras voleas. Mantiene al rival corriendo y sin ángulo para pasarlo.",
+        visualCue: "📍 Volea desde TU lado derecho. Rival corriendo hacia el centro desde SU izquierda.",
+        question: "Estás voleando desde tu derecha. Rival viene corriendo del lado izquierdo hacia el centro.\n\n💭 <em>\"¿Dónde direccionas tu volea?\"</em>",
+        options: [
+          { 
+            text: "Cruzado a SU derecha (donde venía)", 
+            correct: true,
+            feedback: "¡BRILLANTE! Lo mandas de regreso. Él tiene que frenar, cambiar dirección. Tú mantienes control, él sigue corriendo."
+          },
+          { 
+            text: "Paralelo a SU izquierda (espacio abierto)", 
+            correct: false,
+            feedback: "Parece lógico, pero es arriesgado. Ese ángulo es difícil, red más alta, más margen de error. Además, si fallas el ángulo, le das tiempo."
+          },
+          { 
+            text: "Centro a sus pies", 
+            correct: false,
+            feedback: "No es malo, pero desperdicias ventaja. Si él ya viene al centro, le facilitas el próximo golpe."
+          },
+          { 
+            text: "Winner al ángulo imposible", 
+            correct: false,
+            feedback: "Mentalidad incorrecta. Primera volea casi nunca es winner. Es para mantener presión, no para arriesgar todo."
+          }
+        ],
+        principle: "💎 <strong>PRINCIPIO DIRECCIONAL:</strong> \"Primera volea: cruzado (mantiene rival corriendo). Segunda volea: al espacio o pies (cierra punto). No busques winner en primera volea.\"",
+        intensity: 5,
+        atmosphere: "strategic"
+      },
+      {
+        phase: 5,
+        icon: "🟫",
+        title: "LECCIÓN 5 — Lectura Anticipada: Ver Antes de Que Pase",
+        story: `${defaultConfig.coach_name} te muestra un video de Federer.
+
+"Pausa aquí. Mira sus ojos. ¿A dónde mira?"
+
+El video muestra a Federer avanzando ANTES de que el rival golpee.
+
+"No reacciona. Anticipa. Lee tres cosas: posición del rival, calidad de TU golpe anterior, opciones disponibles."
+
+Te mira directo. "El que anticipa, domina. El que reacciona, corre."`,
+        coachTip: "Los profesionales deciden subir a la red 0.4 segundos ANTES de que el rival golpee. Leen lenguaje corporal.",
+        visualCue: "🧠 Mental: Tu golpe fue profundo al revés. Rival retrocede, hombros abiertos, preparación defensiva.",
+        question: "Tu golpe previo fue profundo. Observas a tu rival:\n\n• Está retrocediendo\n• Hombros abiertos (stance abierto)\n• Preparación alta (golpe defensivo)\n\n💭 <em>\"¿Qué haces ANTES de que él golpee?\"</em>",
+        options: [
+          { 
+            text: "Espero a ver su golpe primero", 
+            correct: false,
+            feedback: "Reaccionas en vez de anticipar. Llegas tarde a la red o no llegas. Perdiste 0.5 segundos valiosos."
+          },
+          { 
+            text: "Ya estoy avanzando con pasos divididos", 
+            correct: true,
+            feedback: "¡MAESTRO! Leíste todo: tu golpe fue bueno, él está mal parado, su golpe será defensivo. Ya estás en movimiento cuando él golpea."
+          },
+          { 
+            text: "Me quedo en fondo, es más seguro", 
+            correct: false,
+            feedback: "Desperdicias ventaja total. Creaste la oportunidad perfecta y no la aprovechas. Punto neutral de nuevo."
+          },
+          { 
+            text: "Avanzo solo si veo bola corta", 
+            correct: false,
+            feedback: "Ya es tarde. Si esperas VER la bola corta para LUEGO avanzar, llegas sin tiempo. Se anticipa, no se reacciona."
+          }
+        ],
+        principle: "💎 <strong>PRINCIPIO MAESTRO:</strong> \"Subir a la red no es valentía ni reacción. Es lectura anticipada basada en: 1) Tu golpe previo, 2) Posición del rival, 3) Su lenguaje corporal. El que lee primero, gana primero.\"",
+        intensity: 5,
+        atmosphere: "revelation"
+      }
+    ];
+
+    function getAtmosphereColors(atmosphere) {
+      const atmospheres = {
+        expectation: { glow: '#60a5fa', shadow: 'rgba(96, 165, 250, 0.3)' },
+        learning: { glow: '#a78bfa', shadow: 'rgba(167, 139, 250, 0.3)' },
+        action: { glow: '#f59e0b', shadow: 'rgba(245, 158, 11, 0.3)' },
+        strategic: { glow: '#06b6d4', shadow: 'rgba(6, 182, 212, 0.3)' },
+        focus: { glow: '#10b981', shadow: 'rgba(16, 185, 129, 0.3)' },
+        decisive: { glow: '#ef4444', shadow: 'rgba(239, 68, 68, 0.3)' },
+        revelation: { glow: '#8b5cf6', shadow: 'rgba(139, 92, 246, 0.3)' }
+      };
+      return atmospheres[atmosphere] || atmospheres.expectation;
+    }
+
+    function renderWelcome() {
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseFontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+      const phase = storyPhases[0];
+      const colors = getAtmosphereColors(phase.atmosphere);
+      
+      return `
+        <div class="tennis-court-bg relative" style="min-height: 100%; display: flex; align-items: flex-start; justify-content: center;">
+          <div class="court-corner corner-tl"></div>
+          <div class="court-corner corner-tr"></div>
+          <div class="court-corner corner-bl"></div>
+          <div class="court-corner corner-br"></div>
+          <div class="tennis-ball" style="top: 10%; right: 15%;"></div>
+          <div class="tennis-ball" style="bottom: 20%; left: 10%; animation-delay: -0.7s;"></div>
+          
+          <div class="fade-in slide-up text-center px-5 py-8 max-w-4xl mx-auto relative z-10">
+            <div class="text-7xl mb-6 glow-text" style="color: ${colors.glow};">${phase.icon}</div>
+            
+            <h1 class="font-black mb-4 glow-text" style="font-size: ${baseSize * 2.5}px; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack}; line-height: 1.2;">
+              ${config.game_title || defaultConfig.game_title}
+            </h1>
+            
+            <div class="net-line"></div>
+            
+            <div class="story-box rounded-2xl my-6 mx-auto max-w-3xl" style="border-left-color: ${colors.glow};">
+              <div class="quote-mark" style="color: ${colors.glow};">"</div>
+              <p class="relative z-10 whitespace-pre-line leading-relaxed" style="font-size: ${baseSize * 1.08}px; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack};">
+                ${phase.story.replace(/\${defaultConfig\.coach_name}/g, config.coach_name || defaultConfig.coach_name).replace(/\${defaultConfig\.player_name}/g, config.player_name || defaultConfig.player_name)}
+              </p>
+            </div>
+            
+            <div class="intensity-meter my-8">
+              ${[1,2,3,4,5].map(i => `<div class="intensity-bar ${i <= 1 ? 'active' : ''}" style="color: ${colors.glow};"></div>`).join('')}
+            </div>
+            
+            <div class="mobile-kpis">
+              <span class="mobile-kpi">5 lecturas clave</span>
+              <span class="mobile-kpi">Decisiones bajo presión</span>
+              <span class="mobile-kpi">Aplicación inmediata</span>
+            </div>
+            
+            <button id="startBtn" class="px-12 py-5 rounded-2xl font-bold text-lg transition-all shadow-2xl hover:scale-105" style="background-color: ${config.primary_action_color || defaultConfig.primary_action_color}; color: ${config.background_color || defaultConfig.background_color}; font-family: ${customFont}, ${baseFontStack};">
+              ${config.start_button_text || defaultConfig.start_button_text} →
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPhase(phaseIndex) {
+      const phase = storyPhases[phaseIndex];
+      const progress = (phaseIndex / storyPhases.length) * 100;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseFontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+      const colors = getAtmosphereColors(phase.atmosphere);
+      
+      return `
+        <div class="tennis-court-bg relative" style="min-height: 100%; overflow-y: auto;">
+          <div class="court-corner corner-tl"></div>
+          <div class="court-corner corner-tr"></div>
+          
+          <div class="fade-in px-4 py-6 max-w-5xl mx-auto relative z-10">
+            <!-- Progress Bar -->
+            <div class="mb-8 rounded-full overflow-hidden" style="background-color: ${config.surface_color || defaultConfig.surface_color}; height: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);">
+              <div class="progress-bar h-full relative" style="width: ${progress}%; background: linear-gradient(90deg, ${config.primary_action_color || defaultConfig.primary_action_color}, ${colors.glow}); box-shadow: 0 0 20px ${colors.shadow};">
+              </div>
+            </div>
+            
+            <div class="flex items-center justify-between mb-8">
+              <div class="score-badge" style="background-color: ${config.surface_color || defaultConfig.surface_color}; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack};">
+                ✓ ${correctAnswers} Correctas
+              </div>
+              <div class="score-badge" style="background-color: ${config.surface_color || defaultConfig.surface_color}; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack};">
+                Lección ${phaseIndex}/${storyPhases.length - 1}
+              </div>
+            </div>
+
+            <!-- Phase Header -->
+            <div class="text-center mb-8">
+              <div class="text-6xl mb-4 glow-text" style="color: ${colors.glow};">${phase.icon}</div>
+              <h2 class="font-black mb-6 glow-text" style="font-size: ${baseSize * 1.8}px; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack}; line-height: 1.2;">
+                ${phase.title}
+              </h2>
+              
+              <div class="intensity-meter">
+                ${[1,2,3,4,5].map(i => `<div class="intensity-bar ${i <= phase.intensity ? 'active' : ''}" style="color: ${colors.glow};"></div>`).join('')}
+              </div>
+            </div>
+
+            <!-- Story Section -->
+            <div class="story-box rounded-2xl mb-8" style="border-left-color: ${colors.glow};">
+              <div class="quote-mark" style="color: ${colors.glow};">"</div>
+              <p class="relative z-10 whitespace-pre-line leading-relaxed mb-6" style="font-size: ${baseSize * 1.15}px; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack};">
+                ${phase.story.replace(/\${defaultConfig\.coach_name}/g, config.coach_name || defaultConfig.coach_name).replace(/\${defaultConfig\.player_name}/g, config.player_name || defaultConfig.player_name)}
+              </p>
+            </div>
+
+            ${phase.visualCue ? `
+              <div class="mb-8 p-6 rounded-xl text-center" style="background: linear-gradient(135deg, ${config.surface_color || defaultConfig.surface_color}, rgba(0,0,0,0.3)); border: 2px solid ${colors.glow}; box-shadow: 0 0 30px ${colors.shadow};">
+                <div class="text-3xl mb-3">👁️</div>
+                <p class="italic" style="font-size: ${baseSize * 1.05}px; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack};">
+                  ${phase.visualCue}
+                </p>
+              </div>
+            ` : ''}
+
+            ${phase.coachTip ? `
+              <div class="mb-8 p-6 rounded-xl" style="background-color: ${config.surface_color || defaultConfig.surface_color}; border-left: 4px solid ${config.secondary_action_color || defaultConfig.secondary_action_color};">
+                <div class="flex items-start gap-4">
+                  <div class="text-3xl">💡</div>
+                  <div>
+                    <p class="font-bold mb-2" style="font-size: ${baseSize * 1.1}px; color: ${config.secondary_action_color || defaultConfig.secondary_action_color}; font-family: ${customFont}, ${baseFontStack};">
+                      Consejo del ${config.coach_name || defaultConfig.coach_name}:
+                    </p>
+                    <p style="font-size: ${baseSize}px; color: ${config.text_color || defaultConfig.text_color}; opacity: 0.9; font-family: ${customFont}, ${baseFontStack};">
+                      ${phase.coachTip}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+
+            <div class="net-line"></div>
+
+            <!-- Question Section -->
+            <div class="mb-8 p-6 rounded-2xl" style="background: linear-gradient(135deg, ${config.surface_color || defaultConfig.surface_color}, rgba(0,0,0,0.4)); border: 2px solid ${colors.glow}; box-shadow: 0 8px 32px ${colors.shadow};">
+              <p class="whitespace-pre-line leading-relaxed" style="font-size: ${baseSize * 1.02}px; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack};">
+                ${phase.question}
+              </p>
+            </div>
+
+            <!-- Options -->
+            <div id="optionsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              ${phase.options.map((option, index) => `
+                <div class="option-card p-6 rounded-xl relative" data-index="${index}" style="background: linear-gradient(135deg, ${config.surface_color || defaultConfig.surface_color}, rgba(0,0,0,0.3)); border: 3px solid transparent; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">
+                  <div class="flex items-start gap-4">
+                    <div class="text-3xl flex-shrink-0" style="opacity: 0.6;">${['A', 'B', 'C', 'D'][index]}</div>
+                    <p style="font-size: ${baseSize * 1.05}px; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack}; line-height: 1.6;">
+                      ${option.text}
+                    </p>
+                  </div>
+                  <div class="tooltip" style="background-color: ${config.surface_color || defaultConfig.surface_color}; color: ${config.text_color || defaultConfig.text_color}; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                    Elige sabiamente
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- Feedback Section -->
+            <div id="feedbackContainer" class="hidden mb-8">
+              <div class="p-8 rounded-2xl" style="background: linear-gradient(135deg, ${config.surface_color || defaultConfig.surface_color}, rgba(0,0,0,0.4)); border-left: 6px solid ${colors.glow}; box-shadow: 0 8px 32px ${colors.shadow};">
+                <div class="flex items-start gap-4 mb-6">
+                  <div id="feedbackIcon" class="text-5xl"></div>
+                  <div class="flex-1">
+                    <p id="feedbackText" class="font-bold mb-4 leading-relaxed" style="font-size: ${baseSize * 1.25}px; font-family: ${customFont}, ${baseFontStack};"></p>
+                    <p id="optionFeedback" class="mb-6 leading-relaxed" style="font-size: ${baseSize * 1.05}px; font-family: ${customFont}, ${baseFontStack}; opacity: 0.9;"></p>
+                  </div>
+                </div>
+                <div class="p-6 rounded-xl" style="background-color: rgba(0,0,0,0.3);">
+                  <p id="principleText" class="whitespace-pre-line leading-relaxed" style="font-size: ${baseSize * 1.1}px; font-family: ${customFont}, ${baseFontStack};"></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Next Button -->
+            <div id="nextButtonContainer" class="hidden text-center">
+              <button id="nextBtn" class="px-12 py-5 rounded-2xl font-bold text-lg transition-all shadow-2xl hover:scale-105" style="background-color: ${config.primary_action_color || defaultConfig.primary_action_color}; color: ${config.background_color || defaultConfig.background_color}; font-family: ${customFont}, ${baseFontStack};">
+                ${config.continue_button_text || defaultConfig.continue_button_text} →
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderComplete() {
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseFontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+      const score = correctAnswers;
+      const total = storyPhases.length - 1;
+      const percentage = Math.round((score / total) * 100);
+      
+      let message, emoji, gradientColors;
+      if (percentage === 100) {
+        message = "¡MAESTRO DE LA RED!";
+        emoji = "🏆";
+        gradientColors = "#fbbf24, #f59e0b";
+      } else if (percentage >= 80) {
+        message = "¡EXCELENTE LECTURA!";
+        emoji = "🌟";
+        gradientColors = "#10b981, #059669";
+      } else if (percentage >= 60) {
+        message = "¡BUEN PROGRESO!";
+        emoji = "💪";
+        gradientColors = "#6366f1, #4f46e5";
+      } else {
+        message = "¡SIGUE ENTRENANDO!";
+        emoji = "🎯";
+        gradientColors = "#8b5cf6, #7c3aed";
+      }
+      
+      return `
+        <div class="tennis-court-bg relative" style="min-height: 100%; display: flex; align-items: center; justify-content: center;">
+          <div class="court-corner corner-tl"></div>
+          <div class="court-corner corner-tr"></div>
+          <div class="court-corner corner-bl"></div>
+          <div class="court-corner corner-br"></div>
+          
+          <div class="fade-in text-center px-6 py-12 max-w-4xl mx-auto relative z-10">
+            <div class="text-8xl mb-8 glow-text" style="color: ${config.primary_action_color || defaultConfig.primary_action_color};">${emoji}</div>
+            
+            <h1 class="font-black mb-6 glow-text" style="font-size: ${baseSize * 2.5}px; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack};">
+              ${message}
+            </h1>
+            
+            <div class="mb-8 p-8 rounded-2xl inline-block" style="background: linear-gradient(135deg, ${gradientColors}); box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+              <div class="text-6xl font-black mb-2" style="color: white; font-family: ${customFont}, ${baseFontStack};">
+                ${score}/${total}
+              </div>
+              <div class="text-xl font-bold" style="color: white; font-family: ${customFont}, ${baseFontStack}; opacity: 0.9;">
+                Respuestas Correctas
+              </div>
+            </div>
+
+            <div class="net-line"></div>
+            
+            <div class="story-box rounded-2xl my-10 mx-auto max-w-3xl" style="border-left-color: ${config.primary_action_color || defaultConfig.primary_action_color};">
+              <div class="quote-mark" style="color: ${config.primary_action_color || defaultConfig.primary_action_color};">"</div>
+              <p class="relative z-10 font-bold mb-6" style="font-size: ${baseSize * 1.5}px; color: ${config.primary_action_color || defaultConfig.primary_action_color}; line-height: 1.6; font-family: ${customFont}, ${baseFontStack};">
+                "Subir a la red es una consecuencia,<br>no una decisión impulsiva."
+              </p>
+              <p class="relative z-10 text-2xl" style="color: ${config.text_color || defaultConfig.text_color}; opacity: 0.9; line-height: 1.8; font-family: ${customFont}, ${baseFontStack};">
+                Cuando lees bien, el punto se cierra solo.
+              </p>
+            </div>
+
+            <div class="mb-10 p-8 rounded-2xl" style="background-color: ${config.surface_color || defaultConfig.surface_color};">
+              <p class="font-bold mb-4" style="font-size: ${baseSize * 1.2}px; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack};">
+                📋 Lo que ahora sabes:
+              </p>
+              <div class="text-left max-w-2xl mx-auto" style="font-size: ${baseSize * 1.05}px; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack}; line-height: 2;">
+                ✓ El golpe previo decide si subes<br>
+                ✓ Geometría: avanzas en diagonal según tu tiro<br>
+                ✓ Distancia: 3m primera volea, 2m segunda, 1m cierre<br>
+                ✓ Dirección: primera volea cruzada (70% del tiempo)<br>
+                ✓ Anticipación: lee antes de que el rival golpee
+              </div>
+            </div>
+            
+            <div id="accordionContainer" class="mb-10 max-w-3xl mx-auto hidden">
+              <div class="p-6 rounded-xl mb-4" style="background-color: ${config.surface_color || defaultConfig.surface_color}; border: 2px solid ${config.primary_action_color || defaultConfig.primary_action_color};">
+                <h3 class="font-bold mb-6 text-center" style="font-size: ${baseSize * 1.4}px; color: ${config.primary_action_color || defaultConfig.primary_action_color}; font-family: ${customFont}, ${baseFontStack};">
+                  📋 Checklist para Cancha
+                </h3>
+                
+                <div class="space-y-3">
+                  <div class="accordion-item p-4 rounded-lg cursor-pointer transition-all" style="background-color: rgba(0,0,0,0.2);" data-index="0">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold" style="font-size: ${baseSize * 1.05}px; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack};">
+                        1️⃣ Antes de Subir: Lee el Golpe Previo
+                      </span>
+                      <span class="accordion-icon text-2xl" style="color: ${config.primary_action_color || defaultConfig.primary_action_color};">+</span>
+                    </div>
+                    <div class="accordion-content hidden mt-4 pl-8" style="font-size: ${baseSize * 0.95}px; color: ${config.text_color || defaultConfig.text_color}; opacity: 0.9; line-height: 1.8; font-family: ${customFont}, ${baseFontStack};">
+                      ✓ ¿Tu golpe fue profundo Y pesado?<br>
+                      ✓ ¿Tu golpe fue corto Y el rival corre?<br>
+                      ✓ ¿El rival está INCÓMODO?<br>
+                      ❌ Nunca subas con golpe medio sin peso
+                    </div>
+                  </div>
+
+                  <div class="accordion-item p-4 rounded-lg cursor-pointer transition-all" style="background-color: rgba(0,0,0,0.2);" data-index="1">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold" style="font-size: ${baseSize * 1.05}px; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack};">
+                        2️⃣ Geometría: Avanza en Diagonal
+                      </span>
+                      <span class="accordion-icon text-2xl" style="color: ${config.primary_action_color || defaultConfig.primary_action_color};">+</span>
+                    </div>
+                    <div class="accordion-content hidden mt-4 pl-8" style="font-size: ${baseSize * 0.95}px; color: ${config.text_color || defaultConfig.text_color}; opacity: 0.9; line-height: 1.8; font-family: ${customFont}, ${baseFontStack};">
+                      ✓ Tiraste cruzado → Avanza diagonal a TU lado de ese cruce<br>
+                      ✓ Tiraste paralelo → Avanza recto cubriendo línea<br>
+                      ✓ No corras al centro ciegamente<br>
+                      📐 Cubre el ángulo más probable, no todos
+                    </div>
+                  </div>
+
+                  <div class="accordion-item p-4 rounded-lg cursor-pointer transition-all" style="background-color: rgba(0,0,0,0.2);" data-index="2">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold" style="font-size: ${baseSize * 1.05}px; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack};">
+                        3️⃣ Distancia: La Zona de Oro
+                      </span>
+                      <span class="accordion-icon text-2xl" style="color: ${config.primary_action_color || defaultConfig.primary_action_color};">+</span>
+                    </div>
+                    <div class="accordion-content hidden mt-4 pl-8" style="font-size: ${baseSize * 0.95}px; color: ${config.text_color || defaultConfig.text_color}; opacity: 0.9; line-height: 1.8; font-family: ${customFont}, ${baseFontStack};">
+                      📏 <strong>Primera volea:</strong> 3-3.5m de la red (zona servicio)<br>
+                      📏 <strong>Segunda volea:</strong> 2-2.5m (presionar)<br>
+                      📏 <strong>Tercera volea:</strong> 1-1.5m (definir)<br>
+                      ⚠️ Nunca pegues a la red en primera volea
+                    </div>
+                  </div>
+
+                  <div class="accordion-item p-4 rounded-lg cursor-pointer transition-all" style="background-color: rgba(0,0,0,0.2);" data-index="3">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold" style="font-size: ${baseSize * 1.05}px; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack};">
+                        4️⃣ Dirección: Primera Volea Cruzada
+                      </span>
+                      <span class="accordion-icon text-2xl" style="color: ${config.primary_action_color || defaultConfig.primary_action_color};">+</span>
+                    </div>
+                    <div class="accordion-content hidden mt-4 pl-8" style="font-size: ${baseSize * 0.95}px; color: ${config.text_color || defaultConfig.text_color}; opacity: 0.9; line-height: 1.8; font-family: ${customFont}, ${baseFontStack};">
+                      🎯 <strong>Primera volea:</strong> 70% cruzado (rival sigue corriendo)<br>
+                      🎯 <strong>Segunda volea:</strong> Al espacio o pies<br>
+                      🎯 <strong>Tercera volea:</strong> Winner o ángulo imposible<br>
+                      ❌ No busques winner en primera volea
+                    </div>
+                  </div>
+
+                  <div class="accordion-item p-4 rounded-lg cursor-pointer transition-all" style="background-color: rgba(0,0,0,0.2);" data-index="4">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold" style="font-size: ${baseSize * 1.05}px; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack};">
+                        5️⃣ Anticipación: Lee Antes de Que Golpee
+                      </span>
+                      <span class="accordion-icon text-2xl" style="color: ${config.primary_action_color || defaultConfig.primary_action_color};">+</span>
+                    </div>
+                    <div class="accordion-content hidden mt-4 pl-8" style="font-size: ${baseSize * 0.95}px; color: ${config.text_color || defaultConfig.text_color}; opacity: 0.9; line-height: 1.8; font-family: ${customFont}, ${baseFontStack};">
+                      👁️ Observa: ¿Está retrocediendo?<br>
+                      👁️ Hombros abiertos = golpe defensivo<br>
+                      👁️ Preparación alta = bola sin peso<br>
+                      🏃 Si TODO indica defensa → ya estás avanzando<br>
+                      ⚡ Anticipa, no reacciones
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-6 justify-center">
+              <button id="repeatBtn" class="px-10 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:scale-105" style="background-color: ${config.secondary_action_color || defaultConfig.secondary_action_color}; color: ${config.text_color || defaultConfig.text_color}; font-family: ${customFont}, ${baseFontStack};">
+                🔄 ${config.repeat_button_text || defaultConfig.repeat_button_text}
+              </button>
+              <button id="practiceBtn" class="px-10 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:scale-105" style="background-color: ${config.primary_action_color || defaultConfig.primary_action_color}; color: ${config.background_color || defaultConfig.background_color}; font-family: ${customFont}, ${baseFontStack};">
+                🎾 Llevar a la cancha
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function render() {
+      const app = document.getElementById('app');
+      const backgroundColor = config.background_color || defaultConfig.background_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      
+      app.style.backgroundColor = backgroundColor;
+      app.style.color = textColor;
+      app.style.minHeight = '100%';
+      
+      if (currentPhase === 0) {
+        app.innerHTML = renderWelcome();
+        document.getElementById('startBtn').addEventListener('click', () => {
+          currentPhase = 1;
+          selectedAnswer = null;
+          phaseStartTime = Date.now();
+          render();
+          acScrollToTop();
+        });
+      } else if (currentPhase > storyPhases.length - 1) {
+        app.innerHTML = renderComplete();
+        document.getElementById('repeatBtn').addEventListener('click', () => {
+          currentPhase = 0;
+          selectedAnswer = null;
+          correctAnswers = 0;
+          render();
+          acScrollToTop();
+        });
+        const practiceBtn = document.getElementById('practiceBtn');
+        const accordionContainer = document.getElementById('accordionContainer');
+        
+        practiceBtn.addEventListener('click', () => {
+          accordionContainer.classList.toggle('hidden');
+          practiceBtn.textContent = accordionContainer.classList.contains('hidden') 
+            ? '🎾 Llevar a la cancha' 
+            : '✕ Cerrar checklist';
+          
+          if (!accordionContainer.classList.contains('hidden')) {
+            accordionContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        });
+
+        document.querySelectorAll('.accordion-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const content = item.querySelector('.accordion-content');
+            const icon = item.querySelector('.accordion-icon');
+            const isOpen = !content.classList.contains('hidden');
+            
+            document.querySelectorAll('.accordion-content').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.accordion-icon').forEach(i => i.textContent = '+');
+            
+            if (!isOpen) {
+              content.classList.remove('hidden');
+              icon.textContent = '−';
+              item.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+            } else {
+              item.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+            }
+          });
+        });
+      } else {
+        app.innerHTML = renderPhase(currentPhase);
+        setupPhaseListeners();
+      }
+    }
+
+    function setupPhaseListeners() {
+      const phase = storyPhases[currentPhase];
+      const optionCards = document.querySelectorAll('.option-card');
+      const feedbackContainer = document.getElementById('feedbackContainer');
+      const feedbackIcon = document.getElementById('feedbackIcon');
+      const feedbackText = document.getElementById('feedbackText');
+      const optionFeedback = document.getElementById('optionFeedback');
+      const principleText = document.getElementById('principleText');
+      const nextButtonContainer = document.getElementById('nextButtonContainer');
+      const colors = getAtmosphereColors(phase.atmosphere);
+      
+      optionCards.forEach(card => {
+        card.addEventListener('click', () => {
+          if (selectedAnswer !== null) return;
+          
+          const index = parseInt(card.dataset.index);
+          selectedAnswer = index;
+          const option = phase.options[index];
+          const isCorrect = option.correct;
+          
+          if (isCorrect) {
+            correctAnswers++;
+            card.classList.add('correct');
+            card.style.borderColor = config.primary_action_color || defaultConfig.primary_action_color;
+            card.style.boxShadow = `0 0 30px ${getAtmosphereColors(phase.atmosphere).shadow}`;
+            feedbackIcon.textContent = '✓';
+            feedbackIcon.style.color = config.primary_action_color || defaultConfig.primary_action_color;
+            feedbackText.textContent = '¡CORRECTO!';
+            feedbackText.style.color = config.primary_action_color || defaultConfig.primary_action_color;
+          } else {
+            card.classList.add('incorrect');
+            card.style.borderColor = '#ef4444';
+            card.style.boxShadow = '0 0 30px rgba(239, 68, 68, 0.4)';
+            feedbackIcon.textContent = '✗';
+            feedbackIcon.style.color = '#ef4444';
+            feedbackText.textContent = 'No exactamente...';
+            feedbackText.style.color = '#ef4444';
+            
+            optionCards.forEach((c, i) => {
+              if (phase.options[i].correct) {
+                c.style.borderColor = config.primary_action_color || defaultConfig.primary_action_color;
+                c.style.boxShadow = `0 0 20px ${getAtmosphereColors(phase.atmosphere).shadow}`;
+              }
+            });
+          }
+          
+          optionFeedback.textContent = option.feedback;
+          optionFeedback.style.color = config.text_color || defaultConfig.text_color;
+          principleText.innerHTML = phase.principle;
+          principleText.style.color = config.text_color || defaultConfig.text_color;
+          feedbackContainer.classList.remove('hidden');
+          nextButtonContainer.classList.remove('hidden');
+          
+          optionCards.forEach(c => {
+            c.style.cursor = 'default';
+            c.style.pointerEvents = 'none';
+          });
+
+          feedbackContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+      });
+      
+      const nextBtn = document.getElementById('nextBtn');
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          currentPhase++;
+          selectedAnswer = null;
+          phaseStartTime = Date.now();
+          render();
+          acScrollToTop();
+        });
+      }
+    }
+
+    function showToast(message, color) {
+      const toast = document.createElement('div');
+      toast.className = 'fade-in fixed bottom-8 left-1/2 px-8 py-4 rounded-xl shadow-2xl z-50';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.backgroundColor = color;
+      toast.style.color = config.background_color || defaultConfig.background_color;
+      toast.style.fontFamily = `${config.font_family || defaultConfig.font_family}, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+      toast.style.fontWeight = 'bold';
+      toast.style.fontSize = `${(config.font_size || defaultConfig.font_size) * 1.1}px`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    async function onConfigChange(newConfig) {
+      Object.assign(config, newConfig);
+      render();
+    }
+
+    function mapToCapabilities(cfg) {
+      return {
+        recolorables: [
+          {
+            get: () => cfg.background_color || defaultConfig.background_color,
+            set: (value) => {
+              cfg.background_color = value;
+              if (window.elementSdk) {
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            }
+          },
+          {
+            get: () => cfg.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              cfg.surface_color = value;
+              if (window.elementSdk) {
+                window.elementSdk.setConfig({ surface_color: value });
+              }
+            }
+          },
+          {
+            get: () => cfg.text_color || defaultConfig.text_color,
+            set: (value) => {
+              cfg.text_color = value;
+              if (window.elementSdk) {
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            }
+          },
+          {
+            get: () => cfg.primary_action_color || defaultConfig.primary_action_color,
+            set: (value) => {
+              cfg.primary_action_color = value;
+              if (window.elementSdk) {
+                window.elementSdk.setConfig({ primary_action_color: value });
+              }
+            }
+          },
+          {
+            get: () => cfg.secondary_action_color || defaultConfig.secondary_action_color,
+            set: (value) => {
+              cfg.secondary_action_color = value;
+              if (window.elementSdk) {
+                window.elementSdk.setConfig({ secondary_action_color: value });
+              }
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => cfg.font_family || defaultConfig.font_family,
+          set: (value) => {
+            cfg.font_family = value;
+            if (window.elementSdk) {
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          }
+        },
+        fontSizeable: {
+          get: () => cfg.font_size || defaultConfig.font_size,
+          set: (value) => {
+            cfg.font_size = value;
+            if (window.elementSdk) {
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(cfg) {
+      return new Map([
+        ["game_title", cfg.game_title || defaultConfig.game_title],
+        ["coach_name", cfg.coach_name || defaultConfig.coach_name],
+        ["player_name", cfg.player_name || defaultConfig.player_name],
+        ["start_button_text", cfg.start_button_text || defaultConfig.start_button_text],
+        ["continue_button_text", cfg.continue_button_text || defaultConfig.continue_button_text],
+        ["repeat_button_text", cfg.repeat_button_text || defaultConfig.repeat_button_text]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+
+    currentPhase = 0;
+    render();
+  </script>
+<!-- AC_SCROLL_HELPERS_START -->
+<script>
+  function acScrollToTop() {
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+  }
+
+  function acScrollToElement(id, offset) {
+    var target = document.getElementById(id);
+    if (!target) { acScrollToTop(); return; }
+    var top = target.getBoundingClientRect().top + window.pageYOffset - (offset || 24);
+    try { window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' }); } catch (e) { window.scrollTo(0, Math.max(0, top)); }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () { window.scrollTo(0, 0); });
+</script>
+<!-- AC_SCROLL_HELPERS_END -->
+</body>
+</html>
