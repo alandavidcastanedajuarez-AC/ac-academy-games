@@ -982,6 +982,10 @@
       minigame5: { completed: 0, total: 10 }
     };
 
+    function scrollToGameTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function updateProgress() {
       const totalCompleted = 
         gameState.minigame1.completed + 
@@ -1008,7 +1012,7 @@
       
       buttons.forEach((btn, index) => {
         btn.disabled = true;
-        if (index === correctIndex) {
+        if (index === correctIndex && isCorrect) {
           btn.classList.add('correct');
         } else if (!isCorrect && btn === event.target) {
           btn.classList.add('incorrect');
@@ -1034,7 +1038,7 @@
         section.classList.add('hidden');
       });
       document.getElementById(`minigame${number}`).classList.remove('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollToGameTop();
     }
 
     function revealPhase(phaseNum) {
@@ -1172,7 +1176,7 @@
           </div>
 
           <div style="display: grid; gap: 1rem;">
-            <button onclick="window.location.reload()" style="
+            <button onclick="restartGame()" style="
               background: linear-gradient(135deg, #fbbf24, #f59e0b);
               border: none;
               border-radius: 12px;
@@ -1200,6 +1204,7 @@
       `;
       
       document.body.appendChild(resultScreen);
+      scrollToGameTop();
     }
 
     function saveProgress() {
@@ -1227,9 +1232,35 @@
         saveMessage.remove();
       }, 2000);
     }
+
+    function restartGame() {
+      document.querySelectorAll('.option-button').forEach(button => {
+        button.disabled = false;
+        button.classList.remove('correct', 'incorrect');
+      });
+      document.querySelectorAll('.teaching-box, #final-teaching-3, #next-1, #next-2, #next-3, #next-4, #next-5').forEach(el => {
+        el.classList.remove('show');
+      });
+      document.querySelectorAll('.phase-btn').forEach(btn => btn.classList.remove('revealed'));
+      document.querySelectorAll('.minigame-section').forEach(section => section.classList.add('hidden'));
+      document.getElementById('minigame1').classList.remove('hidden');
+      gameState.minigame1.completed = 0;
+      gameState.minigame2.completed = 0;
+      gameState.minigame3.phasesRevealed = 0;
+      gameState.minigame4.completed = 0;
+      gameState.minigame5.completed = 0;
+      document.getElementById('progressBar').style.width = '0%';
+      document.querySelectorAll('[id^="teaching-"]').forEach(box => box.classList.remove('show'));
+      Array.from(document.body.children).forEach(node => {
+        if (node.style && node.style.position === 'fixed') {
+          const text = node.textContent || '';
+          if (text.includes('CUERPO DE ATLETA AC') || text.includes('Aprendizaje guardado correctamente')) {
+            node.remove();
+          }
+        }
+      });
+      scrollToGameTop();
+    }
   </script>
- <script>
-(function(){function acGameScrollTop(){try{window.scrollTo(0,0);}catch(e){}['.container','.game-container','.game-area','.game-section','.section','.phase-container','.results-screen','.modal-content'].forEach(function(selector){document.querySelectorAll(selector).forEach(function(element){if(!element){return;}try{if(typeof element.scrollTo==='function'){element.scrollTo(0,0);}else{element.scrollTop=0;}}catch(e){element.scrollTop=0;}});});}window.acGameScrollTop=acGameScrollTop;document.addEventListener('click',function(event){var trigger=event.target.closest('button, .btn, .btn-primary, .btn-secondary, .option-btn, .option-button, .action-btn, .phase-button');if(!trigger){return;}setTimeout(acGameScrollTop,40);setTimeout(acGameScrollTop,220);},true);document.addEventListener('DOMContentLoaded',function(){acGameScrollTop();setTimeout(acGameScrollTop,120);});})();
-</script>
 </body>
 </html>

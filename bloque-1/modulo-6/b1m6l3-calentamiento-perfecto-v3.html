@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calentamiento perfecto</title>
+  <title>Calentamiento inteligente</title>
   <style>
     body {
       box-sizing: border-box;
@@ -1117,6 +1117,10 @@
       droppedItems: {}
     };
 
+    function scrollToGameTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     const situations = [
       {
         text: '"Me siento muy rígido de la cadera y zona lumbar, como si no pudiera moverme con fluidez."',
@@ -1359,6 +1363,7 @@
       gameState.currentSituation = 0;
       updateScore();
       showNextSituation();
+      scrollToGameTop();
     }
 
     function showNextSituation() {
@@ -1422,6 +1427,7 @@
       gameState.currentError = 0;
       updateScore();
       showNextError();
+      scrollToGameTop();
     }
 
     function showNextError() {
@@ -1478,6 +1484,7 @@
       gameState.currentQuestion = 0;
       updateScore();
       showNextQuestion();
+      scrollToGameTop();
     }
 
     function showNextQuestion() {
@@ -1522,7 +1529,7 @@
         feedback.innerHTML = `<div class="feedback-message success"><strong>¡Correcto! ✓</strong><br>${question.explanation}</div>`;
         gameState.scores.part5 += 33.33;
       } else {
-        feedback.innerHTML = `<div class="feedback-message error"><strong>Incorrecto.</strong><br><strong>Respuesta correcta:</strong> ${question.options[question.correct]}<br><br>${question.explanation}</div>`;
+        feedback.innerHTML = `<div class="feedback-message error"><strong>Incorrecto.</strong><br>Vuelve a pensar en la lógica del calentamiento.<br><br>${question.explanation}</div>`;
       }
 
       updateScore();
@@ -1538,6 +1545,7 @@
       document.getElementById('finalResults').classList.remove('hidden');
       gameState.currentPart = 6;
       updateScore();
+      scrollToGameTop();
 
       const finalScore = gameState.totalScore;
       document.getElementById('finalScoreNumber').textContent = finalScore + '%';
@@ -1608,7 +1616,7 @@
       document.getElementById('showResultsBtn').style.display = 'none';
       document.getElementById('feedbackPart2').innerHTML = '';
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollToGameTop();
     }
 
     function showVideoMessage() {
@@ -1724,8 +1732,5 @@
       updateScore();
     });
   </script>
- <script>
-(function(){function acGameScrollTop(){try{window.scrollTo(0,0);}catch(e){}['.container','.game-container','.game-area','.game-section','.section','.phase-container','.results-screen','.modal-content'].forEach(function(selector){document.querySelectorAll(selector).forEach(function(element){if(!element){return;}try{if(typeof element.scrollTo==='function'){element.scrollTo(0,0);}else{element.scrollTop=0;}}catch(e){element.scrollTop=0;}});});}window.acGameScrollTop=acGameScrollTop;document.addEventListener('click',function(event){var trigger=event.target.closest('button, .btn, .btn-primary, .btn-secondary, .option-btn, .option-button, .action-btn, .phase-button');if(!trigger){return;}setTimeout(acGameScrollTop,40);setTimeout(acGameScrollTop,220);},true);document.addEventListener('DOMContentLoaded',function(){acGameScrollTop();setTimeout(acGameScrollTop,120);});})();
-</script>
 </body>
 </html>

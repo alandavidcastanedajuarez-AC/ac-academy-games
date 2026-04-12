@@ -1184,7 +1184,7 @@
      </div>
      <div id="score-badge-container"></div>
      <p id="score-message" style="font-size: 20px; color: #4a5568; margin: 20px 0;"></p>
-     <div class="action-buttons"><button class="action-btn action-btn-primary" onclick="window.location.reload()">Repetir juego</button> <button class="action-btn action-btn-secondary" id="exercises-btn">Ejercicios por zona</button>
+     <div class="action-buttons"><button class="action-btn action-btn-primary" onclick="restartGame()">Repetir juego</button> <button class="action-btn action-btn-secondary" id="exercises-btn">Ejercicios por zona</button>
      </div>
      <div id="exercises-panel" class="hidden" style="margin-top: 30px; text-align: left; background: #f7fafc; padding: 30px; border-radius: 12px;">
       <h3 style="font-size: 24px; color: #2d3748; margin-bottom: 20px;">📋 Ejemplos de Ejercicios Específicos por Zona</h3>
@@ -1230,9 +1230,9 @@
   </div>
   <script>
     const defaultConfig = {
-      game_title: "🎮 CUERPO SEGURO AC ⚠️🎾",
-      game_subtitle: "Cómo Prevenir Lesiones en el Tenis",
-      lesson_label: "📘 Lección 5 – Prevención de lesiones comunes"
+      game_title: "Cuerpo seguro AC",
+      game_subtitle: "Cómo prevenir lesiones en el tenis",
+      lesson_label: "Lección 5 - Prevención de lesiones comunes"
     };
 
     let gameState = {
@@ -1246,6 +1246,10 @@
       part7Correct: 0,
       currentPart: 1
     };
+
+    function scrollToGameTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
     const injuryData = {
       hombro: {
@@ -1491,7 +1495,7 @@
           } else {
             sceneCard.classList.add('incorrect');
             feedback.className = 'feedback incorrect show';
-            feedback.textContent = `✗ Incorrecto. La zona en riesgo es ${scene.correct}. ${scene.explanation}`;
+            feedback.textContent = `✗ Vuelve a mirar el gesto y la carga que recibe el cuerpo. ${scene.explanation}`;
           }
           
           updatePart2Progress();
@@ -1792,7 +1796,7 @@
           } else {
             const feedback = card.querySelector('.feedback');
             feedback.className = 'feedback incorrect show';
-            feedback.textContent = `✗ La causa correcta era: ${player.correct}`;
+            feedback.textContent = `✗ No es la causa principal. Revisa la pista corporal del caso y vuelve a relacionarla con el origen más probable.`;
           }
 
           updatePart6Progress();
@@ -1906,6 +1910,47 @@
       });
     }
 
+    function restartGame() {
+      gameState = {
+        score: 0,
+        part1Explored: new Set(),
+        part2Completed: 0,
+        part3Correct: 0,
+        part4Completed: 0,
+        part5Completed: 0,
+        part6Completed: 0,
+        part7Correct: 0,
+        currentPart: 1
+      };
+      document.querySelectorAll('.section').forEach(section => section.classList.add('hidden'));
+      document.getElementById('part1').classList.remove('hidden');
+      document.getElementById('injury-details').className = 'injury-details';
+      document.getElementById('injury-details').innerHTML = '';
+      document.querySelectorAll('.injury-card, .scene-card, .zone-box, .player-card').forEach(card => {
+        card.classList.remove('active', 'correct', 'incorrect', 'selected');
+      });
+      document.querySelectorAll('.feedback').forEach(feedback => {
+        feedback.className = 'feedback';
+        feedback.textContent = '';
+      });
+      document.querySelectorAll('.progress-fill').forEach(fill => fill.style.width = '0%');
+      document.getElementById('score').textContent = '0';
+      document.getElementById('part1-next').disabled = true;
+      ['part2-next','part3-next','part4-next','part5-next','part6-next','part7-finish'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById('questions-container').innerHTML = '';
+      document.getElementById('scenes-container').innerHTML = '';
+      document.getElementById('zones-container').innerHTML = '';
+      document.getElementById('situations-container').innerHTML = '';
+      document.getElementById('errors-container').innerHTML = '';
+      document.getElementById('players-container').innerHTML = '';
+      document.getElementById('exercises-panel').classList.add('hidden');
+      setupPart1();
+      updateScore();
+      scrollToGameTop();
+    }
+
     // Utilidades
     function goToSection(sectionId) {
       document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
@@ -1946,8 +1991,5 @@
       });
     }
   </script>
- <script>
-(function(){function acGameScrollTop(){try{window.scrollTo(0,0);}catch(e){}['.container','.game-container','.game-area','.game-section','.section','.phase-container','.results-screen','.modal-content'].forEach(function(selector){document.querySelectorAll(selector).forEach(function(element){if(!element){return;}try{if(typeof element.scrollTo==='function'){element.scrollTo(0,0);}else{element.scrollTop=0;}}catch(e){element.scrollTop=0;}});});}window.acGameScrollTop=acGameScrollTop;document.addEventListener('click',function(event){var trigger=event.target.closest('button, .btn, .btn-primary, .btn-secondary, .option-btn, .option-button, .action-btn, .phase-button');if(!trigger){return;}setTimeout(acGameScrollTop,40);setTimeout(acGameScrollTop,220);},true);document.addEventListener('DOMContentLoaded',function(){acGameScrollTop();setTimeout(acGameScrollTop,120);});})();
-</script>
 </body>
 </html>

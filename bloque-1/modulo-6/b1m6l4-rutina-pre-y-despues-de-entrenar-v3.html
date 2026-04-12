@@ -612,10 +612,10 @@
      <h1 id="game-title" style="font-size: 42px; color: #667eea; margin: 0 0 10px 0;">🎮 RUTINA TOTAL AC 🔥🎾</h1>
      <p id="lesson-subtitle" style="font-size: 20px; color: #64748b; margin: 5px 0;">📘 Lección 4 – Rutinas rápidas pre y post entrenamiento</p>
     </div>
-    <h2 class="section-title">👋 ¡Bienvenido!</h2>
-    <p style="font-size: 18px; line-height: 1.8; margin-bottom: 20px;">En este juego aprenderás a organizar correctamente tus rutinas de entrenamiento. Descubrirás qué hacer ANTES y DESPUÉS de entrenar, y por qué es tan importante para tu rendimiento.</p>
-    <p style="font-size: 18px; color: #667eea; font-weight: 600; margin-bottom: 20px;">🎯 Aprende a organizar tu rutina ANTES y DESPUÉS del entrenamiento</p>
-    <p style="font-size: 16px; color: #64748b; margin-bottom: 25px;">El juego tiene 6 partes que te llevarán paso a paso hacia convertirte en un experto en rutinas AC.</p>
+    <h2 class="section-title">Pon orden a tu rutina</h2>
+    <p style="font-size: 18px; line-height: 1.7; margin-bottom: 16px;">Aquí vas a decidir qué conviene hacer antes de entrenar, qué va mejor después y cómo reaccionar si tu cuerpo te manda señales.</p>
+    <p style="font-size: 17px; color: #667eea; font-weight: 600; margin-bottom: 20px;">Entramos rápido: explora, ordena, decide y cierra con una rutina clara.</p>
+    <p style="font-size: 15px; color: #64748b; margin-bottom: 25px;">Son 6 bloques cortos. Si ya conoces la idea general, avanza y construye tu versión AC.</p>
     <div class="center"><button id="start-button" class="btn">🚀 Comenzar Entrenamiento</button>
     </div>
    </div><!-- Parte 1: Exploración Guiada -->
@@ -898,6 +898,10 @@
     let parte5Answers = [];
     let parte6Answers = [];
 
+    function scrollToGameTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     // Inicializar Element SDK
     window.elementSdk.init({
       defaultConfig,
@@ -933,11 +937,13 @@
     document.getElementById('start-button').addEventListener('click', () => {
       document.getElementById('parte0').classList.add('hidden');
       document.getElementById('parte1').classList.remove('hidden');
+      scrollToGameTop();
     });
 
     document.getElementById('btn-parte1').addEventListener('click', () => {
       document.getElementById('parte1').classList.add('hidden');
       document.getElementById('parte2').classList.remove('hidden');
+      scrollToGameTop();
     });
 
     // PARTE 2: Drag and Drop
@@ -1067,7 +1073,7 @@
         feedback.classList.remove('hidden');
       } else if (!isCorrectOrder) {
         // Elementos correctos pero en orden incorrecto
-        feedback.textContent = '❌ Los elementos son correctos, pero el ORDEN está incorrecto. Recuerda: primero MOVILIDAD (preparar articulaciones) y luego ACTIVACIÓN (preparar músculos).';
+        feedback.textContent = '❌ Elegiste bien las piezas, pero todavía no fluyen en el orden correcto. Piensa qué necesita activarse primero y qué viene después.';
         feedback.className = 'feedback error';
         feedback.classList.remove('hidden');
       } else {
@@ -1080,6 +1086,7 @@
         setTimeout(() => {
           document.getElementById('parte2').classList.add('hidden');
           document.getElementById('parte3').classList.remove('hidden');
+          scrollToGameTop();
         }, 2000);
       }
     }
@@ -1146,7 +1153,7 @@
         feedback.classList.remove('hidden');
       } else if (!isCorrectOrder) {
         // Elementos correctos pero en orden incorrecto
-        feedback.textContent = '❌ Los elementos son correctos, pero el ORDEN está incorrecto. Recuerda: primero ESTIRAMIENTOS (relajar músculos), luego RESPIRACIÓN (bajar el pulso) y finalmente HIDRATACIÓN (reponer líquidos).';
+        feedback.textContent = '❌ Elegiste bien las piezas, pero el cierre todavía no sigue una secuencia lógica. Reordénalo pensando en soltar, calmar y recuperar.';
         feedback.className = 'feedback error';
         feedback.classList.remove('hidden');
       } else {
@@ -1160,6 +1167,7 @@
           document.getElementById('parte3').classList.add('hidden');
           document.getElementById('parte4').classList.remove('hidden');
           initParte4();
+          scrollToGameTop();
         }, 2000);
       }
     }
@@ -1269,6 +1277,7 @@
       document.getElementById('parte4').classList.add('hidden');
       document.getElementById('parte5').classList.remove('hidden');
       initParte5();
+      scrollToGameTop();
     });
 
     // PARTE 5: ¿Qué está mal?
@@ -1352,6 +1361,7 @@
       document.getElementById('parte5').classList.add('hidden');
       document.getElementById('parte6').classList.remove('hidden');
       initParte6();
+      scrollToGameTop();
     });
 
     // PARTE 6: Prueba Final
@@ -1476,6 +1486,7 @@
     function showResults(totalScore) {
       document.getElementById('parte6').classList.add('hidden');
       document.getElementById('resultado').classList.remove('hidden');
+      scrollToGameTop();
       
       document.getElementById('final-score').textContent = totalScore;
       
@@ -1516,11 +1527,38 @@
     }
 
     document.getElementById('restart-btn').addEventListener('click', () => {
-      window.location.reload();
+      currentScore = {
+        parte2: 0,
+        parte3: 0,
+        parte4: 0,
+        parte5: 0,
+        parte6: 0
+      };
+      parte4Answers = [];
+      parte5Answers = [];
+      parte6Answers = [];
+      document.querySelectorAll('.game-section').forEach(section => section.classList.add('hidden'));
+      document.getElementById('parte0').classList.remove('hidden');
+      document.querySelectorAll('.feedback').forEach(feedback => {
+        feedback.className = 'feedback hidden';
+        feedback.textContent = '';
+      });
+      document.getElementById('check-parte2').disabled = true;
+      document.getElementById('check-parte3').disabled = true;
+      document.getElementById('btn-parte4').classList.add('hidden');
+      document.getElementById('btn-parte5').classList.add('hidden');
+      document.getElementById('submit-parte6').disabled = true;
+      document.getElementById('final-score').textContent = '0';
+      document.getElementById('score-message').textContent = '';
+      document.getElementById('score-breakdown').innerHTML = '';
+      document.querySelectorAll('#cards-parte2 .card, #cards-parte3 .card').forEach(card => {
+        card.style.display = 'block';
+        card.classList.remove('correct', 'incorrect');
+      });
+      document.getElementById('dropped-cards-parte2').innerHTML = '';
+      document.getElementById('dropped-cards-parte3').innerHTML = '';
+      scrollToGameTop();
     });
   </script>
- <script>
-(function(){function acGameScrollTop(){try{window.scrollTo(0,0);}catch(e){}['.container','.game-container','.game-area','.game-section','.section','.phase-container','.results-screen','.modal-content'].forEach(function(selector){document.querySelectorAll(selector).forEach(function(element){if(!element){return;}try{if(typeof element.scrollTo==='function'){element.scrollTo(0,0);}else{element.scrollTop=0;}}catch(e){element.scrollTop=0;}});});}window.acGameScrollTop=acGameScrollTop;document.addEventListener('click',function(event){var trigger=event.target.closest('button, .btn, .btn-primary, .btn-secondary, .option-btn, .option-button, .action-btn, .phase-button');if(!trigger){return;}setTimeout(acGameScrollTop,40);setTimeout(acGameScrollTop,220);},true);document.addEventListener('DOMContentLoaded',function(){acGameScrollTop();setTimeout(acGameScrollTop,120);});})();
-</script>
 </body>
 </html>

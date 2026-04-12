@@ -1495,11 +1495,15 @@
       document.getElementById('score').textContent = kineticScore;
     }
 
+    function scrollToGameTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function goToPhase(phase) {
       document.querySelectorAll('.phase-container').forEach(p => p.classList.remove('active'));
       document.getElementById(`phase${phase}`).classList.add('active');
       currentPhase = phase;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollToGameTop();
     }
 
     // ===== FASE 1: LABORATORIO DE ENERGÍA =====
@@ -1983,17 +1987,8 @@
           const nextQuestion = document.getElementById(`question${questionNum + 1}`);
           nextQuestion.style.opacity = '1';
           nextQuestion.style.pointerEvents = 'auto';
-          
-          window.scrollTo({
-            top: nextQuestion.offsetTop - 100,
-            behavior: 'smooth'
-          });
         } else {
           document.getElementById('phase5Button').style.display = 'block';
-          window.scrollTo({
-            top: document.getElementById('phase5Button').offsetTop - 100,
-            behavior: 'smooth'
-          });
         }
       }, 1500);
     }
@@ -2079,21 +2074,71 @@
           <div class="action-buttons">
             <button class="action-btn primary" onclick="restartGame()">🔄 Repetir</button>
             <button class="action-btn secondary" onclick="showExplanation()">Ver explicacion tecnica</button>
-            <button class="action-btn secondary" onclick="nextLesson()">Volver al inicio</button>
+            <button class="action-btn secondary" onclick="restartGame()">Volver al inicio</button>
           </div>
         </div>
       `;
       
       container.innerHTML += finalScoreHTML;
       
-      window.scrollTo({
-        top: document.querySelector('.final-score-display').offsetTop - 100,
-        behavior: 'smooth'
-      });
+      scrollToGameTop();
     }
 
     function restartGame() {
-      window.location.reload();
+      document.querySelector('.final-score-display')?.remove();
+      kineticScore = 0;
+      currentPhase = 1;
+      activeParts = { pies: false, cadera: false, brazo: false, muneca: false };
+      allPartsActivated = false;
+      timingActive = false;
+      timingNotes = [];
+      currentCombo = 0;
+      totalAttempts = 0;
+      successfulAttempts = 0;
+      bestStreak = 0;
+      currentTimingStep = 0;
+      reactionActive = false;
+      reactionTimes = [];
+      reactionAttempts = 0;
+      reactionSuccesses = 0;
+      perfectHitsCount = 0;
+      currentHighlight = null;
+      highlightStartTime = 0;
+      reactionRound = 0;
+      examAnswers = { 1: null, 2: null, 3: null };
+      examScore = 0;
+      document.getElementById('score').textContent = '0';
+      document.getElementById('comboCount').textContent = '0';
+      document.getElementById('bestStreak').textContent = '0';
+      document.getElementById('accuracy').textContent = '0%';
+      document.getElementById('powerDisplay').textContent = '0%';
+      document.querySelectorAll('.body-segment ellipse, .body-segment rect, .body-segment circle').forEach(shape => {
+        shape.setAttribute('fill', '#475569');
+        shape.setAttribute('opacity', '0.4');
+        shape.style.filter = 'none';
+      });
+      document.querySelectorAll('.info-panel').forEach(panel => panel.style.display = 'none');
+      document.getElementById('infoStart').style.display = 'block';
+      document.getElementById('phase1Success').style.display = 'none';
+      document.getElementById('phase1Button').style.display = 'none';
+      document.getElementById('startTimingGame').style.display = 'block';
+      document.getElementById('phase2Button').style.display = 'none';
+      document.getElementById('phase2Feedback').className = 'feedback-message';
+      document.getElementById('phase2Feedback').textContent = '';
+      document.getElementById('startReactionGame').style.display = 'block';
+      document.getElementById('reactionInstructions').style.display = 'block';
+      document.getElementById('phase3Button').style.display = 'none';
+      document.getElementById('phase3Feedback').className = 'feedback-message';
+      document.getElementById('phase3Feedback').textContent = '';
+      document.querySelectorAll('.question-feedback').forEach(fb => {
+        fb.className = 'question-feedback';
+        fb.textContent = '';
+      });
+      document.querySelectorAll('.exam-option').forEach(option => {
+        option.classList.remove('selected', 'correct', 'incorrect');
+      });
+      document.getElementById('phase5Button').style.display = 'none';
+      goToPhase(1);
     }
 
     function showExplanation() {
@@ -2180,8 +2225,5 @@
       });
     }
   </script>
- <script>
-(function(){function acGameScrollTop(){try{window.scrollTo(0,0);}catch(e){}['.container','.game-container','.game-area','.game-section','.section','.phase-container','.results-screen','.modal-content'].forEach(function(selector){document.querySelectorAll(selector).forEach(function(element){if(!element){return;}try{if(typeof element.scrollTo==='function'){element.scrollTo(0,0);}else{element.scrollTop=0;}}catch(e){element.scrollTop=0;}});});}window.acGameScrollTop=acGameScrollTop;document.addEventListener('click',function(event){var trigger=event.target.closest('button, .btn, .btn-primary, .btn-secondary, .option-btn, .option-button, .action-btn, .phase-button');if(!trigger){return;}setTimeout(acGameScrollTop,40);setTimeout(acGameScrollTop,220);},true);document.addEventListener('DOMContentLoaded',function(){acGameScrollTop();setTimeout(acGameScrollTop,120);});})();
-</script>
 </body>
 </html>
