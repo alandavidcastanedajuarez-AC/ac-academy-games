@@ -403,7 +403,7 @@
   <div class="container"><!-- Pantalla 1: Portada -->
    <div id="home-screen" class="screen active">
     <h1 id="game-title" class="title">Formaciones en dobles</h1>
-    <p id="game-subtitle" class="subtitle">Domina la táctica profesional en dobles</p>
+    <p id="game-subtitle" class="subtitle">Lee la formación, interpreta la presión y decide con criterio</p>
     <div class="tennis-court">
      <div class="court-line center-line"></div>
      <div class="court-line service-line"></div>
@@ -454,7 +454,7 @@
        </ul>
       </div>
      </div>
-    </div><button id="start-game-btn" class="btn">¡Comenzar Entrenamiento Táctico!</button>
+    </div><button id="start-game-btn" class="btn">Empezar reto táctico</button>
    </div><!-- Pantalla 2: Análisis Táctico -->
    <div id="tactical-screen" class="screen">
     <h2 class="title">🧠 ANÁLISIS TÁCTICO</h2>
@@ -657,8 +657,8 @@
         // Configuration object
         const defaultConfig = {
             game_title: "Formaciones en dobles",
-            subtitle: "Domina la táctica profesional en dobles",
-            start_button_text: "¡Comenzar Entrenamiento Táctico!"
+            subtitle: "Lee la formación, interpreta la presión y decide con criterio",
+            start_button_text: "Empezar reto táctico"
         };
 
         let currentScreen = 'home-screen';
@@ -690,12 +690,17 @@
             }
         }
 
+        function scrollToGameTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
             });
             document.getElementById(screenId).classList.add('active');
             currentScreen = screenId;
+            scrollToGameTop();
         }
 
         function showFeedback(elementId, message, isCorrect) {
@@ -709,7 +714,7 @@
             
             allOptions.forEach(opt => {
                 opt.style.pointerEvents = 'none';
-                if (opt.dataset.correct === 'true') {
+                if (opt === option && isCorrect) {
                     opt.classList.add('correct');
                 } else if (opt === option && !isCorrect) {
                     opt.classList.add('incorrect');
@@ -720,14 +725,14 @@
                 let message = '';
                 if (feedbackId === 'pressure-feedback') {
                     message = isCorrect ? 
-                        '🎯 ¡Excelente! La I-Formation es perfecta para situaciones de máxima presión. El elemento sorpresa puede cambiar completamente la dinámica del punto.' : 
-                        '❌ En situaciones críticas, necesitas máxima sorpresa. La I-Formation oculta completamente tu intención y puede desestabilizar al rival.';
+                        '🎯 ¡Excelente! En presión alta conviene una formación que esconda intenciones y vuelva incómoda la devolución rival.' : 
+                        '❌ Piensa en qué formación vuelve menos predecible el saque y obliga al rival a dudar antes de devolver.';
                 } else if (feedbackId === 'communication-feedback') {
                     message = isCorrect ? 
-                        '🤝 ¡Perfecto! Entiendes la coordinación. Si tu compañero va paralelo, tú debes cubrir el cruzado para tener cobertura completa.' : 
-                        '❌ La comunicación en dobles requiere complementariedad. Si uno cubre paralelo, el otro debe ir al cruzado.';
+                        '🤝 ¡Perfecto! En dobles, la mejor comunicación reparte espacios y evita que ambos persigan la misma pelota.' : 
+                        '❌ Revisa qué espacio queda libre cuando tu compañero toma una línea. La cobertura útil siempre complementa, no duplica.';
                 } else {
-                    message = isCorrect ? '✅ ¡Correcto! Excelente lectura táctica.' : '❌ Revisa la situación y piensa en la mejor estrategia.';
+                    message = isCorrect ? '✅ Buena lectura táctica.' : '❌ Revisa la situación y piensa qué decisión genera más orden y presión sobre el rival.';
                 }
                 showFeedback(feedbackId, message, isCorrect);
             }
@@ -742,8 +747,8 @@
             
             const isCorrect = card.dataset.formation === 'australian';
             const message = isCorrect ? 
-                '🌀 ¡Excelente elección! La formación australiana es perfecta para romper patrones de devolución cruzada. Al posicionar ambos sacadores del mismo lado, fuerzas al rival a cambiar sus ángulos naturales y crear incertidumbre.' : 
-                '🤔 Piensa estratégicamente: si el rival siempre devuelve cruzado con precisión, necesitas una formación que cambie completamente sus ángulos de referencia. La australiana los saca de su zona de confort.';
+                '🌀 ¡Excelente elección! Elegiste una formación que rompe la devolución cruzada cómoda y obliga al rival a recalcular sus ángulos.' : 
+                '🤔 Piensa en una formación que cambie por completo la referencia visual del devolvedor y lo saque de su patrón favorito.';
             
             showFeedback('tactical-feedback', message, isCorrect);
         }
@@ -777,17 +782,17 @@
             let certification = '';
             
             if (finalScore === 3) {
-                message = '🏆 ¡MAESTRO TÁCTICO PROFESIONAL!<br>Puntuación: 3/3';
-                analysis = 'Demuestras un dominio excepcional de las formaciones de dobles. Tu capacidad para leer situaciones de juego y elegir la táctica correcta está al nivel de los mejores equipos del circuito profesional.';
-                certification = '🥇 "Estratega de Dobles - Nivel ATP/WTA"';
+                message = '🏆 Lectura táctica sobresaliente<br>Puntuación: 3/3';
+                analysis = 'Lees muy bien las formaciones de dobles y eliges respuestas útiles según el contexto. Tu criterio táctico ya se siente maduro y aplicable en partido.';
+                certification = '🥇 Estratega de dobles AC - nivel sobresaliente';
             } else if (finalScore === 2) {
-                message = ' ¡Muy buen nivel táctico!<br>Puntuación: 2/3';
-                analysis = 'Tienes una sólida comprensión de las formaciones de dobles. Con un poco más de práctica en situaciones de presión, podrás alcanzar el nivel de maestría táctica.';
-                certification = '🥈 "Táctico Avanzado - Nivel Competitivo"';
+                message = '🎯 Muy buen criterio táctico<br>Puntuación: 2/3';
+                analysis = 'Tienes una comprensión sólida de las formaciones de dobles. Con un poco más de práctica en puntos de presión, tu lectura será todavía más precisa.';
+                certification = '🥈 Táctico avanzado AC';
             } else {
                 message = '📚 Sigue entrenando tu visión táctica<br>Puntuación: ' + finalScore + '/3';
-                analysis = 'Tienes las bases, pero necesitas desarrollar más tu capacidad de análisis situacional. Practica identificando cuándo usar cada formación según el contexto del partido.';
-                certification = '🥉 "Aprendiz Táctico - En Desarrollo"';
+                analysis = 'Tienes las bases, pero todavía conviene afinar cuándo usar cada formación según el momento del punto y la presión del partido.';
+                certification = '🥉 Aprendiz táctico AC';
             }
             
             scoreMessage.innerHTML = message;

@@ -1916,9 +1916,6 @@
             
             optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
                 btn.disabled = true;
-                if (btn.dataset.correct === 'true') {
-                    btn.classList.add('correct');
-                }
             });
 
             if (isCorrect) {

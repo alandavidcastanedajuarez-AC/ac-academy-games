@@ -622,7 +622,7 @@
    <div class="screen active" id="introScreen">
     <div class="intro-screen">
      <h1 class="intro-title" id="gameTitle">Lee al rival</h1>
-     <p class="intro-subtitle" id="gameSubtitle">El Lenguaje Corporal Táctico</p>
+     <p class="intro-subtitle" id="gameSubtitle">Señales corporales que cambian tu decisión en cancha</p>
      <div class="player-silhouettes">
       <div class="silhouette"><span class="silhouette-icon">😔</span> <span class="silhouette-label">Frustrado</span>
       </div>
@@ -631,9 +631,9 @@
       <div class="silhouette"><span class="silhouette-icon">🎯</span> <span class="silhouette-label">Concentrado</span>
       </div>
      </div>
-     <p class="intro-message" id="introText">Tu cuerpo habla.<br>
+     <p class="intro-message" id="introText">Tu cuerpo comunica sensaciones.<br>
       El del rival también.<br>
-      Aprende a leerlo y usarlo a tu favor.</p><button class="btn-primary" id="startBtn" onclick="startGame()">🧠 Empezar el juego</button>
+      Aprende a detectarlas antes de decidir.</p><button class="btn-primary" id="startBtn" onclick="startGame()">🧠 Empezar el reto</button>
     </div>
    </div><!-- Pantalla 2: Juego de Memorama -->
    <div class="screen" id="gameScreen">
@@ -692,9 +692,9 @@
   <script>
     const defaultConfig = {
       game_title: "Lee al rival",
-      game_subtitle: "El Lenguaje Corporal Táctico",
-      intro_text: "Tu cuerpo habla.\nEl del rival también.\nAprende a leerlo y usarlo a tu favor.",
-      start_button: "🧠 Empezar el juego",
+      game_subtitle: "Señales corporales que cambian tu decisión en cancha",
+      intro_text: "Tu cuerpo comunica sensaciones.\nEl del rival también.\nAprende a detectarlas antes de decidir.",
+      start_button: "🧠 Empezar el reto",
       continue_button: "Ir a lectura de partido",
       restart_button: "🔄 Jugar de nuevo"
     };
@@ -1081,12 +1081,6 @@
 
       if (isCorrect) {
         gameState.correctScenarios++;
-      } else {
-        buttons.forEach((btn) => {
-          if (btn !== button && btn.textContent === tacticalScenarios[gameState.scenarioIndex].options.find((option) => option.correct).text) {
-            btn.classList.add('correct');
-          }
-        });
       }
 
       const feedbackEl = document.getElementById('scenarioFeedback');
@@ -1190,11 +1184,16 @@
       showScreen('introScreen');
     }
 
+    function scrollToGameTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function showScreen(screenId) {
       document.querySelectorAll('.screen').forEach(screen => {
         screen.classList.remove('active');
       });
       document.getElementById(screenId).classList.add('active');
+      scrollToGameTop();
     }
 
     const dataHandler = {

@@ -952,6 +952,7 @@
       const screens = document.querySelectorAll('.screen');
       screens.forEach(screen => screen.classList.remove('active'));
       document.getElementById(screenId).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function checkAnswer(element, isCorrect, principleNum) {
@@ -1035,12 +1036,12 @@
       }
 
       if (isCorrect) {
-        feedback.textContent = '✅ ¡Pensaste como un estratega! Orden perfecto: Usar tu mejor golpe → Jugar profundo → Atacar debilidad → Mover al rival';
+        feedback.textContent = '✅ Buena secuencia táctica. Priorizaste primero lo que sostiene control y después lo que termina de abrir la ventaja.';
         feedback.className = 'feedback correct show';
         finalChallengeScore = 1;
         score += 1;
       } else {
-        feedback.textContent = '❌ Revisa tus prioridades tácticas. Pista: Primero usa tu arma, luego presiona profundo, ataca la debilidad y finalmente mueve al rival para abrir la cancha.';
+        feedback.textContent = '❌ Revisa el orden de tus prioridades. Piensa primero en qué decisión te da control real del punto y deja para después lo que solo amplía la ventaja.';
         feedback.className = 'feedback incorrect show';
       }
 

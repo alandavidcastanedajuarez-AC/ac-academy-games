@@ -1043,9 +1043,9 @@
        <p>Táctica agresiva que abre espacios y genera ángulos ganadores, pero con mayor riesgo.</p>
       </div>
      </div>
-     <div style="font-size: 1.3rem; margin: 40px 0; padding: 30px; background: rgba(255,255,255,0.1); border-radius: 15px; border-left: 5px solid #ffd700;">
-      <p style="font-style: italic; margin-bottom: 15px; color: #ffd700;">"En dobles, elegir la dirección correcta puede cambiar todo el partido."</p>
-      <p style="font-weight: bold; margin: 0;">¿Sabes cuándo atacar al centro o a los lados?</p>
+      <div style="font-size: 1.3rem; margin: 40px 0; padding: 30px; background: rgba(255,255,255,0.1); border-radius: 15px; border-left: 5px solid #ffd700;">
+      <p style="font-style: italic; margin-bottom: 15px; color: #ffd700;">"No siempre gana el golpe más fuerte: gana el que resuelve mejor la situación."</p>
+      <p style="font-weight: bold; margin: 0;">Aprende a distinguir cuándo conviene asegurar por el centro y cuándo vale la pena abrir la cancha.</p>
      </div><button class="start-btn" onclick="startGame()">¡Comenzar el desafío! 🚀</button>
     </div>
    </div><!-- Sección 1: Ataque al Centro -->
@@ -1709,50 +1709,50 @@
         const challenges = {
             1: {
                 correct: "¡Bien leído! El centro genera confusión y te da más margen de error.",
-                incorrect: "Con ambos en red dejando hueco, el centro es la opción más inteligente."
+                incorrect: "Cuando ambos cierran la red, conviene la dirección que te da más margen y complica su coordinación."
             },
             2: {
                 correct: "Golpear al centro mantiene el control del punto y reduce el riesgo.",
-                incorrect: "En puntos largos e importantes, el centro te da más seguridad y control."
+                incorrect: "En puntos largos, piensa en la opción que te deja controlar el intercambio sin regalar riesgo."
             },
             3: {
                 correct: "Exacto, el centro rompe la coordinación entre ambos en formación I.",
-                incorrect: "En I-Formation, atacar el centro crea más confusión que buscar ángulos."
+                incorrect: "Ante una formación que esconde intenciones, busca la respuesta que más desordene la coordinación rival."
             },
             4: {
                 correct: "Perfecto. Atacaste donde el rival no puede reaccionar a tiempo.",
-                incorrect: "Si cubre el centro, hay que explotar el espacio libre en su línea."
+                incorrect: "Si el centro está bien protegido, revisa qué espacio lateral queda realmente disponible."
             },
             5: {
                 correct: "Excelente lectura: explotaste su debilidad lateral.",
-                incorrect: "Cuando un rival es lento lateralmente, hay que aprovechar esa debilidad."
+                incorrect: "Si detectas una debilidad de desplazamiento, elige la dirección que la castigue con intención."
             },
             6: {
                 correct: "¡Correcto! La volea corta y precisa es ideal para abrir ángulos laterales.",
-                incorrect: "Los mejores voleadores usan golpes cortos y precisos para atacar espacios."
+                incorrect: "Piensa qué golpe te permite abrir espacio sin perder equilibrio ni iniciativa."
             }
         };
 
         const finalChallenges = {
             1: {
                 correct: "¡Perfecto! Con rival en red, el centro crea confusión y es más seguro.",
-                incorrect: "Con rival en red cubriendo bien, el centro es la opción más inteligente."
+                incorrect: "Con el rival bien plantado en red, conviene la dirección que combine seguridad y confusión."
             },
             2: {
                 correct: "¡Excelente! Aprovechaste su debilidad de desplazamiento lateral.",
-                incorrect: "Si el rival cubre mal los lados, hay que explotar esa debilidad."
+                incorrect: "Si aparece una debilidad lateral clara, busca la decisión que la obligue a moverse peor."
             },
             3: {
                 correct: "¡Correcto! Con ambos atrás, el centro mantiene presión sin riesgo.",
-                incorrect: "Cuando ambos están atrás, el centro es más efectivo que buscar ángulos."
+                incorrect: "Cuando ambos defienden desde atrás, prioriza la opción que mantenga presión con menos riesgo."
             },
             4: {
                 correct: "¡Perfecto! Espacio abierto = oportunidad de winner lateral.",
-                incorrect: "Con espacio libre, hay que aprovecharlo atacando al lado."
+                incorrect: "Si el espacio aparece, conviene la dirección que lo aprovecha sin forzar de más."
             },
             5: {
                 correct: "¡Excelente! En puntos de presión, minimizar riesgo es clave.",
-                incorrect: "En 40-40, la seguridad del centro es más inteligente que arriesgar."
+                incorrect: "En puntos de máxima presión, suele rendir más la decisión que conserva control antes que brillo."
             }
         };
 
@@ -1761,11 +1761,16 @@
             animateBallToCenter();
         }
 
+        function scrollToGameTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
             });
             document.getElementById(screenId).classList.add('active');
+            scrollToGameTop();
         }
 
         function animateBallToCenter() {
@@ -1787,8 +1792,6 @@
                 btn.disabled = true;
                 if (btn === button) {
                     btn.classList.add(isCorrect ? 'correct' : 'incorrect');
-                } else if (btn.textContent.includes('✅')) {
-                    btn.classList.add('correct');
                 }
             });
             
@@ -1860,8 +1863,6 @@
                 btn.disabled = true;
                 if (btn === button) {
                     btn.classList.add(isCorrect ? 'correct' : 'incorrect');
-                } else {
-                    btn.classList.add(isCorrect ? 'incorrect' : 'correct');
                 }
             });
             
@@ -2199,7 +2200,6 @@
 
         function reviewComparison() {
             showScreen('comparisonSection');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function restartGame() {
