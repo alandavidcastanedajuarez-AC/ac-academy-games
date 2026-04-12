@@ -742,7 +742,7 @@
    <div class="screen active" id="screen-intro">
     <div class="intro-screen">
      <h1 class="intro-title" id="gameTitle">La pirámide del saque</h1>
-     <p class="intro-subtitle" id="gameSubtitle">Controla la energía desde la base hasta la raqueta</p>
+     <p class="intro-subtitle" id="gameSubtitle">Entiende cómo la energía sube desde la base y se convierte en velocidad de saque</p>
      <div class="pyramid-animation">
       <div class="lightning-bolt">
        ⚡
@@ -756,7 +756,7 @@
    </div><!-- PANTALLA 2: FASE 1 - LAS 4 CAPAS -->
    <div class="screen" id="screen-phase1">
     <h2 class="section-title">Las 4 Capas de la Cadena Cinética</h2>
-    <p class="instruction-text">Aprende cómo la energía fluye desde tus pies hasta la raqueta</p>
+    <p class="instruction-text">Mira la secuencia completa antes de construirla: el saque funciona mejor cuando cada capa impulsa a la siguiente</p>
     <div class="cards-container">
      <div class="layer-card">
       <div class="layer-icon">
@@ -1110,19 +1110,19 @@
       </div>
      </div>
     </div>
-    <div style="text-align: center; margin-top: 40px;"><button class="btn" onclick="goToResults()">Ver mis Resultados    </button>
+    <div style="text-align: center; margin-top: 40px;"><button class="btn" onclick="goToResults()">Ver mis resultados</button>
     </div>
    </div><!-- PANTALLA 7: RESULTADOS -->
    <div class="screen" id="screen-results">
     <div class="results-screen">
-     <h2 class="section-title">Saque Power Score AC</h2>
+     <h2 class="section-title">Power Score del saque AC</h2>
      <div class="score-display" id="finalScore">
       0%
      </div>
      <div class="achievement" id="achievementText">
       Cargando...
      </div>
-     <div class="buttons-group"><button class="btn" onclick="restartGame()">🔁 Repetir</button> <button class="btn btn-secondary" onclick="showServeRecap()">📘 Repasar secuencia</button> <button class="btn btn-secondary" onclick="showFeedback()">💾 Guardar progreso</button>
+     <div class="buttons-group"><button class="btn" onclick="restartGame()">🔁 Repetir</button> <button class="btn btn-secondary" onclick="showServeRecap()">📘 Repasar secuencia</button> <button class="btn btn-secondary" onclick="showFeedback()">💾 Guardar mi avance</button>
      </div>
     </div>
    </div>
@@ -1131,7 +1131,7 @@
     // Config object
     const defaultConfig = {
       game_title: "La pirámide del saque",
-      game_subtitle: "Controla la energía desde la base hasta la raqueta",
+      game_subtitle: "Entiende cómo la energía sube desde la base y se convierte en velocidad de saque",
       start_button_text: "⚡ Empezar",
       background_color: "#667eea",
       accent_color: "#ffd700",
@@ -1243,10 +1243,15 @@
     }
 
     // Navigation functions
+    function scrollToGameTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function showScreen(screenId) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(screenId).classList.add('active');
       gameState.currentPhase = screenId.replace('screen-', '');
+      scrollToGameTop();
     }
 
     function startGame() {
@@ -1364,13 +1369,13 @@
         slot.innerHTML = draggedElement.innerHTML;
         draggedElement.classList.add('placed');
         gameState.dragDropCorrect++;
-        showFeedbackMessage('✅ ¡Correcto! La energía sube un nivel');
+        showFeedbackMessage('✅ Bien. La energía ya subió un nivel con sentido.');
 
         if (gameState.dragDropCorrect === 4) {
-          showFeedbackMessage('🎉 ¡Pirámide completa! Continuemos...', 3000);
+          showFeedbackMessage('🎉 Pirámide completa. Ahora toca sentir esa secuencia en movimiento.', 3000);
         }
       } else {
-        showFeedbackMessage('❌ No puedes poner la energía arriba si no está abajo primero');
+        showFeedbackMessage('❌ Aquí la secuencia se corta. La base debe sostener lo que viene después.');
         draggedElement.style.animation = 'shake 0.5s';
         setTimeout(() => {
           draggedElement.style.animation = '';
@@ -1420,10 +1425,10 @@
             showFeedbackMessage('🚀 ¡Saque perfecto! Energía completa', 3000);
           }, 1000);
         } else {
-          showFeedbackMessage(`✅ Correcto! Ahora activa: ${simulatorSequence[currentStep]}`);
+          showFeedbackMessage(`✅ Bien. Ahora deja que la energía siga hacia: ${simulatorSequence[currentStep]}`);
         }
       } else {
-        showFeedbackMessage('❌ Energía interrumpida → Orden incorrecto');
+        showFeedbackMessage('❌ La cadena se interrumpió. Reinicia y vuelve a construir el flujo.');
         setTimeout(() => {
           resetSimulator();
         }, 1500);

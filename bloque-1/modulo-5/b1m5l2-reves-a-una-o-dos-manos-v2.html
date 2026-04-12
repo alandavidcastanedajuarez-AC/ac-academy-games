@@ -1016,7 +1016,7 @@
      </div><!-- Contenido sobre la cancha -->
      <div class="hero-content">
       <h1 id="main-title">¿Qué revés es para ti?</h1>
-      <p id="subtitle">Una Mano vs Dos Manos – Decide, Aprende y Domina</p>
+      <p id="subtitle">Compara sensaciones, decide con criterio y entiende qué patrón te favorece más</p>
       <div class="animation-container"><!-- Jugador 1: Una Mano -->
        <div class="player-silhouette" id="oneHandAnim">
         <svg class="silhouette-svg" viewbox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="40" r="25" fill="#f093fb" /> <ellipse cx="100" cy="90" rx="30" ry="40" fill="#f5576c" /> <rect x="70" y="90" width="8" height="60" rx="4" fill="#f5576c" transform="rotate(-30 100 90)" /> <rect x="122" y="90" width="8" height="80" rx="4" fill="#f093fb" transform="rotate(45 100 90)" /> <rect x="85" y="130" width="10" height="70" rx="5" fill="#f5576c" /> <rect x="105" y="130" width="10" height="70" rx="5" fill="#f5576c" />
@@ -1036,15 +1036,15 @@
          Dos Manos
         </div>
        </div>
-      </div><button class="btn" id="btn-start">🎾 <span id="start-button-text">Comenzar el juego</span></button>
+      </div><button class="btn" id="btn-start">🎾 <span id="start-button-text">Empezar el reto</span></button>
      </div>
     </div>
    </div><!-- PANTALLA 2: INTRODUCCIÓN MAGISTRAL -->
    <div id="screen-intro" class="screen">
     <div class="comparison-screen">
      <div class="comparison-header">
-      <h1>📚 Entender las Diferencias</h1>
-      <p>Conoce las ventajas y limitaciones de cada técnica</p>
+      <h1>📚 Entiende las diferencias</h1>
+      <p>Qué gana cada revés, qué exige y en qué situaciones suele rendir mejor</p>
      </div>
      <div class="comparison-grid"><!-- Tarjeta Revés a Una Mano -->
       <div class="card">
@@ -1099,7 +1099,7 @@
        </div>
       </div>
      </div>
-     <div style="text-align: center; margin-top: 3rem;"><button class="btn" id="btn-to-game">🎾 Jugar: decide la técnica correcta</button>
+      <div style="text-align: center; margin-top: 3rem;"><button class="btn" id="btn-to-game">🎾 Probar situaciones reales</button>
      </div>
     </div>
    </div><!-- PANTALLA 3: JUEGO DE SITUACIONES -->
@@ -1107,7 +1107,7 @@
     <div class="situations-screen">
      <div style="text-align: center; padding: 2rem 1rem 1rem 1rem;">
       <h1 style="font-size: 2.5rem; color: #fbbf24; margin-bottom: 0.5rem; text-shadow: 2px 2px 6px rgba(0,0,0,0.5);">🎯 Elige la Técnica Correcta</h1>
-      <p style="font-size: 1.2rem; opacity: 0.9; margin-bottom: 1rem;">Decide qué revés es más eficiente según la situación</p>
+      <p style="font-size: 1.2rem; opacity: 0.9; margin-bottom: 1rem;">Lee la pelota y elige el revés que mejor resuelve cada contexto</p>
       <div class="progress"><span>Situación <span id="current-situation">1</span> de 5</span>
       </div>
      </div>
@@ -1132,7 +1132,7 @@
    <div id="screen-results" class="screen">
     <div class="results-container">
      <h1 style="font-size: 2.8rem; margin-bottom: 1rem;">🏆 Tus Resultados AC</h1>
-     <p style="font-size: 1.2rem; opacity: 0.9; margin-bottom: 3rem;">Análisis completo de tu perfil técnico</p>
+      <p style="font-size: 1.2rem; opacity: 0.9; margin-bottom: 3rem;">Síntesis de tu lectura técnica y de tu estilo más natural</p>
      <div class="circular-progress" id="circular-progress">
       <div class="circular-progress-text" id="total-percentage">
        0%
@@ -1181,8 +1181,8 @@
   <script>
     const defaultConfig = {
       main_title: "¿Qué revés es para ti?",
-      subtitle: "Una Mano vs Dos Manos – Decide, Aprende y Domina",
-      start_button: "Comenzar el juego",
+      subtitle: "Compara sensaciones, decide con criterio y entiende qué patrón te favorece más",
+      start_button: "Empezar el reto",
       one_hand_players: "Federer, Wawrinka, Thiem, Gasquet",
       two_hands_players: "Djokovic, Murray, Medvedev, Osaka",
       background_color: "#667eea",
@@ -1422,11 +1422,16 @@
 
     startPortadaAnimation();
 
+    function scrollToGameTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function showScreen(screenId) {
       document.querySelectorAll('.screen').forEach(screen => {
         screen.classList.remove('active');
       });
       document.getElementById(screenId).classList.add('active');
+      scrollToGameTop();
     }
 
     document.getElementById('btn-start').addEventListener('click', () => {
@@ -1476,11 +1481,6 @@
             e.target.classList.add('correct');
           } else {
             e.target.classList.add('incorrect');
-            choiceBtns.forEach(b => {
-              if (b.dataset.answer === situation.correctAnswer) {
-                b.classList.add('correct');
-              }
-            });
           }
 
           choiceBtns.forEach(b => b.disabled = true);
@@ -1491,7 +1491,7 @@
 
           setTimeout(() => {
             showSituation(index + 1);
-          }, 4000);
+          }, 3200);
         });
       });
     }
@@ -1546,7 +1546,7 @@
 
           setTimeout(() => {
             showBall(index + 1);
-          }, 2000);
+          }, 1700);
         });
       });
     }
@@ -1626,7 +1626,7 @@
       } else if (totalPercent >= 65) {
         level = '🎯 Buen Lector del Revés';
       } else {
-        level = '  ️ Revés en Desarrollo';
+        level = '📈 Revés en desarrollo';
       }
 
       document.getElementById('tactical-score').textContent = `${tacticalScore}/5`;

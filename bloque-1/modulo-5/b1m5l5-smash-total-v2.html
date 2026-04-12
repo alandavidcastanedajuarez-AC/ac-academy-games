@@ -1116,7 +1116,7 @@
      Smash Total AC
     </div>
     <div class="main-subtitle" id="game-subtitle">
-     Domina técnica, mecánica y lectura táctica del smash
+     Construye un smash más completo: lectura, mecánica, timing y decisión táctica
     </div>
     <div class="phases-preview">
      <div class="phase-badge">
@@ -1159,7 +1159,7 @@
        Examen Final
       </div>
      </div>
-    </div><button id="start-button" class="btn-primary">🎾 Comenzar Entrenamiento</button>
+    </div><button id="start-button" class="btn-primary">🎾 Empezar reto</button>
    </div><!-- FASE 1: MECÁNICA DEL SMASH -->
    <div id="phase1-screen" class="screen">
     <div class="content-box">
@@ -1460,8 +1460,8 @@
     // Configuración por defecto
     const defaultConfig = {
       game_title: "Smash Total AC",
-      game_subtitle: "Domina técnica, mecánica y lectura táctica del smash",
-      start_button: "🎾 Comenzar Entrenamiento",
+      game_subtitle: "Construye un smash más completo: lectura, mecánica, timing y decisión táctica",
+      start_button: "🎾 Empezar reto",
       phase1_title: "🎯 Fase 1: La Mecánica del Smash",
       phase2_title: "🔨 Fase 2: Construye el Smash",
       phase3_title: "⚡ Fase 3: Simulador Técnico",
@@ -1808,12 +1808,16 @@
     initSDKs();
 
     // Navegación de pantallas
+    function scrollToGameTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function showScreen(screenId) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       const screen = document.getElementById(screenId);
       if (screen) {
         screen.classList.add('active');
-        window.scrollTo(0, 0);
+        scrollToGameTop();
       }
     }
 
@@ -1897,7 +1901,7 @@
               }
             } else {
               slot.classList.add('incorrect');
-              showFeedback('phase2-feedback', '❌ Incorrecto. El Smash fluye en secuencia: Detección → Pasos → Preparación → Impacto. Reintenta.', 'error');
+              showFeedback('phase2-feedback', '❌ Aún no fluye bien. Revisa qué parte debe aparecer antes para que el smash conserve orden y equilibrio.', 'error');
               setTimeout(() => {
                 slot.classList.remove('incorrect');
               }, 1000);
@@ -2194,9 +2198,6 @@
         if (btnIndex === choiceIndex) {
           btn.classList.add(choice.correct ? 'correct' : 'incorrect');
         }
-        if (scenario.options[btnIndex].correct) {
-          btn.classList.add('correct');
-        }
       });
 
       const feedback = choice.correct ? scenario.feedback.correct : scenario.feedback.incorrect;
@@ -2309,10 +2310,6 @@
         
         if (btnAnswer === answerIndex) {
           btn.classList.add(answerIndex === question.correct ? 'correct' : 'incorrect');
-        }
-        
-        if (btnAnswer === question.correct && answerIndex !== question.correct) {
-          btn.classList.add('correct');
         }
       });
 
