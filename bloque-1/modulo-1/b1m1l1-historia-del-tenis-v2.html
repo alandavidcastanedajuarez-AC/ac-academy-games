@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Historia del Tenis: de los origenes a la Era Open</title>
+  <style>
+    :root {
+      --bg: #f6efe4;
+      --surface: #fffaf2;
+      --ink: #21313c;
+      --muted: #5c6b75;
+      --line: #d9c4a6;
+      --brand: #b85c38;
+      --brand-dark: #8f4123;
+      --highlight: #2f7b6a;
+      --shadow: 0 18px 38px rgba(33, 49, 60, 0.12);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(184, 92, 56, 0.12), transparent 34%),
+        linear-gradient(180deg, var(--bg) 0%, #fff 100%);
+      color: var(--ink);
+    }
+    .page {
+      width: min(1040px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+    .hero, .timeline-card, .summary {
+      background: rgba(255, 250, 242, 0.94);
+      border: 1px solid rgba(217, 196, 166, 0.7);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+    }
+    .hero { padding: 28px 22px; margin-bottom: 24px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(184, 92, 56, 0.12);
+      color: var(--brand-dark);
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.04;
+    }
+    .hero p {
+      margin: 0;
+      max-width: 760px;
+      font-size: 1.02rem;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .hero-chip {
+      padding: 14px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid rgba(217, 196, 166, 0.8);
+      font-size: 0.96rem;
+      color: var(--muted);
+    }
+    .hero-chip strong {
+      display: block;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin: 24px 0 16px;
+    }
+    .section-head h2 { margin: 0; font-size: 1.45rem; }
+    .section-head p { margin: 0; color: var(--muted); font-size: 0.96rem; }
+    .timeline { display: grid; gap: 14px; }
+    .timeline-card { overflow: hidden; }
+    .timeline-toggle {
+      width: 100%;
+      border: 0;
+      background: none;
+      padding: 18px;
+      text-align: left;
+      color: inherit;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 14px;
+      align-items: center;
+    }
+    .badge-year {
+      width: 78px;
+      min-height: 78px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      color: #fff7ed;
+      font-weight: 800;
+      font-size: 1rem;
+      text-align: center;
+      padding: 10px;
+    }
+    .toggle-copy h3 { margin: 0 0 6px; font-size: 1.08rem; }
+    .toggle-copy p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .toggle-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgba(47, 123, 106, 0.12);
+      color: var(--highlight);
+      font-size: 1.3rem;
+      font-weight: 700;
+      transition: transform 0.25s ease;
+    }
+    .timeline-card[data-open="true"] .toggle-icon { transform: rotate(45deg); }
+    .timeline-details {
+      display: none;
+      border-top: 1px solid rgba(217, 196, 166, 0.72);
+      padding: 0 18px 18px;
+    }
+    .timeline-card[data-open="true"] .timeline-details { display: block; }
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 16px;
+      padding-top: 16px;
+    }
+    .detail-block, .detail-fact {
+      background: #fff;
+      border: 1px solid rgba(217, 196, 166, 0.72);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .detail-block p, .detail-fact p { margin: 0; line-height: 1.62; color: var(--muted); }
+    .detail-block strong, .detail-fact strong { display: block; color: var(--ink); margin-bottom: 8px; }
+    .summary {
+      margin-top: 24px;
+      padding: 20px;
+      display: grid;
+      gap: 14px;
+    }
+    .summary h2 { margin: 0; font-size: 1.3rem; }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .summary-item {
+      padding: 16px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid rgba(217, 196, 166, 0.72);
+    }
+    .summary-item strong { display: block; margin-bottom: 6px; }
+    .summary-item p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .action-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .action-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--highlight), #23594d);
+      color: #f4fffb;
+    }
+    .action-btn.secondary {
+      background: rgba(33, 49, 60, 0.08);
+      color: var(--ink);
+    }
+    @media (max-width: 860px) {
+      .hero-grid, .summary-grid, .details-grid { grid-template-columns: 1fr; }
+      .section-head { align-items: start; flex-direction: column; }
+    }
+    @media (max-width: 640px) {
+      .page { width: min(100% - 20px, 1040px); padding: 16px 0 32px; }
+      .hero, .timeline-card, .summary { border-radius: 20px; }
+      .timeline-toggle { grid-template-columns: 1fr; }
+      .badge-year { width: 100%; min-height: 56px; border-radius: 16px; }
+      .toggle-icon { width: 100%; border-radius: 14px; height: 44px; }
+      .hero, .summary { padding: 18px; }
+      .timeline-toggle, .timeline-details { padding-left: 14px; padding-right: 14px; }
+      .action-btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <span class="eyebrow">Módulo 1 · Origen del juego</span>
+      <h1>Historia del tenis sin rodeos</h1>
+      <p>Recorre los momentos que transformaron al tenis desde un juego de monasterio hasta un deporte global. Cada parada te da una idea clave y una curiosidad que sí vale la pena recordar.</p>
+      <div class="hero-grid">
+        <div class="hero-chip"><strong>6 hitos clave</strong>Desde el Jeu de Paume hasta la tecnología moderna.</div>
+        <div class="hero-chip"><strong>Lectura rápida</strong>Tarjetas cortas, sin introducción pesada y con expansión opcional.</div>
+        <div class="hero-chip"><strong>Ideal para móvil</strong>Se abre una sola etapa por vez para que el recorrido no se vuelva cansado.</div>
+      </div>
+    </section>
+
+    <div class="section-head">
+      <div>
+        <h2>Línea del tiempo</h2>
+        <p>Toca una etapa para abrirla. No hace scroll agresivo porque sigues en la misma vista.</p>
+      </div>
+    </div>
+
+    <section class="timeline" id="timeline"></section>
+
+    <section class="summary" id="summary">
+      <h2>Qué cambia a lo largo de la historia</h2>
+      <div class="summary-grid">
+        <article class="summary-item"><strong>Del patio al estadio</strong><p>El juego pasó de espacios cerrados y reglas locales a un deporte internacional con torneos icónicos.</p></article>
+        <article class="summary-item"><strong>De la mano a la tecnología</strong><p>Raquetas, superficies y datos transformaron la forma de competir y de entrenar.</p></article>
+        <article class="summary-item"><strong>De élite cerrada a espectáculo global</strong><p>La Era Open y la televisión hicieron del tenis un deporte mucho más visible y profesional.</p></article>
+      </div>
+      <div class="action-row">
+        <button class="action-btn" type="button" id="openFirst">Empezar desde el origen</button>
+        <button class="action-btn secondary" type="button" id="collapseAll">Cerrar todas las etapas</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const timelineData = [
+      { year: "Siglo XII", title: "Jeu de Paume", preview: "En Francia nace el ancestro del tenis moderno, primero sin raquetas.", detail: "Los jugadores golpeaban la pelota con la palma de la mano en patios cerrados. De ahí nace parte del lenguaje que todavía acompaña al tenis actual.", fact: "La palabra tenis se relaciona con el grito francés 'tenez', usado para avisar que venía el servicio." },
+      { year: "Siglo XVI", title: "La raqueta cambia el juego", preview: "Aparecen las primeras raquetas y el control mejora de forma radical.", detail: "El paso de la mano a la raqueta permitió golpes más precisos, más variedad táctica y una evolución técnica que ya se parece más al tenis que conocemos.", fact: "Las primeras cuerdas se hacían con tripa animal y exigían bastante mantenimiento." },
+      { year: "1874", title: "Nace el lawn tennis", preview: "Se fijan reglas para jugar al aire libre sobre césped.", detail: "Walter Clopton Wingfield impulsó una versión reglamentada para césped que ayudó a estandarizar medidas, servicio y puntuación.", fact: "Este paso hizo que el juego saliera de espacios cerrados y creciera entre nuevos públicos." },
+      { year: "1877", title: "Wimbledon pone el estándar", preview: "El torneo más histórico convierte al tenis en una referencia competitiva real.", detail: "Con Wimbledon, el tenis ganó prestigio competitivo, organización más estable y una vitrina que empujó su expansión internacional.", fact: "Muchas tradiciones del tenis moderno se consolidaron a partir de la cultura de Wimbledon." },
+      { year: "1968", title: "Comienza la Era Open", preview: "Profesionales y amateurs pueden competir juntos por fin.", detail: "La Era Open elimina una división artificial y vuelve el circuito mucho más competitivo, visible y profesional también en premios.", fact: "Rod Laver ganó el Grand Slam en 1969, ya dentro de esta nueva era." },
+      { year: "Actualidad", title: "Datos, tecnología y análisis", preview: "El tenis moderno mezcla talento, preparación física y lectura de datos.", detail: "Hoy conviven superficies específicas, tecnología de línea, sensores y métricas que ayudan a competir con más precisión.", fact: "La tecnología no reemplaza el juego, pero sí mejora la toma de decisiones y la experiencia del espectador." }
+    ];
+
+    const timelineEl = document.getElementById("timeline");
+
+    function renderTimeline() {
+      timelineEl.innerHTML = timelineData.map((item, index) => `
+        <article class="timeline-card" data-open="false">
+          <button class="timeline-toggle" type="button" aria-expanded="false" data-index="${index}">
+            <div class="badge-year">${item.year}</div>
+            <div class="toggle-copy">
+              <h3>${item.title}</h3>
+              <p>${item.preview}</p>
+            </div>
+            <div class="toggle-icon">+</div>
+          </button>
+          <div class="timeline-details">
+            <div class="details-grid">
+              <div class="detail-block"><strong>Lo importante aquí</strong><p>${item.detail}</p></div>
+              <div class="detail-fact"><strong>Dato que sí conviene recordar</strong><p>${item.fact}</p></div>
+            </div>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function toggleCard(targetCard) {
+      const isOpen = targetCard.dataset.open === "true";
+      document.querySelectorAll(".timeline-card").forEach((card) => {
+        card.dataset.open = "false";
+        card.querySelector(".timeline-toggle").setAttribute("aria-expanded", "false");
+      });
+      if (!isOpen) {
+        targetCard.dataset.open = "true";
+        targetCard.querySelector(".timeline-toggle").setAttribute("aria-expanded", "true");
+      }
+    }
+
+    renderTimeline();
+    const firstCard = document.querySelector(".timeline-card");
+    if (firstCard) {
+      toggleCard(firstCard);
+    }
+
+    timelineEl.addEventListener("click", (event) => {
+      const toggle = event.target.closest(".timeline-toggle");
+      if (!toggle) return;
+      toggleCard(toggle.closest(".timeline-card"));
+    });
+
+    document.getElementById("openFirst").addEventListener("click", () => {
+      const firstCard = document.querySelector(".timeline-card");
+      if (!firstCard) return;
+      toggleCard(firstCard);
+      firstCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      document.querySelectorAll(".timeline-card").forEach((card) => {
+        card.dataset.open = "false";
+        card.querySelector(".timeline-toggle").setAttribute("aria-expanded", "false");
+      });
+      document.getElementById("summary").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Curiosidades del Tenis</title>
+  <style>
+    :root {
+      --bg: #eef2ff;
+      --surface: rgba(255, 255, 255, 0.95);
+      --ink: #1e2840;
+      --muted: #65718a;
+      --line: #d7ddf1;
+      --accent: #3c5ccf;
+      --good: #2b8f68;
+      --warn: #b86b35;
+      --shadow: 0 20px 40px rgba(30, 40, 64, 0.14);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(60, 92, 207, 0.16), transparent 30%),
+        linear-gradient(180deg, var(--bg) 0%, #ffffff 100%);
+    }
+    .page {
+      width: min(900px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+    .hero, .hud, .card-shell, .summary {
+      background: var(--surface);
+      border: 1px solid rgba(215, 221, 241, 0.92);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero, .hud, .card-shell, .summary { padding: 22px; }
+    .hero { margin-bottom: 16px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(60, 92, 207, 0.1);
+      color: var(--accent);
+      font-size: 0.84rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(2rem, 5vw, 3rem);
+      line-height: 1.05;
+    }
+    .hero p, .summary p { margin: 0; color: var(--muted); line-height: 1.62; }
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .hud-item {
+      background: #fff;
+      border: 1px solid rgba(215, 221, 241, 0.92);
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .hud-item strong {
+      display: block;
+      font-size: 1.4rem;
+      margin-bottom: 4px;
+    }
+    .hud-item span { color: var(--muted); font-size: 0.94rem; }
+    .card-shell { display: grid; gap: 16px; margin-bottom: 16px; }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 14px;
+    }
+    .card-top h2 { margin: 0 0 8px; font-size: 1.3rem; }
+    .card-top p { margin: 0; color: var(--muted); line-height: 1.58; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(30, 40, 64, 0.08);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .card {
+      border-radius: 22px;
+      background: linear-gradient(135deg, #3350b8, #233989);
+      color: #f3f6ff;
+      min-height: 280px;
+      padding: 22px;
+      display: grid;
+      gap: 18px;
+      align-content: start;
+      cursor: pointer;
+    }
+    .card[data-face="back"] { background: linear-gradient(135deg, #cf6b4a, #ab4e31); }
+    .card-kicker {
+      display: inline-flex;
+      width: fit-content;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .card h3 {
+      margin: 0;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      line-height: 1.15;
+    }
+    .card p { margin: 0; line-height: 1.62; color: rgba(243, 246, 255, 0.92); }
+    .feedback {
+      display: none;
+      border-radius: 18px;
+      padding: 14px 16px;
+      line-height: 1.6;
+      font-weight: 600;
+    }
+    .feedback.show { display: block; }
+    .feedback.good { background: rgba(43, 143, 104, 0.12); color: #21684d; }
+    .feedback.warn { background: rgba(184, 107, 53, 0.14); color: #8a542a; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .actions button {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .actions .primary { background: linear-gradient(135deg, var(--accent), #2e46a2); color: #f4f7ff; }
+    .actions .secondary { background: rgba(30, 40, 64, 0.08); color: var(--ink); }
+    .summary { display: none; }
+    .summary[data-open="true"] { display: block; }
+    .summary h2 { margin: 0 0 10px; font-size: 1.4rem; }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .summary-item {
+      background: #fff;
+      border: 1px solid rgba(215, 221, 241, 0.92);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .summary-item strong { display: block; margin-bottom: 6px; }
+    .summary-item p { margin: 0; color: var(--muted); line-height: 1.55; }
+    @media (max-width: 860px) {
+      .hud, .summary-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .page { width: min(100% - 20px, 900px); padding: 16px 0 32px; }
+      .hero, .hud, .card-shell, .summary { padding: 18px; border-radius: 20px; }
+      .card-top { flex-direction: column; }
+      .card { min-height: 220px; padding: 18px; }
+      .actions button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <span class="eyebrow">Módulo 1 · Cierre ligero</span>
+      <h1>5 curiosidades del tenis para recordar mejor</h1>
+      <p>Esta versión entra mucho más rápido: una curiosidad por vez, respuesta clara y avance ágil. La meta no es cansarte, sino dejarte con ganas de terminar el recorrido.</p>
+    </section>
+
+    <section class="hud">
+      <article class="hud-item"><strong id="progressValue">1/5</strong><span>Curiosidad actual</span></article>
+      <article class="hud-item"><strong id="seenValue">0</strong><span>Tarjetas vistas</span></article>
+      <article class="hud-item"><strong id="accuracyValue">0%</strong><span>Precisión autoevaluada</span></article>
+    </section>
+
+    <section class="card-shell">
+      <div class="card-top">
+        <div>
+          <h2 id="cardTitle">Curiosidad 1</h2>
+          <p id="cardContext">Toca la tarjeta para ver la respuesta y luego decide si ya lo sabías o si quieres reforzarlo.</p>
+        </div>
+        <span class="pill" id="facePill">Pregunta</span>
+      </div>
+
+      <article class="card" id="flashcard" data-face="front">
+        <span class="card-kicker" id="cardKicker">Pregunta rápida</span>
+        <h3 id="cardMain">¿Por qué se dice "love" para cero puntos?</h3>
+        <p id="cardSub">Toca para descubrir la respuesta.</p>
+      </article>
+
+      <div class="feedback" id="feedback"></div>
+
+      <div class="actions">
+        <button class="primary" type="button" id="knowBtn">Lo sabía</button>
+        <button class="secondary" type="button" id="reinforceBtn">Quiero recordarlo mejor</button>
+        <button class="secondary" type="button" id="nextBtn">Siguiente</button>
+        <button class="secondary" type="button" id="restartBtn">Reiniciar</button>
+      </div>
+    </section>
+
+    <section class="summary" id="summary" data-open="false">
+      <h2>Cierre del recorrido</h2>
+      <p>Ya viste las cinco curiosidades. Aquí tienes el resumen corto de lo que más conviene retener.</p>
+      <div class="summary-grid">
+        <article class="summary-item"><strong>Lenguaje del tenis</strong><p>Muchas palabras del tenis vienen de raíces francesas y de etapas históricas muy antiguas.</p></article>
+        <article class="summary-item"><strong>Superficies</strong><p>El juego cambia de forma real según sea pasto, arcilla o pista dura.</p></article>
+        <article class="summary-item"><strong>Tradición y evolución</strong><p>El tenis conserva símbolos históricos, pero no ha dejado de transformarse.</p></article>
+      </div>
+      <div class="actions" style="margin-top:16px;">
+        <button class="primary" type="button" id="playAgain">Volver a empezar</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const flashcards = [
+      { question: '¿Por qué se dice "love" para cero puntos?', answer: 'Porque se asocia al francés "l’oeuf", el huevo, por su forma parecida al cero.', note: "Es una pista lingüística que conecta la historia del tenis con sus raíces francesas." },
+      { question: "¿El saque siempre fue por arriba?", answer: "No. Al principio se servía de una forma mucho más simple y baja.", note: "El saque moderno apareció con la evolución técnica del deporte y cambió mucho el ritmo del juego." },
+      { question: "¿Cuántas superficies dominan el tenis profesional?", answer: "Tres: pista dura, arcilla y pasto.", note: "Cada una cambia el bote, la velocidad y la forma de construir el punto." },
+      { question: "¿Qué superficie suele sentirse más rápida?", answer: "El pasto, por su bote más bajo y su ritmo más veloz.", note: "Por eso Wimbledon suele asociarse con decisiones más rápidas." },
+      { question: "¿Cuál es el gran torneo histórico de arcilla?", answer: "Roland Garros, en París.", note: "La arcilla roja y la exigencia física lo convierten en un reto muy distinto al resto." }
+    ];
+
+    let currentIndex = 0;
+    let isBack = false;
+    let seenCards = new Set();
+    let totalAnswers = 0;
+    let positiveAnswers = 0;
+    let autoAdvanceTimer = null;
+
+    const flashcard = document.getElementById("flashcard");
+    const feedback = document.getElementById("feedback");
+    const summary = document.getElementById("summary");
+
+    function currentCard() { return flashcards[currentIndex]; }
+
+    function updateHud() {
+      document.getElementById("progressValue").textContent = `${currentIndex + 1}/${flashcards.length}`;
+      document.getElementById("seenValue").textContent = String(seenCards.size);
+      const accuracy = totalAnswers > 0 ? Math.round((positiveAnswers / totalAnswers) * 100) : 0;
+      document.getElementById("accuracyValue").textContent = `${accuracy}%`;
+    }
+
+    function renderCard() {
+      const item = currentCard();
+      document.getElementById("cardTitle").textContent = `Curiosidad ${currentIndex + 1}`;
+      document.getElementById("cardContext").textContent = isBack
+        ? item.note
+        : "Toca la tarjeta para ver la respuesta y después decide cómo te fue con esta curiosidad.";
+      document.getElementById("facePill").textContent = isBack ? "Respuesta" : "Pregunta";
+      document.getElementById("cardKicker").textContent = isBack ? "Respuesta breve" : "Pregunta rápida";
+      document.getElementById("cardMain").textContent = isBack ? item.answer : item.question;
+      document.getElementById("cardSub").textContent = isBack ? item.note : "Toca para descubrir la respuesta.";
+      flashcard.dataset.face = isBack ? "back" : "front";
+    }
+
+    function showFeedback(type, text) {
+      feedback.className = `feedback show ${type}`;
+      feedback.textContent = text;
+    }
+
+    function queueNextCard(delay = 900) {
+      if (autoAdvanceTimer) {
+        clearTimeout(autoAdvanceTimer);
+      }
+      autoAdvanceTimer = setTimeout(() => {
+        autoAdvanceTimer = null;
+        nextCard();
+      }, delay);
+    }
+
+    function nextCard() {
+      seenCards.add(currentIndex);
+      if (currentIndex === flashcards.length - 1) {
+        summary.dataset.open = "true";
+        summary.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+      currentIndex += 1;
+      isBack = false;
+      renderCard();
+      updateHud();
+      showFeedback("good", "Seguimos. La siguiente curiosidad ya está lista.");
+    }
+
+    function restartGame() {
+      currentIndex = 0;
+      isBack = false;
+      seenCards = new Set();
+      totalAnswers = 0;
+      positiveAnswers = 0;
+      summary.dataset.open = "false";
+      renderCard();
+      updateHud();
+      showFeedback("good", "Reiniciamos el recorrido. Vamos con la primera curiosidad.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    flashcard.addEventListener("click", () => {
+      isBack = !isBack;
+      renderCard();
+    });
+
+    document.getElementById("knowBtn").addEventListener("click", () => {
+      if (!isBack) {
+        showFeedback("warn", "Primero toca la tarjeta para ver la respuesta.");
+        return;
+      }
+      totalAnswers += 1;
+      positiveAnswers += 1;
+      seenCards.add(currentIndex);
+      updateHud();
+      showFeedback("good", "Buenísimo. Esa curiosidad ya la tienes bastante clara.");
+      queueNextCard();
+    });
+
+    document.getElementById("reinforceBtn").addEventListener("click", () => {
+      if (!isBack) {
+        isBack = true;
+        renderCard();
+      }
+      totalAnswers += 1;
+      seenCards.add(currentIndex);
+      updateHud();
+      showFeedback("warn", "Perfecto. La idea es que esta curiosidad te quede mejor grabada.");
+      queueNextCard(1100);
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      if (autoAdvanceTimer) {
+        clearTimeout(autoAdvanceTimer);
+        autoAdvanceTimer = null;
+      }
+      nextCard();
+    });
+    document.getElementById("restartBtn").addEventListener("click", () => {
+      if (autoAdvanceTimer) {
+        clearTimeout(autoAdvanceTimer);
+        autoAdvanceTimer = null;
+      }
+      restartGame();
+    });
+    document.getElementById("playAgain").addEventListener("click", () => {
+      if (autoAdvanceTimer) {
+        clearTimeout(autoAdvanceTimer);
+        autoAdvanceTimer = null;
+      }
+      restartGame();
+    });
+
+    renderCard();
+    updateHud();
+  </script>
+</body>
+</html>

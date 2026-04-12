@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Protagonistas del Tenis</title>
+  <style>
+    :root {
+      --bg: #f4eff9;
+      --surface: rgba(255, 255, 255, 0.94);
+      --ink: #231f37;
+      --muted: #696281;
+      --line: #ddd4ee;
+      --accent: #7a57c5;
+      --accent-dark: #5e3fa3;
+      --good: #2a8f66;
+      --warn: #c7693a;
+      --shadow: 0 18px 36px rgba(35, 31, 55, 0.14);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(122, 87, 197, 0.18), transparent 30%),
+        linear-gradient(180deg, var(--bg) 0%, #ffffff 100%);
+    }
+    .page {
+      width: min(1080px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+    .hero, .hud, .board, .footer-card, .modal {
+      background: var(--surface);
+      border: 1px solid rgba(221, 212, 238, 0.92);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero, .hud, .board, .footer-card { padding: 22px; }
+    .hero { margin-bottom: 16px; }
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(122, 87, 197, 0.12);
+      color: var(--accent-dark);
+      font-size: 0.84rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(2rem, 5vw, 3rem);
+      line-height: 1.05;
+    }
+    .hero p, .footer-card p { margin: 0; color: var(--muted); line-height: 1.6; }
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .hud-item {
+      background: #fff;
+      border: 1px solid rgba(221, 212, 238, 0.92);
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .hud-item strong {
+      display: block;
+      font-size: 1.45rem;
+      margin-bottom: 4px;
+    }
+    .hud-item span { color: var(--muted); font-size: 0.94rem; }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .column h2 { margin: 0 0 12px; font-size: 1.18rem; }
+    .column p { margin: 0 0 14px; color: var(--muted); }
+    .stack { display: grid; gap: 10px; }
+    .card-button {
+      width: 100%;
+      border: 1px solid rgba(221, 212, 238, 0.92);
+      background: #fff;
+      border-radius: 18px;
+      padding: 14px;
+      text-align: left;
+      cursor: pointer;
+      color: inherit;
+      font: inherit;
+      transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+    }
+    .card-button[data-selected="true"] {
+      border-color: rgba(122, 87, 197, 0.56);
+      box-shadow: 0 10px 20px rgba(122, 87, 197, 0.14);
+      transform: translateY(-1px);
+    }
+    .card-button[data-locked="true"] { opacity: 0.62; cursor: default; }
+    .term-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+    }
+    .term-line strong { display: block; margin-bottom: 5px; }
+    .term-line small, .card-button p { color: var(--muted); line-height: 1.5; margin: 0; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(35, 31, 55, 0.08);
+      font-size: 0.77rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .feedback {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      display: none;
+      line-height: 1.58;
+      font-weight: 600;
+    }
+    .feedback.good { display: block; background: rgba(42, 143, 102, 0.12); color: #1c5f44; }
+    .feedback.warn { display: block; background: rgba(199, 105, 58, 0.14); color: #8a4b2d; }
+    .actions {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .actions button, .modal button {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .actions .primary, .modal .primary { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: #f7f2ff; }
+    .actions .secondary, .modal .secondary { background: rgba(35, 31, 55, 0.08); color: var(--ink); }
+    .footer-card { margin-top: 16px; }
+    .footer-card h2 { margin: 0 0 8px; font-size: 1.22rem; }
+    .modal-wrap {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 14, 25, 0.48);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 20;
+    }
+    .modal-wrap[data-open="true"] { display: flex; }
+    .modal { width: min(520px, 100%); padding: 24px; text-align: center; }
+    .modal h3 { margin: 0 0 8px; font-size: 1.6rem; }
+    .modal p { margin: 0; color: var(--muted); line-height: 1.6; }
+    .modal .actions { justify-content: center; }
+    @media (max-width: 860px) {
+      .hud, .board { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .page { width: min(100% - 20px, 1080px); padding: 16px 0 32px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <span class="eyebrow">Módulo 1 · Leyendas del tenis</span>
+      <h1>Relaciona protagonistas con su huella</h1>
+      <p>Elige primero una figura y luego el logro que mejor la representa. El juego es rápido, claro y sin explicaciones eternas para que entres a aprender desde el primer toque.</p>
+    </section>
+
+    <section class="hud">
+      <article class="hud-item"><strong id="scoreValue">0</strong><span>Puntos acumulados</span></article>
+      <article class="hud-item"><strong id="matchesValue">0/6</strong><span>Emparejamientos correctos</span></article>
+      <article class="hud-item"><strong id="hintValue">0</strong><span>Pistas usadas</span></article>
+    </section>
+
+    <section class="board">
+      <article class="column">
+        <h2>Leyendas del tenis</h2>
+        <p>Selecciona una figura histórica.</p>
+        <div class="stack" id="termsList"></div>
+      </article>
+      <article class="column">
+        <h2>Logros o aportes</h2>
+        <p>Ahora busca el logro que mejor encaja.</p>
+        <div class="stack" id="definitionsList"></div>
+      </article>
+    </section>
+
+    <div class="feedback" id="feedback"></div>
+
+    <div class="actions">
+      <button class="primary" type="button" id="hintBtn">Dar una pista</button>
+      <button class="secondary" type="button" id="resetBtn">Reiniciar partida</button>
+    </div>
+
+    <section class="footer-card">
+      <h2>Qué entrena este juego</h2>
+      <p>No se trata solo de memorizar nombres. La idea es reconocer qué hizo única a cada figura: dominio competitivo, cambio cultural o impacto histórico.</p>
+    </section>
+  </main>
+
+  <div class="modal-wrap" id="celebration" data-open="false">
+    <div class="modal">
+      <h3>Completaste el tablero</h3>
+      <p id="celebrationText">Ya uniste a las seis figuras con su aporte principal.</p>
+      <div class="actions">
+        <button class="primary" type="button" id="playAgainBtn">Volver a jugar</button>
+        <button class="secondary" type="button" id="closeModalBtn">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const gameData = [
+      { term: "Suzanne Lenglen", era: "1920s", icon: "👑", definition: "Revolucionó el tenis femenino con un estilo elegante y dominante en los años 20." },
+      { term: "Rod Laver", era: "1960s", icon: "🏆", definition: "Único tenista en lograr dos Grand Slams de calendario completos." },
+      { term: "Billie Jean King", era: "1970s", icon: "⚖️", definition: "Pionera en la igualdad de género y referente histórico dentro y fuera de la cancha." },
+      { term: "Roger Federer", era: "2000s", icon: "🎾", definition: "Símbolo de elegancia competitiva y parte central de la era dorada del tenis." },
+      { term: "Rafael Nadal", era: "2000s", icon: "🏟️", definition: "El gran rey de Roland Garros y referente máximo sobre arcilla." },
+      { term: "Novak Djokovic", era: "2000s", icon: "🧠", definition: "Figura histórica por su consistencia, flexibilidad y fortaleza mental." }
+    ];
+
+    let selectedTerm = null;
+    let selectedDefinition = null;
+    let matches = [];
+    let score = 0;
+    let hintsUsed = 0;
+
+    const termsList = document.getElementById("termsList");
+    const definitionsList = document.getElementById("definitionsList");
+    const feedback = document.getElementById("feedback");
+    const celebration = document.getElementById("celebration");
+
+    function shuffle(array) {
+      return [...array].sort(() => Math.random() - 0.5);
+    }
+
+    function renderGame() {
+      const shuffledTerms = shuffle(gameData);
+      const shuffledDefinitions = shuffle(gameData);
+      termsList.innerHTML = shuffledTerms.map((item) => `
+        <button class="card-button" type="button" data-type="term" data-term="${item.term}">
+          <div class="term-line">
+            <div>
+              <strong>${item.icon} ${item.term}</strong>
+              <small>${item.era}</small>
+            </div>
+            <span class="pill">Figura</span>
+          </div>
+        </button>
+      `).join("");
+      definitionsList.innerHTML = shuffledDefinitions.map((item) => `
+        <button class="card-button" type="button" data-type="definition" data-term="${item.term}">
+          <div class="term-line">
+            <div><strong>${item.definition}</strong></div>
+            <span class="pill">Logro</span>
+          </div>
+        </button>
+      `).join("");
+    }
+
+    function updateHud() {
+      document.getElementById("scoreValue").textContent = String(score);
+      document.getElementById("matchesValue").textContent = `${matches.length}/6`;
+      document.getElementById("hintValue").textContent = String(hintsUsed);
+    }
+
+    function showFeedback(type, text) {
+      feedback.className = `feedback ${type}`;
+      feedback.textContent = text;
+    }
+
+    function clearSelections() {
+      selectedTerm = null;
+      selectedDefinition = null;
+      document.querySelectorAll(".card-button").forEach((button) => {
+        if (button.dataset.locked !== "true") {
+          button.dataset.selected = "false";
+        }
+      });
+    }
+
+    function lockMatch(term) {
+      document.querySelectorAll(`[data-term="${CSS.escape(term)}"]`).forEach((button) => {
+        button.dataset.locked = "true";
+        button.dataset.selected = "false";
+      });
+    }
+
+    function openCelebration() {
+      document.getElementById("celebrationText").textContent = `Cerraste los 6 emparejamientos con ${score} puntos y ${hintsUsed} pistas.`;
+      celebration.dataset.open = "true";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function tryMatch() {
+      if (!selectedTerm || !selectedDefinition) return;
+      if (selectedTerm === selectedDefinition) {
+        matches.push(selectedTerm);
+        score += 10;
+        lockMatch(selectedTerm);
+        showFeedback("good", "Correcto. Esa figura sí coincide con ese aporte histórico.");
+        if (matches.length === gameData.length) {
+          updateHud();
+          setTimeout(openCelebration, 500);
+        }
+      } else {
+        showFeedback("warn", "No va por ahí. Revisa el aporte histórico antes de intentar otra vez.");
+      }
+      clearSelections();
+      updateHud();
+    }
+
+    function resetGame() {
+      selectedTerm = null;
+      selectedDefinition = null;
+      matches = [];
+      score = 0;
+      hintsUsed = 0;
+      celebration.dataset.open = "false";
+      renderGame();
+      updateHud();
+      showFeedback("good", "Partida reiniciada. Elige primero una leyenda y luego su logro.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function giveHint() {
+      const remaining = gameData.find((item) => !matches.includes(item.term));
+      if (!remaining) return;
+      hintsUsed += 1;
+      updateHud();
+      showFeedback("warn", `Pista: piensa en ${remaining.term} y en el periodo ${remaining.era}.`);
+    }
+
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest(".card-button");
+      if (!button || button.dataset.locked === "true") return;
+      if (button.dataset.type === "term") {
+        selectedTerm = button.dataset.term;
+      } else {
+        selectedDefinition = button.dataset.term;
+      }
+      document.querySelectorAll(`.card-button[data-type="${button.dataset.type}"]`).forEach((item) => {
+        if (item.dataset.locked !== "true") {
+          item.dataset.selected = "false";
+        }
+      });
+      button.dataset.selected = "true";
+      tryMatch();
+    });
+
+    document.getElementById("hintBtn").addEventListener("click", giveHint);
+    document.getElementById("resetBtn").addEventListener("click", resetGame);
+    document.getElementById("playAgainBtn").addEventListener("click", resetGame);
+    document.getElementById("closeModalBtn").addEventListener("click", () => {
+      celebration.dataset.open = "false";
+      document.querySelector(".footer-card").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    renderGame();
+    updateHud();
+    showFeedback("good", "Elige una figura y luego el logro que mejor la representa.");
+  </script>
+</body>
+</html>

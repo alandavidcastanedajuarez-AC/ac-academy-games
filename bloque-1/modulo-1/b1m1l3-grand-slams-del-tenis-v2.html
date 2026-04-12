@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grand Slams del Tenis: mapa mundial</title>
+  <style>
+    :root {
+      --bg: #eef5fb;
+      --surface: rgba(255, 255, 255, 0.94);
+      --ink: #1c3142;
+      --muted: #607180;
+      --line: #d5e0ea;
+      --grass: #2f8a4d;
+      --clay: #c45e39;
+      --hard: #2e64c4;
+      --shadow: 0 18px 38px rgba(28, 49, 66, 0.12);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(46, 100, 196, 0.16), transparent 28%),
+        linear-gradient(180deg, var(--bg) 0%, #ffffff 100%);
+    }
+    .page {
+      width: min(1080px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+    .hero, .world-strip, .slam-grid, .detail-panel, .closing {
+      background: var(--surface);
+      border: 1px solid rgba(213, 224, 234, 0.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero, .world-strip, .detail-panel, .closing { padding: 22px; }
+    .hero { margin-bottom: 18px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(46, 100, 196, 0.1);
+      color: var(--hard);
+      font-size: 0.84rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(2rem, 5vw, 3rem);
+      line-height: 1.05;
+    }
+    .hero p, .world-strip p, .closing p { margin: 0; color: var(--muted); line-height: 1.62; }
+    .world-strip { margin-bottom: 18px; }
+    .hero-points {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .hero-points article {
+      background: #fff;
+      border: 1px solid rgba(213, 224, 234, 0.9);
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .hero-points strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .hero-points p {
+      font-size: 0.94rem;
+    }
+    .strip-points {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .point {
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid rgba(213, 224, 234, 0.9);
+      padding: 14px;
+      min-height: 100%;
+    }
+    .point strong { display: block; margin-bottom: 5px; }
+    .point small { color: var(--muted); display: block; line-height: 1.4; }
+    .point .surface {
+      display: inline-flex;
+      margin-top: 8px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .surface.grass { background: var(--grass); }
+    .surface.clay { background: var(--clay); }
+    .surface.hard { background: var(--hard); }
+    .section-head { margin: 18px 0 12px; }
+    .section-head h2 { margin: 0 0 6px; font-size: 1.35rem; }
+    .section-head p { margin: 0; color: var(--muted); }
+    .slam-grid {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .slam-card {
+      background: #fff;
+      border: 1px solid rgba(213, 224, 234, 0.9);
+      border-radius: 20px;
+      padding: 18px;
+      display: grid;
+      gap: 10px;
+    }
+    .slam-card h3 { margin: 0; font-size: 1.15rem; }
+    .slam-card p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; }
+    .meta span {
+      display: inline-flex;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(28, 49, 66, 0.08);
+      color: var(--ink);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .slam-card button, .closing button {
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-weight: 800;
+    }
+    .slam-card button {
+      background: linear-gradient(135deg, #153968, #2e64c4);
+      color: #f3f8ff;
+      width: fit-content;
+    }
+    .detail-panel { margin-top: 18px; display: none; }
+    .detail-panel[data-open="true"] { display: block; }
+    .detail-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 16px;
+    }
+    .detail-top h3 { margin: 0 0 6px; font-size: 1.45rem; }
+    .detail-top p { margin: 0; color: var(--muted); }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 14px;
+    }
+    .detail-block {
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid rgba(213, 224, 234, 0.9);
+      padding: 16px;
+    }
+    .detail-block strong { display: block; margin-bottom: 8px; }
+    .detail-block p, .detail-block li { color: var(--muted); line-height: 1.58; }
+    .detail-block ul { margin: 0; padding-left: 18px; }
+    .closing { margin-top: 18px; }
+    .closing-grid {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .closing-grid article {
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid rgba(213, 224, 234, 0.9);
+      padding: 16px;
+    }
+    .closing-grid strong { display: block; margin-bottom: 6px; }
+    .closing button {
+      margin-top: 16px;
+      background: rgba(28, 49, 66, 0.08);
+      color: var(--ink);
+    }
+    @media (max-width: 900px) {
+      .hero-points, .slam-grid, .detail-grid, .closing-grid { grid-template-columns: 1fr; }
+      .strip-points { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .detail-top { flex-direction: column; }
+      .slam-card button { width: 100%; }
+    }
+    @media (max-width: 640px) {
+      .page { width: min(100% - 20px, 1080px); padding: 16px 0 32px; }
+      .hero, .world-strip, .slam-grid, .detail-panel, .closing { padding: 18px; border-radius: 20px; }
+      .strip-points { grid-template-columns: 1fr; }
+      .point, .slam-card, .detail-block, .closing-grid article { padding: 14px; }
+      .detail-panel button, .closing button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <span class="eyebrow">Módulo 1 · Los 4 grandes</span>
+      <h1>Un viaje rápido por los Grand Slams</h1>
+      <p>Este juego ya no depende de un mapa difícil de tocar en móvil. Primero ves la ruta mundial y luego abres el torneo que quieras explorar con más calma.</p>
+      <div class="hero-points">
+        <article>
+          <strong>4 torneos, 1 vuelta al mundo</strong>
+          <p>Ubica rápido dónde se juega cada uno y en qué parte del calendario aparece.</p>
+        </article>
+        <article>
+          <strong>Superficies que cambian el juego</strong>
+          <p>Entiende por qué no se compite igual en pasto, arcilla o pista dura.</p>
+        </article>
+        <article>
+          <strong>Lectura corta</strong>
+          <p>Se abre un detalle por vez para que el recorrido no se vuelva pesado en teléfono.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="world-strip">
+      <h2 style="margin:0 0 8px;">La vuelta al mundo del tenis</h2>
+      <p>Arranca en Australia, cruza a Europa, sube al Reino Unido y termina en Nueva York.</p>
+      <div class="strip-points">
+        <div class="point"><strong>Melbourne</strong><small>Australian Open · Enero-Febrero</small><span class="surface hard">Pista dura</span></div>
+        <div class="point"><strong>París</strong><small>Roland Garros · Mayo-Junio</small><span class="surface clay">Arcilla</span></div>
+        <div class="point"><strong>Londres</strong><small>Wimbledon · Junio-Julio</small><span class="surface grass">Pasto</span></div>
+        <div class="point"><strong>Nueva York</strong><small>US Open · Agosto-Septiembre</small><span class="surface hard">Pista dura</span></div>
+      </div>
+    </section>
+
+    <div class="section-head">
+      <h2>Explora un torneo</h2>
+      <p>Cuando eliges uno sí hacemos scroll al panel de detalle, porque cambia por completo la pantalla central.</p>
+    </div>
+
+    <section class="slam-grid" id="slamGrid"></section>
+    <section class="detail-panel" id="detailPanel" data-open="false"></section>
+
+    <section class="closing">
+      <h2>Qué conviene recordar</h2>
+      <p>No todos los Grand Slams se juegan igual, y eso cambia ritmo, bote y exigencia física.</p>
+      <div class="closing-grid">
+        <article><strong>Pasto</strong>El juego tiende a ser más rápido y con bote más bajo.</article>
+        <article><strong>Arcilla</strong>La pelota frena más y favorece intercambios largos.</article>
+        <article><strong>Dura</strong>Ofrece un equilibrio más neutro entre potencia y control.</article>
+      </div>
+      <button type="button" id="backTop">Volver al inicio del recorrido</button>
+    </section>
+  </main>
+
+  <script>
+    const slams = [
+      { key: "australian-open", name: "Australian Open", city: "Melbourne, Australia", surface: "Pista dura", season: "Enero - Febrero", founded: "1905", description: "Abre el año y suele marcar el tono competitivo del calendario.", facts: ["Se le conoce como el Happy Slam por su ambiente relajado.", "El calor extremo puede cambiar mucho las condiciones.", "Djokovic domina gran parte de su historia reciente."], learning: "Ayuda a entender cómo una pista dura puede ser exigente sin llegar a sentirse tan extrema como el césped o la arcilla." },
+      { key: "roland-garros", name: "Roland Garros", city: "París, Francia", surface: "Arcilla", season: "Mayo - Junio", founded: "1891", description: "Es el examen grande de paciencia, piernas y construcción del punto.", facts: ["Es el único Grand Slam sobre arcilla roja.", "Nadal lo convirtió en territorio histórico.", "El bote alto y el deslizamiento cambian la táctica."], learning: "Muestra por qué la arcilla premia la resistencia, el control y la lectura del intercambio." },
+      { key: "wimbledon", name: "Wimbledon", city: "Londres, Inglaterra", surface: "Pasto", season: "Junio - Julio", founded: "1877", description: "Es el torneo más tradicional del tenis y el más ligado a su historia.", facts: ["Es el único Grand Slam sobre pasto.", "La ropa blanca sigue siendo parte de su identidad.", "El bote bajo acelera decisiones y tiempos."], learning: "Enseña cómo una superficie rápida obliga a resolver antes y a atacar con más convicción." },
+      { key: "us-open", name: "US Open", city: "Nueva York, Estados Unidos", surface: "Pista dura", season: "Agosto - Septiembre", founded: "1881", description: "Es el Grand Slam más eléctrico por ambiente, horarios y energía del público.", facts: ["Su ambiente nocturno es de los más intensos.", "Ofrece uno de los premios más altos del tenis.", "La pista dura aquí se asocia con ritmo alto."], learning: "Sirve para ver que una pista dura también cambia según el entorno, el clima y la velocidad concreta de la cancha." }
+    ];
+
+    const slamGrid = document.getElementById("slamGrid");
+    const detailPanel = document.getElementById("detailPanel");
+
+    function renderCards() {
+      slamGrid.innerHTML = slams.map((slam) => `
+        <article class="slam-card">
+          <div class="meta"><span>${slam.city}</span><span>${slam.season}</span></div>
+          <h3>${slam.name}</h3>
+          <p>${slam.description}</p>
+          <div class="meta"><span>${slam.surface}</span><span>Fundado en ${slam.founded}</span></div>
+          <button type="button" data-key="${slam.key}">Explorar torneo</button>
+        </article>
+      `).join("");
+    }
+
+    function renderDetail(key) {
+      const slam = slams.find((item) => item.key === key);
+      if (!slam) return;
+      detailPanel.dataset.open = "true";
+      detailPanel.innerHTML = `
+        <div class="detail-top">
+          <div>
+            <h3>${slam.name}</h3>
+            <p>${slam.city} · ${slam.season} · ${slam.surface}</p>
+          </div>
+          <button type="button" id="closeDetail" style="border:0;border-radius:999px;padding:10px 16px;background:rgba(28,49,66,0.08);cursor:pointer;font:inherit;font-weight:700;color:var(--ink);">Cerrar detalle</button>
+        </div>
+        <div class="detail-grid">
+          <article class="detail-block">
+            <strong>Qué define a este Grand Slam</strong>
+            <p>${slam.description}</p>
+            <p style="margin-top:10px;">${slam.learning}</p>
+          </article>
+          <article class="detail-block">
+            <strong>3 datos que sí conviene recordar</strong>
+            <ul>${slam.facts.map((fact) => `<li>${fact}</li>`).join("")}</ul>
+          </article>
+        </div>
+      `;
+      detailPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById("closeDetail").addEventListener("click", () => {
+        detailPanel.dataset.open = "false";
+        detailPanel.innerHTML = "";
+        document.querySelector(".closing").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+
+    slamGrid.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-key]");
+      if (!button) return;
+      renderDetail(button.dataset.key);
+    });
+
+    document.getElementById("backTop").addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    renderCards();
+  </script>
+</body>
+</html>

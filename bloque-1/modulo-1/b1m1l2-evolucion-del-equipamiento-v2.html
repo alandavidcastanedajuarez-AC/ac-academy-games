@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Evolucion del Equipamiento en el Tenis</title>
+  <style>
+    :root {
+      --bg: #eef4f1;
+      --surface: rgba(255, 255, 255, 0.92);
+      --ink: #17313a;
+      --muted: #607680;
+      --line: #d0dde1;
+      --accent: #cf6a3d;
+      --shadow: 0 16px 32px rgba(23, 49, 58, 0.12);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(31, 122, 111, 0.12), transparent 28%),
+        linear-gradient(180deg, var(--bg) 0%, #ffffff 100%);
+    }
+    .page {
+      width: min(1080px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+    .hero, .selector, .comparison, .summary {
+      background: var(--surface);
+      border: 1px solid rgba(208, 221, 225, 0.88);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero, .comparison, .summary { padding: 22px; }
+    .hero { margin-bottom: 20px; }
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #0b5d54;
+      background: rgba(31, 122, 111, 0.11);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(2rem, 5vw, 3rem);
+      line-height: 1.04;
+    }
+    .hero p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      line-height: 1.62;
+    }
+    .hero-grid {
+      margin-top: 18px;
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .hero-grid article {
+      background: #fff;
+      border: 1px solid rgba(208, 221, 225, 0.88);
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .hero-grid strong { display: block; margin-bottom: 4px; }
+    .section-head { margin: 18px 0 12px; }
+    .section-head h2 { margin: 0 0 6px; font-size: 1.35rem; }
+    .section-head p { margin: 0; color: var(--muted); }
+    .selector {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .selector button, .cta-row button { border: 0; cursor: pointer; font: inherit; }
+    .selector button {
+      text-align: left;
+      padding: 16px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid rgba(208, 221, 225, 0.88);
+      color: inherit;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .selector button[data-active="true"] {
+      border-color: rgba(207, 106, 61, 0.5);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(207, 106, 61, 0.12);
+    }
+    .selector-title { display: block; font-weight: 800; margin-bottom: 6px; }
+    .selector-text { color: var(--muted); line-height: 1.5; font-size: 0.95rem; }
+    .comparison { margin-top: 18px; }
+    .comparison-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .comparison-head h3 { margin: 0 0 4px; font-size: 1.3rem; }
+    .comparison-head p { margin: 0; color: var(--muted); }
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .era-card {
+      border-radius: 20px;
+      padding: 18px;
+      color: #11242a;
+      min-height: 100%;
+    }
+    .era-card.ayer { background: linear-gradient(180deg, #fff0dd 0%, #ffe3c7 100%); }
+    .era-card.hoy { background: linear-gradient(180deg, #e7f5f0 0%, #d4efe8 100%); }
+    .era-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+    .era-badge {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      background: rgba(17, 36, 42, 0.08);
+    }
+    .era-card h4 { margin: 0; font-size: 1.15rem; }
+    .era-card ul { margin: 0; padding-left: 18px; line-height: 1.65; }
+    .insight {
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(57, 92, 200, 0.08), rgba(31, 122, 111, 0.1));
+      border: 1px solid rgba(57, 92, 200, 0.14);
+      color: var(--muted);
+      line-height: 1.58;
+    }
+    .insight strong { display: block; color: var(--ink); margin-bottom: 6px; }
+    .summary { margin-top: 18px; }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .summary-item {
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid rgba(208, 221, 225, 0.88);
+      padding: 16px;
+    }
+    .summary-item strong { display: block; margin-bottom: 6px; }
+    .summary-item p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .cta-row {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .cta-row button {
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), #ad4b21);
+      color: #fffaf5;
+    }
+    .cta-row button.secondary {
+      background: rgba(23, 49, 58, 0.08);
+      color: var(--ink);
+    }
+    @media (max-width: 860px) {
+      .hero-grid, .selector, .comparison-grid, .summary-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .page { width: min(100% - 20px, 1080px); padding: 16px 0 32px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <span class="eyebrow">Módulo 1 · Tecnología y evolución</span>
+      <h1>Cómo cambió el equipamiento del tenis</h1>
+      <p>Aquí no hace falta leer un catálogo eterno. Elige una categoría, compara antes y ahora, y quédate solo con el cambio que más impactó en el juego moderno.</p>
+      <div class="hero-grid">
+        <article><strong>3 categorías</strong>Raquetas, pelotas y calzado.</article>
+        <article><strong>Lectura rápida</strong>El panel cambia completo cuando eliges una categoría.</article>
+        <article><strong>Enfoque móvil</strong>Se evita el layout de escritorio con panel sticky.</article>
+      </div>
+    </section>
+
+    <div class="section-head">
+      <h2>Elige qué comparar</h2>
+      <p>Cuando cambias de categoría sí subimos al inicio del panel, porque cambia el contexto principal.</p>
+    </div>
+
+    <section class="selector" id="selector"></section>
+    <section class="comparison" id="comparisonPanel"></section>
+
+    <section class="summary">
+      <h2>Qué aprendizaje deja este juego</h2>
+      <div class="summary-grid">
+        <article class="summary-item"><strong>La herramienta sí importa</strong><p>Los materiales cambiaron la velocidad, el control y la seguridad del jugador.</p></article>
+        <article class="summary-item"><strong>No todo evolucionó al mismo tiempo</strong><p>Raquetas, pelotas y calzado crecieron por razones distintas, pero con un mismo objetivo: rendimiento más confiable.</p></article>
+        <article class="summary-item"><strong>La tecnología modifica la táctica</strong><p>Cuando el equipamiento mejora, también cambia la manera de competir y entrenar.</p></article>
+      </div>
+      <div class="cta-row">
+        <button type="button" id="startWithRackets">Ver primero raquetas</button>
+        <button type="button" class="secondary" id="showSummaryBtn">Recordar el resumen</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const categories = [
+      {
+        key: "racket",
+        label: "Raquetas",
+        blurb: "De madera pesada a materiales ligeros y mucho más potentes.",
+        old: { title: "Raqueta antigua", badge: "Ayer", items: ["Madera maciza y mucho más peso.", "Cabeza pequeña y punto de impacto reducido.", "Menor potencia y menos absorción de vibraciones."] },
+        current: { title: "Raqueta moderna", badge: "Hoy", items: ["Grafito, carbono y combinaciones más ligeras.", "Cabeza más amplia y mayor tolerancia al error.", "Más potencia, mejor control y menos vibración."] },
+        insight: "La evolución de la raqueta cambió la forma de golpear y también el ritmo del tenis moderno: hoy se puede generar más velocidad sin perder tanta estabilidad."
+      },
+      {
+        key: "ball",
+        label: "Pelotas",
+        blurb: "De rebotes irregulares a una experiencia más consistente y estandarizada.",
+        old: { title: "Pelota antigua", badge: "Ayer", items: ["Rellenos y materiales menos estables.", "Rebote más impredecible.", "Menor durabilidad y menor consistencia."] },
+        current: { title: "Pelota moderna", badge: "Hoy", items: ["Presurización y caucho más controlados.", "Rebote más uniforme y fácil de medir.", "Estandarización para torneos y entrenamiento."] },
+        insight: "Cuando la pelota se vuelve más consistente, el jugador puede construir mejor sus patrones, ajustar tiempos y entrenar con referencias más fiables."
+      },
+      {
+        key: "shoe",
+        label: "Calzado",
+        blurb: "De zapatos genéricos a modelos pensados según la superficie.",
+        old: { title: "Calzado tradicional", badge: "Ayer", items: ["Poca sujeción lateral para frenadas y cambios de dirección.", "Una sola idea de suela para casi todo.", "Menor amortiguación y menos protección."] },
+        current: { title: "Calzado especializado", badge: "Hoy", items: ["Suela adaptada a arcilla, césped o pista dura.", "Mayor soporte lateral y mejor tracción.", "Amortiguación y estabilidad pensadas para competir."] },
+        insight: "El calzado moderno no solo mejora el rendimiento: también reduce desgaste innecesario y ayuda a cuidar el cuerpo a largo plazo."
+      }
+    ];
+
+    const selectorEl = document.getElementById("selector");
+    const comparisonPanel = document.getElementById("comparisonPanel");
+    let activeKey = "racket";
+
+    function renderSelector() {
+      selectorEl.innerHTML = categories.map((category) => `
+        <button type="button" data-key="${category.key}" data-active="${category.key === activeKey}">
+          <span class="selector-title">${category.label}</span>
+          <span class="selector-text">${category.blurb}</span>
+        </button>
+      `).join("");
+    }
+
+    function renderComparison() {
+      const category = categories.find((item) => item.key === activeKey);
+      comparisonPanel.innerHTML = `
+        <div class="comparison-head">
+          <div>
+            <h3>${category.label}: antes y ahora</h3>
+            <p>${category.blurb}</p>
+          </div>
+        </div>
+        <div class="comparison-grid">
+          <article class="era-card ayer">
+            <div class="era-top">
+              <h4>${category.old.title}</h4>
+              <span class="era-badge">${category.old.badge}</span>
+            </div>
+            <ul>${category.old.items.map((item) => `<li>${item}</li>`).join("")}</ul>
+          </article>
+          <article class="era-card hoy">
+            <div class="era-top">
+              <h4>${category.current.title}</h4>
+              <span class="era-badge">${category.current.badge}</span>
+            </div>
+            <ul>${category.current.items.map((item) => `<li>${item}</li>`).join("")}</ul>
+          </article>
+        </div>
+        <div class="insight"><strong>Qué conviene llevarte de esta comparación</strong>${category.insight}</div>
+      `;
+    }
+
+    function setCategory(key, shouldScroll = false) {
+      activeKey = key;
+      renderSelector();
+      renderComparison();
+      if (shouldScroll) {
+        comparisonPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    selectorEl.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-key]");
+      if (!button) return;
+      const nextKey = button.dataset.key;
+      if (nextKey === activeKey) return;
+      setCategory(nextKey, true);
+    });
+
+    document.getElementById("startWithRackets").addEventListener("click", () => setCategory("racket", true));
+    document.getElementById("showSummaryBtn").addEventListener("click", () => {
+      document.querySelector(".summary").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    renderSelector();
+    renderComparison();
+  </script>
+</body>
+</html>
